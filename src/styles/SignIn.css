@@ -1,0 +1,16 @@
+.signin-page {
+  background-color: #3f51b5;
+  height: 100vh;
+  display: flex;
+}
+
+.signin-form {
+  width: 300px;
+  margin: auto;
+  padding: 2rem;
+  text-align: center;
+}
+.signin-form .form-field {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
