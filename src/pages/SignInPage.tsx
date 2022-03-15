@@ -4,19 +4,30 @@ import React, { useContext } from "react";
 import { FormField } from "../components/utils/FormField";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import "../styles/SignIn.css";
-import { ISignIn, signIn } from "../logic/auth.logic";
+import { ISignIn } from "../logic/auth.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import RFI_Logo from "../resources/rfi_logo_R.svg";
 
-export const SignIn: React.FC = () => {
+export const SignInPage: React.FC = () => {
   const auth = useContext(AuthContext);
   const navigate = useNavigate();
 
   return (
-    <div>
-      <Card className="signin-form" elevation={0}>
+    <Card
+      className="signin-page"
+      sx={{
+        width: "100vw",
+        height: "100vh",
+        borderRadius: 0,
+        display: "flex",
+      }}
+    >
+      <Card className="signin-form" variant="outlined">
+        <img src={RFI_Logo} alt="RFI Logo" width={100} height={100} />
         <Typography variant="h5">Sign In</Typography>
         <Formik
+          enableReinitialize
           initialValues={{
             username: "test",
             password: "test1",
@@ -61,6 +72,6 @@ export const SignIn: React.FC = () => {
           )}
         </Formik>
       </Card>
-    </div>
+    </Card>
   );
 };

@@ -1,5 +1,5 @@
 import React from "react";
-import { useLocation, Navigate } from "react-router-dom";
+import { useLocation, Navigate, useNavigate } from "react-router-dom";
 
 import { ISignIn, signIn } from "../../logic/auth.logic";
 
@@ -7,6 +7,7 @@ interface AuthContextType {
   token: any;
   signin: (user: ISignIn, callback: VoidFunction) => void;
   signout: (callback: VoidFunction) => void;
+  loadLocalToken: (callback: VoidFunction) => void;
 }
 
 export let AuthContext = React.createContext<AuthContextType>(null!);
@@ -14,21 +15,31 @@ export let AuthContext = React.createContext<AuthContextType>(null!);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   let [token, setToken] = React.useState<any>(null);
 
-  let signin = (user: ISignIn, callback: VoidFunction) => {
+  const loadLocalToken = (callback: VoidFunction) => {
+    const local_token = localStorage.getItem("auth_token");
+    console.log(local_token);
+
+    if (local_token) {
+      setToken(local_token);
+      callback();
+    }
+  };
+
+  const signin = (user: ISignIn, callback: VoidFunction) => {
     return signIn(user, (data: any) => {
       setToken(data.token);
       callback();
     });
   };
 
-  let signout = (callback: VoidFunction) => {
+  const signout = (callback: VoidFunction) => {
     // return fakeAuthProvider.signout(() => {
     //   setUser(null);
     //   callback();
     // });
   };
 
-  let value = { token, signin, signout };
+  let value = { token, loadLocalToken, signin, signout };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
@@ -40,8 +51,12 @@ function useAuth() {
 export const RequireAuth = ({ children }: { children: JSX.Element }) => {
   let auth = useAuth();
   let location = useLocation();
+  const navigate = useNavigate();
 
   if (!auth.token) {
+    auth.loadLocalToken(() => {
+      navigate("/batching");
+    });
     // Redirect them to the /login page, but save the current location they were
     // trying to go to when they were redirected. This allows us to send them
     // along to that page after they login, which is a nicer user experience
