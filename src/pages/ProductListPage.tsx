@@ -1,18 +1,61 @@
 import React from "react";
 import { DataTable } from "../components/utils/DataTable";
-import { GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
+import {
+  GridColDef,
+  GridRenderCellParams,
+  GridValueGetterParams,
+} from "@mui/x-data-grid";
 import { listProducts, ProductStatus } from "../logic/product.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
-
-const columns: GridColDef[] = [
-  // { field: "id", headerName: "ID", width: 300 },
-  { field: "product_code", headerName: "Product Code", width: 150 },
-  { field: "name", headerName: "Name", width: 250 },
-  { field: "status", headerName: "Status", type: "string", width: 200 },
-  { field: "cost", headerName: "Cost", type: "number", width: 150 },
-];
+import { Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const ProductListPage = () => {
+  const navigate = useNavigate();
+
+  const columns: GridColDef[] = [
+    // { field: "id", headerName: "ID", width: 300 },
+    { field: "product_code", headerName: "Product Code", width: 200 },
+    { field: "status", headerName: "Status", type: "string", width: 200 },
+    {
+      field: "approved_version",
+      headerName: "Approved Version",
+      width: 200,
+    },
+    { field: "cost", headerName: "Cost", width: 200 },
+    {
+      field: "id",
+      headerName: "Actions",
+      align: "left",
+      width: 250,
+      renderCell: (params: GridRenderCellParams<Date>) => (
+        <strong>
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={() =>
+              navigate(`/products/${params.value}`, { replace: false })
+            }
+          >
+            View Details
+          </Button>
+          <Button
+            variant="outlined"
+            color="primary"
+            size="small"
+            style={{ marginLeft: 16 }}
+            onClick={() =>
+              navigate(`/products/${params.value}`, { replace: false })
+            }
+          >
+            Formula
+          </Button>
+        </strong>
+      ),
+    },
+  ];
+
   const auth = React.useContext(AuthContext);
   const [rows, setRows] = React.useState<any>(null);
 
@@ -22,8 +65,8 @@ const ProductListPage = () => {
         return {
           id: product._id,
           product_code: product.product_code,
-          name: product.name,
-          cost: product.cost,
+          approved_version: product.approved_version,
+          cost: `$${product.cost}`,
           status: ProductStatus[product.status - 1][0],
         };
       });

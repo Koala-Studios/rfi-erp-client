@@ -12,6 +12,7 @@ import AuthProvider, {
 import BatchingListPage from "./pages/BatchingListPage";
 import { Navbar } from "./components/navigation/Navbar";
 import ProductListPage from "./pages/ProductListPage";
+import { ProductDetailPage } from "./pages/ProductDetailPage";
 
 const mainTheme = createTheme({
   palette: {
@@ -57,6 +58,16 @@ function App() {
                 <RequireAuth>
                   <Navbar>
                     <ProductListPage />
+                  </Navbar>
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/products/:id"
+              element={
+                <RequireAuth>
+                  <Navbar>
+                    <ProductDetailPage />
                   </Navbar>
                 </RequireAuth>
               }

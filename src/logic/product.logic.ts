@@ -11,13 +11,13 @@ export const ProductStatus = [
 
 export interface IProduct {
     _id:string;
-    product_id: string;
 	product_code:string;
-    cost: number;
+	versions:number,
+	approved_version:number,
+	cost: number;
     date_created: Date;
-    name: string;
     status: number;
-  }
+}
 
 const api = axios.create({
 	baseURL: "http://localhost:5000/products",
@@ -50,4 +50,31 @@ export const listProducts = async (
 		});
 
 	return batches;
+};
+
+export const getProduct = async (
+    token:string,
+    id:string
+): Promise<IProduct | null> => {
+	const config = {
+		headers: { Authorization: `Bearer ${token}` },
+		params: {
+			id:id
+		},
+	};
+
+	let product: IProduct | null = null;
+
+	await api
+		.get("/get", config)
+		.then((res) => {
+			if (res.status === apiStatus.OK) {
+				product = res.data;
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	return product;
 };
