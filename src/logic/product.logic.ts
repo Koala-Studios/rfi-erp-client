@@ -12,6 +12,7 @@ export const ProductStatus = [
 export interface IProduct {
     _id:string;
 	product_code:string;
+	name:string;
 	versions:number,
 	approved_version:number,
 	cost: number;

@@ -19,7 +19,8 @@ export const ProductDetailPage = () => {
 
   return (
     <Card variant="outlined" sx={{ padding: 3 }}>
-      <Typography variant="h6">Product Code: {product.product_code}</Typography>
+    <Typography variant="h6">Product Code: {product.product_code}</Typography>
+      <Typography variant="h6">Product Name: {product.name}</Typography>
       <Typography variant="h6">
         Approved Version: {product.approved_version}
       </Typography>
