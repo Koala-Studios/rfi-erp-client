@@ -257,9 +257,12 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
               >
                 {item.icon}
                 <ListItemText
+                  primaryTypographyProps={{
+                    color: location.pathname === item.link ? "#fff" : "#b2bac2",
+                    fontWeight: "500",
+                  }}
                   primary={item.text}
                   sx={{
-                    fontWeight: "medium",
                     marginLeft: 2,
                   }}
                 />
