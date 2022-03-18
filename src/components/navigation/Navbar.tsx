@@ -105,6 +105,7 @@ interface AppBarProps extends MuiAppBarProps {
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })<AppBarProps>(({ theme, open }) => ({
+  boxShadow: "0 0 11px 0 #0000004f",
   backgroundColor: "white",
   color: "black",
   borderBottom: "1px solid #c9c9c9",
