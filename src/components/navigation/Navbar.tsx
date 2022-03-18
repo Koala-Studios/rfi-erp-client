@@ -31,7 +31,7 @@ import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
 import BiotechIcon from "@mui/icons-material/Biotech";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import InventoryIcon from "@mui/icons-material/Inventory";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 
 const drawerWidth = 240;
 
@@ -139,6 +139,7 @@ interface Props {
 }
 
 export const Navbar: React.FC<Props> = ({ title, children }) => {
+  let location = useLocation();
   const theme = useTheme();
   const [open, setOpen] = React.useState(true);
 
@@ -208,7 +209,18 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
           />
           {LinkItems.map((item, index) => (
             <Link to={item.link}>
-              <ListItem button key={index}>
+              <ListItem
+                button
+                key={index}
+                sx={{
+                  background:
+                    location.pathname === item.link ? "#0c3467" : "#020818",
+                  transition: "400ms",
+                  "&:hover": {
+                    background: "#061e3d",
+                  },
+                }}
+              >
                 {item.icon}
                 <ListItemText
                   primary={item.text}
