@@ -24,7 +24,7 @@ const CustomToolbar = () => {
 
 export const DataTable: React.FC<Props> = ({ rows, columns }) => {
   return (
-    <div style={{ height: 850, width: "100%" }}>
+    <div style={{ height: "calc(90vh - 64px)", width: "100%" }}>
       <DataGrid
         rows={rows}
         columns={columns}
