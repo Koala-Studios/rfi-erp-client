@@ -1,4 +1,5 @@
 body {
+  background-color: #ededed !important;
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
     "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
@@ -15,4 +16,8 @@ code {
 a {
   text-decoration: none !important;
   color: unset;
+}
+
+.MuiDataGrid-root {
+  background-color: white;
 }
