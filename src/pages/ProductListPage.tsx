@@ -17,7 +17,6 @@ const ProductListPage = () => {
     // { field: "id", headerName: "ID", width: 300 },
     { field: "product_code", headerName: "Product Code", width: 200 },
     { field: "name", headerName: "Product Name", width: 250 },
-    { field: "status", headerName: "Status", type: "string", width: 200 },
     {
       field: "approved_version",
       headerName: "Approved Version",
@@ -69,7 +68,6 @@ const ProductListPage = () => {
           name: product.name,
           approved_version: product.approved_version,
           cost: `$${product.cost}`,
-          status: ProductStatus[product.status - 1][0],
         };
       });
       setRows(newRows);

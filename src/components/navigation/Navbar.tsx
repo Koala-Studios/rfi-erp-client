@@ -52,8 +52,13 @@ const LinkItems = [
     icon: <InventoryIcon></InventoryIcon>,
   },
   {
+    text: "Forecast",
+    link: "/forecast",
+    icon: <BiotechIcon></BiotechIcon>,
+  },
+  {
     text: "Purchase Orders",
-    link: "/products",
+    link: "/purchase-orders",
     icon: <ShoppingBasketIcon></ShoppingBasketIcon>,
   },
   {
@@ -63,13 +68,8 @@ const LinkItems = [
   },
   {
     text: "Stock Count",
-    link: "/stockcount",
+    link: "/stock-count",
     icon: <ContentPasteIcon></ContentPasteIcon>,
-  },
-  {
-    text: "Forecast",
-    link: "/forecast",
-    icon: <BiotechIcon></BiotechIcon>,
   },
   {
     text: "Users",
@@ -87,6 +87,7 @@ const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
+  marginTop: 64,
   marginLeft: `-${drawerWidth}px`,
   ...(open && {
     transition: theme.transitions.create("margin", {
@@ -104,6 +105,9 @@ interface AppBarProps extends MuiAppBarProps {
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })<AppBarProps>(({ theme, open }) => ({
+  backgroundColor: "white",
+  color: "black",
+  borderBottom: "1px solid #c9c9c9",
   transition: theme.transitions.create(["margin", "width"], {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
@@ -125,9 +129,15 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   // necessary for content to be below app bar
   ...theme.mixins.toolbar,
   justifyContent: "flex-end",
+  backgroundColor: "#061e3d",
+  color: "white",
 }));
 
-export const Navbar: React.FC = ({ children }) => {
+interface Props {
+  title: string;
+}
+
+export const Navbar: React.FC<Props> = ({ title, children }) => {
   const theme = useTheme();
   const [open, setOpen] = React.useState(true);
 
@@ -153,9 +163,9 @@ export const Navbar: React.FC = ({ children }) => {
           >
             <MenuIcon />
           </IconButton>
-          {/* <Typography variant="h6" noWrap component="div">
-            Persistent drawer
-          </Typography> */}
+          <Typography variant="h6" noWrap component="div">
+            {title}
+          </Typography>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -173,7 +183,7 @@ export const Navbar: React.FC = ({ children }) => {
       >
         <DrawerHeader>
           <img src={RFI_Logo} alt="RFI Logo" width={200} height={60} />
-          <IconButton onClick={handleDrawerClose}>
+          <IconButton onClick={handleDrawerClose} color="secondary">
             {theme.direction === "ltr" ? (
               <ChevronLeftIcon />
             ) : (
@@ -181,9 +191,20 @@ export const Navbar: React.FC = ({ children }) => {
             )}
           </IconButton>
         </DrawerHeader>
-        <Divider />
-        <Divider />
-        <List>
+
+        <List
+          sx={{
+            backgroundColor: "#020818",
+            color: "white",
+            height: "100%",
+            paddingTop: 0,
+          }}
+        >
+          <Divider
+            sx={{
+              borderColor: "#ffffff36",
+            }}
+          />
           {LinkItems.map((item, index) => (
             <Link to={item.link}>
               <ListItem button key={index}>
@@ -196,7 +217,11 @@ export const Navbar: React.FC = ({ children }) => {
                   }}
                 />
               </ListItem>
-              <Divider />
+              <Divider
+                sx={{
+                  borderColor: "#ffffff36",
+                }}
+              />
             </Link>
           ))}
         </List>

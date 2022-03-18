@@ -4,11 +4,13 @@ import apiStatus from "./apiStatus";
 export interface IFormula {
   _id: string;
   product_code: string;
+  product_id: string;
   version: number;
   date_created: Date;
   formula_items: [
     {
       material_code: string;
+      material_id: string;//inventory
       amount: number;
       notes: string;
     }

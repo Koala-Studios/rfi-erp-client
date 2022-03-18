@@ -13,15 +13,15 @@ import BatchingListPage from "./pages/BatchingListPage";
 import { Navbar } from "./components/navigation/Navbar";
 import ProductListPage from "./pages/ProductListPage";
 import { ProductDetailPage } from "./pages/ProductDetailPage";
+import { ForecastPage } from "./pages/ForecastPage";
+import InventoryListPage from "./pages/InventoryListPage";
+import { UserListPage } from "./pages/UserListPage";
 
 const mainTheme = createTheme({
   palette: {
-    primary: { main: "rgb(5, 30, 52)" },
-    // background: {
-    //   paper: "rgb(5, 30, 52)",
-    // },
+    primary: { main: "#061e3d" },
     secondary: {
-      main: "#2c394e",
+      main: "#fff",
     },
   },
 });
@@ -43,10 +43,60 @@ function App() {
               }
             />
             <Route
+              path="/inventory"
+              element={
+                <RequireAuth>
+                  <Navbar title="Inventory">
+                    <InventoryListPage />
+                  </Navbar>
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/projects"
+              element={
+                <RequireAuth>
+                  <Navbar title="Projects">
+                    <UserListPage />
+                  </Navbar>
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/purchase-orders"
+              element={
+                <RequireAuth>
+                  <Navbar title="Purchase Orders">
+                    <UserListPage />
+                  </Navbar>
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/stock-count"
+              element={
+                <RequireAuth>
+                  <Navbar title="Stock Count">
+                    <UserListPage />
+                  </Navbar>
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/users"
+              element={
+                <RequireAuth>
+                  <Navbar title="Users">
+                    <UserListPage />
+                  </Navbar>
+                </RequireAuth>
+              }
+            />
+            <Route
               path="/batching"
               element={
                 <RequireAuth>
-                  <Navbar>
+                  <Navbar title="Batching">
                     <BatchingListPage />
                   </Navbar>
                 </RequireAuth>
@@ -56,18 +106,30 @@ function App() {
               path="/products"
               element={
                 <RequireAuth>
-                  <Navbar>
+                  <Navbar title="Products">
                     <ProductListPage />
                   </Navbar>
                 </RequireAuth>
               }
             />
+
             <Route
               path="/products/:id"
               element={
                 <RequireAuth>
-                  <Navbar>
+                  <Navbar title="Product Details">
                     <ProductDetailPage />
+                  </Navbar>
+                </RequireAuth>
+              }
+            />
+
+            <Route
+              path="/forecast"
+              element={
+                <RequireAuth>
+                  <Navbar title="Forecast Calculator">
+                    <ForecastPage />
                   </Navbar>
                 </RequireAuth>
               }

@@ -21,9 +21,14 @@ export const SignInPage: React.FC = () => {
         height: "100vh",
         borderRadius: 0,
         display: "flex",
+        backgroundColor: "#061e3d",
       }}
     >
-      <Card className="signin-form" variant="outlined">
+      <Card
+        className="signin-form"
+        variant="outlined"
+        sx={{ boxShadow: "0 0 30px 4px #041326" }}
+      >
         <img src={RFI_Logo} alt="RFI Logo" width={100} height={100} />
         <Typography variant="h5">Sign In</Typography>
         <Formik
