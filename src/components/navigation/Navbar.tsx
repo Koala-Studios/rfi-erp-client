@@ -31,7 +31,12 @@ import ShoppingBasketIcon from "@mui/icons-material/ShoppingBasket";
 import BiotechIcon from "@mui/icons-material/Biotech";
 import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import InventoryIcon from "@mui/icons-material/Inventory";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import AccountCircle from "@mui/icons-material/AccountCircle";
 import { Link, useLocation } from "react-router-dom";
+import Badge from "@mui/material/Badge";
+import Avatar from "@mui/material/Avatar";
+import { AuthContext } from "./AuthProvider";
 
 const drawerWidth = 240;
 
@@ -139,7 +144,8 @@ interface Props {
 }
 
 export const Navbar: React.FC<Props> = ({ title, children }) => {
-  let location = useLocation();
+  const location = useLocation();
+  const auth = React.useContext(AuthContext);
 
   const theme = useTheme();
   const [open, setOpen] = React.useState(true);
@@ -162,7 +168,11 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
             aria-label="open drawer"
             onClick={handleDrawerOpen}
             edge="start"
-            sx={{ mr: 2, ...(open && { display: "none" }) }}
+            sx={{
+              border: "1px solid #00000036",
+              mr: 2,
+              ...(open && { display: "none" }),
+            }}
           >
             <MenuIcon />
           </IconButton>
@@ -171,10 +181,27 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
             variant="h6"
             noWrap
             component="div"
-            sx={{ marginLeft: 2 }}
+            sx={{ marginLeft: 2, flexGrow: 1 }}
           >
             {title}
           </Typography>
+          <IconButton size="large" color="primary" sx={{ mr: 1 }}>
+            <Badge badgeContent={6} color="info">
+              <NotificationsIcon
+                color="primary"
+                sx={{ height: 30, width: 30 }}
+              />
+            </Badge>
+          </IconButton>
+          <IconButton
+            aria-label="account of current user"
+            aria-controls="menu-appbar"
+            aria-haspopup="true"
+            // onClick={handleMenu}
+            color="inherit"
+          >
+            <Avatar sx={{ bgcolor: "#0288d1" }}>TE</Avatar>
+          </IconButton>
         </Toolbar>
       </AppBar>
       <Drawer
