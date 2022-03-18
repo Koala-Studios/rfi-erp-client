@@ -140,6 +140,7 @@ interface Props {
 
 export const Navbar: React.FC<Props> = ({ title, children }) => {
   let location = useLocation();
+
   const theme = useTheme();
   const [open, setOpen] = React.useState(true);
 
@@ -165,7 +166,13 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
           >
             <MenuIcon />
           </IconButton>
-          <Typography variant="h6" noWrap component="div">
+
+          <Typography
+            variant="h6"
+            noWrap
+            component="div"
+            sx={{ marginLeft: 2 }}
+          >
             {title}
           </Typography>
         </Toolbar>
