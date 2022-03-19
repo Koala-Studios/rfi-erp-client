@@ -29,6 +29,7 @@ export const DataTable: React.FC<Props> = ({ rows, columns }) => {
         rows={rows}
         columns={columns}
         pageSize={25}
+        pagination
         rowsPerPageOptions={[5]}
         components={{
           Toolbar: CustomToolbar,
