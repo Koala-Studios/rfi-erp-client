@@ -26,14 +26,16 @@ const api = axios.create({
 
 export const listProducts = async (
     token:string,
+	approved:boolean,
     count:number,
 	page: number
 ): Promise<IProduct[]> => {
 	const config = {
 		headers: { Authorization: `Bearer ${token}` },
 		params: {
-			count: count,
-			page: page,
+			approved,
+			count,
+			page,
 		},
 	};
 

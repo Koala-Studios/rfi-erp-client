@@ -57,6 +57,11 @@ const LinkItems = [
     icon: <InventoryIcon></InventoryIcon>,
   },
   {
+    text: "Development",
+    link: "/development",
+    icon: <GroupIcon></GroupIcon>,
+  },
+  {
     text: "Forecast",
     link: "/forecast",
     icon: <BiotechIcon></BiotechIcon>,
