@@ -33,6 +33,7 @@ import AccountTreeIcon from "@mui/icons-material/AccountTree";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import AccountCircle from "@mui/icons-material/AccountCircle";
+import PersonPinCircleIcon from '@mui/icons-material/PersonPinCircle';
 import { Link, useLocation } from "react-router-dom";
 import Badge from "@mui/material/Badge";
 import Avatar from "@mui/material/Avatar";
@@ -80,6 +81,11 @@ const LinkItems = [
     text: "Users",
     link: "/users",
     icon: <GroupIcon></GroupIcon>,
+  },
+  {
+    text: "Suppliers",
+    link: "/suppliers",
+    icon: <PersonPinCircleIcon></PersonPinCircleIcon>,
   },
 ];
 

@@ -16,6 +16,7 @@ import { ProductDetailPage } from "./pages/ProductDetailPage";
 import { ForecastPage } from "./pages/ForecastPage";
 import InventoryListPage from "./pages/InventoryListPage";
 import { UserListPage } from "./pages/UserListPage";
+import SupplierListPage from "./pages/SupplierListPage";
 
 const mainTheme = createTheme({
   palette: {
@@ -88,6 +89,16 @@ function App() {
                 <RequireAuth>
                   <Navbar title="Users">
                     <UserListPage />
+                  </Navbar>
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/suppliers"
+              element={
+                <RequireAuth>
+                  <Navbar title="Suppliers">
+                    <SupplierListPage />
                   </Navbar>
                 </RequireAuth>
               }
