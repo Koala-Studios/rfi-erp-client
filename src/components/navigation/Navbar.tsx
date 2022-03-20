@@ -236,11 +236,11 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
             paddingTop: 0,
           }}
         >
-          <Divider
+          {/* <Divider
             sx={{
               borderColor: "#ffffff36",
             }}
-          />
+          /> */}
           {LinkItems.map((item, index) => (
             <Link to={item.link}>
               <ListItem
@@ -249,10 +249,19 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
                 sx={{
                   background:
                     location.pathname === item.link ? "#0c3467" : "#020818",
+                  border: "1px solid #020818",
                   transition: "400ms",
                   "&:hover": {
                     background: "#061e3d",
+                    border: "1px solid #0c3467",
                   },
+                  width: "unset",
+                  margin: 1.1,
+                  mb: 0,
+                  mt: 0.7,
+                  borderRadius: 2,
+                  pt: 0.5,
+                  pb: 0.5,
                 }}
               >
                 {item.icon}
@@ -267,11 +276,11 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
                   }}
                 />
               </ListItem>
-              <Divider
+              {/* <Divider
                 sx={{
                   borderColor: "#ffffff36",
                 }}
-              />
+              /> */}
             </Link>
           ))}
         </List>

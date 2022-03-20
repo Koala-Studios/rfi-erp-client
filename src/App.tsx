@@ -15,7 +15,7 @@ import ProductListPage from "./pages/ProductListPage";
 import { ProductDetailPage } from "./pages/ProductDetailPage";
 import { ForecastPage } from "./pages/ForecastPage";
 import InventoryListPage from "./pages/InventoryListPage";
-import { UserListPage } from "./pages/UserListPage";
+import UserListPage from "./pages/UserListPage";
 
 const mainTheme = createTheme({
   palette: {
