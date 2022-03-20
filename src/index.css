@@ -21,3 +21,10 @@ a {
 .MuiDataGrid-root {
   background-color: white;
 }
+.MuiDataGrid-cellContent {
+  font-weight: 500;
+}
+
+.MuiDataGrid-row {
+  pointer-events: none !important;
+}

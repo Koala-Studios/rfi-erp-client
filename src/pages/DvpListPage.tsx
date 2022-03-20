@@ -5,16 +5,22 @@ import {
   GridRenderCellParams,
   GridValueGetterParams,
 } from "@mui/x-data-grid";
-import { listProducts, ProductStatus } from "../logic/product.logic";
+import { listProducts } from "../logic/product.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { Button, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+
+const ProductStatus = [
+  ["Pending", "error"],
+  ["In Progress", "warning"],
+  ["Awaiting Approval", "info"],
+  ["Approved", "success"],
+];
 
 const ProductListPage = () => {
   const navigate = useNavigate();
 
   const columns: GridColDef[] = [
-    // { field: "id", headerName: "ID", width: 300 },
     { field: "product_code", headerName: "Product Code", width: 200 },
     { field: "name", headerName: "Product Name", width: 250 },
     {
@@ -23,11 +29,12 @@ const ProductListPage = () => {
       width: 200,
       renderCell: (params: GridRenderCellParams<number>) => (
         <Chip
-          label={ProductStatus[params.value][0]}
+          label={ProductStatus[params.value - 1][0]}
           sx={{
-            bgColor: ProductStatus[params.value][1],
-            color: ProductStatus[params.value][1],
+            fontWeight: 600,
           }}
+          //@ts-ignore
+          color={ProductStatus[params.value - 1][1]}
           variant="outlined"
         />
       ),
