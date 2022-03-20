@@ -7,7 +7,7 @@ import {
 } from "@mui/x-data-grid";
 import { listProducts, ProductStatus } from "../logic/product.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
-import { Button } from "@mui/material";
+import { Button, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 const ProductListPage = () => {
@@ -18,8 +18,23 @@ const ProductListPage = () => {
     { field: "product_code", headerName: "Product Code", width: 200 },
     { field: "name", headerName: "Product Name", width: 250 },
     {
+      field: "status",
+      headerName: "Status",
+      width: 200,
+      renderCell: (params: GridRenderCellParams<number>) => (
+        <Chip
+          label={ProductStatus[params.value][0]}
+          sx={{
+            bgColor: ProductStatus[params.value][1],
+            color: ProductStatus[params.value][1],
+          }}
+          variant="outlined"
+        />
+      ),
+    },
+    {
       field: "approved_version",
-      headerName: "Approved Version",
+      headerName: "Latest Version",
       width: 200,
     },
     { field: "cost", headerName: "Cost", width: 200 },
@@ -28,7 +43,7 @@ const ProductListPage = () => {
       headerName: "Actions",
       align: "left",
       width: 250,
-      renderCell: (params: GridRenderCellParams<Date>) => (
+      renderCell: (params: GridRenderCellParams<string>) => (
         <strong>
           <Button
             variant="contained"
@@ -60,14 +75,15 @@ const ProductListPage = () => {
   const [rows, setRows] = React.useState<any>(null);
 
   React.useEffect(() => {
-    listProducts(auth.token, true, 25, 1).then((productList) => {
+    listProducts(auth.token, false, 25, 1).then((productList) => {
       const newRows = productList.map((product) => {
         return {
           id: product._id,
           product_code: product.product_code,
           name: product.name,
+          status: product.status,
           approved_version: product.approved_version,
-          cost: `$${product.cost}`,
+          cost: product.cost ? `$${product.cost}` : "-",
         };
       });
       setRows(newRows);

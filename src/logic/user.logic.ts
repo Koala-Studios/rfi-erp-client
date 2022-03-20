@@ -7,9 +7,14 @@ export interface INotification {
 	object: string;
 }
 
+export interface IUser {
+	_id:string;
+	email:string;
+	username:string;
+}
 
 const api = axios.create({
-	baseURL: "http://localhost:5000",
+	baseURL: "http://localhost:5000/user",
 });
 
 export const getUser = async (
@@ -23,7 +28,7 @@ export const getUser = async (
 		headers: { Authorization: `Bearer ${token}` },
 	};
 	await api
-		.get("/user/getUser", config)
+		.get("/getUser", config)
 		.then((res) => {
 			if (res.status === apiStatus.OK) {
 				success = true;
@@ -35,6 +40,37 @@ export const getUser = async (
 		});
 	return success;
 };
+
+export const listUsers = async (
+    token:string,
+    count:number,
+	page: number
+): Promise<IUser[]> => {
+	const config = {
+		headers: { Authorization: `Bearer ${token}` },
+		params: {
+			count: count,
+			page: page,
+		},
+	};
+
+	let users: IUser[] = [];
+
+	await api
+		.get("/list", config)
+		.then((res) => {
+			if (res.status === apiStatus.OK) {
+				users = res.data;
+			}
+		})
+		.catch((err) => {
+			console.log(err);
+		});
+
+	return users;
+};
+
+
 
 // export const getNotifications = async (
 // 	Store: IStore
