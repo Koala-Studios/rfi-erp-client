@@ -1,14 +1,6 @@
 import axios from "axios";
 import apiStatus from "./apiStatus";
 
-
-export const ProductStatus = [
-   ['Pending', '#d26f6f'],
-['In Progress','#EBD671'],
-    ['Awaiting Approval','#6FB2D2'],
-['Approved','#85C88A'],
-]
-
 export interface IProduct {
     _id:string;
 	product_code:string;

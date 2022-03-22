@@ -5,7 +5,7 @@ import {
   GridRenderCellParams,
   GridValueGetterParams,
 } from "@mui/x-data-grid";
-import { listProducts, ProductStatus } from "../logic/product.logic";
+import { listProducts } from "../logic/product.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
