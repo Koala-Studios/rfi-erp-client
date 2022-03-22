@@ -1,4 +1,4 @@
-import { Box, Button, Card, TextField } from "@mui/material";
+import { Box, Button, Card, TextField, Typography } from "@mui/material";
 import { GridColDef } from "@mui/x-data-grid";
 import React from "react";
 import { AuthContext } from "../components/navigation/AuthProvider";
@@ -41,6 +41,7 @@ export const ForecastPage = () => {
     ]);
   };
   const handleRemoveLine = (lineProduct: IProductLine) => {
+    if (lineItems.length <= 1) return;
     const index = lineItems.indexOf(lineProduct);
 
     if (index >= 0) {
@@ -51,7 +52,7 @@ export const ForecastPage = () => {
 
   const handleTextOnChange = (index: number, type: number, value: string) => {
     if (type === 1) {
-      lineItems.at(index)!.product_code = value;
+      lineItems.at(index)!.product_code = value.toUpperCase();
     } else if (type === 2) {
       lineItems.at(index)!.name = value;
     } else if (type === 3 && (value === "" || Number(value))) {
@@ -90,9 +91,22 @@ export const ForecastPage = () => {
         sx={{ padding: 4, marginBottom: 3 }}
         component="div"
       >
+        <Box component="div" sx={{ display: "inline" }}>
+          <Button
+            size="large"
+            variant="outlined"
+            onClick={handleAddLine}
+            sx={{ marginRight: 4 }}
+          >
+            + Add Line
+          </Button>
+          <Button size="large" variant="contained" onClick={handleCalculate}>
+            Calculate
+          </Button>
+        </Box>
         {lineItems.map((lineProduct: IProductLine, index) => {
           return (
-            <Box sx={{ marginBottom: 3 }}>
+            <Box sx={{ marginTop: 3 }}>
               <Box component="div" sx={{ display: "flex", gridGap: 30 }}>
                 <TextField
                   size="small"
@@ -104,6 +118,7 @@ export const ForecastPage = () => {
                   }
                 />
                 <TextField
+                  sx={{ width: 450 }}
                   size="small"
                   label="Name"
                   variant="outlined"
@@ -133,23 +148,11 @@ export const ForecastPage = () => {
             </Box>
           );
         })}
-
-        <Box component="div" sx={{ display: "inline" }}>
-          <Button
-            size="large"
-            variant="outlined"
-            onClick={handleAddLine}
-            sx={{ marginRight: 4 }}
-          >
-            + Add Line
-          </Button>
-          <Button size="large" variant="contained" onClick={handleCalculate}>
-            Calculate
-          </Button>
-        </Box>
       </Card>
       {materialRows ? (
-        <DataTable rows={materialRows!} columns={materialColumns}></DataTable>
+        <Box>
+          <DataTable title="Forecast Results" rows={materialRows!} columns={materialColumns}></DataTable>
+        </Box>
       ) : null}
     </Box>
   );
