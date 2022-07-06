@@ -15,23 +15,19 @@ interface Props {
   columns: GridColDef[];
 }
 
-const CustomToolbar = () => {
-  return (
-    <GridToolbarContainer>
-      <GridToolbarFilterButton />
-      <GridToolbarExport />
-    </GridToolbarContainer>
-  );
-};
+export const DataTable: React.FC<Props> = ({ title, rows, columns }) => {
+  const CustomToolbar: React.FC = () => {
+    return (
+      <GridToolbarContainer>
+        {title ? <Typography variant="h6">{title}</Typography> : null}
+        <GridToolbarFilterButton />
+        <GridToolbarExport />
+      </GridToolbarContainer>
+    );
+  };
 
-export const DataTable: React.FC<Props> = ({title, rows, columns }) => {
   return (
     <div style={{ height: "calc(90vh - 64px)", width: "100%" }}>
-        {title ? (
-        <Typography variant="h6">
-          {title}
-        </Typography>
-        ) : null }
       <DataGrid
         rows={rows}
         columns={columns}
