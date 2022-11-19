@@ -16,12 +16,17 @@ interface Props {
   auto_height?: boolean;
 }
 
-export const DataTable: React.FC<Props> = ({ title, rows, columns, auto_height = false }) => {
+export const DataTable: React.FC<Props> = ({
+  title,
+  rows,
+  columns,
+  auto_height = false,
+}) => {
   const CustomToolbar: React.FC = () => {
     return (
       <GridToolbarContainer>
         {title ? <Typography variant="h6">{title}</Typography> : null}
-        <GridToolbarFilterButton />
+        {/* <GridToolbarFilterButton /> */}
         <GridToolbarExport />
       </GridToolbarContainer>
     );
@@ -36,7 +41,7 @@ export const DataTable: React.FC<Props> = ({ title, rows, columns, auto_height =
         rowHeight={38}
         pageSize={25}
         pagination
-        rowsPerPageOptions={[5,25]}
+        rowsPerPageOptions={[5, 25]}
         components={{
           Toolbar: CustomToolbar,
         }}

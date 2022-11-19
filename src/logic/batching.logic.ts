@@ -35,7 +35,7 @@ export const listBatching = async (
 		.get("/list", config)
 		.then((res) => {
 			if (res.status === apiStatus.OK) {
-				batches = res.data;
+				batches = res.data.res;
 			}
 		})
 		.catch((err) => {

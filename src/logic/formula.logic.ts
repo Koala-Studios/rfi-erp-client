@@ -40,8 +40,10 @@ export const getFormula = async (
     .get("/get", config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
-        formula = res.data;
+        formula = res.data.res;
       }
+      console.log('hello')
+      window.dispatchEvent(new CustomEvent('NotificationEvent', { detail: res.data.message }));
     })
     .catch((err) => {
       console.log(err);
