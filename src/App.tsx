@@ -18,6 +18,7 @@ import InventoryListPage from "./pages/InventoryListPage";
 import SupplierListPage from "./pages/SupplierListPage";
 import UserListPage from "./pages/UserListPage";
 import DvpListPage from "./pages/DvpListPage";
+import FormulaPage from "./pages/FormulaPage";
 
 const mainTheme = createTheme({
   palette: {
@@ -141,6 +142,17 @@ function App() {
                 <RequireAuth>
                   <Navbar title="Product Details">
                     <ProductDetailPage />
+                  </Navbar>
+                </RequireAuth>
+              }
+            />
+
+            <Route
+              path="/formula/:id"
+              element={
+                <RequireAuth>
+                  <Navbar title="Formula Page">
+                    <FormulaPage />
                   </Navbar>
                 </RequireAuth>
               }

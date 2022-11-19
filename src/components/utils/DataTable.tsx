@@ -13,9 +13,10 @@ interface Props {
   title?: string;
   rows: any[];
   columns: GridColDef[];
+  auto_height?: boolean;
 }
 
-export const DataTable: React.FC<Props> = ({ title, rows, columns }) => {
+export const DataTable: React.FC<Props> = ({ title, rows, columns, auto_height = false }) => {
   const CustomToolbar: React.FC = () => {
     return (
       <GridToolbarContainer>
@@ -31,9 +32,11 @@ export const DataTable: React.FC<Props> = ({ title, rows, columns }) => {
       <DataGrid
         rows={rows}
         columns={columns}
+        autoHeight={auto_height}
+        rowHeight={38}
         pageSize={25}
         pagination
-        rowsPerPageOptions={[5]}
+        rowsPerPageOptions={[5,25]}
         components={{
           Toolbar: CustomToolbar,
         }}

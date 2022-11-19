@@ -18,7 +18,7 @@ const FormulaTable = () => {
 
   if (rows == null) return null;
 
-  return <DataTable rows={rows!} columns={columns}></DataTable>;
+  return <DataTable auto_height={true} rows={rows!} columns={columns}></DataTable>;
 };
 
 export default FormulaTable;

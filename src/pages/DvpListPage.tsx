@@ -15,36 +15,38 @@ const ProductStatus = [
   ["In Progress", "warning"],
   ["Awaiting Approval", "info"],
   ["Approved", "success"],
+  ["Error","error"]
 ];
 
-const ProductListPage = () => {
+const DvpListPage = () => {
   const navigate = useNavigate();
 
   const columns: GridColDef[] = [
     { field: "product_code", headerName: "Product Code", width: 200 },
-    { field: "name", headerName: "Product Name", width: 250 },
+    { field: "name", headerName: "Product Name", width: 300 },
     {
       field: "status",
       headerName: "Status",
       width: 200,
       renderCell: (params: GridRenderCellParams<number>) => (
         <Chip
-          label={ProductStatus[params.value - 1][0]}
+          label={ProductStatus[params.value ? params.value - 1 : 4][0]}
           sx={{
             fontWeight: 600,
           }}
           //@ts-ignore
-          color={ProductStatus[params.value - 1][1]}
+          color={ProductStatus[params.value ? params.value - 1 : 4][1]}
           variant="outlined"
         />
       ),
     },
     {
-      field: "approved_version",
-      headerName: "Latest Version",
-      width: 200,
+      field: "versions",
+      headerName: "Latest V#",
+      width: 80,
+      align:'right'
     },
-    { field: "cost", headerName: "Cost", width: 200 },
+    { field: "cost", headerName: "Cost", width: 100, align:'right' },
     {
       field: "id",
       headerName: "Actions",
@@ -68,7 +70,7 @@ const ProductListPage = () => {
             size="small"
             style={{ marginLeft: 16 }}
             onClick={() =>
-              navigate(`/products/${params.value}`, { replace: false })
+              navigate(`/formula/${params.value}`, { replace: false })
             }
           >
             Formula
@@ -83,14 +85,16 @@ const ProductListPage = () => {
 
   React.useEffect(() => {
     listProducts(auth.token, false, 25, 1).then((productList) => {
+      console.log(productList)
       const newRows = productList.map((product) => {
         return {
           id: product._id,
           product_code: product.product_code,
           name: product.name,
           status: product.status,
+          versions: product.versions,
           approved_version: product.approved_version,
-          cost: product.cost ? `$${product.cost}` : "-",
+          cost: product.cost,
         };
       });
       setRows(newRows);
@@ -102,4 +106,4 @@ const ProductListPage = () => {
   return <DataTable rows={rows!} columns={columns}></DataTable>;
 };
 
-export default ProductListPage;
+export default DvpListPage;

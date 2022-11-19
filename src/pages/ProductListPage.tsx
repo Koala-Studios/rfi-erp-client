@@ -15,8 +15,8 @@ const ProductListPage = () => {
 
   const columns: GridColDef[] = [
     // { field: "id", headerName: "ID", width: 300 },
-    { field: "product_code", headerName: "Product Code", width: 200 },
-    { field: "name", headerName: "Product Name", width: 250 },
+    { field: "product_code", headerName: "Product Code", width: 120 },
+    { field: "name", headerName: "Product Name", width: 300 },
     {
       field: "approved_version",
       headerName: "Approved Version",
@@ -60,7 +60,7 @@ const ProductListPage = () => {
   const [rows, setRows] = React.useState<any>(null);
 
   React.useEffect(() => {
-    listProducts(auth.token, true, 25, 1).then((productList) => {
+    listProducts(auth.token, true, 1500, 1).then((productList) => {
       const newRows = productList.map((product) => {
         return {
           id: product._id,

@@ -9,6 +9,7 @@ export interface IBatching {
     batch_code: string;
     status: number;
 	product_code:string;
+	product_name?:string;
   }
 
 const api = axios.create({

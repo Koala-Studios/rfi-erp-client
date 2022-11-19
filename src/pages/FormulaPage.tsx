@@ -3,34 +3,53 @@ import { DataTable } from "../components/utils/DataTable";
 import { GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { getFormula } from "../logic/formula.logic";
+import { useNavigate, useParams } from "react-router-dom";
+import { Card } from "@mui/material";
 
 const columns: GridColDef[] = [
   // { field: "id", headerName: "ID", width: 300 },
-  { field: "date", headerName: "Date Created", width: 250 },
+  // { field: "date", headerName: "Date Created", width: 250 },
   { field: "material_code", headerName: "Material Code", width: 150 },
-  { field: "quantity", headerName: "Quantity", type: "number", width: 150 },
+  { field: "material_name", headerName: "Material Name", width: 300 },
+  { field: "quantity", headerName: "Qty(%)", type: "number", width: 90 },
+  { field: "notes", headerName: "Notes", type: "number", width: 400 },
+  
 ];
 
-const BatchingListPage = () => {
+const FormulaPage = () => {
+  
   const auth = React.useContext(AuthContext);
   const [rows, setRows] = React.useState<any>(null);
-
+  const { id } = useParams();
+  // const { approved_version } = useParams();
   React.useEffect(() => {
-    getFormula(auth.token, 25, 1).then((formula) => {
-      const newRows = formula!.formula_items.map((item) => {
-        return {
-          id: item.material_id,
-          material_code: item.material_code,
-          quantity: item.amount,
-        };
-      });
-      setRows(newRows);
+    getFormula(auth.token, id!).then((formula) => {
+      console.log(formula,' TEST')
+      if(!formula?.formula_items) {
+        setRows({});
+      } else {
+        const newRows = formula!.formula_items.map((item) => {
+          return {
+            id: item.material_id,
+            material_code: item.material_code,
+            material_name: item.material_name,
+            quantity: item.amount,
+            notes: item.notes,
+          };
+        });
+        setRows(newRows);
+      }
+
     });
   }, []);
 
   if (rows == null) return null;
 
-  return <DataTable rows={rows!} columns={columns}></DataTable>;
+return (
+  <Card variant="outlined" sx={{ padding: 3, overflowY: 'auto' }}>
+    
+    <DataTable  auto_height={true} rows={rows!} columns={columns}></DataTable>
+  </Card> );
 };
 
-export default BatchingListPage;
+export default FormulaPage;

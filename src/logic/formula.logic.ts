@@ -9,6 +9,7 @@ export interface IFormula {
   date_created: Date;
   formula_items: [
     {
+      material_name: string;
       material_code: string;
       material_id: string;//inventory
       amount: number;
@@ -23,21 +24,20 @@ const api = axios.create({
 
 export const getFormula = async (
   token: string,
-  product_id: number,
-  version: number
+  id: string,
+  // version: string
 ): Promise<IFormula | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
     params: {
-      product_id: product_id,
-      version: version,
+      product_id: id
     },
   };
-
+  console.log(id, 'test')
   let formula: IFormula | null = null;
 
   await api
-    .get("/list", config)
+    .get("/get", config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
         formula = res.data;
