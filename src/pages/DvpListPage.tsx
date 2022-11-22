@@ -70,7 +70,7 @@ const DvpListPage = () => {
             size="small"
             style={{ marginLeft: 16 }}
             onClick={() =>
-              navigate(`/formula/${params.value}`, { replace: false })
+              navigate(`/formula/${params.value}/${params.row.versions}`, { replace: false })
             }
           >
             Formula

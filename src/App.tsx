@@ -148,7 +148,7 @@ function App() {
             />
 
             <Route
-              path="/formula/:id"
+              path="/formula/:id/:version"
               element={
                 <RequireAuth>
                   <Navbar title="Formula Page">

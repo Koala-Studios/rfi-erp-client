@@ -12,6 +12,7 @@ const columns: GridColDef[] = [
   { field: "material_code", headerName: "Material Code", width: 150 },
   { field: "material_name", headerName: "Material Name", width: 300 },
   { field: "quantity", headerName: "Qty(%)", type: "number", width: 90 },
+  { field: "cost", headerName: "Cost($)", type: "number", width: 100 },
   { field: "notes", headerName: "Notes", type: "number", width: 400 },
   
 ];
@@ -21,9 +22,10 @@ const FormulaPage = () => {
   const auth = React.useContext(AuthContext);
   const [rows, setRows] = React.useState<any>(null);
   const { id } = useParams();
+  const { version } = useParams();
   // const { approved_version } = useParams();
   React.useEffect(() => {
-    getFormula(auth.token, id!).then((formula) => {
+    getFormula(auth.token, id!, version! ).then((formula) => {
       console.log(formula,' TEST')
       if(!formula?.formula_items) {
         setRows({});
@@ -33,6 +35,7 @@ const FormulaPage = () => {
             id: item.material_id,
             material_code: item.material_code,
             material_name: item.material_name,
+            cost: item.cost * (item.amount/100),
             quantity: item.amount,
             notes: item.notes,
           };

@@ -14,6 +14,7 @@ export interface IFormula {
       material_id: string;//inventory
       amount: number;
       notes: string;
+      cost: number;
     }
   ];
 }
@@ -25,15 +26,15 @@ const api = axios.create({
 export const getFormula = async (
   token: string,
   id: string,
-  // version: string
+  version: string
 ): Promise<IFormula | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
     params: {
-      product_id: id
+      product_id: id, version: version
     },
   };
-  console.log(id, 'test')
+  // console.log(id, version, 'testing it all')
   let formula: IFormula | null = null;
 
   await api
