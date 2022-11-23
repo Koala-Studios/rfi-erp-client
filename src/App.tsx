@@ -19,6 +19,7 @@ import SupplierListPage from "./pages/SupplierListPage";
 import UserListPage from "./pages/UserListPage";
 import DvpListPage from "./pages/DvpListPage";
 import FormulaPage from "./pages/FormulaPage";
+import POListPage from "./pages/POListPage";
 
 const mainTheme = createTheme({
   palette: {
@@ -70,7 +71,7 @@ function App() {
               element={
                 <RequireAuth>
                   <Navbar title="Purchase Orders">
-                    <UserListPage />
+                    <POListPage />
                   </Navbar>
                 </RequireAuth>
               }
