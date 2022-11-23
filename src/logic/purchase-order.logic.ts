@@ -2,22 +2,26 @@ import axios from "axios";
 import apiStatus from "./apiStatus";
 
 
-interface IOrderItemContainer {
+interface IOrderItem {
     product_code:string;
     product_name:string;
     lot_number:string;
     quantity:number;
     price:number;
     status:number;
-    material_id:string;
+    product_id:string;
     date_arrived?:string;
 }
 export interface IPurchaseOrder {
     _id:string;
-    supplier_code:string;
+	supplier_code:string;
     supplier:string;
+	date_arrived: Date,
+	date_purchased:Date,
+	status: Number,
     order_code:string;
-    order_items:[IOrderItemContainer]
+
+    order_items:[IOrderItem]
 }
 
 const api = axios.create({
@@ -51,31 +55,4 @@ export const listPOs = async (
 		});
 
 	return po_list;
-};
-
-export const getProduct = async (
-    token:string,
-    id:string
-): Promise<IPurchaseOrder | null> => {
-	const config = {
-		headers: { Authorization: `Bearer ${token}` },
-		params: {
-			id:id
-		},
-	};
-
-	let purchase_order: IPurchaseOrder | null = null;
-
-	await api
-		.get("/get", config)
-		.then((res) => {
-			if (res.status === apiStatus.OK) {
-				purchase_order = res.data;
-			}
-		})
-		.catch((err) => {
-			console.log(err);
-		});
-
-	return purchase_order;
 };
