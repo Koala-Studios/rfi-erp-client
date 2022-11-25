@@ -43,7 +43,7 @@ export const getFormula = async (
       if (res.status === apiStatus.OK) {
         formula = res.data.res;
       }
-      console.log('hello')
+      // console.log('hello')
       window.dispatchEvent(new CustomEvent('NotificationEvent', { detail: res.data.message }));
     })
     .catch((err) => {
