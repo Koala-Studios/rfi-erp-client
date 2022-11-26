@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useLocation, Navigate, useNavigate } from "react-router-dom";
 
 import { ISignIn, signIn } from "../../logic/auth.logic";
@@ -7,7 +7,7 @@ interface AuthContextType {
   token: any;
   signin: (user: ISignIn, callback: VoidFunction) => void;
   signout: (callback: VoidFunction) => void;
-  loadLocalToken: (callback: VoidFunction) => void;
+  loadLocalToken: (callback: Function) => void;
 }
 
 export let AuthContext = React.createContext<AuthContextType>(null!);
@@ -15,13 +15,11 @@ export let AuthContext = React.createContext<AuthContextType>(null!);
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   let [token, setToken] = React.useState<any>(null);
 
-  const loadLocalToken = (callback: VoidFunction) => {
+  const loadLocalToken = (callback: Function) => {
     const local_token = localStorage.getItem("auth_token");
-    console.log(local_token);
 
     if (local_token) {
-      setToken(local_token);
-      callback();
+      callback(local_token);
     }
   };
 
@@ -54,8 +52,9 @@ export const RequireAuth = ({ children }: { children: JSX.Element }) => {
   const navigate = useNavigate();
 
   if (!auth.token) {
-    auth.loadLocalToken(() => {
-      navigate("/batching");
+    auth.loadLocalToken((local_token: string) => {
+      auth.token = local_token;
+      navigate(location);
     });
     // Redirect them to the /login page, but save the current location they were
     // trying to go to when they were redirected. This allows us to send them

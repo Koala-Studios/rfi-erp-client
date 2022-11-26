@@ -33,12 +33,15 @@ export const DataTable: React.FC<Props> = ({
   };
 
   return (
-    <div style={{ height: "calc(90vh - 64px)", width: "100%" }}>
+    <div style={{ height: "100%", width: "100%", minHeight: 100 }}>
       <DataGrid
+        style={{
+          border: "1px solid #c9c9c9",
+        }}
         rows={rows}
         columns={columns}
         autoHeight={auto_height}
-        rowHeight={38}
+        rowHeight={39}
         pageSize={25}
         pagination
         rowsPerPageOptions={[5, 25]}

@@ -19,7 +19,7 @@ export const signIn = async (data: ISignIn, callback: any) => {
 		username: data.username,
 		password: data.password,
 	};
-    
+
 	await api
 		.post("/login", config)
 		.then((res) => {

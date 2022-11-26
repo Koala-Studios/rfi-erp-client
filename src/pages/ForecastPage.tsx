@@ -1,5 +1,5 @@
 import { Box, Button, Card, TextField, Typography } from "@mui/material";
-import DeleteIcon from '@mui/icons-material/Delete';
+import DeleteIcon from "@mui/icons-material/Delete";
 import { GridColDef } from "@mui/x-data-grid";
 import React from "react";
 import { AuthContext } from "../components/navigation/AuthProvider";
@@ -10,7 +10,6 @@ import {
   IProductLine,
 } from "../logic/forecast.logic";
 import Delete from "@mui/icons-material/Delete";
-
 
 const materialColumns: GridColDef[] = [
   { field: "product_code", headerName: "Product Code", width: 150 },
@@ -35,14 +34,14 @@ export const ForecastPage = () => {
   const handleAddLine = (lineProduct: IProductLine) => {
     const index = lineItems.indexOf(lineProduct) + 1;
     SetLineItems([
-      ...(lineItems.slice(0, index)),
+      ...lineItems.slice(0, index),
       {
         product_id: "",
         product_code: "",
         name: "",
         amount: "",
       },
-      ...(lineItems.slice(index, lineItems.length))
+      ...lineItems.slice(index, lineItems.length),
     ]);
   };
   const handleRemoveLine = (lineProduct: IProductLine) => {
@@ -111,23 +110,26 @@ export const ForecastPage = () => {
         </Box>
         {lineItems.map((lineProduct: IProductLine, index) => {
           return (
-            <Box sx={{ marginTop: 3 }}>
+            <Box sx={{ marginTop: 3 }} key={index}>
               <Box component="div" sx={{ display: "flex", gridGap: 30 }}>
-              <Button
+                <Button
                   sx={{ borderColor: "red!important", color: "red!important" }}
                   variant="outlined"
                   onClick={() => handleRemoveLine(lineProduct)}
                 >
-                  <DeleteIcon/>
+                  <DeleteIcon />
                 </Button>
                 <Button
-            size="large"
-            variant="outlined"
-            onClick={() => handleAddLine(lineProduct)}
-            sx={{ borderColor: "green!important", color: "green!important" }}
-          >
-            +
-          </Button>
+                  size="large"
+                  variant="outlined"
+                  onClick={() => handleAddLine(lineProduct)}
+                  sx={{
+                    borderColor: "green!important",
+                    color: "green!important",
+                  }}
+                >
+                  +
+                </Button>
                 <TextField
                   size="small"
                   label="Product Code"
@@ -164,7 +166,11 @@ export const ForecastPage = () => {
       </Card>
       {materialRows ? (
         <Box>
-          <DataTable title="Forecast Results" rows={materialRows!} columns={materialColumns}></DataTable>
+          <DataTable
+            title="Forecast Results"
+            rows={materialRows!}
+            columns={materialColumns}
+          ></DataTable>
         </Box>
       ) : null}
     </Box>

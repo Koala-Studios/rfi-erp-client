@@ -64,7 +64,7 @@ const UserListPage = () => {
           + New User
         </Button>
       </Card>
-      <DataTable rows={rows!} columns={columns}></DataTable>;
+      <DataTable rows={rows!} columns={columns}></DataTable>
     </Box>
   );
 };

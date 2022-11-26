@@ -3,7 +3,12 @@ import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import {
+  createTheme,
+  Shadows,
+  ThemeOptions,
+  ThemeProvider,
+} from "@mui/material/styles";
 import { SignInPage } from "./pages/SignInPage";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import AuthProvider, {
@@ -20,6 +25,7 @@ import UserListPage from "./pages/UserListPage";
 import DvpListPage from "./pages/DvpListPage";
 import FormulaPage from "./pages/FormulaPage";
 import POListPage from "./pages/POListPage";
+import ProjectListPage from "./pages/ProjectListPage";
 
 const mainTheme = createTheme({
   palette: {
@@ -28,6 +34,7 @@ const mainTheme = createTheme({
       main: "#fff",
     },
   },
+  shadows: Array(25).fill("none") as Shadows,
 });
 
 function App() {
@@ -38,14 +45,14 @@ function App() {
           <Routes>
             <Route path="/login" element={<SignInPage />} />
 
-            <Route
+            {/* <Route
               path="/"
               element={
                 <RequireAuth>
                   <BatchingListPage />
                 </RequireAuth>
               }
-            />
+            /> */}
             <Route
               path="/inventory"
               element={
@@ -61,7 +68,7 @@ function App() {
               element={
                 <RequireAuth>
                   <Navbar title="Projects">
-                    <UserListPage />
+                    <ProjectListPage />
                   </Navbar>
                 </RequireAuth>
               }

@@ -5,18 +5,23 @@ import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { useTheme } from "@mui/material/styles";
 
 interface Props {
   title: string;
   description?: string;
-  onSubmit?: () => void;
-  onClose?: () => void;
+  onSubmit: Function;
+  onClose?: Function;
   open: boolean;
   setOpen: any;
   submitText: string;
 }
 
 const FormDialog: React.FC<Props> = (props) => {
+  const theme = useTheme();
+  const fullScreen = useMediaQuery(theme.breakpoints.down("md"));
+
   const handleClickOpen = () => {
     props.setOpen(true);
   };
@@ -28,21 +33,31 @@ const FormDialog: React.FC<Props> = (props) => {
   };
   const handleSubmit = () => {
     if (props.onSubmit) props.onSubmit();
-    props.setOpen(false);
   };
 
   return (
-    <Dialog open={props.open} onClose={handleClose}>
+    <Dialog
+      open={props.open}
+      onClose={handleClose}
+      maxWidth={"sm"}
+      fullWidth
+      fullScreen={fullScreen}
+    >
       <DialogTitle>{props.title}</DialogTitle>
-      <DialogContent>
+
+      <DialogContent sx={{ pt: "10px!important" }}>
         {props.description && (
           <DialogContentText>{props.description}</DialogContentText>
         )}
         {props.children}
       </DialogContent>
-      <DialogActions>
-        <Button onClick={handleClose}>Cancel</Button>
-        <Button onClick={handleSubmit}>{props.submitText}</Button>
+      <DialogActions sx={{ justifyContent: "space-between" }}>
+        <Button color="error" onClick={handleClose}>
+          Cancel
+        </Button>
+        <Button variant="contained" onClick={handleSubmit}>
+          {props.submitText}
+        </Button>
       </DialogActions>
     </Dialog>
   );

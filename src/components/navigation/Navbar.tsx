@@ -35,13 +35,15 @@ import NotificationsIcon from "@mui/icons-material/Notifications";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import PersonPinCircleIcon from "@mui/icons-material/PersonPinCircle";
 import { Link, useLocation } from "react-router-dom";
-import Badge from "@mui/material/Badge";
+import Badge, { BadgeProps } from "@mui/material/Badge";
 import Avatar from "@mui/material/Avatar";
 import { AuthContext } from "./AuthProvider";
 import { useEffect } from "react";
 import NotificationHandler from "./NotificationHandler";
+import Button from "@mui/material/Button";
+import FormHandler from "./FormHandler";
 
-const drawerWidth = 240;
+const drawerWidth = 190;
 
 const LinkItems = [
   {
@@ -99,13 +101,14 @@ const LinkItems = [
 const Main = styled("main", { shouldForwardProp: (prop) => prop !== "open" })<{
   open?: boolean;
 }>(({ theme, open }) => ({
+  height: "calc(100vh - 55px)",
   flexGrow: 1,
-  padding: theme.spacing(3),
+  padding: theme.spacing(2),
   transition: theme.transitions.create("margin", {
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  marginTop: 64,
+  marginTop: 55,
   marginLeft: `-${drawerWidth}px`,
   ...(open && {
     transition: theme.transitions.create("margin", {
@@ -123,7 +126,7 @@ interface AppBarProps extends MuiAppBarProps {
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== "open",
 })<AppBarProps>(({ theme, open }) => ({
-  boxShadow: "0 0 11px 0 #0000004f",
+  boxShadow: "none",
   backgroundColor: "white",
   color: "black",
   borderBottom: "1px solid #c9c9c9",
@@ -152,6 +155,15 @@ const DrawerHeader = styled("div")(({ theme }) => ({
   color: "white",
 }));
 
+const StyledBadge = styled(Badge)<BadgeProps>(({ theme }) => ({
+  "& .MuiBadge-badge": {
+    right: 4,
+    top: 5,
+    padding: "10px 6px",
+    borderRadius: 20,
+  },
+}));
+
 interface Props {
   title: string;
 }
@@ -174,8 +186,8 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar position="fixed" open={open} elevation={0}>
-        <Toolbar>
+      <AppBar position="fixed" open={open}>
+        <Toolbar style={{ minHeight: 55 }}>
           <IconButton
             color="inherit"
             aria-label="open drawer"
@@ -183,38 +195,66 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
             edge="start"
             sx={{
               border: "1px solid #00000036",
-              mr: 2,
+              mr: 1,
               ...(open && { display: "none" }),
             }}
           >
             <MenuIcon />
           </IconButton>
 
-          <Typography
-            variant="h6"
-            noWrap
-            component="div"
-            sx={{ marginLeft: 2, flexGrow: 1 }}
-          >
+          <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             {title}
           </Typography>
           <IconButton size="large" color="primary" sx={{ mr: 1 }}>
-            <Badge badgeContent={6} color="info">
+            <StyledBadge badgeContent={6} color="info">
               <NotificationsIcon
                 color="primary"
                 sx={{ height: 30, width: 30 }}
               />
-            </Badge>
+            </StyledBadge>
           </IconButton>
-          <IconButton
+          <div
+            style={{ padding: 5 }}
             aria-label="account of current user"
             aria-controls="menu-appbar"
             aria-haspopup="true"
             // onClick={handleMenu}
             color="inherit"
           >
-            <Avatar sx={{ bgcolor: "#0288d1" }}>TE</Avatar>
-          </IconButton>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                cursor: "pointer",
+              }}
+            >
+              <Avatar
+                variant="rounded"
+                sx={{ bgcolor: "#061e3d", height: 37, width: 37 }}
+              >
+                TE
+              </Avatar>
+
+              <div style={{ textAlign: "start" }}>
+                <Typography
+                  variant="subtitle1"
+                  noWrap
+                  component="div"
+                  sx={{ marginLeft: 1, mb: 0, lineHeight: 1 }}
+                >
+                  test
+                </Typography>
+                <Typography
+                  variant="subtitle2"
+                  noWrap
+                  component="div"
+                  sx={{ marginLeft: 1, lineHeight: 1 }}
+                >
+                  test@gmail.com
+                </Typography>
+              </div>
+            </div>
+          </div>
         </Toolbar>
       </AppBar>
       <Drawer
@@ -230,9 +270,13 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
         anchor="left"
         open={open}
       >
-        <DrawerHeader>
-          <img src={RFI_Logo} alt="RFI Logo" width={200} height={60} />
-          <IconButton onClick={handleDrawerClose} color="secondary">
+        <DrawerHeader style={{ minHeight: 55 }}>
+          <img src={RFI_Logo} alt="RFI Logo" width={167} height={50} />
+          <IconButton
+            size="small"
+            onClick={handleDrawerClose}
+            color="secondary"
+          >
             {theme.direction === "ltr" ? (
               <ChevronLeftIcon />
             ) : (
@@ -255,10 +299,9 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
             }}
           /> */}
           {LinkItems.map((item, index) => (
-            <Link to={item.link}>
+            <Link to={item.link} key={index}>
               <ListItem
                 button
-                key={index}
                 sx={{
                   background:
                     location.pathname === item.link ? "#0c3467" : "#020818",
@@ -269,10 +312,10 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
                     border: "1px solid #0c3467",
                   },
                   width: "unset",
-                  margin: 1.1,
+                  margin: 0.5,
                   mb: 0,
-                  mt: 0.7,
-                  borderRadius: 2,
+                  mt: 1,
+                  borderRadius: 1,
                   pt: 0.5,
                   pb: 0.5,
                 }}
@@ -282,10 +325,11 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
                   primaryTypographyProps={{
                     color: location.pathname === item.link ? "#fff" : "#b2bac2",
                     fontWeight: "500",
+                    fontSize: "0.85rem",
                   }}
                   primary={item.text}
                   sx={{
-                    marginLeft: 2,
+                    marginLeft: 1,
                   }}
                 />
               </ListItem>
@@ -301,6 +345,7 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
 
       <Main open={open}>{children}</Main>
       <NotificationHandler></NotificationHandler>
+      <FormHandler></FormHandler>
     </Box>
   );
 };

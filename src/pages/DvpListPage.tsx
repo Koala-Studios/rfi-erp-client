@@ -15,7 +15,7 @@ const ProductStatus = [
   ["In Progress", "warning"],
   ["Awaiting Approval", "info"],
   ["Approved", "success"],
-  ["Error","error"]
+  ["Error", "error"],
 ];
 
 const DvpListPage = () => {
@@ -44,9 +44,9 @@ const DvpListPage = () => {
       field: "versions",
       headerName: "Latest V#",
       width: 80,
-      align:'right'
+      align: "right",
     },
-    { field: "cost", headerName: "Cost", width: 100, align:'right' },
+    { field: "cost", headerName: "Cost", width: 100, align: "right" },
     {
       field: "id",
       headerName: "Actions",
@@ -70,7 +70,9 @@ const DvpListPage = () => {
             size="small"
             style={{ marginLeft: 16 }}
             onClick={() =>
-              navigate(`/formula/${params.value}/${params.row.versions}`, { replace: false })
+              navigate(`/formula/${params.value}/${params.row.versions}`, {
+                replace: false,
+              })
             }
           >
             Formula
@@ -85,8 +87,8 @@ const DvpListPage = () => {
 
   React.useEffect(() => {
     listProducts(auth.token, false, 25, 1).then((productList) => {
-      console.log(productList)
-      const newRows = productList.map((product) => {
+      console.log(productList);
+      const newRows = productList.map((product, idx) => {
         return {
           id: product._id,
           product_code: product.product_code,
@@ -95,6 +97,7 @@ const DvpListPage = () => {
           versions: product.versions,
           approved_version: product.approved_version,
           cost: product.cost,
+          key: idx,
         };
       });
       setRows(newRows);
