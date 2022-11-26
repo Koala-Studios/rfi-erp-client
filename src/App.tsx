@@ -26,6 +26,7 @@ import DvpListPage from "./pages/DvpListPage";
 import FormulaPage from "./pages/FormulaPage";
 import POListPage from "./pages/POListPage";
 import ProjectListPage from "./pages/ProjectListPage";
+import { PurchaseDetailPage } from "./pages/PurchaseDetailPage";
 
 const mainTheme = createTheme({
   palette: {
@@ -79,6 +80,16 @@ function App() {
                 <RequireAuth>
                   <Navbar title="Purchase Orders">
                     <POListPage />
+                  </Navbar>
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/purchase-orders/:id"
+              element={
+                <RequireAuth>
+                  <Navbar title="Purchase Order">
+                    <PurchaseDetailPage />
                   </Navbar>
                 </RequireAuth>
               }

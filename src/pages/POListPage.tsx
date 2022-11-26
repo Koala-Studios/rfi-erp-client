@@ -32,7 +32,7 @@ const POListPage = () => {
             color="primary"
             size="small"
             onClick={() =>
-              navigate(`/products/${params.value}`, { replace: false })
+              navigate(`/purchase-orders/${params.value}`, { replace: false })
             }
           >
             View Details
