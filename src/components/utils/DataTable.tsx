@@ -26,8 +26,11 @@ export const DataTable: React.FC<Props> = ({
     return (
       <GridToolbarContainer>
         {title ? <Typography variant="h6">{title}</Typography> : null}
-        {/* <GridToolbarFilterButton /> */}
-        <GridToolbarExport />
+        <GridToolbarFilterButton
+          onResize={undefined}
+          onResizeCapture={undefined}
+        />
+        {/* <GridToolbarExport /> */}
       </GridToolbarContainer>
     );
   };
