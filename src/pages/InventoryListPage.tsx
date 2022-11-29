@@ -17,12 +17,22 @@ const InventoryListPage = () => {
   const columns: GridColDef[] = [
     { field: "product_id", headerName: "Item Code", width: 120 },
     { field: "name", headerName: "Item Name", width: 300 },
-    { field: "cost", headerName: "Cost/KG", width: 100, align:'right' },
-    { field: "on_hand", headerName: "On Hand", width: 100, align:'right' },
-    { field: "reorder_amount", headerName: "Reorder Amt", width: 100, align:'right'  },
-    { field: "on_order", headerName: "On Order", width: 100, align:'right' },
-    { field: "quarantined", headerName: "Quarantined", width: 100, align:'right' },
-    { field: "allocated", headerName: "Allocated", width: 100, align:'right' },
+    { field: "cost", headerName: "Cost/KG", width: 100, align: "right" },
+    { field: "on_hand", headerName: "On Hand", width: 100, align: "right" },
+    {
+      field: "reorder_amount",
+      headerName: "Reorder Amt",
+      width: 100,
+      align: "right",
+    },
+    { field: "on_order", headerName: "On Order", width: 100, align: "right" },
+    {
+      field: "quarantined",
+      headerName: "Quarantined",
+      width: 100,
+      align: "right",
+    },
+    { field: "allocated", headerName: "Allocated", width: 100, align: "right" },
     {
       field: "id",
       headerName: "Actions",
@@ -69,9 +79,9 @@ const InventoryListPage = () => {
         item.stock.map((stock) => {
           on_hand += stock.on_hand ? stock.on_hand : 0;
           on_order += stock.on_order ? stock.on_order : 0;
-          quarantined += stock.quarantined ? stock.quarantined : 0;;
-          allocated += stock.allocated ? stock.allocated : 0;;
-        })
+          quarantined += stock.quarantined ? stock.quarantined : 0;
+          allocated += stock.allocated ? stock.allocated : 0;
+        });
         return {
           id: item._id,
           product_id: item.product_code,
@@ -79,7 +89,7 @@ const InventoryListPage = () => {
           cost: item.cost,
           reorder_amount: item.reorder_amount ? item.reorder_amount : 0,
           on_hand: on_hand,
-          on_order:on_order,
+          on_order: on_order,
           quarantined: quarantined,
           allocated: allocated,
         };
@@ -90,7 +100,13 @@ const InventoryListPage = () => {
 
   if (rows == null) return null;
 
-  return <DataTable rows={rows!} columns={columns}></DataTable>;
+  return (
+    <DataTable
+      rows={rows!}
+      columns={columns}
+      listOptions={undefined}
+    ></DataTable>
+  );
 };
 
 export default InventoryListPage;

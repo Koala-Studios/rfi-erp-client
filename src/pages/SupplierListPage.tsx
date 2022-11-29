@@ -52,14 +52,14 @@ const SupplierListPage = () => {
 
   React.useEffect(() => {
     listSuppliers(auth.token, 25, 1).then((supplierList) => {
-      const newRows = supplierList.map((supplier) => { 
+      const newRows = supplierList.map((supplier) => {
         return {
           id: supplier._id,
           code: supplier.code,
           name: supplier.name,
           contact_name: supplier.contact_name,
           address_one: supplier.address_one,
-          address_two: supplier.address_two
+          address_two: supplier.address_two,
         };
       });
       setRows(newRows);
@@ -68,7 +68,13 @@ const SupplierListPage = () => {
 
   if (rows == null) return null;
 
-  return <DataTable rows={rows!} columns={columns}></DataTable>;
+  return (
+    <DataTable
+      rows={rows!}
+      columns={columns}
+      listOptions={undefined}
+    ></DataTable>
+  );
 };
 
 export default SupplierListPage;

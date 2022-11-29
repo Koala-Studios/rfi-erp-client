@@ -1,5 +1,5 @@
 import axios from "axios";
-import apiStatus from "./apiStatus";
+import { apiStatus, IListOptions } from "./utils";
 
 export interface IFormula {
   _id: string;
@@ -11,7 +11,7 @@ export interface IFormula {
     {
       material_name: string;
       material_code: string;
-      material_id: string;//inventory
+      material_id: string; //inventory
       amount: number;
       notes: string;
       cost: number;
@@ -31,7 +31,8 @@ export const getFormula = async (
   const config = {
     headers: { Authorization: `Bearer ${token}` },
     params: {
-      product_id: id, version: version
+      product_id: id,
+      version: version,
     },
   };
   // console.log(id, version, 'testing it all')
@@ -44,7 +45,9 @@ export const getFormula = async (
         formula = res.data.res;
       }
       // console.log('hello')
-      window.dispatchEvent(new CustomEvent('NotificationEvent', { detail: res.data.message }));
+      window.dispatchEvent(
+        new CustomEvent("NotificationEvent", { detail: res.data.message })
+      );
     })
     .catch((err) => {
       console.log(err);

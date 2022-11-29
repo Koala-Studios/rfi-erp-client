@@ -106,7 +106,13 @@ const DvpListPage = () => {
 
   if (rows == null) return null;
 
-  return <DataTable rows={rows!} columns={columns}></DataTable>;
+  return (
+    <DataTable
+      rows={rows!}
+      columns={columns}
+      listOptions={undefined}
+    ></DataTable>
+  );
 };
 
 export default DvpListPage;

@@ -8,12 +8,14 @@ import {
   GridValueGetterParams,
 } from "@mui/x-data-grid";
 import { Typography } from "@mui/material";
+import { IListOptions } from "../../logic/utils";
 
 interface Props {
   title?: string;
   rows: any[];
   columns: GridColDef[];
   auto_height?: boolean;
+  listOptions?: IListOptions;
 }
 
 export const DataTable: React.FC<Props> = ({
@@ -21,15 +23,16 @@ export const DataTable: React.FC<Props> = ({
   rows,
   columns,
   auto_height = false,
+  listOptions,
 }) => {
   const CustomToolbar: React.FC = () => {
     return (
       <GridToolbarContainer>
         {title ? <Typography variant="h6">{title}</Typography> : null}
-        <GridToolbarFilterButton
-          onResize={undefined}
-          onResizeCapture={undefined}
-        />
+        {/* <GridToolbarFilterButton
+          onResize={() => {}}
+          onResizeCapture={() => {}}
+        /> */}
         {/* <GridToolbarExport /> */}
       </GridToolbarContainer>
     );
@@ -47,7 +50,8 @@ export const DataTable: React.FC<Props> = ({
         rowHeight={39}
         pageSize={25}
         pagination
-        rowsPerPageOptions={[5, 25]}
+        rowCount={listOptions!.totalDocs}
+        rowsPerPageOptions={[25]}
         components={{
           Toolbar: CustomToolbar,
         }}

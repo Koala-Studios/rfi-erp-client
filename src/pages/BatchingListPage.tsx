@@ -23,7 +23,7 @@ const BatchingListPage = () => {
         return {
           id: batch._id,
           batch_code: batch.batch_code,
-          date: (batch.date_created).toString().replace(/\T.+/, ''),
+          date: batch.date_created.toString().replace(/\T.+/, ""),
           quantity: batch.quantity,
           product_code: batch.product_code,
           product_name: batch.product_name,
@@ -35,7 +35,13 @@ const BatchingListPage = () => {
 
   if (rows == null) return null;
 
-  return <DataTable rows={rows!} columns={columns}></DataTable>;
+  return (
+    <DataTable
+      rows={rows!}
+      columns={columns}
+      listOptions={undefined}
+    ></DataTable>
+  );
 };
 
 export default BatchingListPage;

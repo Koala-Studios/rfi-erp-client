@@ -1,94 +1,93 @@
 import axios from "axios";
-import apiStatus from "./apiStatus";
-
+import { apiStatus, IListOptions } from "./utils";
 
 interface IInventoryContainer {
-    batch_code:string;
-    supplier_id:string;
-    on_hand:number;
-    on_order:number;
-    quarantined:number;
-    allocated:number;
-    price:number;
+  batch_code: string;
+  supplier_id: string;
+  on_hand: number;
+  on_order: number;
+  quarantined: number;
+  allocated: number;
+  price: number;
 }
 interface IRegulatoryContainer {
-    fda_status?:number;
-    cpl_hazard?:string;
-    fema_number?:number;
-    ttb_status?:string;
-    eu_status?:number;
-    organic?:boolean;
-    kosher?:boolean;
+  fda_status?: number;
+  cpl_hazard?: string;
+  fema_number?: number;
+  ttb_status?: string;
+  eu_status?: number;
+  organic?: boolean;
+  kosher?: boolean;
 }
 export interface IInventory {
-    _id:string;
-	product_code:string;
-	name:string;
-	cost: number;
-    quantity: number;
-    date_created: Date;
-    cas_number: string;
-    reorder_amount: number;
-    stock:[IInventoryContainer];
-    regulatory:IRegulatoryContainer;
+  _id: string;
+  product_code: string;
+  name: string;
+  cost: number;
+  quantity: number;
+  date_created: Date;
+  cas_number: string;
+  reorder_amount: number;
+  stock: [IInventoryContainer];
+  regulatory: IRegulatoryContainer;
 }
 
 const api = axios.create({
-	baseURL: "http://localhost:5000/inventory",
+  baseURL: "http://localhost:5000/inventory",
 });
 
 export const listInventory = async (
-    token:string,
-    count:number,
-	page: number
+  token: string,
+  count: number,
+  page: number
 ): Promise<IInventory[]> => {
-	const config = {
-		headers: { Authorization: `Bearer ${token}` },
-		params: {
-			count,
-			page,
-		},
-	};
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {
+      count,
+      page,
+    },
+  };
 
-	let inventory_list: IInventory[] = [];
+  let inventory_list: IInventory[] = [];
 
-	await api
-		.get("/list", config)
-		.then((res) => {
-			if (res.status === apiStatus.OK) {
-				inventory_list = res.data;
-			}
-		})
-		.catch((err) => {
-			console.log(err);
-		});
+  await api
+    .get("/list", config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        inventory_list = res.data;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 
-	return inventory_list;
+  return inventory_list;
 };
 
 export const getProduct = async (
-    token:string,
-    id:string
+  token: string,
+  id: string
 ): Promise<IInventory | null> => {
-	const config = {
-		headers: { Authorization: `Bearer ${token}` },
-		params: {
-			id:id
-		},
-	};
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {
+      id: id,
+    },
+  };
 
-	let inventory_item: IInventory | null = null;
+  let inventory_item: IInventory | null = null;
 
-	await api
-		.get("/get", config)
-		.then((res) => {
-			if (res.status === apiStatus.OK) {
-				inventory_item = res.data;
-			}
-		})
-		.catch((err) => {
-			console.log(err);
-		});
+  await api
+    .get("/get", config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        inventory_item = res.data;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 
-	return inventory_item;
+  return inventory_item;
 };

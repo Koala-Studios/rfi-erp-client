@@ -10,6 +10,7 @@ import { AuthContext } from "../components/navigation/AuthProvider";
 import { Button, Card, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { formTypes } from "../logic/form.logic";
+import { IListData } from "../logic/utils";
 
 const ProjectStatus = [
   ["Pending", "error"],
@@ -64,26 +65,26 @@ const ProjectListPage = () => {
   ];
 
   const auth = React.useContext(AuthContext);
-  const [rows, setRows] = React.useState<any>(null);
+  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listProjects(auth.token, 25, 1).then((projectList) => {
-      console.log(projectList);
-      const newRows = projectList.map((project) => {
+    listProjects(auth.token, 25, 1).then((list) => {
+      console.log(list);
+      const newRows = list!.docs.map((project) => {
         return {
           id: project._id,
-          project_code: project.project_code,
           name: project.name,
+          // project_code: project.project_code,
           // status: project.status,
           // assigned_user: project.assigned_user,
           // notes: project.notes,
         };
       });
-      setRows(newRows);
+      setDataOptions({ rows: newRows, listOptions: list! });
     });
   }, []);
 
-  if (rows == null) return null;
+  if (dataOptions == null) return null;
 
   //TODO:Memoization
   const createProjectForm = () => {
@@ -110,7 +111,11 @@ const ProjectListPage = () => {
           + New Project
         </Button>
       </Card>
-      <DataTable rows={rows!} columns={columns}></DataTable>;
+      <DataTable
+        rows={dataOptions.rows}
+        columns={columns}
+        listOptions={dataOptions.listOptions}
+      ></DataTable>
     </>
   );
 };

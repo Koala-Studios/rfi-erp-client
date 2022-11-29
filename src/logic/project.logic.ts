@@ -1,6 +1,6 @@
 import { IUser } from "./user.logic";
 import axios from "axios";
-import apiStatus from "./apiStatus";
+import { apiStatus, IListOptions } from "./utils";
 
 export interface IProject {
   _id: string;
@@ -30,7 +30,7 @@ export const listProjects = async (
   token: string,
   count: number,
   page: number
-): Promise<IProject[]> => {
+): Promise<IListOptions | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
     params: {
@@ -39,20 +39,20 @@ export const listProjects = async (
     },
   };
 
-  let batches: IProject[] = [];
+  let list: IListOptions | null = null;
 
   await api
     .get("/list", config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
-        batches = res.data;
+        list = res.data.res;
       }
     })
     .catch((err) => {
       console.log(err);
     });
 
-  return batches;
+  return list;
 };
 
 export const getProject = async (

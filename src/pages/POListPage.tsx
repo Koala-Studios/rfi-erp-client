@@ -10,7 +10,6 @@ import { AuthContext } from "../components/navigation/AuthProvider";
 import { Button, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
-
 const POListPage = () => {
   const navigate = useNavigate();
 
@@ -38,8 +37,8 @@ const POListPage = () => {
             View Details
           </Button>
         </strong>
-      )
-    }
+      ),
+    },
   ];
 
   const auth = React.useContext(AuthContext);
@@ -47,15 +46,17 @@ const POListPage = () => {
 
   React.useEffect(() => {
     listPOs(auth.token, 25, 1).then((purchaseList) => {
-      console.log(purchaseList)
+      console.log(purchaseList);
       const newRows = purchaseList.map((purchase) => {
         return {
           id: purchase._id,
           order_code: purchase.order_code,
           supplier: purchase.supplier,
-          date_purchased: purchase.date_purchased.toString().replace(/\T.+/, ''),
+          date_purchased: purchase.date_purchased
+            .toString()
+            .replace(/\T.+/, ""),
           status: purchase.status,
-          item_count: purchase.order_items.length
+          item_count: purchase.order_items.length,
         };
       });
       setRows(newRows);
@@ -64,7 +65,13 @@ const POListPage = () => {
 
   if (rows == null) return null;
 
-  return <DataTable rows={rows!} columns={columns}></DataTable>;
+  return (
+    <DataTable
+      rows={rows!}
+      columns={columns}
+      listOptions={undefined}
+    ></DataTable>
+  );
 };
 
 export default POListPage;
