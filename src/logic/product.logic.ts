@@ -16,35 +16,35 @@ const api = axios.create({
   baseURL: "http://localhost:5000/products",
 });
 
+
+
 export const listProducts = async (
   token: string,
-  approved: boolean,
   count: number,
   page: number
-): Promise<IProduct[]> => {
+): Promise<IListOptions | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
     params: {
-      approved,
       count,
       page,
     },
   };
 
-  let batches: IProduct[] = [];
+  let list: IListOptions | null = null;
 
   await api
     .get("/list", config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
-        batches = res.data;
+        list = res.data.res;
       }
     })
     .catch((err) => {
       console.log(err);
     });
 
-  return batches;
+  return list;
 };
 
 export const getProduct = async (

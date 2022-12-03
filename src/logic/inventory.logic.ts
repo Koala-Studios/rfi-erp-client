@@ -35,12 +35,11 @@ export interface IInventory {
 const api = axios.create({
   baseURL: "http://localhost:5000/inventory",
 });
-
 export const listInventory = async (
   token: string,
   count: number,
   page: number
-): Promise<IInventory[]> => {
+): Promise<IListOptions | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
     params: {
@@ -49,20 +48,20 @@ export const listInventory = async (
     },
   };
 
-  let inventory_list: IInventory[] = [];
+  let list: IListOptions | null = null;
 
   await api
     .get("/list", config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
-        inventory_list = res.data;
+        list = res.data.res;
       }
     })
     .catch((err) => {
       console.log(err);
     });
 
-  return inventory_list;
+  return list;
 };
 
 export const getProduct = async (

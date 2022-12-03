@@ -9,6 +9,7 @@ import { listProducts } from "../logic/product.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { Button, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { IListData } from "../logic/utils";
 
 const ProductStatus = [
   ["Pending", "error"],
@@ -83,12 +84,11 @@ const DvpListPage = () => {
   ];
 
   const auth = React.useContext(AuthContext);
-  const [rows, setRows] = React.useState<any>(null);
+  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listProducts(auth.token, false, 25, 1).then((productList) => {
-      console.log(productList);
-      const newRows = productList.map((product, idx) => {
+    listProducts(auth.token, 25, 1).then((list) => { //TODO: FIX DEFAULT QUERY WITH UNNAPPROVED VS APPROVED PRODUCTS
+      const newRows = list!.docs.map((product /*, idx*/) => {
         return {
           id: product._id,
           product_code: product.product_code,
@@ -97,20 +97,20 @@ const DvpListPage = () => {
           versions: product.versions,
           approved_version: product.approved_version,
           cost: product.cost,
-          key: idx,
+          // key: idx,
         };
       });
-      setRows(newRows);
+      setDataOptions({ rows: newRows, listOptions: list! });
     });
   }, []);
 
-  if (rows == null) return null;
-
+  if (dataOptions == null) return null;
+  
   return (
     <DataTable
-      rows={rows!}
+      rows={dataOptions.rows}
       columns={columns}
-      listOptions={undefined}
+      listOptions={dataOptions.listOptions}
     ></DataTable>
   );
 };

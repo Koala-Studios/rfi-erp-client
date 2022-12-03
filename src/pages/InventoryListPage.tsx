@@ -10,6 +10,7 @@ import { AuthContext } from "../components/navigation/AuthProvider";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { setTokenSourceMapRange } from "typescript";
+import { IListData } from "../logic/utils";
 
 const InventoryListPage = () => {
   const navigate = useNavigate();
@@ -67,16 +68,16 @@ const InventoryListPage = () => {
   ];
 
   const auth = React.useContext(AuthContext);
-  const [rows, setRows] = React.useState<any>(null);
+  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listInventory(auth.token, 1500, 1).then((inventoryList) => {
-      const newRows = inventoryList.map((item) => {
+    listInventory(auth.token, 25, 1).then((list) => {
+      const newRows = list!.docs.map((item) => {
         let on_hand = 0;
         let on_order = 0;
         let quarantined = 0;
         let allocated = 0;
-        item.stock.map((stock) => {
+        item!.stock.map((stock: { on_hand: any; on_order: any; quarantined: any; allocated: any; }) => {
           on_hand += stock.on_hand ? stock.on_hand : 0;
           on_order += stock.on_order ? stock.on_order : 0;
           quarantined += stock.quarantined ? stock.quarantined : 0;
@@ -94,17 +95,17 @@ const InventoryListPage = () => {
           allocated: allocated,
         };
       });
-      setRows(newRows);
+      setDataOptions({ rows: newRows, listOptions: list! });
     });
   }, []);
 
-  if (rows == null) return null;
+  if (dataOptions == null) return null;
 
   return (
     <DataTable
-      rows={rows!}
+      rows={dataOptions.rows}
       columns={columns}
-      listOptions={undefined}
+      listOptions={dataOptions.listOptions}
     ></DataTable>
   );
 };

@@ -9,6 +9,7 @@ import { listProducts } from "../logic/product.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { IListData } from "../logic/utils";
 
 const ProductListPage = () => {
   const navigate = useNavigate();
@@ -57,11 +58,11 @@ const ProductListPage = () => {
   ];
 
   const auth = React.useContext(AuthContext);
-  const [rows, setRows] = React.useState<any>(null);
+  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listProducts(auth.token, true, 1500, 1).then((productList) => {
-      const newRows = productList.map((product) => {
+    listProducts(auth.token, 25, 1).then((list) => {
+      const newRows = list!.docs.map((product) => {
         return {
           id: product._id,
           product_code: product.product_code,
@@ -70,17 +71,17 @@ const ProductListPage = () => {
           cost: `$${product.cost}`,
         };
       });
-      setRows(newRows);
+      setDataOptions({ rows: newRows, listOptions: list! });
     });
   }, []);
 
-  if (rows == null) return null;
-
+  if (dataOptions == null) return null;
+  
   return (
     <DataTable
-      rows={rows!}
+      rows={dataOptions.rows}
       columns={columns}
-      listOptions={undefined}
+      listOptions={dataOptions.listOptions}
     ></DataTable>
   );
 };

@@ -50,7 +50,7 @@ export const DataTable: React.FC<Props> = ({
         rowHeight={39}
         pageSize={25}
         pagination
-        rowCount={listOptions!.totalDocs}
+        // rowCount={listOptions!.totalDocs}
         rowsPerPageOptions={[25]}
         components={{
           Toolbar: CustomToolbar,

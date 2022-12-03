@@ -3,6 +3,7 @@ import { DataTable } from "../components/utils/DataTable";
 import { GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import { listBatching } from "../logic/batching.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
+import { IListData } from "../logic/utils";
 
 const columns: GridColDef[] = [
   // { field: "id", headerName: "ID", width: 300 },
@@ -15,11 +16,11 @@ const columns: GridColDef[] = [
 
 const BatchingListPage = () => {
   const auth = React.useContext(AuthContext);
-  const [rows, setRows] = React.useState<any>(null);
+  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listBatching(auth.token, 100, 1).then((batchingList) => {
-      const newRows = batchingList.map((batch) => {
+    listBatching(auth.token, 100, 1).then((list) => {
+      const newRows = list!.docs.map((batch) => {
         return {
           id: batch._id,
           batch_code: batch.batch_code,
@@ -29,17 +30,17 @@ const BatchingListPage = () => {
           product_name: batch.product_name,
         };
       });
-      setRows(newRows);
+      setDataOptions({ rows: newRows, listOptions: list! });
     });
   }, []);
 
-  if (rows == null) return null;
+  if (dataOptions == null) return null;
 
   return (
     <DataTable
-      rows={rows!}
+      rows={dataOptions.rows}
       columns={columns}
-      listOptions={undefined}
+      listOptions={dataOptions.listOptions}
     ></DataTable>
   );
 };

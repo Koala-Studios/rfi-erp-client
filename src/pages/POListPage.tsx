@@ -9,6 +9,7 @@ import { listPOs } from "../logic/purchase-order.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { Button, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { IListData } from "../logic/utils";
 
 const POListPage = () => {
   const navigate = useNavigate();
@@ -42,12 +43,11 @@ const POListPage = () => {
   ];
 
   const auth = React.useContext(AuthContext);
-  const [rows, setRows] = React.useState<any>(null);
+  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listPOs(auth.token, 25, 1).then((purchaseList) => {
-      console.log(purchaseList);
-      const newRows = purchaseList.map((purchase) => {
+    listPOs(auth.token, 25, 1).then((list) => {
+      const newRows = list!.docs.map((purchase) => {
         return {
           id: purchase._id,
           order_code: purchase.order_code,
@@ -59,17 +59,18 @@ const POListPage = () => {
           item_count: purchase.order_items.length,
         };
       });
-      setRows(newRows);
+      setDataOptions({ rows: newRows, listOptions: list! });
     });
   }, []);
 
-  if (rows == null) return null;
 
+  if (dataOptions == null) return null;
+  
   return (
     <DataTable
-      rows={rows!}
+      rows={dataOptions.rows}
       columns={columns}
-      listOptions={undefined}
+      listOptions={dataOptions.listOptions}
     ></DataTable>
   );
 };

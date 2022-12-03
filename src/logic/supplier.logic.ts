@@ -19,30 +19,29 @@ export const listSuppliers = async (
   token: string,
   count: number,
   page: number
-): Promise<ISupplier[]> => {
+): Promise<IListOptions | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
     params: {
-      count: count,
-      page: page,
+      count,
+      page,
     },
   };
 
-  let suppliers: ISupplier[] = [];
+  let list: IListOptions | null = null;
 
   await api
     .get("/list", config)
     .then((res) => {
-      console.log(res.data);
       if (res.status === apiStatus.OK) {
-        suppliers = res.data;
+        list = res.data.res;
       }
     })
     .catch((err) => {
       console.log(err);
     });
 
-  return suppliers;
+  return list;
 };
 
 export const getSupplier = async (

@@ -30,7 +30,7 @@ export const listPOs = async (
   token: string,
   count: number,
   page: number
-): Promise<IPurchaseOrder[]> => {
+): Promise<IListOptions | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
     params: {
@@ -39,20 +39,20 @@ export const listPOs = async (
     },
   };
 
-  let po_list: IPurchaseOrder[] = [];
+  let list: IListOptions | null = null;
 
   await api
     .get("/list", config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
-        po_list = res.data;
+        list = res.data.res;
       }
     })
     .catch((err) => {
       console.log(err);
     });
 
-  return po_list;
+  return list;
 };
 
 export const getPurchase = async (

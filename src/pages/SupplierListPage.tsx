@@ -9,6 +9,7 @@ import { listSuppliers } from "../logic/supplier.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { IListData } from "../logic/utils";
 
 const SupplierListPage = () => {
   const navigate = useNavigate();
@@ -48,11 +49,11 @@ const SupplierListPage = () => {
   ];
 
   const auth = React.useContext(AuthContext);
-  const [rows, setRows] = React.useState<any>(null);
+  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listSuppliers(auth.token, 25, 1).then((supplierList) => {
-      const newRows = supplierList.map((supplier) => {
+    listSuppliers(auth.token, 25, 1).then((list) => {
+      const newRows = list!.docs.map((supplier) => {
         return {
           id: supplier._id,
           code: supplier.code,
@@ -62,17 +63,18 @@ const SupplierListPage = () => {
           address_two: supplier.address_two,
         };
       });
-      setRows(newRows);
+      setDataOptions({ rows: newRows, listOptions: list! });
     });
   }, []);
 
-  if (rows == null) return null;
 
+  if (dataOptions == null) return null;
+  
   return (
     <DataTable
-      rows={rows!}
+      rows={dataOptions.rows}
       columns={columns}
-      listOptions={undefined}
+      listOptions={dataOptions.listOptions}
     ></DataTable>
   );
 };

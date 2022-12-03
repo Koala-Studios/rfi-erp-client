@@ -20,27 +20,27 @@ export const listBatching = async (
   token: string,
   count: number,
   page: number
-): Promise<IBatching[]> => {
+): Promise<IListOptions | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
     params: {
-      count: count,
-      page: page,
+      count,
+      page,
     },
   };
 
-  let batches: IBatching[] = [];
+  let list: IListOptions | null = null;
 
   await api
     .get("/list", config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
-        batches = res.data.res;
+        list = res.data.res;
       }
     })
     .catch((err) => {
       console.log(err);
     });
 
-  return batches;
+  return list;
 };
