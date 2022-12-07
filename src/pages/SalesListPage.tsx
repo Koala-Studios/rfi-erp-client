@@ -5,19 +5,19 @@ import {
   GridRenderCellParams,
   GridValueGetterParams,
 } from "@mui/x-data-grid";
-import { listPOs } from "../logic/purchase-order.logic";
+import { listSalesOrders } from "../logic/sales-order.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { Button, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { IListData } from "../logic/utils";
 
-const POListPage = () => {
+const SalesListPage = () => {
   const navigate = useNavigate();
 
   const columns: GridColDef[] = [
     { field: "order_code", headerName: "Order Code", width: 200 },
-    { field: "supplier", headerName: "Supplier Name", width: 200 },
-    { field: "date_purchased", headerName: "Purchase Date", width: 200 },
+    { field: "customer", headerName: "Customer Name", width: 200 },
+    { field: "date_orderd", headerName: "Purchase Date", width: 200 },
     { field: "item_count", headerName: "Item Count", width: 200 },
     { field: "status", headerName: "Status", width: 200 },
     {
@@ -32,7 +32,7 @@ const POListPage = () => {
             color="primary"
             size="small"
             onClick={() =>
-              navigate(`/purchase-orders/${params.value}`, { replace: false })
+              navigate(`/sales-orders/${params.value}`, { replace: false })
             }
           >
             View Details
@@ -46,17 +46,17 @@ const POListPage = () => {
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listPOs(auth.token, 25, 1).then((list) => {
-      const newRows = list!.docs.map((purchase) => {
+    listSalesOrders(auth.token, 25, 1).then((list) => {
+      const newRows = list!.docs.map((order) => {
         return {
-          id: purchase._id,
-          order_code: purchase.order_code,
-          supplier: purchase.supplier,
-          date_purchased: purchase.date_purchased
+          id: order._id,
+          order_code: order.order_code,
+          customer: order.customer,
+          date_orderd: order.date_orderd
             .toString()
             .replace(/\T.+/, ""),
-          status: purchase.status,
-          item_count: purchase.order_items.length,
+          status: order.status,
+          item_count: order.order_items.length,
         };
       });
       setDataOptions({ rows: newRows, listOptions: list! });
@@ -75,4 +75,4 @@ const POListPage = () => {
   );
 };
 
-export default POListPage;
+export default SalesListPage;

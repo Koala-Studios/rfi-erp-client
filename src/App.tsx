@@ -27,6 +27,8 @@ import FormulaPage from "./pages/FormulaPage";
 import POListPage from "./pages/POListPage";
 import ProjectListPage from "./pages/ProjectListPage";
 import { PurchaseDetailPage } from "./pages/PurchaseDetailPage";
+import SalesListPage from "./pages/SalesListPage";
+import { SalesDetailPage } from "./pages/SalesDetailPage";
 
 const mainTheme = createTheme({
   palette: {
@@ -90,6 +92,26 @@ function App() {
                 <RequireAuth>
                   <Navbar title="Purchase Order">
                     <PurchaseDetailPage />
+                  </Navbar>
+                </RequireAuth>
+              }
+            />
+                        <Route
+              path="/sales-orders"
+              element={
+                <RequireAuth>
+                  <Navbar title="Sales Orders">
+                    <SalesListPage />
+                  </Navbar>
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/sales-orders/:id"
+              element={
+                <RequireAuth>
+                  <Navbar title="Sales Order">
+                    <SalesDetailPage />
                   </Navbar>
                 </RequireAuth>
               }

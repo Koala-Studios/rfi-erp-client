@@ -33,7 +33,7 @@ export const calculateForecast = async (
   await api
     .post("/calculate", data, config)
     .then((res) => {
-      console.log(forecastResult);
+      // console.log(res);
       if (res.status === apiStatus.OK) {
         forecastResult = res.data;
       }

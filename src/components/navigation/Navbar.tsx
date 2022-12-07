@@ -77,6 +77,12 @@ const LinkItems = [
     icon: <ShoppingBasketIcon></ShoppingBasketIcon>,
   },
   {
+    text: "Sales Orders",
+    link: "/sales-orders",
+    icon: <ShoppingBasketIcon></ShoppingBasketIcon>,
+  },
+  
+  {
     text: "Inventory",
     link: "/inventory",
     icon: <StorageIcon></StorageIcon>,

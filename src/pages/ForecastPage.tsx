@@ -76,6 +76,7 @@ export const ForecastPage = () => {
     });
 
     calculateForecast(auth.token, forecastList).then((result: IForecast[]) => {
+      console.log(result)
       const newRows = result.map((item, idx) => {
         return {
           id: idx,
@@ -170,6 +171,8 @@ export const ForecastPage = () => {
             title="Forecast Results"
             rows={materialRows!}
             columns={materialColumns}
+            auto_height={true}
+            listOptions={undefined}
           ></DataTable>
         </Box>
       ) : null}
