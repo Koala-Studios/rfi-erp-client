@@ -29,6 +29,7 @@ import ProjectListPage from "./pages/ProjectListPage";
 import { PurchaseDetailPage } from "./pages/PurchaseDetailPage";
 import SalesListPage from "./pages/SalesListPage";
 import { SalesDetailPage } from "./pages/SalesDetailPage";
+import FormulaDevPage from "./pages/FormulaDevPage";
 
 const mainTheme = createTheme({
   palette: {
@@ -194,6 +195,17 @@ function App() {
                 <RequireAuth>
                   <Navbar title="Formula Page">
                     <FormulaPage />
+                  </Navbar>
+                </RequireAuth>
+              }
+            />
+
+            <Route
+              path="/formula/develop/:id/:version"
+              element={
+                <RequireAuth>
+                  <Navbar title="Formula Development Page">
+                    <FormulaDevPage />
                   </Navbar>
                 </RequireAuth>
               }

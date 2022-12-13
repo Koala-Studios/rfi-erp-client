@@ -90,3 +90,31 @@ export const getProduct = async (
 
   return inventory_item;
 };
+
+
+export const lookupInventory = async ( //TODO: Not finished
+  token: string,
+  string:string
+): Promise<any | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {
+      string
+    },
+  };
+
+  let list: IListOptions | null = null;
+
+  await api
+    .get("/lookup", config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        list = res.data;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  console.log(list)
+  return list;
+};
