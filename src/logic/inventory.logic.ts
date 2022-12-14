@@ -94,22 +94,24 @@ export const getProduct = async (
 
 export const lookupInventory = async ( //TODO: Not finished
   token: string,
-  string:string
-): Promise<any | null> => {
+  string:string,
+  for_sale:boolean
+): Promise<IInventory[] | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
     params: {
-      string
+      string,
+      for_sale
     },
   };
 
-  let list: IListOptions | null = null;
+  let list: IInventory[] | null = null;
 
   await api
     .get("/lookup", config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
-        list = res.data;
+        list = res.data.res;
       }
     })
     .catch((err) => {

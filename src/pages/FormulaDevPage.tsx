@@ -10,6 +10,7 @@ import { lookupInventory } from "../logic/inventory.logic";
 
 
 const FormulaDevPage = () => {
+const [invLookupCatalog, setInvLookupCatalog] = React.useState<any>(null);
 const columns: GridColDef[] = [
   // { field: "id", headerName: "ID", width: 300 },
   // { field: "date", headerName: "Date Created", width: 250 },
@@ -18,11 +19,11 @@ const columns: GridColDef[] = [
       <Autocomplete
   disablePortal
   id="combo-box-demo"
-  options={['this has to be','filled by results', 'of filterChanges function']}
+  options={invLookupCatalog ? invLookupCatalog : []}
   sx={{ width: 300 }}
   onInputChange={(event, newInputValue) => {
     if(newInputValue.length > 4) {
-    const test = filterChanges(newInputValue.toUpperCase());
+    filterChanges(newInputValue.toUpperCase());
     console.log(newInputValue, test, 'asdapuja')
     }
   }}
@@ -44,10 +45,22 @@ const columns: GridColDef[] = [
 const auth = React.useContext(AuthContext);
 
 function filterChanges(string: string) {
-        const test = lookupInventory(auth.token, string).then((result) => {
-            console.log(result)
-        });
-        return test;
+        lookupInventory(auth.token, string, false).then((result) => {
+            console.log(result,' TEST')
+            if(!result) {
+                setInvLookupCatalog([]);
+            } else {
+              const newCatalog = result?.map((item) => {
+                return {
+                  id: item._id,
+                  code: item.product_code,
+                  label: item.name,
+                  cost: item.cost
+                };
+              });
+              setInvLookupCatalog(newCatalog);
+            }
+          });
     };
 
 
