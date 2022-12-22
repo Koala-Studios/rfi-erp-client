@@ -1,22 +1,22 @@
 import axios from "axios";
 import { apiStatus, IListOptions } from "./utils";
 
+export interface IFormulaItem {
+  material_name: string;
+  material_code: string;
+  material_id: string; //inventory
+  amount: number;
+  notes: string;
+  cost: number;
+}
+
 export interface IFormula {
   _id: string;
   product_code: string;
   product_id: string;
   version: number;
   date_created: Date;
-  formula_items: [
-    {
-      material_name: string;
-      material_code: string;
-      material_id: string; //inventory
-      amount: number;
-      notes: string;
-      cost: number;
-    }
-  ];
+  formula_items: IFormulaItem[];
 }
 
 const api = axios.create({

@@ -94,13 +94,13 @@ export const getProduct = async (
 
 export const lookupInventory = async ( //TODO: Not finished
   token: string,
-  string:string,
+  search_value:string,
   for_sale:boolean
 ): Promise<IInventory[] | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
     params: {
-      string,
+      search_value,
       for_sale
     },
   };
@@ -117,6 +117,5 @@ export const lookupInventory = async ( //TODO: Not finished
     .catch((err) => {
       console.log(err);
     });
-  console.log(list)
   return list;
 };
