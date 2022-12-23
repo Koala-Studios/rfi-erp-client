@@ -30,6 +30,7 @@ import { PurchaseDetailPage } from "./pages/PurchaseDetailPage";
 import SalesListPage from "./pages/SalesListPage";
 import { SalesDetailPage } from "./pages/SalesDetailPage";
 import FormulaDevPage from "./pages/FormulaDevPage";
+import { ProjectDetails } from "./components/project/ProjectDetails";
 
 const mainTheme = createTheme({
   palette: {
@@ -78,6 +79,16 @@ function App() {
               }
             />
             <Route
+              path="/projects/:id"
+              element={
+                <RequireAuth>
+                  <Navbar title="Projects Details">
+                    <ProjectDetails />
+                  </Navbar>
+                </RequireAuth>
+              }
+            />
+            <Route
               path="/purchase-orders"
               element={
                 <RequireAuth>
@@ -97,7 +108,7 @@ function App() {
                 </RequireAuth>
               }
             />
-                        <Route
+            <Route
               path="/sales-orders"
               element={
                 <RequireAuth>

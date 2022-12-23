@@ -167,6 +167,7 @@ const FormulaDevPage = () => {
                 <TextField
                   variant="filled"
                   autoFocus
+                  value={""}
                   // onChange={(value) => {
 
                   //   setEditMode(false);
