@@ -178,13 +178,14 @@ const FormulaDevPage = () => {
             } else {
               // <Typography></Typography>
               return (
-                <Typography
-                  style={{ width: "100%", height: "100%" }}
-                  variant="subtitle2"
-                  onClick={() => setEditMode(row_params.row.id)}
+                <div
+                  style={{ minWidth: "100%", minHeight: "100%" }}
+                  onDoubleClick={() => setEditMode(row_params.row.id)}
                 >
-                  {row_params.row.material_name}
-                </Typography>
+                  <Typography variant="subtitle2">
+                    {row_params.row.material_name}
+                  </Typography>
+                </div>
               );
             }
           }}
@@ -240,12 +241,12 @@ const FormulaDevPage = () => {
     setRows([
       ...rows.slice(0, index + 1),
       {
-        id: rowCount,
+        id: "row" + rowCount,
       },
       ...rows.slice(index == rows.length - 1 ? index + 2 : index + 1),
     ]);
     setRowCount(rowCount + 1);
-
+    setEditMode("row" + rowCount);
     console.log(rows);
   };
 
