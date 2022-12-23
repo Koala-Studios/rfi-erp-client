@@ -1,6 +1,6 @@
 import React from "react";
 import { DataTable } from "../components/utils/DataTable";
-import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { getFormula } from "../logic/formula.logic";
 import { useNavigate, useParams } from "react-router-dom";
@@ -11,13 +11,48 @@ import { IFormula, IFormulaItem } from "../logic/formula.logic";
 import AddBoxOutlinedIcon from '@mui/icons-material/AddBoxOutlined';
 import RemoveOutlinedIcon from '@mui/icons-material/RemoveOutlined';
 import { apiStatus } from "../logic/utils";
+import { fireEvent } from "@testing-library/react";
 
 
 
 
 const FormulaDevPage = () => {
 const [invLookupCatalog, setInvLookupCatalog] = React.useState<any>(null);
+const auth = React.useContext(AuthContext);
+  const [rowCount, setRowCount] = React.useState<any>(0);
+  const [rows, setRows] = React.useState<any>(null);
+  const [editMode, setEditMode] = React.useState<boolean>(false);
+  const { id } = useParams();
+  const { version } = useParams();
+  // const { approved_version } = useParams();
+React.useEffect(() => {
+  getFormula(auth.token, id!, version! ).then((formula) => {
+    // console.log(formula,' TEST')
+    if(!formula?.formula_items) {
+      setRows({});
+    } else {
+      const newRows = formula!.formula_items.map((item) => {
+        return {
+          id: item.material_id,
+          material_id:item.material_id,
+          material_code: item.material_code,
+          material_name: item.material_name,
+          item_cost: item.cost,
+          cost: null,
+          amount:null,
+          last_cost: item.cost,
+          last_amount: item.amount,
+          notes: item.notes,
+        };
+      });
+      setRows(newRows);
+    }
 
+  });
+}, []);
+React.useEffect(() => {
+  console.log(rows,'poop')
+}, [rows])
 interface IFormulaDevRow extends IFormulaItem {
   id:number;
   last_cost:number | null;
@@ -61,8 +96,8 @@ const columns: GridColDef[] = [
 },
   { field: "material_code", headerName: "Mat Code", width: 90, align:'right',
     },
-  { field: "material_name", headerName: "Mat Name", width: 320, editable:true,
-  renderEditCell: (row_params: GridRenderCellParams<string>) => (
+  { field: "material_name", headerName: "Mat Name", width: 320, 
+  renderCell: (row_params: GridRenderCellParams<string>) => (
     <Autocomplete
     clearOnBlur={true}
     id="combo-box-demo"
@@ -75,12 +110,6 @@ const columns: GridColDef[] = [
     // selectOnFocus
     // openOnFocus
     // disableClearable
-    onKeyDownCapture={(event) => {
-        if(event.code == "Space" 
-           ) {
-            event.stopPropagation();
-        } 
-    }}
     onInputChange={(event, newInputValue) => {
       if(newInputValue.length > 2) {
       filterChanges(newInputValue.toUpperCase());
@@ -90,34 +119,36 @@ const columns: GridColDef[] = [
     onChange={(event, value) => { //Works great if you use arrow keys and Enter key to select, otherwise it doesn't work :-()
       const value_obj = value as IFormulaDevRow
       console.log(event,value)
-      if(value_obj) {
-        let newRow:IFormulaDevRow = {
-          id: row_params.row.id,
-          material_id: value_obj.material_id,
-          material_code: value_obj.material_code,
-          material_name: value_obj.material_name,
-          cost: value_obj.cost,
-          amount: 0,
-          last_amount: null,
-          item_cost: value_obj.cost,
-          last_cost: 0,
-          notes: ''
-        }
-        handleEditRow(newRow)
-      } else {
-        console.log('dud')
-      }
+        if(value_obj) {
+          let newRow:IFormulaDevRow = {
+            id: row_params.row.id,
+            material_id: value_obj.material_id,
+            material_code: value_obj.material_code,
+            material_name: value_obj.material_name,
+            cost: value_obj.cost,
+            amount: 3,
+            last_amount: null,
+            item_cost: value_obj.cost,
+            last_cost: 0,
+            notes: ''
+          }
+          handleEditRow(newRow)
+          row_params.value = value_obj.material_name
+        } else {
+          console.log('dud')
+        }      
 
     }}
-    renderInput={(params) => <TextField variant="filled"  autoFocus label={row_params.value} {...params}
+    renderInput={(params) =>  <TextField variant="filled"   autoFocus label={row_params.row.material_name} {...params}
      />
     }
       />
-  )},
+)},
   { field: "amount", headerName: "Qty(%)", type: "number", width: 90, editable:true },
-  { field: "cost", headerName: "Cost", type: "number", width: 100 ,  valueGetter: (params) => params.row.cost * params.row.amount},
+  { field: "cost", headerName: "Cost", type: "number", width: 100 ,  valueGetter: (params) => params.row.item_cost * params.row.amount},
   { field: "last_amount", headerName: "Prev Qty(%)", type: "number", width: 90 },
   { field: "last_cost", headerName: "Prev Cost", type: "number", width: 100 ,  valueGetter: (params) => params.row.last_cost * params.row.last_amount },
+  { field: "item_cost", headerName: "Mat Cost/KG", type: "number", width: 100 },
   { field: "notes", headerName: "Notes", type: "string", width: 400, editable:true },
   
 ];
@@ -139,15 +170,13 @@ const handleAddRow = (row_id:number) => {
 }
 
 const handleEditRow = (newRow:IFormulaDevRow) => {
-    setRows(rows.map((m: { id: number; }) => {
-      if (m.id === newRow.id) {
-        return newRow;
+  const rowIndex = rows.findIndex((r:IFormulaDevRow) => r.id === newRow.id);
 
-      } else {
-        return m;
-      }
-      
-    }));
+  setRows([
+    ...rows.slice(0,rowIndex),
+    newRow,
+    ...rows.slice(rowIndex == rows.length - 1? rowIndex : rowIndex + 1)
+  ]);
 }
 
 const handleDeleteRow = (row_id:number) => {
@@ -156,7 +185,6 @@ const handleDeleteRow = (row_id:number) => {
   );
 }
 
-const auth = React.useContext(AuthContext);
 
 function filterChanges(string: string) {
         lookupInventory(auth.token, string, false).then((result) => {
@@ -173,45 +201,27 @@ function filterChanges(string: string) {
               setInvLookupCatalog(newCatalog);
           });
     };
-  
-  const [rowCount, setRowCount] = React.useState<any>(0);
-  const [rows, setRows] = React.useState<any>(null);
-  
-  const { id } = useParams();
-  const { version } = useParams();
-  // const { approved_version } = useParams();
-  React.useEffect(() => {
-    getFormula(auth.token, id!, version! ).then((formula) => {
-      // console.log(formula,' TEST')
-      if(!formula?.formula_items) {
-        setRows({});
-      } else {
-        const newRows = formula!.formula_items.map((item) => {
-          return {
-            id: item.material_id,
-            material_id:item.material_id,
-            material_code: item.material_code,
-            material_name: item.material_name,
-            cost: null,
-            amount:null,
-            item_cost: item.cost,
-            last_cost: item.cost * (item.amount/100),
-            last_amount: item.amount,
-            notes: item.notes,
-          };
-        });
-        setRows(newRows);
-      }
 
-    });
-  }, []);
+
 
   if (rows == null) return null;
 
 return (
-  <Card variant="outlined" sx={{ padding: 3, overflowY: 'auto' }}>
-    <DataTable auto_height={true} rows={rows!} columns={columns}></DataTable>
-  </Card> );
+  <>
+  {/* <Card variant="outlined">
+    <TextField type='number'></TextField>
+  </Card> */}
+    <Card variant="outlined" sx={{ padding: 3, overflowY: 'auto' }}>
+    <DataGrid onCellKeyDown={(params,event) => {
+      if(event.code == "Space" 
+      ) {
+       event.stopPropagation();
+      } 
+    }}
+    autoHeight={true} rows={rows!} columns={columns}></DataGrid>
+  </Card>
+  </>
+ );
 
 };
 export default FormulaDevPage;

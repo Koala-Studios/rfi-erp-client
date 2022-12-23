@@ -5,7 +5,7 @@ import { AuthContext } from "../components/navigation/AuthProvider";
 import { getPurchase, IPurchaseOrder } from "../logic/purchase-order.logic";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { DataTable } from "../components/utils/DataTable";
-import { GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
+import { GridColDef, GridRenderCellParams, GridValueGetterParams } from "@mui/x-data-grid";
 
 export const PurchaseDetailPage = () => {
   const navigate = useNavigate();
@@ -16,9 +16,46 @@ export const PurchaseDetailPage = () => {
 
 const columns: GridColDef[] = [
     { field: "material_code", headerName: "Material Code", width: 150 },
-    { field: "material_name", headerName: "Material Name", width: 300 },
-    { field: "quantity", headerName: "Qty(%)", type: "number", width: 90 },
-    { field: "cost", headerName: "Cost($)", type: "number", width: 100 },
+    { field: "material_name", headerName: "Material Name", width: 280 },
+    { field: "amount", headerName: "Order Qty(KG)", type: "number", width: 110, align:'center' },
+    { field: "received_amount", headerName: "Recvd Qty(KG)", type: "number", width: 110 , align:'center'},
+    { field: "cost", headerName: "Cost($/KG)", type: "number", width: 100 , align:'center'},
+    { field: "lot_number", headerName: "Lot#", type: "string", width: 120, editable:true , align:'right'},
+    { field: "container_size", headerName: "Cont Size(KG/x)", type: "number", width: 120, editable:true , align:'center'},
+    { field: "process_amount", headerName: "Qty to Process", type: "number", width: 120, editable:true , align:'center'},
+    {
+      field: "id",
+      headerName: "Actions",
+      align: "left",
+      width: 240,
+      renderCell: (params: GridRenderCellParams<string>) => (
+        <strong>
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={() => 
+              console.log('send to QC')
+            }
+          >
+            Send to Qc
+          </Button>
+          
+          <Button
+            variant="outlined"
+            color="error"
+            size="small"
+            style={{ marginLeft: 16 }}
+            onClick={() => 
+              console.log('send to gulag')
+            }
+          >
+            Quarantine
+          </Button>
+        </strong>
+      ),
+    },
+    
   ];
 
   useEffect(() => {
@@ -26,13 +63,15 @@ const columns: GridColDef[] = [
       setPurchaseOrder(purchase);
       const newRows = purchase!.order_items.map((item) => {
         return {
-          id: item.material_id,
+          id: item.material_id + Math.random()*1.213,
           material_code: item.product_code,
           material_name: item.material_name,
           cost: item.price,
-          quantity: item.amount,
+          amount: item.amount,
           status: item.status,
-
+          container_size: null,
+          process_amount: null,
+          received_amount: 0, //gotta update these 
         };
       });
       setRows(newRows);
@@ -43,6 +82,7 @@ const columns: GridColDef[] = [
   if (purchase == null || rows == null) return null;
 
   return (
+    <>
     <Card variant="outlined" sx={{ padding: 3 }}>
       <Button
         sx={{ marginBottom: 4 }}
@@ -59,20 +99,15 @@ const columns: GridColDef[] = [
         />
         Back to Products
       </Button>
-      <Typography variant="h6">Product Code: {purchase.order_code}</Typography>
-      <Typography variant="h6">Product Name: {purchase.date_purchased}</Typography>
-      <Typography variant="h6">
-        {/* Approved Version: {product.approved_version} */}
-      </Typography>
-      {/* <Typography variant="h6">Cost: {product.cost}</Typography> */}
-      <Button sx={{ marginTop: 3 }} variant="contained" size="large">
-        View Formula
-      </Button>
+      <Typography variant="h6">Order Code: {purchase.order_code}</Typography>
+      <Typography variant="h6">Order Date: {purchase.date_purchased}</Typography>
 
-      <Card variant="outlined" sx={{ padding: 5, overflowY: 'auto' }}>
-    
+
+    </Card>
+    <Card variant="outlined" sx={{ padding: 5, overflowY: 'auto' }}>
     <DataTable  auto_height={true} rows={rows!} columns={columns}></DataTable>
   </Card>;
-    </Card>
+    </>
+    
   );
 };
