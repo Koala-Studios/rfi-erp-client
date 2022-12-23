@@ -25,7 +25,7 @@ const FormulaDevPage = () => {
   const auth = React.useContext(AuthContext);
   const [rowCount, setRowCount] = React.useState<any>(0);
   const [rows, setRows] = React.useState<any>(null);
-  const [editMode, setEditMode] = React.useState<boolean>(false);
+  const [editMode, setEditMode] = React.useState<string | null>(null);
   const { id } = useParams();
   const { version } = useParams();
   // const { approved_version } = useParams();
@@ -49,13 +49,12 @@ const FormulaDevPage = () => {
             notes: item.notes,
           };
         });
+
         setRows(newRows);
       }
     });
   }, []);
-  React.useEffect(() => {
-    console.log(rows, "poop");
-  }, [rows]);
+
   interface IFormulaDevRow extends IFormulaItem {
     id: number;
     last_cost: number | null;
@@ -160,10 +159,10 @@ const FormulaDevPage = () => {
               console.log("dud");
             }
 
-            setEditMode(false);
+            setEditMode(null);
           }}
           renderInput={(params) => {
-            if (editMode) {
+            if (editMode === row_params.row.id) {
               return (
                 <TextField
                   variant="filled"
@@ -180,8 +179,9 @@ const FormulaDevPage = () => {
               // <Typography></Typography>
               return (
                 <Typography
+                  style={{ width: "100%", height: "100%" }}
                   variant="subtitle2"
-                  onClick={() => setEditMode(true)}
+                  onClick={() => setEditMode(row_params.row.id)}
                 >
                   {row_params.row.material_name}
                 </Typography>
