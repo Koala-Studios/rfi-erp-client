@@ -19,6 +19,7 @@ import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
 import RemoveOutlinedIcon from "@mui/icons-material/RemoveOutlined";
 import { apiStatus } from "../logic/utils";
 import { fireEvent } from "@testing-library/react";
+import GenericAutocomplete from "../components/utils/GenericAutocomplete";
 
 const FormulaDevPage = () => {
   const [invLookupCatalog, setInvLookupCatalog] = React.useState<any>(null);
@@ -119,77 +120,11 @@ const FormulaDevPage = () => {
       headerName: "Mat Name",
       width: 320,
       renderCell: (row_params: GridRenderCellParams<string>) => (
-        <Autocomplete
-          clearOnBlur={true}
-          id="combo-box-demo"
-          filterOptions={(x) => x}
-          options={invLookupCatalog ? invLookupCatalog : []}
-          PaperComponent={({ children }) => (
-            <Paper style={{ background: "#eeeee4" }}>{children}</Paper>
-          )}
-          sx={{ width: 320 }}
-          // selectOnFocus
-          // openOnFocus
-          // disableClearable
-          onInputChange={(event, newInputValue) => {
-            if (newInputValue.length > 2) {
-              filterChanges(newInputValue.toUpperCase());
-            }
-          }}
-          onChange={(event, value) => {
-            //Works great if you use arrow keys and Enter key to select, otherwise it doesn't work :-()
-            const value_obj = value as IFormulaDevRow;
-            console.log(event, value);
-            if (value_obj) {
-              let newRow: IFormulaDevRow = {
-                id: row_params.row.id,
-                material_id: value_obj.material_id,
-                material_code: value_obj.material_code,
-                material_name: value_obj.material_name,
-                cost: value_obj.cost,
-                amount: 3,
-                last_amount: null,
-                item_cost: value_obj.cost,
-                last_cost: 0,
-                notes: "",
-              };
-              handleEditRow(newRow);
-              row_params.value = value_obj.material_name;
-            } else {
-              console.log("dud");
-            }
-
-            setEditMode(null);
-          }}
-          renderInput={(params) => {
-            if (editMode === row_params.row.id) {
-              return (
-                <TextField
-                  variant="filled"
-                  autoFocus
-                  value={""}
-                  // onChange={(value) => {
-
-                  //   setEditMode(false);
-                  // }}
-                  placeholder={row_params.row.material_name}
-                  {...params}
-                />
-              );
-            } else {
-              // <Typography></Typography>
-              return (
-                <div
-                  style={{ minWidth: "100%", minHeight: "100%" }}
-                  onDoubleClick={() => setEditMode(row_params.row.id)}
-                >
-                  <Typography variant="subtitle2">
-                    {row_params.row.material_name}
-                  </Typography>
-                </div>
-              );
-            }
-          }}
+        <GenericAutocomplete
+          editMode={editMode}
+          setEditMode={setEditMode}
+          handleEditRow={handleEditRow}
+          rowParams={row_params}
         />
       ),
     },
