@@ -44,7 +44,6 @@ export const DataTable: React.FC<Props> = ({
         style={{
           border: "1px solid #c9c9c9",
         }}
-        // hideFooter (testing for formula dev page, maybe making new grid page for it?)
         rows={rows}
         columns={columns}
         autoHeight={auto_height}

@@ -65,6 +65,7 @@ const UserListPage = () => {
         </Button>
       </Card>
       <DataTable
+        auto_height={true}
         rows={rows!}
         columns={columns}
         listOptions={undefined}

@@ -1,4 +1,5 @@
 import {
+  Box,
   Button,
   Card,
   Chip,
@@ -36,32 +37,6 @@ const ProjectStatus = [
   ["Error", "error"],
 ];
 
-const initialRows: GridRowsProp = [
-  {
-    id: 123,
-    name: "agwdfgasgd",
-    product_name: "afhsdjmyhm",
-    assigned_user: "Jimmy",
-    status: 2,
-    product_status: 4,
-  },
-  {
-    id: 124,
-    name: "agwdfgasgd",
-    product_name: "afhsdjmyhm",
-    assigned_user: "Daniel",
-    status: 2,
-    product_status: 4,
-  },
-  {
-    id: 125,
-    name: "agwaesgd",
-    product_name: "wwdaf",
-    assigned_user: "Frank",
-    status: 3,
-    product_status: 4,
-  },
-];
 
 function SelectEditInputCell(props: GridRenderCellParams) {
   const { id, value, field } = props;
@@ -75,6 +50,11 @@ function SelectEditInputCell(props: GridRenderCellParams) {
     });
     apiRef.current.stopCellEditMode({ id, field });
   };
+
+
+
+  
+
 
   return (
     <Select
@@ -99,6 +79,45 @@ const renderSelectEditInputCell: GridColDef["renderCell"] = (params) => {
 
 export const ProjectDetailsTable = () => {
   const navigate = useNavigate();
+
+  const handleAddLine = () => {
+    setRows([
+      ...rows,
+      {
+        id: Math.random()*100
+      },
+    ]);
+  };
+
+  const [rows,setRows] = React.useState<any>(null);
+  React.useEffect(() => {
+    setRows(  [  
+      {
+          id: 123,
+          name: "agwdfgasgd",
+          product_name: "afhsdjmyhm",
+          assigned_user: "Jimmy",
+          status: 2,
+          product_status: 4,
+        },
+        {
+          id: 124,
+          name: "agwdfgasgd",
+          product_name: "afhsdjmyhm",
+          assigned_user: "Daniel",
+          status: 2,
+          product_status: 4,
+        },
+        {
+          id: 125,
+          name: "agwaesgd",
+          product_name: "wwdaf",
+          assigned_user: "Frank",
+          status: 3,
+          product_status: 4,
+        },
+      ]); 
+  },[]);
 
   const columns: GridColDef[] = [
     {
@@ -179,20 +198,34 @@ export const ProjectDetailsTable = () => {
     },
   ];
 
+  if (rows == null) return null;
   return (
-    <DataGrid
-      style={{
-        border: "1px solid #c9c9c9",
-      }}
-      rows={initialRows}
-      columns={columns}
-      autoHeight={true}
-      rowHeight={45}
-      editMode="row"
-      experimentalFeatures={{ newEditingApi: true }}
-      // hideFooter
-      hideFooterPagination
-      // rowCount={listOptions!.totalDocs}
-    />
+    <>
+      <Box component="div" sx={{ display: "inline" }}>
+        <Button
+          size="large"
+          variant="outlined"
+          onClick={handleAddLine}
+          sx={{ marginRight: 4 }}
+        >
+          + Add Line
+        </Button>
+      </Box>
+
+      <DataGrid
+        style={{
+          border: "1px solid #c9c9c9",
+        }}
+        rows={rows}
+        columns={columns}
+        autoHeight={true}
+        rowHeight={45}
+        editMode="row"
+        experimentalFeatures={{ newEditingApi: true }}
+        // hideFooter
+        hideFooterPagination
+        // rowCount={listOptions!.totalDocs}
+      />
+    </>
   );
 };
