@@ -34,7 +34,6 @@ const FormulaDevPage = () => {
   // const { approved_version } = useParams();
   React.useEffect(() => {
     getFormula(auth.token, id!, version!).then((formula) => {
-      // console.log(formula,' TEST')
       if (!formula?.formula_items) {
         setRows({});
       } else {
@@ -356,20 +355,8 @@ const FormulaDevPage = () => {
                 }}
               ></TextField>
             </Grid>
-            <Grid item xs={3.8}></Grid>
-            <Grid item xs={1.2}>
-              <TextField
-                spellCheck="false"
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-                size="small"
-                variant="outlined"
-                label={"Cost"}
-                // InputProps={{
-                //   readOnly: true,
-                // }}
-              ></TextField>
-            </Grid>
+            <Grid item xs={5}></Grid>
+
             <Grid item xs={12}>
               <TextField
                 spellCheck="false"
@@ -396,53 +383,41 @@ const FormulaDevPage = () => {
       </Card>
       <Card variant="outlined" sx={{ padding: 3, overflowY: "auto" }}> {/*FORMULA DEV SECTION*/}
       <div style={{ display: "flex", gap: 16, marginBottom:15 }}>
-      <Grid container spacing={3}>
-            <Grid item xs={2}>
+      <Grid container spacing={2}>
+          <Grid item xs={1.5}>
+              <Button variant="contained" size="medium">Clone</Button>
+          </Grid>
+          <Grid item xs={0.8}>
               <TextField
                 spellCheck="false"
                 InputLabelProps={{ shrink: true }}
                 fullWidth
                 size="small"
                 variant="outlined"
-                InputProps={{
-                  readOnly: true,
-                }}
-                label={"Product Code"}
+                label={"Mult"}
+                // InputProps={{
+                //   readOnly: true,
+                // }}
               ></TextField>
             </Grid>
-            <Grid item xs={5}>
-              <TextField
-                spellCheck="false"
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-                size="small"
-                variant="outlined"
-                label={"Product Name"}
-                InputProps={{
-                  readOnly: true,
-                }}
-              ></TextField>
+            <Grid item xs={1.5}>
+              <Button variant="contained" size="medium">
+                Apply
+              </Button>
             </Grid>
-            <Grid item xs={3.8}></Grid>
-            <Grid item xs={1.2}>
-              <TextField
-                spellCheck="false"
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-                size="small"
-                variant="outlined"
-                label={"Cost"}
-                //@ts-ignore
-                value={cost}
-                InputProps={{
-                  readOnly: true,
-                }}
-              ></TextField>
+          <Grid item xs={4.5}></Grid>
+          
+          <Grid item xs={1}>
+              <Button variant="contained" size="medium">
+                Submit
+              </Button>
             </Grid>
-            
+          <Grid item xs={1.2}>
+            <Typography variant="h6"  >Cost: {cost}</Typography>
+          </Grid>
 
-            </Grid>
-            
+
+          </Grid>
       </div>
         <DataGrid
           rowHeight={39}
