@@ -8,12 +8,15 @@ import {
   Autocomplete,
   Button,
   Card,
+  Checkbox,
   Grid,
   Paper,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import { lookupInventory } from "../logic/inventory.logic";
+import { getProduct } from "../logic/product.logic";
 import { Field } from "formik";
 import { IFormula, IFormulaItem } from "../logic/formula.logic";
 import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
@@ -21,14 +24,20 @@ import RemoveOutlinedIcon from "@mui/icons-material/RemoveOutlined";
 import { apiStatus } from "../logic/utils";
 import { fireEvent } from "@testing-library/react";
 import GenericAutocomplete from "../components/utils/GenericAutocomplete";
+import { IProduct } from "../logic/product.logic";
+import WarningIcon from '@mui/icons-material/Warning';
 
 const FormulaDevPage = () => {
   const [invLookupCatalog, setInvLookupCatalog] = React.useState<any>(null);
   const auth = React.useContext(AuthContext);
   const [rowCount, setRowCount] = React.useState<any>(0);
   const [cost,setCost] = React.useState<number>(0);
+  const [totalAmt, setTotalAmt] = React.useState<number>(0);
   const [rows, setRows] = React.useState<any>(null);
   const [editMode, setEditMode] = React.useState<string | null>(null);
+  const [carrier, setCarrier] = React.useState<string | null>(null);
+  const [prod_yield, setYield] = React.useState<number>(1.00);
+  
   const { id } = useParams();
   const { version } = useParams();
   // const { approved_version } = useParams();
@@ -37,9 +46,11 @@ const FormulaDevPage = () => {
       if (!formula?.formula_items) {
         setRows({});
       } else {
-        const newRows = formula!.formula_items.map((item) => {
+        let count = 0;
+        let amount = 0;
+        const newRows = formula!.formula_items.map((item, index) => {
           return {
-            id: item.material_id,
+            id: item.material_id + '' + count++,
             material_id: item.material_id,
             material_code: item.material_code,
             material_name: item.material_name,
@@ -50,16 +61,40 @@ const FormulaDevPage = () => {
             last_amount: item.amount,
             notes: item.notes,
           };
-        });
 
+          
+        });
         setRows(newRows);
+        setRowCount(count);
       }
     });
   }, []);
 
+
+  
+    const [product, setProduct] = React.useState<IProduct | null>(null);
+
+  React.useEffect(() => {
+    getProduct(auth.token, id!).then((product) => {
+      setProduct(product);
+    });
+
+  }, []);
+
   React.useEffect(() => {
     handleSetCost()
+    console.log(totalAmt)
   },[rows])
+
+  React.useEffect(() => { //Temporary method of adjusting carrier amt, other methods would cause infinite recursion atm
+    handleCalcCarrier()
+  },[cost])
+
+  React.useEffect(() => {
+    if(carrier != null) {
+      handleCalcCarrier()
+    }
+  },[carrier])
 
   interface IFormulaDevRow extends IFormulaItem {
     id: string;
@@ -73,7 +108,7 @@ const FormulaDevPage = () => {
       field: "id",
       headerName: "Actions",
       align: "left",
-      width: 120,
+      width: 135,
       renderCell: (params: GridRenderCellParams<string>) => (
         <strong>
           <Button
@@ -111,6 +146,7 @@ const FormulaDevPage = () => {
           >
             +
           </Button>
+          <Checkbox disabled={carrier != null && carrier != params.row.id} checked={carrier === params.row.id} onClick={() =>{ setCarrier(carrier === null ? params.row.id : null) }} />
         </strong>
       ),
     },
@@ -164,7 +200,7 @@ const FormulaDevPage = () => {
       sortable: false,
       filterable:false,
       align:'right',
-      valueGetter: (params) =>  params.row.amount === 0  ? null : params.row.item_cost * params.row.amount,
+      valueGetter: (params) =>  params.row.amount === 0  ? null : (params.row.item_cost * params.row.amount) /100,
     },
     {
       field: "last_amount",
@@ -204,6 +240,10 @@ const FormulaDevPage = () => {
       ...rows.slice(0, index + 1),
       {
         id: "row" + rowCount,
+        amount: 0,
+        last_amount: 0,
+        item_cost:0,
+        cost:0
       },
       ...rows.slice(index == rows.length - 1 ? index + 2 : index + 1),
     ]);
@@ -219,6 +259,8 @@ const FormulaDevPage = () => {
       newRow,
       ...rows.slice(rowIndex == rows.length - 1 ? rowIndex : rowIndex + 1),
     ]);
+
+
   };
 
   const handleEditCell = (row_id:string,field:string, value:any ) => {
@@ -229,18 +271,39 @@ const FormulaDevPage = () => {
         ...rows[rowIndex],
         [field] : value
       },
-      ...rows.slice(rowIndex == rows.length - 1 ? rowIndex : rowIndex + 1),
-    ]);
+      ...rows.slice(rowIndex == rows.length ? rowIndex : rowIndex + 1),
+    ])
+
   }
 
   const handleDeleteRow = (row_id: string) => {
-    setRows(rows.filter((m: IFormulaDevRow) => m.id !== row_id));
+    if(row_id === carrier) {
+      setCarrier(null)
+    }
+    setRows([...(rows.filter((m: IFormulaDevRow) => m.id !== row_id))]);
   };
 
   const handleSetCost = () => {
     if(rows) {
       // @ts-ignore
-      setCost(rows.reduce((a, b) => a + (( (b.amount === 0) ? b.last_amount:  b.amount)*b.item_cost)/100, 0).toFixed(2))
+      setTotalAmt(rows.reduce((a, b) => a + ( !b.amount ? b.last_amount:  b.amount),0).toFixed(2))
+      // @ts-ignore
+      setCost(rows.reduce((a, b) => a + (( !b.amount ? b.last_amount:  b.amount)*b.item_cost)/100, 0).toFixed(2))
+    }
+  }
+
+  const handleCalcCarrier = () => {
+    if(rows && carrier != null) {
+        
+      let totalMat = 0;
+      // @ts-ignore
+      rows.map(mat => {
+        if(mat.id != carrier) {
+
+          totalMat += mat.amount ? mat.amount : mat.last_amount
+        }
+      });
+        handleEditCell(carrier,'amount',totalMat < 100 ? 100 - totalMat : NaN )
     }
   }
 
@@ -373,7 +436,7 @@ const FormulaDevPage = () => {
 
           <Card
             variant="outlined"
-            style={{ width: "40%", minWidth: "40%", padding: 16 }}
+            style={{ width: "40%", minWidth: "40%"}}
           >
             <div>
               <Typography variant="h6">Overview Stats</Typography>
@@ -382,7 +445,7 @@ const FormulaDevPage = () => {
         </div>
       </Card>
       <Card variant="outlined" sx={{ padding: 3, overflowY: "auto" }}> {/*FORMULA DEV SECTION*/}
-      <div style={{ display: "flex", gap: 16, marginBottom:15 }}>
+      <div style={{ display: "flex", paddingBottom:16}}>
       <Grid container spacing={2}>
           <Grid item xs={1.5}>
               <Button variant="contained" size="medium">Clone</Button>
@@ -405,15 +468,22 @@ const FormulaDevPage = () => {
                 Apply
               </Button>
             </Grid>
-          <Grid item xs={4.5}></Grid>
+          <Grid item xs={3.5}></Grid>
           
           <Grid item xs={1}>
               <Button variant="contained" size="medium">
                 Submit
               </Button>
             </Grid>
-          <Grid item xs={1.2}>
-            <Typography variant="h6"  >Cost: {cost}</Typography>
+          <Grid item xs={0.5} >
+            <div hidden={!(prod_yield === 1 && totalAmt > 100)}>
+              <Tooltip  placement='top' title="The total surpasses 100 & the yield is set to 1.00">
+                <WarningIcon  sx={{color:'orange' }}/>
+              </Tooltip>
+            </div>
+          </Grid>
+          <Grid item xs={3}>
+            <Typography variant="h6">  Amount: {totalAmt} | Cost: {cost}</Typography>
           </Grid>
 
 

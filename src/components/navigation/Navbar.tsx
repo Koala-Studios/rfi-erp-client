@@ -57,6 +57,11 @@ const LinkItems = [
     icon: <HvacIcon></HvacIcon>,
   },
   {
+    text: "Inventory",
+    link: "/inventory",
+    icon: <StorageIcon></StorageIcon>,
+  },
+  {
     text: "Products",
     link: "/products",
     icon: <InventoryIcon></InventoryIcon>,
@@ -80,12 +85,6 @@ const LinkItems = [
     text: "Sales Orders",
     link: "/sales-orders",
     icon: <ShoppingBasketIcon></ShoppingBasketIcon>,
-  },
-  
-  {
-    text: "Inventory",
-    link: "/inventory",
-    icon: <StorageIcon></StorageIcon>,
   },
   {
     text: "Stock Count",

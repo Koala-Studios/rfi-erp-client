@@ -23,7 +23,16 @@ const ProductListPage = () => {
       headerName: "Approved Version",
       width: 200,
     },
-    { field: "cost", headerName: "Cost", width: 200 },
+    { field: "cost", headerName: "Cost/KG", width: 100, align: "right" },
+    { field: "on_hand", headerName: "On Hand", width: 100, align: "right" },
+    { field: "on_order", headerName: "On Order", width: 100, align: "right" },
+    {
+      field: "quarantined",
+      headerName: "Quarantined",
+      width: 100,
+      align: "right",
+    },
+    { field: "allocated", headerName: "Allocated", width: 100, align: "right" },
     {
       field: "id",
       headerName: "Actions",
@@ -61,7 +70,7 @@ const ProductListPage = () => {
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listProducts(auth.token, 25, 1).then((list) => {
+    listProducts(auth.token, 25, 1,true).then((list) => {
       const newRows = list!.docs.map((product) => {
         return {
           id: product._id,
@@ -69,6 +78,10 @@ const ProductListPage = () => {
           name: product.name,
           approved_version: product.approved_version,
           cost: `$${product.cost}`,
+          on_hand: product.on_hand ? product.on_hand : 0,
+          on_order: product.on_order ? product.on_order : 0,
+          quarantined: product.quarantined ? product.quarantined : 0,
+          allocated: product.allocated ? product.allocated : 0,
         };
       });
       setDataOptions({ rows: newRows, listOptions: list! });

@@ -89,10 +89,10 @@ const InventoryListPage = () => {
           name: item.name,
           cost: item.cost,
           reorder_amount: item.reorder_amount ? item.reorder_amount : 0,
-          on_hand: on_hand,
-          on_order: on_order,
-          quarantined: quarantined,
-          allocated: allocated,
+          on_hand: item.on_hand ? item.on_hand : 0,
+          on_order: item.on_order ? item.on_order : 0,
+          quarantined: item.quarantined ? item.quarantined : 0,
+          allocated: item.allocated ? item.allocated : 0,
         };
       });
       setDataOptions({ rows: newRows, listOptions: list! });
