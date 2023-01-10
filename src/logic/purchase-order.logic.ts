@@ -18,7 +18,7 @@ export interface IPurchaseOrder {
   date_purchased: Date;
   status: Number;
   order_code: string;
-
+  notes:string;
   order_items: [IOrderItem];
 }
 

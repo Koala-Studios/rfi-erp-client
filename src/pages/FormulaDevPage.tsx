@@ -9,6 +9,7 @@ import {
   Button,
   Card,
   Checkbox,
+  FormControlLabel,
   Grid,
   Paper,
   TextField,
@@ -32,19 +33,30 @@ const FormulaDevPage = () => {
   const auth = React.useContext(AuthContext);
   const [rowCount, setRowCount] = React.useState<any>(0);
   const [cost,setCost] = React.useState<number>(0);
+  const [multiplier, setMultiplier] = React.useState<number>(1.00);
   const [totalAmt, setTotalAmt] = React.useState<number>(0);
   const [rows, setRows] = React.useState<any>(null);
   const [editMode, setEditMode] = React.useState<string | null>(null);
   const [carrier, setCarrier] = React.useState<string | null>(null);
-  const [prod_yield, setYield] = React.useState<number>(1.00);
+  const [prodYield, setYield] = React.useState<number>(1.00);
+  const [changedYield, setChangedYield] = React.useState<boolean>(true);
+  const [approveonSubmit, setApproveonSubmit] = React.useState<boolean>(false);
   
   const { id } = useParams();
   const { version } = useParams();
   // const { approved_version } = useParams();
   React.useEffect(() => {
     getFormula(auth.token, id!, version!).then((formula) => {
+      setYield(formula!.yield ? formula!.yield : 1.00)
       if (!formula?.formula_items) {
-        setRows({});
+        setRows([{
+          id: "row" + rowCount,
+          amount: 0,
+          last_amount: 0,
+          item_cost:0,
+          cost:0
+        }]);
+        setRowCount(rowCount + 1)
       } else {
         let count = 0;
         let amount = 0;
@@ -100,7 +112,7 @@ const FormulaDevPage = () => {
     id: string;
     last_cost: number | null;
     item_cost: number | null;
-    last_amount: number | null;
+    last_amount: number;
   }
 
   const columns: GridColDef[] = [
@@ -221,6 +233,7 @@ const FormulaDevPage = () => {
       width: 100,
       valueGetter: (params) => params.row.last_cost,
     },
+
     {
       field: "notes",
       headerName: "Notes",
@@ -251,13 +264,27 @@ const FormulaDevPage = () => {
     // setEditMode("row" + rowCount); //onBlur in autocomplete clashes with this, also slows page down
   };
 
+  const handleMultiplier = (mult_amount:number) => {
+    setRows(
+      rows.map((material:IFormulaDevRow, index:number) => {
+        if(material.id != carrier) {
+          material.amount = material.amount ? material.amount * mult_amount : material.last_amount * mult_amount
+        }
+      console.log(material.amount, mult_amount)
+        return(
+          material
+        )
+      })
+
+    )
+  }
   const handleEditRow = (row_id:string, newRow: IFormulaDevRow ) => {
     const rowIndex = rows.findIndex((r: IFormulaDevRow) => r.id === '' + row_id);
 
     setRows([
       ...rows.slice(0, rowIndex),
       newRow,
-      ...rows.slice(rowIndex == rows.length - 1 ? rowIndex : rowIndex + 1),
+      ...rows.slice(rowIndex == rows.length ? rowIndex : rowIndex + 1),
     ]);
 
 
@@ -303,6 +330,26 @@ const FormulaDevPage = () => {
       }
         handleEditCell(carrier,'amount',totalMat < 100 ? 100 - totalMat : NaN )
     }
+  }
+
+  const handleSubmit = () => {
+    const newVersion = {
+      yield: prodYield,
+      formula_items: rows.map((material:IFormulaDevRow) => {
+        return ({
+          material_code: material.material_code,
+          amount: material.amount? material.amount : material.last_amount,
+          notes: material.notes,
+          material_id: material.material_id,
+          material_name: material.material_name,
+        }
+        )
+      }),
+      product_id: product?._id,
+      approved: approveonSubmit
+    }
+    //TODO: handle submitting the version!
+    console.log(newVersion)
   }
 
   function filterChanges(string: string) {
@@ -446,7 +493,7 @@ const FormulaDevPage = () => {
       <div style={{ display: "flex", paddingBottom:16}}>
       <Grid container spacing={2}>
           <Grid item xs={1.5}>
-              <Button variant="contained" size="medium">Clone</Button>
+              <Button variant="contained" size="medium">Import Formula</Button>
           </Grid>
           <Grid item xs={0.8}>
               <TextField
@@ -456,25 +503,43 @@ const FormulaDevPage = () => {
                 size="small"
                 variant="outlined"
                 label={"Mult"}
+                onChange={(e) => {setMultiplier( e.target.value ? parseFloat(e.target.value) : 1 )}}
                 // InputProps={{
                 //   readOnly: true,
                 // }}
               ></TextField>
             </Grid>
             <Grid item xs={1.5}>
-              <Button variant="contained" size="medium">
+              <Button variant="contained" size="medium" onClick={(e) => {handleMultiplier(multiplier) }}>
                 Apply
               </Button>
             </Grid>
-          <Grid item xs={3.5}></Grid>
-          
           <Grid item xs={1}>
-              <Button variant="contained" size="medium">
+          <FormControlLabel control={<Checkbox onClick={()=> { if(changedYield) { setYield(1.00)} /* <-- this portion doesn't work atm because of field below*/; setChangedYield(!changedYield)}}  checked={changedYield} />} label="Base100?" />
+          </Grid>
+          <Grid item xs={0.75}>
+
+              <TextField
+                spellCheck="false"
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+                size="small"
+                variant="outlined"
+                label={"Yield Ratio"}
+                disabled={changedYield}
+                defaultValue={prodYield.toFixed(2)}
+                onChange={(e) => { setYield( parseFloat(e.target.value) ) }} //here
+              ></TextField>
+            </Grid>
+          <Grid item xs={1.2}></Grid>
+          <Grid item xs={1.75}>
+          <FormControlLabel control={<Checkbox onClick={()=> { setApproveonSubmit(!approveonSubmit)}}  checked={approveonSubmit} />} label="Approve?" />
+              <Button variant="contained" size="medium" onClick={() => handleSubmit()}>
                 Submit
               </Button>
             </Grid>
           <Grid item xs={0.5} >
-            <div hidden={!(prod_yield === 1 && totalAmt > 100)}>
+            <div hidden={!(prodYield === 1 && totalAmt > 100)}>
               <Tooltip  placement='top' title="The total surpasses 100 & the yield is set to 1.00">
                 <WarningIcon  sx={{color:'orange' }}/>
               </Tooltip>
@@ -501,11 +566,11 @@ const FormulaDevPage = () => {
                   setEditMode(null)
                   break;
                 }
-                case("Enter"):
-                {
-                  console.log('test', event, params )
-                  break;
-                }
+                // case("Enter"):
+                // {
+                //   console.log('test', event, params )
+                //   break;
+                // }
                 case("ArrowDown"):
                 case("ArrowUp"):
                 case("Backspace"):
@@ -514,13 +579,10 @@ const FormulaDevPage = () => {
                 }
               }              
             } else {
-              if( event.code == "Enter")
-              {
-
-                // setEditMode(params.row.id);
-                //@ts-ignore
-                // (event.target).firstChild.firstChild.firstChild.focus();
-              }
+              // if( event.code == "Enter")
+              // {
+              //   // console.log(event, params)
+              // }
             }
           }}
           onCellEditCommit={(e,value) => {

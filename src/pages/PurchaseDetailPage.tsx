@@ -1,4 +1,4 @@
-import { Button, Card, IconButton, Typography } from "@mui/material";
+import { Button, Card, Grid, IconButton, TextField, Typography } from "@mui/material";
 import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../components/navigation/AuthProvider";
@@ -19,10 +19,11 @@ export const PurchaseDetailPage = () => {
       { field: "material_code", headerName: "Material Code", width: 150 },
       { field: "material_name", headerName: "Material Name", width: 280 },
       { field: "amount", headerName: "Order Qty(KG)", type: "number", width: 110, align:'center' },
-      { field: "received_amount", headerName: "Recvd Qty(KG)", type: "number", width: 110 , align:'center'},
+      { field: "received_amount", headerName: "Received Qty", type: "number", width: 100 , align:'center'},
+      { field: "remaining_amount", headerName: "Awaiting Qty", type: "number", width: 100 , align:'center'},
       { field: "cost", headerName: "Cost($/KG)", type: "number", width: 100 , align:'center'},
       { field: "lot_number", headerName: "Lot#", type: "string", width: 120, editable:true , align:'right'},
-      { field: "container_size", headerName: "Cont Size(KG/x)", type: "number", width: 120, editable:true , align:'center'},
+      { field: "container_size", headerName: "Cont Size(KG)", type: "number", width: 120, editable:true , align:'center'},
       { field: "process_amount", headerName: "Qty to Process", type: "number", width: 120, editable:true , align:'center'},
       {
         field: "id",
@@ -62,7 +63,7 @@ const editColumns : GridColDef[] = [
     field: "id",
     headerName: "Actions",
     align: "left",
-    width: 240,
+    width: 80,
     renderCell: (params: GridRenderCellParams<string>) => (
           <strong>
           <Button
@@ -83,7 +84,7 @@ const editColumns : GridColDef[] = [
           >
             -
           </Button>
-          <Button
+          {/* <Button
             variant="outlined"
             color="success"
             size="small"
@@ -99,15 +100,14 @@ const editColumns : GridColDef[] = [
             onClick={() => handleAddRow(params.row.id)}
           >
             +
-          </Button>
+          </Button> */}
           </strong>
         )
     },
     { field: "material_code", headerName: "Material Code", width: 150 },
     { field: "material_name", headerName: "Material Name", width: 280 },
-    { field: "amount", headerName: "Order Qty(KG)", type: "number", width: 110, align:'center' },
-    { field: "received_amount", headerName: "Recvd Qty(KG)", type: "number", width: 110 , align:'center'},
-    { field: "cost", headerName: "Cost($/KG)", type: "number", width: 100 , align:'center'},
+    { field: "amount", headerName: "Order Qty(KG)", type: "number", width: 110, align:'center', editable:true },
+    { field: "cost", headerName: "Cost($/KG)", type: "number", width: 100 , align:'center', editable:true},
   ];
 
   useEffect(() => {
@@ -125,6 +125,7 @@ const editColumns : GridColDef[] = [
           container_size: null,
           process_amount: null,
           received_amount: 0, //gotta update these 
+          remaining_amount: 0,
         };
       });
       setRows(newRows);
@@ -137,7 +138,7 @@ const editColumns : GridColDef[] = [
     setRows([...(rows.filter((m:{id:string}) => m.id !== row_id))]);
   };
 
-  const handleAddRow = (row_id: string) => {
+  const handleInsertRow = (row_id: string) => {
     const index = rows.findIndex(
       (element: {id:string }) => element.id === row_id
     );
@@ -153,7 +154,21 @@ const editColumns : GridColDef[] = [
       ...rows.slice(index == rows.length - 1 ? index + 2 : index + 1),
     ]);
     setRowCount(rowCount + 1);
-    // setEditMode("row" + rowCount); //onBlur in autocomplete clashes with this, also slows page down
+  };
+
+  const handleAddRow = () => {
+
+    setRows([
+      {
+        id: "row" + rowCount,
+        amount: 0,
+        last_amount: 0,
+        item_cost:0,
+        cost:0
+      },
+      ...rows.slice(0),
+    ]);
+    setRowCount(rowCount + 1);
   };
 
   if (purchase == null || rows == null) return null;
@@ -186,14 +201,103 @@ const editColumns : GridColDef[] = [
         Toggle Edit (TESTING)
       </Button>
       
-      <Typography variant="h6">Editing?: {status === 1 ? 'TRUE' : 'FALSE'}</Typography>
+      <Grid container spacing={3}>
+            <Grid item xs={2}>
+              <TextField
+                onChange={(e) =>console.log('cry')
+                  // setpurchase({ ...purchase, purchase_code: e.target.value })
+                }
+                spellCheck="false"
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+                size="small"
+                variant="outlined"
+                label={"purchase Code"}
+                value={purchase.order_code}
+              ></TextField>
+            </Grid>
+            <Grid item xs={3}>
+              <TextField
+                // onChange={(e) =>console.log('cry')
+                //   setpurchase({ ...purchase, start_date: e.target.value })
+                // }
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                size="small"
+                variant="outlined"
+                label={"Start Date"}
+                type={"date"}
+                // value={yyyymmdd(purchase.start_date)}
+              ></TextField>
+            </Grid>
+            <Grid item xs={3}>
+              {/* <DatePicker
+                label="Basic example"
+                value={undefined}
+                // onChange={(newValue) => {
+                //   setValue(newValue);
+                // }}
+                renderInput={(params) => <TextField {...params} />}
+              /> */}
+              <TextField
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                size="small"
+                variant="outlined"
+                label={"End Date"}
+                type={"date"}
+                // value={purchase.finish_date}
+              ></TextField>
+            </Grid>
+            <Grid item xs={2}>
+              <TextField
+                onChange={(e) =>console.log('cry')
+                  // setpurchase({ ...purchase, status: e.target.value ? parseInt(e.target.value) : 0 })
+                }
+                spellCheck="false"
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+                size="small"
+                variant="outlined"
+                label={"Status"}
+                value={purchase.status}
+              ></TextField>
+            </Grid>
 
-      <Typography variant="h6">Order Code: {purchase.order_code}</Typography>
-      <Typography variant="h6">Order Date: {purchase.date_purchased}</Typography>
+
+            <Grid item xs={3}>
+              <TextField
+                spellCheck="false"
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+                size="small"
+                variant="outlined"
+                label={"Supplier"}
+              ></TextField>
+            </Grid>
+
+            <Grid item xs={12}>
+              <TextField
+                onChange={(e) =>console.log('cry')
+                  // setpurchase({ ...purchase, notes: e.target.value })
+                }
+                spellCheck="false"
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+                size="small"
+                variant="outlined"
+                label={"Notes"}
+                multiline
+                rows={6}
+                value={purchase.notes}
+              ></TextField>
+            </Grid>
+          </Grid>
 
 
     </Card>
     <Card variant="outlined" sx={{ padding: 5, overflowY: 'auto' }}>
+    <Button style={{marginBottom:10}} variant="contained" onClick={()=>{handleAddRow()}}>Add Row</Button>
     <DataTable  auto_height={true} rows={rows!} columns={status === 1 ? editColumns : nonEditColumns}></DataTable>
   </Card>;
     </>
