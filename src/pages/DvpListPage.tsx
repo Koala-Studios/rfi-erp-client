@@ -88,7 +88,7 @@ const DvpListPage = () => {
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listProducts(auth.token, 25, 1, false).then((list) => { //TODO: FIX DEFAULT QUERY WITH UNNAPPROVED VS APPROVED PRODUCTS
+    listProducts(auth.token, 25, 1, false).then((list) => {
       const newRows = list!.docs.map((product /*, idx*/) => {
         return {
           id: product._id,
@@ -98,7 +98,6 @@ const DvpListPage = () => {
           versions: product.versions,
           approved_version: product.approved_version,
           cost: product.cost,
-          // key: idx,
         };
       });
       setDataOptions({ rows: newRows, listOptions: list! });

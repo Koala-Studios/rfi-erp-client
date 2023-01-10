@@ -1,10 +1,11 @@
-import { Autocomplete, Paper, TextField, Typography } from "@mui/material";
+import { Autocomplete, Checkbox, Paper, TextField, Typography } from "@mui/material";
 import { GridRenderCellParams } from "@mui/x-data-grid";
 import { setegid } from "process";
 import React from "react";
 import { IFormulaItem } from "../../logic/formula.logic";
 import { lookupInventory } from "../../logic/inventory.logic";
 import { AuthContext } from "../navigation/AuthProvider";
+import SpaIcon from '@mui/icons-material/Spa';
 
 interface IFormulaDevRow extends IFormulaItem {
   id: number;
@@ -28,7 +29,7 @@ const GenericAutocomplete: React.FC<Props> = ({
 }) => {
   const [invLookupCatalog, setInvLookupCatalog] = React.useState<any>(null);
   const auth = React.useContext(AuthContext);
-
+  const [inputValue, setInputValue] = React.useState("");
   function filterChanges(string: string) {
     lookupInventory(auth.token, string, false).then((result) => {
       const newCatalog = result?.map((item, key) => {
@@ -47,32 +48,52 @@ const GenericAutocomplete: React.FC<Props> = ({
 
   return (
     <Autocomplete
-      clearOnBlur={true}
+      // clearOnBlur={true}
       id="combo-box-demo"
       filterOptions={(x) => x}
       openOnFocus
       selectOnFocus
+      freeSolo
+      onBlur={() => {
+        if (editMode === rowParams.row.id) {
+
+          setEditMode(null);
+        }
+      }} //Have to test this more, it used to glitch out
       options={invLookupCatalog ? invLookupCatalog : []}
+      renderOption={(props, option:any, { selected }) => (
+
+        <li {...props}>
+          {option.label}
+            <SpaIcon style={{maxWidth:"20px",marginLeft:"5px", color:"#67996c", display:option.cost < 20 ? 'none' : 'block' }}/>
+        </li>
+      )}
       PaperComponent={({ children }) => (
         <Paper
-        variant="outlined"
-        style={{
-          background: "#e4e6ee",
-          fontSize: "16px",
-          maxWidth: "450px",
-          minWidth: "450px",
-        }}
-      >
-        {children}
-      </Paper>
+          variant="outlined"
+          style={{
+            background: "#e4e6ee",
+            fontSize: "16px",
+            maxWidth: "450px",
+            minWidth: "450px",
+            minHeight: "39px",
+            marginLeft:"-3%"
+          }}
+        >
+          {children}
+        </Paper>
       )}
       sx={{ width: 340, height: "39px" }}
       // selectOnFocus
       // openOnFocus
       // disableClearable
+      inputValue={inputValue}
       onInputChange={(event, newInputValue) => {
         if (newInputValue.length > 2) {
           filterChanges(newInputValue.toUpperCase());
+        }
+        if(editMode === rowParams.row.id) {
+          setInputValue(newInputValue);
         }
       }}
       onChange={(event, value) => {
@@ -98,43 +119,37 @@ const GenericAutocomplete: React.FC<Props> = ({
 
         setEditMode(null);
       }}
-      renderInput={(params) => {
-        params.inputProps.style = { textTransform: "uppercase" } //textTransform uppercase doesn't work on style 
-        if (editMode === rowParams.row.id) {
-          return (
-            <TextField
-              variant="filled"
-              autoFocus
-              style={{
-                marginLeft: "-5%",
-                minWidth: "110%",
-                minHeight: "39px",
-                maxHeight: "39px",
-
-              }}
-              placeholder={rowParams.row.material_name}
-              {...params}
-            />
-          );
-        } else {
-          return (
-            <div
-            style={{ minWidth: "340px", minHeight: "39px", paddingBottom: "10px", paddingTop: "10px" }}
-            // onClick={(e) => {  //This stops the console errors but breaks the autocomplete, might explore further later
-            //   if(rowParams.row.id != editMode) {
-            //     e.stopPropagation()
-            //   }
-            // }}
-            onDoubleClick={() => setEditMode(rowParams.row.id)}
-            >
-              <Typography variant="subtitle2"
-              style={{ fontSize:'15px' }}>
-                {rowParams.row.material_name}
-              </Typography>
-            </div>
-          );
-        }
-      }}
+      renderInput={(params) => (
+        <div
+          ref={params.InputProps.ref}
+          style={{ width: "340px", height: "39px" }}
+          onDoubleClick={() => {
+            setInputValue("");
+            setEditMode(rowParams.row.id);
+          }}
+        >
+          <input
+            autoFocus={true}
+            type="text"
+            style={{ marginLeft: "-3%", width: "340px", height: "39px", textTransform: "uppercase" }}
+            hidden={editMode != rowParams.row.id}
+            {...params.inputProps}
+          />
+          <div
+            style={{
+              minWidth: "340px",
+              minHeight: "39px",
+              paddingBottom: "10px",
+              paddingTop: "10px",
+            }}
+            hidden={editMode === rowParams.row.id}
+          >
+            <Typography variant="subtitle2" style={{ fontSize: "15px" }}>
+              {rowParams.row.material_name}
+            </Typography>
+          </div>
+        </div>
+      )}
     />
   );
 };
