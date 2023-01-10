@@ -2,6 +2,7 @@ import * as React from "react";
 import {
   DataGrid,
   GridColDef,
+  GridEventListener,
   GridToolbarContainer,
   GridToolbarExport,
   GridToolbarFilterButton,
@@ -16,6 +17,7 @@ interface Props {
   columns: GridColDef[];
   auto_height?: boolean;
   listOptions?: IListOptions;
+  handleDBClick?: GridEventListener<"rowClick">;
 }
 
 export const DataTable: React.FC<Props> = ({
@@ -24,6 +26,7 @@ export const DataTable: React.FC<Props> = ({
   columns,
   auto_height = false,
   listOptions,
+  handleDBClick,
 }) => {
   const CustomToolbar: React.FC = () => {
     return (
@@ -41,6 +44,7 @@ export const DataTable: React.FC<Props> = ({
   return (
     <div style={{ height: "100%", width: "100%", minHeight: 100 }}>
       <DataGrid
+        onRowDoubleClick={handleDBClick}
         style={{
           border: "1px solid #c9c9c9",
         }}

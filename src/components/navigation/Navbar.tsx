@@ -269,6 +269,7 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
           "& .MuiDrawer-paper": {
             width: drawerWidth,
             boxSizing: "border-box",
+            border: "none",
           },
         }}
         variant="persistent"
