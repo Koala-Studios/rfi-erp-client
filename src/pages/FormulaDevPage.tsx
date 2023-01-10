@@ -296,13 +296,11 @@ const FormulaDevPage = () => {
     if(rows && carrier != null) {
         
       let totalMat = 0;
-      // @ts-ignore
-      rows.map(mat => {
-        if(mat.id != carrier) {
-
-          totalMat += mat.amount ? mat.amount : mat.last_amount
+      for(var i = 0; i < rows.length; i++) {
+        if(rows[i].id != carrier) {
+          totalMat += rows[i].amount ? rows[i].amount : rows[i].last_amount
         }
-      });
+      }
         handleEditCell(carrier,'amount',totalMat < 100 ? 100 - totalMat : NaN )
     }
   }
@@ -503,6 +501,11 @@ const FormulaDevPage = () => {
                   setEditMode(null)
                   break;
                 }
+                case("Enter"):
+                {
+                  console.log('test', event, params )
+                  break;
+                }
                 case("ArrowDown"):
                 case("ArrowUp"):
                 case("Backspace"):
@@ -510,6 +513,14 @@ const FormulaDevPage = () => {
                   event.stopPropagation()
                 }
               }              
+            } else {
+              if( event.code == "Enter")
+              {
+
+                // setEditMode(params.row.id);
+                //@ts-ignore
+                // (event.target).firstChild.firstChild.firstChild.focus();
+              }
             }
           }}
           onCellEditCommit={(e,value) => {

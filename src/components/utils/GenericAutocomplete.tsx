@@ -1,4 +1,4 @@
-import { Autocomplete, Checkbox, Paper, TextField, Typography } from "@mui/material";
+import { Autocomplete, Checkbox, Grid, Paper, TextField, Typography } from "@mui/material";
 import { GridRenderCellParams } from "@mui/x-data-grid";
 import { setegid } from "process";
 import React from "react";
@@ -64,8 +64,11 @@ const GenericAutocomplete: React.FC<Props> = ({
       renderOption={(props, option:any, { selected }) => (
 
         <li {...props}>
+          <div style={{ minWidth:25, width:25 }}>
+          <SpaIcon style={{maxWidth:20, color:"#67996c", display:option.cost < 20 ? 'none' : 'block' }}/>
+          
+          </div>
           {option.label}
-            <SpaIcon style={{maxWidth:"20px",marginLeft:"5px", color:"#67996c", display:option.cost < 20 ? 'none' : 'block' }}/>
         </li>
       )}
       PaperComponent={({ children }) => (
