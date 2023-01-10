@@ -6,12 +6,13 @@ export interface IProject {
   _id: string;
   project_code: string;
   name: string;
-  date_created: Date;
+  date_created?: Date;
   start_date: Date;
-  finish_date: Date;
-  assigned_user: IUser;
-  status: number;
-  notes: string;
+  finish_date?: Date;
+  assigned_user?: IUser;
+  status?: number;
+  notes?: string;
+  project_items: IProjectItem[];
 }
 
 export interface IProjectItem {
@@ -82,27 +83,78 @@ export const getProject = async (
   return project;
 };
 
+// export const createProject = async (
+//   token: string,
+//   formData: string
+// ): Promise<IProject | null> => {
+//   const config = {
+//     headers: { Authorization: `Bearer ${token}` },
+//   };
+
+//   let project: IProject | null = null;
+
+//   await api
+//     .post("/create", formData, config)
+//     .then((res) => {
+//       console.log(res);
+//       if (res.status === apiStatus.CREATED) {
+//         project = res.data;
+//       }
+//     })
+//     .catch((err) => {
+//       console.log(err);
+//     });
+
+//   return project;
+// };
+
 export const createProject = async (
   token: string,
-  formData: string
-): Promise<IProject | null> => {
+  formData: IProject
+): Promise<string | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
   };
 
-  let project: IProject | null = null;
+  let rtn = null;
 
   await api
     .post("/create", formData, config)
     .then((res) => {
       console.log(res);
       if (res.status === apiStatus.CREATED) {
-        project = res.data;
+        console.log(res.data);
+        rtn = res.data;
       }
     })
     .catch((err) => {
       console.log(err);
     });
 
-  return project;
+  return rtn;
+};
+export const updateProject = async (
+  token: string,
+  formData: IProject
+): Promise<boolean> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  let rtn = false;
+
+  await api
+    .post("/update", formData, config)
+    .then((res) => {
+      console.log(res);
+      if (res.status === apiStatus.OK) {
+        console.log(res.data);
+        rtn = true;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
 };

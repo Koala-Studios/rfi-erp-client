@@ -27,6 +27,7 @@ import SaveIcon from "@mui/icons-material/Save";
 import CancelIcon from "@mui/icons-material/Close";
 import { useNavigate } from "react-router-dom";
 import IconButton from "@mui/material/IconButton";
+import { IProjectItem } from "../../logic/project.logic";
 // import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 const ProjectStatus = [
@@ -36,7 +37,6 @@ const ProjectStatus = [
   ["Approved", "success"],
   ["Error", "error"],
 ];
-
 
 function SelectEditInputCell(props: GridRenderCellParams) {
   const { id, value, field } = props;
@@ -50,11 +50,6 @@ function SelectEditInputCell(props: GridRenderCellParams) {
     });
     apiRef.current.stopCellEditMode({ id, field });
   };
-
-
-
-  
-
 
   return (
     <Select
@@ -77,47 +72,52 @@ const renderSelectEditInputCell: GridColDef["renderCell"] = (params) => {
   return <SelectEditInputCell {...params} />;
 };
 
-export const ProjectDetailsTable = () => {
+interface Props {
+  projectItems: IProjectItem[];
+  setProjectItems: any;
+}
+
+export const ProjectDetailsTable: React.FC<Props> = ({ projectItems }) => {
   const navigate = useNavigate();
 
   const handleAddLine = () => {
     setRows([
       ...rows,
       {
-        id: Math.random()*100
+        id: Math.random() * 100,
       },
     ]);
   };
 
-  const [rows,setRows] = React.useState<any>(null);
+  const [rows, setRows] = React.useState<any>(null);
   React.useEffect(() => {
-    setRows(  [  
+    setRows([
       {
-          id: 123,
-          name: "agwdfgasgd",
-          product_name: "afhsdjmyhm",
-          assigned_user: "Jimmy",
-          status: 2,
-          product_status: 4,
-        },
-        {
-          id: 124,
-          name: "agwdfgasgd",
-          product_name: "afhsdjmyhm",
-          assigned_user: "Daniel",
-          status: 2,
-          product_status: 4,
-        },
-        {
-          id: 125,
-          name: "agwaesgd",
-          product_name: "wwdaf",
-          assigned_user: "Frank",
-          status: 3,
-          product_status: 4,
-        },
-      ]); 
-  },[]);
+        id: 123,
+        name: "agwdfgasgd",
+        product_name: "afhsdjmyhm",
+        assigned_user: "Jimmy",
+        status: 2,
+        product_status: 4,
+      },
+      {
+        id: 124,
+        name: "agwdfgasgd",
+        product_name: "afhsdjmyhm",
+        assigned_user: "Daniel",
+        status: 2,
+        product_status: 4,
+      },
+      {
+        id: 125,
+        name: "agwaesgd",
+        product_name: "wwdaf",
+        assigned_user: "Frank",
+        status: 3,
+        product_status: 4,
+      },
+    ]);
+  }, []);
 
   const columns: GridColDef[] = [
     {

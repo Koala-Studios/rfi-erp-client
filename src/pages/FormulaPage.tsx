@@ -14,20 +14,17 @@ const columns: GridColDef[] = [
   { field: "quantity", headerName: "Qty(%)", type: "number", width: 90 },
   { field: "cost", headerName: "Cost($)", type: "number", width: 100 },
   { field: "notes", headerName: "Notes", type: "number", width: 400 },
-  
 ];
 
 const FormulaPage = () => {
-  
   const auth = React.useContext(AuthContext);
   const [rows, setRows] = React.useState<any>(null);
-  const { id } = useParams();
-  const { version } = useParams();
+  const { id, version } = useParams();
   // const { approved_version } = useParams();
   React.useEffect(() => {
-    getFormula(auth.token, id!, version! ).then((formula) => {
-      console.log(formula,' TEST')
-      if(!formula?.formula_items) {
+    getFormula(auth.token, id!, version!).then((formula) => {
+      console.log(formula, " TEST");
+      if (!formula?.formula_items) {
         setRows({});
       } else {
         const newRows = formula!.formula_items.map((item) => {
@@ -35,24 +32,23 @@ const FormulaPage = () => {
             id: item.material_id,
             material_code: item.material_code,
             material_name: item.material_name,
-            cost: item.cost * (item.amount/100),
+            cost: item.cost * (item.amount / 100),
             quantity: item.amount,
             notes: item.notes,
           };
         });
         setRows(newRows);
       }
-
     });
   }, []);
 
   if (rows == null) return null;
 
-return (
-  <Card variant="outlined" sx={{ padding: 3, overflowY: 'auto' }}>
-    
-    <DataTable  auto_height={true} rows={rows!} columns={columns}></DataTable>
-  </Card> );
+  return (
+    <Card variant="outlined" sx={{ padding: 3, overflowY: "auto" }}>
+      <DataTable auto_height={true} rows={rows!} columns={columns}></DataTable>
+    </Card>
+  );
 };
 
 export default FormulaPage;

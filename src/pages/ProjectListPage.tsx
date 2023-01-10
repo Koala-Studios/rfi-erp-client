@@ -2,6 +2,7 @@ import React from "react";
 import { DataTable } from "../components/utils/DataTable";
 import {
   GridColDef,
+  GridEventListener,
   GridRenderCellParams,
   GridValueGetterParams,
 } from "@mui/x-data-grid";
@@ -57,7 +58,7 @@ const ProjectListPage = () => {
               navigate(`/projects/${params.value}`, { replace: false })
             }
           >
-            View Details
+            Open Project
           </Button>
         </strong>
       ),
@@ -101,17 +102,30 @@ const ProjectListPage = () => {
     );
   };
 
+  const createNewProject = () => {
+    navigate(`/projects/new`, { replace: false });
+  };
+
+  const handleRowDBClick: GridEventListener<"rowClick"> = (
+    params, // GridRowParams
+    event, // MuiEvent<React.MouseEvent<HTMLElement>>
+    details // GridCallbackDetails
+  ) => {
+    navigate(`/projects/${params.row.id}`, { replace: false });
+  };
+
   return (
     <>
       <Card
         variant="outlined"
         sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
       >
-        <Button variant="contained" color="primary" onClick={createProjectForm}>
+        <Button variant="contained" color="primary" onClick={createNewProject}>
           + New Project
         </Button>
       </Card>
       <DataTable
+        handleDBClick={handleRowDBClick}
         rows={dataOptions.rows}
         columns={columns}
         listOptions={dataOptions.listOptions}
