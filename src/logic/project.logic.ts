@@ -5,6 +5,7 @@ import { apiStatus, IListOptions } from "./utils";
 export interface IProject {
   _id: string;
   project_code: string;
+  iteration: number;
   name: string;
   date_created?: Date;
   start_date: Date;

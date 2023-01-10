@@ -27,13 +27,15 @@ let savedProject: IProject | null = null;
 
 export const ProjectDetails = () => {
   const navigate = useNavigate();
-
   const { id } = useParams();
   const auth = useContext(AuthContext);
   const [project, setProject] = useState<IProject>({
     _id: "",
     name: "",
     project_code: "",
+    iteration:1,
+    status: 1,
+    assigned_user: undefined,
     project_items: [],
     start_date: new Date(),
   });
@@ -108,21 +110,21 @@ export const ProjectDetails = () => {
       <Card variant="outlined" style={{ padding: 16 }}>
         <div style={{ display: "flex", gap: 16 }}>
           <Grid container spacing={3}>
-            <Grid item xs={12}>
+          <Grid item xs={1}>
               <TextField
                 onChange={(e) =>
-                  setProject({ ...project, name: e.target.value })
+                  setProject({ ...project, status: e.target.value ? parseInt(e.target.value) : 0 })
                 }
                 spellCheck="false"
                 InputLabelProps={{ shrink: true }}
                 fullWidth
                 size="small"
                 variant="outlined"
-                label={"Project Title"}
-                value={project.name}
+                label={"ITR"}
+                value={project.iteration}
               ></TextField>
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={2}>
               <TextField
                 onChange={(e) =>
                   setProject({ ...project, project_code: e.target.value })
@@ -136,8 +138,37 @@ export const ProjectDetails = () => {
                 value={project.project_code}
               ></TextField>
             </Grid>
+            <Grid item xs={7}>
+              <TextField
+                onChange={(e) =>
+                  setProject({ ...project, name: e.target.value })
+                }
+                spellCheck="false"
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+                size="small"
+                variant="outlined"
+                label={"Project Title"}
+                value={project.name}
+              ></TextField>
+            </Grid>
+            <Grid item xs={2}>
+              <TextField
+                onChange={(e) =>
+                  setProject({ ...project, status: e.target.value ? parseInt(e.target.value) : 0 })
+                }
+                spellCheck="false"
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+                size="small"
+                variant="outlined"
+                label={"Status"}
+                value={project.status}
+              ></TextField>
+            </Grid>
 
-            <Grid item xs={6}>
+
+            <Grid item xs={3}>
               <TextField
                 spellCheck="false"
                 InputLabelProps={{ shrink: true }}
@@ -145,6 +176,17 @@ export const ProjectDetails = () => {
                 size="small"
                 variant="outlined"
                 label={"Customer"}
+              ></TextField>
+            </Grid>
+            <Grid item xs={3}>
+            <TextField
+                spellCheck="false"
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+                size="small"
+                variant="outlined"
+                label={"Assigned Rep"}
+                value={project.assigned_user}
               ></TextField>
             </Grid>
             <Grid item xs={6}>
