@@ -97,6 +97,11 @@ const LinkItems = [
     icon: <GroupIcon></GroupIcon>,
   },
   {
+    text: "Customers",
+    link: "/customers",
+    icon: <GroupIcon></GroupIcon>,
+  },
+  {
     text: "Suppliers",
     link: "/suppliers",
     icon: <PersonPinCircleIcon></PersonPinCircleIcon>,

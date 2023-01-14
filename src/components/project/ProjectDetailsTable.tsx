@@ -1,33 +1,30 @@
 import {
   Box,
   Button,
-  Card,
   Chip,
-  Grid,
+  MenuItem,
   Select,
   SelectChangeEvent,
-  TextField,
-  Typography,
 } from "@mui/material";
 import React from "react";
 import {
   DataGrid,
   GridColDef,
   GridRenderCellParams,
-  GridRowsProp,
-  GridToolbarExport,
-  GridToolbarFilterButton,
-  GridValueGetterParams,
   useGridApiContext,
 } from "@mui/x-data-grid";
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import SaveIcon from "@mui/icons-material/Save";
-import CancelIcon from "@mui/icons-material/Close";
+
 import { useNavigate } from "react-router-dom";
 import IconButton from "@mui/material/IconButton";
 import { IProjectItem } from "../../logic/project.logic";
+import TableAutocomplete from "../utils/TableAutocomplete";
+import { ObjectID } from "bson";
+import { IFormulaItem } from "../../logic/formula.logic";
+import { IInventory } from "../../logic/inventory.logic";
+import { IUser } from "../../logic/user.logic";
 // import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
 const ProjectStatus = [
@@ -56,14 +53,15 @@ function SelectEditInputCell(props: GridRenderCellParams) {
       value={value}
       onChange={handleChange}
       size="small"
-      sx={{ height: 1 }}
-      native
-      autoFocus
+      sx={{
+        height: 1,
+        width: "100%",
+      }}
     >
-      <option value={1}>Pending</option>
-      <option value={2}>In Progress</option>
-      <option value={3}>Awaiting Approval</option>
-      <option value={4}>Approved</option>
+      <MenuItem value={1}>Pending</MenuItem>
+      <MenuItem value={2}>In Progress</MenuItem>
+      <MenuItem value={3}>Awaiting Approval</MenuItem>
+      <MenuItem value={4}>Approved</MenuItem>
     </Select>
   );
 }
@@ -77,51 +75,64 @@ interface Props {
   setProjectItems: any;
 }
 
-export const ProjectDetailsTable: React.FC<Props> = ({ projectItems }) => {
+export const ProjectDetailsTable: React.FC<Props> = ({
+  projectItems,
+  setProjectItems,
+}) => {
   const navigate = useNavigate();
 
-  const handleAddLine = () => {
-    setRows([
-      ...rows,
+  const handleEditProductRow = (rowid: string, value: IInventory) => {
+    let pList = projectItems.slice();
+    const rowIdx = projectItems.findIndex((r) => r._id === rowid);
+    pList[rowIdx].product_code = value.product_code;
+    pList[rowIdx].product_id = value._id;
+    pList[rowIdx].product_name = value.name;
+
+    setProjectItems(pList);
+  };
+  const handleEditAsigneeRow = (rowid: string, value: IUser) => {
+    let pList = projectItems.slice();
+    const rowIdx = projectItems.findIndex((r) => r._id === rowid);
+    pList[rowIdx].assigned_user = value;
+
+    setProjectItems(pList);
+  };
+
+  const handleAddRow = () => {
+    setProjectItems([
+      ...projectItems,
       {
-        id: Math.random() * 100,
+        _id: new ObjectID().toHexString(),
+        flavor_name: "",
+        product_id: "",
+        status: 1,
+        product_status: 1,
+        product_name: "",
+        product_code: "",
+        // code:""
       },
     ]);
   };
 
-  const [rows, setRows] = React.useState<any>(null);
-  React.useEffect(() => {
-    setRows([
-      {
-        id: 123,
-        name: "agwdfgasgd",
-        product_name: "afhsdjmyhm",
-        assigned_user: "Jimmy",
-        status: 2,
-        product_status: 4,
-      },
-      {
-        id: 124,
-        name: "agwdfgasgd",
-        product_name: "afhsdjmyhm",
-        assigned_user: "Daniel",
-        status: 2,
-        product_status: 4,
-      },
-      {
-        id: 125,
-        name: "agwaesgd",
-        product_name: "wwdaf",
-        assigned_user: "Frank",
-        status: 3,
-        product_status: 4,
-      },
-    ]);
-  }, []);
+  const handleDeleteRow = (row_id: string) => {
+    const rowIdx = projectItems.findIndex((r) => r._id === row_id);
+
+    let pList = projectItems.slice();
+    pList.splice(rowIdx, 1);
+    setProjectItems(pList);
+  };
+
+  // React.useEffect(() => {
+  //   //user came out of edit mode
+  //   console.log(rows);
+  //   if (editMode == null) {
+  //     setProjectItems(rows);
+  //   }
+  // }, [editMode]);
 
   const columns: GridColDef[] = [
     {
-      field: "name",
+      field: "flavor_name",
       headerName: "Request Flavor Name",
       width: 300,
       editable: true,
@@ -130,13 +141,41 @@ export const ProjectDetailsTable: React.FC<Props> = ({ projectItems }) => {
       field: "product_name",
       headerName: "Internal Product",
       width: 300,
-      editable: true,
+      sortable: false,
+      filterable: false,
+      renderCell: (row_params: GridRenderCellParams<string>) => (
+        <TableAutocomplete
+          dbOption="inventory"
+          handleEditRow={handleEditProductRow}
+          rowParams={row_params}
+          initialValue={row_params.row.product_name}
+          letterMin={3}
+          getOptionLabel={(item: IInventory) =>
+            `${item.product_code} | ${item.name}`
+          }
+        />
+      ),
     },
     {
       field: "assigned_user",
       headerName: "Assignee",
       width: 200,
-      editable: true,
+      sortable: false,
+      filterable: false,
+      renderCell: (row_params: GridRenderCellParams<string>) => (
+        <TableAutocomplete
+          dbOption="user"
+          handleEditRow={handleEditAsigneeRow}
+          rowParams={row_params}
+          initialValue={
+            row_params.row.assigned_user
+              ? row_params.row.assigned_user.username
+              : ""
+          }
+          letterMin={1}
+          getOptionLabel={(item: IUser) => item.username}
+        />
+      ),
     },
     {
       field: "product_status",
@@ -151,6 +190,7 @@ export const ProjectDetailsTable: React.FC<Props> = ({ projectItems }) => {
             fontWeight: 600,
           }}
           //@ts-ignore
+
           color={ProjectStatus[params.value ? params.value - 1 : 4][1]}
           variant="outlined"
         />
@@ -160,6 +200,7 @@ export const ProjectDetailsTable: React.FC<Props> = ({ projectItems }) => {
       field: "status",
       headerName: "Status",
       editable: true,
+      renderEditCell: renderSelectEditInputCell,
       width: 200,
       renderCell: (params: GridRenderCellParams<number>) => (
         <Chip
@@ -174,14 +215,14 @@ export const ProjectDetailsTable: React.FC<Props> = ({ projectItems }) => {
       ),
     },
     {
-      field: "id",
+      field: "product_id",
       headerName: "Actions",
       align: "left",
       width: 250,
       renderCell: (params: GridRenderCellParams<string>) => {
         // const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
         return (
-          <strong>
+          <div>
             <Button
               color="primary"
               variant="contained"
@@ -192,23 +233,30 @@ export const ProjectDetailsTable: React.FC<Props> = ({ projectItems }) => {
             >
               View Product
             </Button>
-          </strong>
+            <IconButton
+              onClick={() => handleDeleteRow(params.row._id)}
+              aria-label="delete"
+              color="error"
+            >
+              <DeleteIcon />
+            </IconButton>
+          </div>
         );
       },
     },
   ];
 
-  if (rows == null) return null;
+  // if (rows == null) return null;
   return (
     <>
       <Box component="div" sx={{ display: "inline" }}>
         <Button
           size="large"
           variant="outlined"
-          onClick={handleAddLine}
-          sx={{ marginRight: 4 }}
+          onClick={handleAddRow}
+          sx={{ mb: 2 }}
         >
-          + Add Line
+          + Add Row
         </Button>
       </Box>
 
@@ -216,12 +264,23 @@ export const ProjectDetailsTable: React.FC<Props> = ({ projectItems }) => {
         style={{
           border: "1px solid #c9c9c9",
         }}
-        rows={rows}
+        rows={projectItems}
         columns={columns}
         autoHeight={true}
         rowHeight={45}
-        editMode="row"
+        editMode="cell"
+        getRowId={(row) => row._id}
         experimentalFeatures={{ newEditingApi: true }}
+        processRowUpdate={(newRow) => {
+          let pList = projectItems.slice();
+          const rowIdx = projectItems.findIndex((r) => r._id === newRow._id);
+          pList[rowIdx] = newRow;
+          setProjectItems(pList);
+          return newRow;
+        }}
+        onProcessRowUpdateError={(e) => {
+          console.error("onProcessRowUpdateError", e);
+        }}
         // hideFooter
         hideFooterPagination
         // rowCount={listOptions!.totalDocs}

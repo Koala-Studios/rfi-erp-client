@@ -1,4 +1,6 @@
 import { Button, Paper, Typography } from "@mui/material";
+import SaveIcon from "@mui/icons-material/Save";
+import CancelIcon from "@mui/icons-material/Close";
 import React from "react";
 
 interface Props {
@@ -33,16 +35,21 @@ const SaveForm: React.FC<Props> = ({ display, onSave, onCancel }) => {
 
       <div>
         <Button
-          sx={{ width: 100 }}
           color="secondary"
           variant="outlined"
           onClick={onCancel}
+          startIcon={<CancelIcon />}
         >
           Cancel
         </Button>
         <Button
-          sx={{ ml: 2, width: 100, backgroundColor: "#008060" }}
+          sx={{
+            ml: 2,
+            textAlign: "center",
+          }}
           variant="contained"
+          color="success"
+          startIcon={<SaveIcon />}
           onClick={onSave}
         >
           Save

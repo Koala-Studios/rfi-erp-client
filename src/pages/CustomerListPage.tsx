@@ -16,14 +16,14 @@ const CustomerListPage = () => {
   const columns: GridColDef[] = [
     { field: "name", headerName: "Customer Name", width: 250 },
     { field: "code", headerName: "Customer Code", width: 200 },
-    {
-      field: "contact_name",
-      headerName: "Contact Name",
-      width: 200,
-    },
-    { field: "address_one", headerName: "Address Line One", width: 200 },
-    { field: "address_two", headerName: "Address Line Two", width: 200 },
-    { field: "phone", headerName: "Phone Number", width: 200 },
+    // {
+    //   field: "contact_name",
+    //   headerName: "Contact Name",
+    //   width: 200,
+    // },
+    // { field: "address_one", headerName: "Address Line One", width: 200 },
+    // { field: "address_two", headerName: "Address Line Two", width: 200 },
+    // { field: "phone", headerName: "Phone Number", width: 200 },
     {
       field: "id",
       headerName: "Actions",
@@ -51,14 +51,15 @@ const CustomerListPage = () => {
 
   React.useEffect(() => {
     listCustomers(auth.token, 25, 1).then((customerList) => {
+      console.log(customerList);
       const newRows = customerList.map((customer) => {
         return {
           id: customer._id,
           code: customer.code,
           name: customer.name,
-          contact_name: customer.contact_name,
-          address_one: customer.address_one,
-          address_two: customer.address_two,
+          // contact_name: customer.contact_name,
+          // address_one: customer.address_one,
+          // address_two: customer.address_two,
         };
       });
       setRows(newRows);

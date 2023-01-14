@@ -88,3 +88,30 @@ export const listUsers = async (
 
 // 	return notifications;
 // };
+
+export const lookupUser = async (
+  //TODO: Not finished
+  token: string,
+  search_value: string
+): Promise<IUser[] | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {
+      search_value,
+    },
+  };
+
+  let list: IUser[] | null = null;
+
+  await api
+    .get("/lookup", config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        list = res.data.res;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  return list;
+};

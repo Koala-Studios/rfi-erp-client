@@ -1,26 +1,32 @@
 import { IUser } from "./user.logic";
 import axios from "axios";
 import { apiStatus, IListOptions } from "./utils";
+import { ICustomer } from "./customer.logic";
 
 export interface IProject {
   _id: string;
   project_code: string;
   name: string;
   date_created?: Date;
-  start_date: Date;
-  finish_date?: Date;
+  start_date: string;
+  finish_date?: string;
   assigned_user?: IUser;
   status?: number;
   notes?: string;
+  customer: ICustomer | null;
   project_items: IProjectItem[];
 }
 
 export interface IProjectItem {
-  name: string;
-  code: string;
-  status: string;
+  _id: string;
+  flavor_name: string;
+  // code: string;
   product_id: string;
+  product_name: string;
+  status: number;
+  product_status: number;
   product_code: string;
+  assigned_user: IUser;
 }
 
 const api = axios.create({

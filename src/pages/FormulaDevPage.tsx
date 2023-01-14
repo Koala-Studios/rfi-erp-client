@@ -15,7 +15,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { lookupInventory } from "../logic/inventory.logic";
+import { IInventory, lookupInventory } from "../logic/inventory.logic";
 import { getProduct } from "../logic/product.logic";
 import { Field } from "formik";
 import { IFormula, IFormulaItem } from "../logic/formula.logic";
@@ -23,21 +23,21 @@ import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
 import RemoveOutlinedIcon from "@mui/icons-material/RemoveOutlined";
 import { apiStatus } from "../logic/utils";
 import { fireEvent } from "@testing-library/react";
-import GenericAutocomplete from "../components/utils/GenericAutocomplete";
+import TableAutocomplete from "../components/utils/TableAutocomplete";
 import { IProduct } from "../logic/product.logic";
-import WarningIcon from '@mui/icons-material/Warning';
+import WarningIcon from "@mui/icons-material/Warning";
 
 const FormulaDevPage = () => {
   const [invLookupCatalog, setInvLookupCatalog] = React.useState<any>(null);
   const auth = React.useContext(AuthContext);
   const [rowCount, setRowCount] = React.useState<any>(0);
-  const [cost,setCost] = React.useState<number>(0);
+  const [cost, setCost] = React.useState<number>(0);
   const [totalAmt, setTotalAmt] = React.useState<number>(0);
   const [rows, setRows] = React.useState<any>(null);
   const [editMode, setEditMode] = React.useState<string | null>(null);
   const [carrier, setCarrier] = React.useState<string | null>(null);
-  const [prod_yield, setYield] = React.useState<number>(1.00);
-  
+  const [prod_yield, setYield] = React.useState<number>(1.0);
+
   const { id } = useParams();
   const { version } = useParams();
   // const { approved_version } = useParams();
@@ -50,19 +50,17 @@ const FormulaDevPage = () => {
         let amount = 0;
         const newRows = formula!.formula_items.map((item, index) => {
           return {
-            id: item.material_id + '' + count++,
+            id: item.material_id + "" + count++,
             material_id: item.material_id,
             material_code: item.material_code,
             material_name: item.material_name,
             item_cost: item.cost,
             cost: 0,
             amount: 0,
-            last_cost: item.cost*item.amount/100,
+            last_cost: (item.cost * item.amount) / 100,
             last_amount: item.amount,
             notes: item.notes,
           };
-
-          
         });
         setRows(newRows);
         setRowCount(count);
@@ -70,31 +68,29 @@ const FormulaDevPage = () => {
     });
   }, []);
 
-
-  
-    const [product, setProduct] = React.useState<IProduct | null>(null);
+  const [product, setProduct] = React.useState<IProduct | null>(null);
 
   React.useEffect(() => {
     getProduct(auth.token, id!).then((product) => {
       setProduct(product);
     });
-
   }, []);
 
   React.useEffect(() => {
-    handleSetCost()
-    console.log(totalAmt)
-  },[rows])
-
-  React.useEffect(() => { //Temporary method of adjusting carrier amt, other methods would cause infinite recursion atm
-    handleCalcCarrier()
-  },[cost])
+    handleSetCost();
+    console.log(totalAmt);
+  }, [rows]);
 
   React.useEffect(() => {
-    if(carrier != null) {
-      handleCalcCarrier()
+    //Temporary method of adjusting carrier amt, other methods would cause infinite recursion atm
+    handleCalcCarrier();
+  }, [cost]);
+
+  React.useEffect(() => {
+    if (carrier != null) {
+      handleCalcCarrier();
     }
-  },[carrier])
+  }, [carrier]);
 
   interface IFormulaDevRow extends IFormulaItem {
     id: string;
@@ -146,7 +142,13 @@ const FormulaDevPage = () => {
           >
             +
           </Button>
-          <Checkbox disabled={carrier != null && carrier != params.row.id} checked={carrier === params.row.id} onClick={() =>{ setCarrier(carrier === null ? params.row.id : null) }} />
+          <Checkbox
+            disabled={carrier != null && carrier != params.row.id}
+            checked={carrier === params.row.id}
+            onClick={() => {
+              setCarrier(carrier === null ? params.row.id : null);
+            }}
+          />
         </strong>
       ),
     },
@@ -156,20 +158,26 @@ const FormulaDevPage = () => {
       width: 90,
       align: "right",
       sortable: false,
-      filterable:false
+      filterable: false,
     },
     {
       field: "material_name",
       headerName: "Mat Name",
       width: 340,
       sortable: false,
-      filterable:false,
+      filterable: false,
       renderCell: (row_params: GridRenderCellParams<string>) => (
-        <GenericAutocomplete
-          editMode={editMode}
-          setEditMode={setEditMode}
+        <TableAutocomplete
+          dbOption="inventory"
+          // editMode={editMode}
+          // setEditMode={setEditMode}
           handleEditRow={handleEditRow}
           rowParams={row_params}
+          initialValue={row_params.row.material_name}
+          letterMin={3}
+          getOptionLabel={(item: IInventory) =>
+            `${item.product_code} | ${item.name}`
+          }
         />
       ),
     },
@@ -178,9 +186,9 @@ const FormulaDevPage = () => {
       headerName: "Mat Cost/KG",
       type: "number",
       sortable: false,
-      filterable:false,
+      filterable: false,
       width: 100,
-      align:'left'
+      align: "left",
     },
     {
       field: "amount",
@@ -189,8 +197,9 @@ const FormulaDevPage = () => {
       width: 90,
       editable: true,
       sortable: false,
-      align:'left',
-      valueGetter: (params) => params.row.amount === 0  ? null : params.row.amount
+      align: "left",
+      valueGetter: (params) =>
+        params.row.amount === 0 ? null : params.row.amount,
     },
     {
       field: "cost",
@@ -198,26 +207,29 @@ const FormulaDevPage = () => {
       type: "number",
       width: 100,
       sortable: false,
-      filterable:false,
-      align:'right',
-      valueGetter: (params) =>  params.row.amount === 0  ? null : (params.row.item_cost * params.row.amount) /100,
+      filterable: false,
+      align: "right",
+      valueGetter: (params) =>
+        params.row.amount === 0
+          ? null
+          : (params.row.item_cost * params.row.amount) / 100,
     },
     {
       field: "last_amount",
       headerName: "Prev Qty(%)",
       type: "number",
       sortable: false,
-      filterable:false,
+      filterable: false,
       width: 90,
-      align:'right',
-      valueGetter: (params) => params.row.last_amount
+      align: "right",
+      valueGetter: (params) => params.row.last_amount,
     },
     {
       field: "last_cost",
       headerName: "Prev Cost",
       type: "number",
       sortable: false,
-      filterable:false,
+      filterable: false,
       width: 100,
       valueGetter: (params) => params.row.last_cost,
     },
@@ -226,7 +238,7 @@ const FormulaDevPage = () => {
       headerName: "Notes",
       type: "string",
       sortable: false,
-      filterable:false,
+      filterable: false,
       width: 400,
       editable: true,
     },
@@ -242,8 +254,8 @@ const FormulaDevPage = () => {
         id: "row" + rowCount,
         amount: 0,
         last_amount: 0,
-        item_cost:0,
-        cost:0
+        item_cost: 0,
+        cost: 0,
       },
       ...rows.slice(index == rows.length - 1 ? index + 2 : index + 1),
     ]);
@@ -251,61 +263,68 @@ const FormulaDevPage = () => {
     // setEditMode("row" + rowCount); //onBlur in autocomplete clashes with this, also slows page down
   };
 
-  const handleEditRow = (row_id:string, newRow: IFormulaDevRow ) => {
-    const rowIndex = rows.findIndex((r: IFormulaDevRow) => r.id === '' + row_id);
+  const handleEditRow = (id: string, newRow: IFormulaDevRow) => {
+    const rowIndex = rows.findIndex((r: IFormulaDevRow) => r.id === id);
 
     setRows([
       ...rows.slice(0, rowIndex),
       newRow,
-      ...rows.slice(rowIndex == rows.length - 1 ? rowIndex : rowIndex + 1),
+      ...rows.slice(rowIndex === rows.length - 1 ? rowIndex : rowIndex + 1),
     ]);
-
-
   };
 
-  const handleEditCell = (row_id:string,field:string, value:any ) => {
+  const handleEditCell = (row_id: string, field: string, value: any) => {
     const rowIndex = rows.findIndex((r: IFormulaDevRow) => r.id === row_id);
     setRows([
       ...rows.slice(0, rowIndex),
       {
         ...rows[rowIndex],
-        [field] : value
+        [field]: value,
       },
       ...rows.slice(rowIndex == rows.length ? rowIndex : rowIndex + 1),
-    ])
-
-  }
+    ]);
+  };
 
   const handleDeleteRow = (row_id: string) => {
-    if(row_id === carrier) {
-      setCarrier(null)
+    if (row_id === carrier) {
+      setCarrier(null);
     }
-    setRows([...(rows.filter((m: IFormulaDevRow) => m.id !== row_id))]);
+    setRows([...rows.filter((m: IFormulaDevRow) => m.id !== row_id)]);
   };
 
   const handleSetCost = () => {
-    if(rows) {
-      // @ts-ignore
-      setTotalAmt(rows.reduce((a, b) => a + ( !b.amount ? b.last_amount:  b.amount),0).toFixed(2))
-      // @ts-ignore
-      setCost(rows.reduce((a, b) => a + (( !b.amount ? b.last_amount:  b.amount)*b.item_cost)/100, 0).toFixed(2))
+    if (rows) {
+      setTotalAmt(
+        rows
+          // @ts-ignore
+          .reduce((a, b) => a + (!b.amount ? b.last_amount : b.amount), 0)
+          .toFixed(2)
+      );
+      setCost(
+        rows
+          .reduce(
+            // @ts-ignore
+            (a, b) =>
+              a + ((!b.amount ? b.last_amount : b.amount) * b.item_cost) / 100,
+            0
+          )
+          .toFixed(2)
+      );
     }
-  }
+  };
 
   const handleCalcCarrier = () => {
-    if(rows && carrier != null) {
-        
+    if (rows && carrier != null) {
       let totalMat = 0;
       // @ts-ignore
-      rows.map(mat => {
-        if(mat.id != carrier) {
-
-          totalMat += mat.amount ? mat.amount : mat.last_amount
+      rows.map((mat) => {
+        if (mat.id != carrier) {
+          totalMat += mat.amount ? mat.amount : mat.last_amount;
         }
       });
-        handleEditCell(carrier,'amount',totalMat < 100 ? 100 - totalMat : NaN )
+      handleEditCell(carrier, "amount", totalMat < 100 ? 100 - totalMat : NaN);
     }
-  }
+  };
 
   function filterChanges(string: string) {
     lookupInventory(auth.token, string, false).then((result) => {
@@ -327,10 +346,10 @@ const FormulaDevPage = () => {
 
   return (
     <>
-            <Card variant="outlined" style={{ padding: 16, marginBottom:10 }}>
+      <Card variant="outlined" style={{ padding: 16, marginBottom: 10 }}>
         <div style={{ display: "flex", gap: 16 }}>
           <Grid container spacing={3}>
-          <Grid item xs={2.5}>
+            <Grid item xs={2.5}>
               <TextField
                 fullWidth
                 InputLabelProps={{ shrink: true }}
@@ -352,7 +371,7 @@ const FormulaDevPage = () => {
                 // }}
                 renderInput={(params) => <TextField {...params} />}
               /> */}
-              <TextField 
+              <TextField
                 fullWidth
                 InputLabelProps={{ shrink: true }}
                 size="small"
@@ -434,23 +453,24 @@ const FormulaDevPage = () => {
             </Grid>
           </Grid>
 
-          <Card
-            variant="outlined"
-            style={{ width: "40%", minWidth: "40%"}}
-          >
+          <Card variant="outlined" style={{ width: "40%", minWidth: "40%" }}>
             <div>
               <Typography variant="h6">Overview Stats</Typography>
             </div>
           </Card>
         </div>
       </Card>
-      <Card variant="outlined" sx={{ padding: 3, overflowY: "auto" }}> {/*FORMULA DEV SECTION*/}
-      <div style={{ display: "flex", paddingBottom:16}}>
-      <Grid container spacing={2}>
-          <Grid item xs={1.5}>
-              <Button variant="contained" size="medium">Clone</Button>
-          </Grid>
-          <Grid item xs={0.8}>
+      <Card variant="outlined" sx={{ padding: 3, overflowY: "auto" }}>
+        {" "}
+        {/*FORMULA DEV SECTION*/}
+        <div style={{ display: "flex", paddingBottom: 16 }}>
+          <Grid container spacing={2}>
+            <Grid item xs={1.5}>
+              <Button variant="contained" size="medium">
+                Clone
+              </Button>
+            </Grid>
+            <Grid item xs={0.8}>
               <TextField
                 spellCheck="false"
                 InputLabelProps={{ shrink: true }}
@@ -468,27 +488,31 @@ const FormulaDevPage = () => {
                 Apply
               </Button>
             </Grid>
-          <Grid item xs={3.5}></Grid>
-          
-          <Grid item xs={1}>
+            <Grid item xs={3.5}></Grid>
+
+            <Grid item xs={1}>
               <Button variant="contained" size="medium">
                 Submit
               </Button>
             </Grid>
-          <Grid item xs={0.5} >
-            <div hidden={!(prod_yield === 1 && totalAmt > 100)}>
-              <Tooltip  placement='top' title="The total surpasses 100 & the yield is set to 1.00">
-                <WarningIcon  sx={{color:'orange' }}/>
-              </Tooltip>
-            </div>
+            <Grid item xs={0.5}>
+              <div hidden={!(prod_yield === 1 && totalAmt > 100)}>
+                <Tooltip
+                  placement="top"
+                  title="The total surpasses 100 & the yield is set to 1.00"
+                >
+                  <WarningIcon sx={{ color: "orange" }} />
+                </Tooltip>
+              </div>
+            </Grid>
+            <Grid item xs={3}>
+              <Typography variant="h6">
+                {" "}
+                Amount: {totalAmt} | Cost: {cost}
+              </Typography>
+            </Grid>
           </Grid>
-          <Grid item xs={3}>
-            <Typography variant="h6">  Amount: {totalAmt} | Cost: {cost}</Typography>
-          </Grid>
-
-
-          </Grid>
-      </div>
+        </div>
         <DataGrid
           rowHeight={39}
           hideFooter
@@ -497,25 +521,22 @@ const FormulaDevPage = () => {
               event.stopPropagation();
             }
             if (editMode !== null) {
-              switch(event.code) {
-                case("Escape"):
-                {
-                  setEditMode(null)
+              switch (event.code) {
+                case "Escape": {
+                  setEditMode(null);
                   break;
                 }
-                case("ArrowDown"):
-                case("ArrowUp"):
-                case("Backspace"):
-                {
-                  event.stopPropagation()
+                case "ArrowDown":
+                case "ArrowUp":
+                case "Backspace": {
+                  event.stopPropagation();
                 }
-              }              
+              }
             }
           }}
-          onCellEditCommit={(e,value) => {
-            handleEditCell(e.id.toString() ,e.field, e.value)
-          }
-          }
+          onCellEditCommit={(e, value) => {
+            handleEditCell(e.id.toString(), e.field, e.value);
+          }}
           autoHeight={true}
           rows={rows!}
           columns={columns}

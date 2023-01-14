@@ -31,10 +31,12 @@ import SalesListPage from "./pages/SalesListPage";
 import { SalesDetailPage } from "./pages/SalesDetailPage";
 import FormulaDevPage from "./pages/FormulaDevPage";
 import { ProjectDetails } from "./components/project/ProjectDetails";
+import CustomerListPage from "./pages/CustomerListPage";
 
 const mainTheme = createTheme({
   palette: {
     primary: { main: "#061e3d" },
+    success: { main: "#008060" },
     secondary: {
       main: "#fff",
     },
@@ -144,6 +146,16 @@ function App() {
                 <RequireAuth>
                   <Navbar title="Users">
                     <UserListPage />
+                  </Navbar>
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/customers"
+              element={
+                <RequireAuth>
+                  <Navbar title="Customers">
+                    <CustomerListPage />
                   </Navbar>
                 </RequireAuth>
               }
