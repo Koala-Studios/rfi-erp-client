@@ -4,6 +4,8 @@ import { GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
 import { listBatching } from "../logic/batching.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { IListData } from "../logic/utils";
+import { Button, Card } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 const columns: GridColDef[] = [
   // { field: "id", headerName: "ID", width: 300 },
@@ -15,6 +17,8 @@ const columns: GridColDef[] = [
 ];
 
 const BatchingListPage = () => {
+  
+  const navigate = useNavigate();
   const auth = React.useContext(AuthContext);
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
@@ -33,15 +37,30 @@ const BatchingListPage = () => {
       setDataOptions({ rows: newRows, listOptions: list! });
     });
   }, []);
+  const createNewBatching = () => {
+    navigate(`/batching/new`, { replace: false });
+  };
+
+
 
   if (dataOptions == null) return null;
 
   return (
+    <>
+    <Card
+    variant="outlined"
+    sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
+  >
+    <Button variant="contained" color="primary" onClick={createNewBatching}>
+      + New Product
+    </Button>
+  </Card>
     <DataTable
       rows={dataOptions.rows}
       columns={columns}
       listOptions={dataOptions.listOptions}
     ></DataTable>
+    </>
   );
 };
 

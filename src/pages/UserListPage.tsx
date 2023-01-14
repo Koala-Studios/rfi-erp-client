@@ -54,13 +54,17 @@ const UserListPage = () => {
       setRows(newRows);
     });
   }, []);
+  const createNewUser = () => {
+    navigate(`/users/new`, { replace: false });
+  };
+
 
   if (rows == null) return null;
 
   return (
     <Box>
       <Card variant="outlined" sx={{ mb: 3, p: 3 }}>
-        <Button variant="contained" color="primary">
+        <Button variant="contained" color="primary" onClick={createNewUser}>
           + New User
         </Button>
       </Card>

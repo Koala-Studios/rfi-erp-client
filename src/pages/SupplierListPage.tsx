@@ -7,7 +7,7 @@ import {
 } from "@mui/x-data-grid";
 import { listSuppliers } from "../logic/supplier.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
-import { Button } from "@mui/material";
+import { Button, Card } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { IListData } from "../logic/utils";
 
@@ -66,16 +66,28 @@ const SupplierListPage = () => {
       setDataOptions({ rows: newRows, listOptions: list! });
     });
   }, []);
-
+  const createNewSupplier = () => {
+    navigate(`/suppliers/new`, { replace: false });
+  };
 
   if (dataOptions == null) return null;
   
   return (
+    <>
+    <Card
+    variant="outlined"
+    sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
+  >
+    <Button variant="contained" color="primary" onClick={createNewSupplier}>
+      + New Product
+    </Button>
+  </Card>
     <DataTable
       rows={dataOptions.rows}
       columns={columns}
       listOptions={dataOptions.listOptions}
     ></DataTable>
+    </>
   );
 };
 

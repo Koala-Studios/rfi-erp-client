@@ -7,7 +7,7 @@ import {
 } from "@mui/x-data-grid";
 import { listCustomers } from "../logic/customer.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
-import { Button } from "@mui/material";
+import { Button, Card } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 
 const CustomerListPage = () => {
@@ -64,15 +64,30 @@ const CustomerListPage = () => {
       setRows(newRows);
     });
   }, []);
+  const createNewCustomer = () => {
+    navigate(`/customers/new`, { replace: false });
+  };
+
+
 
   if (rows == null) return null;
 
   return (
+    <>
+    <Card
+    variant="outlined"
+    sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
+  >
+    <Button variant="contained" color="primary" onClick={createNewCustomer}>
+      + New Product
+    </Button>
+  </Card>
     <DataTable
       rows={rows!}
       columns={columns}
       listOptions={undefined}
     ></DataTable>
+    </>
   );
 };
 

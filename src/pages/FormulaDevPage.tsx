@@ -334,7 +334,6 @@ const FormulaDevPage = () => {
 
   const handleSubmit = () => {
     const newVersion = {
-      yield: prodYield,
       formula_items: rows.map((material:IFormulaDevRow) => {
         return ({
           material_code: material.material_code,
@@ -346,7 +345,9 @@ const FormulaDevPage = () => {
         )
       }),
       product_id: product?._id,
-      approved: approveonSubmit
+      approved: approveonSubmit,
+      formula_factor: totalAmt/100,
+      yield: prodYield,
     }
     //TODO: handle submitting the version!
     console.log(newVersion)
