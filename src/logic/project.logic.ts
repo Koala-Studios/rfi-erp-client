@@ -6,6 +6,7 @@ import { ICustomer } from "./customer.logic";
 export interface IProject {
   _id: string;
   project_code: string;
+  iteration: number;
   name: string;
   date_created?: Date;
   start_date: string;

@@ -7,7 +7,7 @@ import {
 } from "@mui/x-data-grid";
 import { listProducts } from "../logic/product.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
-import { Button, Chip } from "@mui/material";
+import { Button, Card, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { IListData } from "../logic/utils";
 
@@ -88,7 +88,7 @@ const DvpListPage = () => {
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listProducts(auth.token, 25, 1, false).then((list) => { //TODO: FIX DEFAULT QUERY WITH UNNAPPROVED VS APPROVED PRODUCTS
+    listProducts(auth.token, 25, 1, false).then((list) => {
       const newRows = list!.docs.map((product /*, idx*/) => {
         return {
           id: product._id,
@@ -98,21 +98,36 @@ const DvpListPage = () => {
           versions: product.versions,
           approved_version: product.approved_version,
           cost: product.cost,
-          // key: idx,
         };
       });
       setDataOptions({ rows: newRows, listOptions: list! });
     });
   }, []);
 
+  const createNewFormula= () => {
+    navigate(`/inventory/new`, { replace: false });
+  };
+
+
+
   if (dataOptions == null) return null;
   
   return (
+    <>
+    <Card
+    variant="outlined"
+    sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
+  >
+    <Button variant="contained" color="primary" onClick={createNewFormula}>
+      + New Product
+    </Button>
+  </Card>
     <DataTable
       rows={dataOptions.rows}
       columns={columns}
       listOptions={dataOptions.listOptions}
     ></DataTable>
+    </>
   );
 };
 

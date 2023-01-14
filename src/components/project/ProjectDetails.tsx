@@ -32,6 +32,7 @@ const emptyProject: IProject = {
   project_items: [],
   start_date: "",
   customer: null,
+  iteration: 0,
 };
 
 let savedProject: IProject | null = null;

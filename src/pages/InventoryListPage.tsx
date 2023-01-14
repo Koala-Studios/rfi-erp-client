@@ -7,7 +7,7 @@ import {
 } from "@mui/x-data-grid";
 import { listInventory } from "../logic/inventory.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
-import { Button } from "@mui/material";
+import { Button, Card } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { setTokenSourceMapRange } from "typescript";
 import { IListData } from "../logic/utils";
@@ -38,7 +38,7 @@ const InventoryListPage = () => {
       field: "id",
       headerName: "Actions",
       align: "left",
-      width: 250,
+      width: 120,
       renderCell: (params: GridRenderCellParams<string>) => (
         <strong>
           <Button
@@ -51,17 +51,6 @@ const InventoryListPage = () => {
           >
             View Details
           </Button>
-          <Button
-            variant="outlined"
-            color="primary"
-            size="small"
-            style={{ marginLeft: 16 }}
-            onClick={() =>
-              navigate(`/formula/${params.value}`, { replace: false })
-            }
-          >
-            Formula
-          </Button>
         </strong>
       ),
     },
@@ -73,40 +62,46 @@ const InventoryListPage = () => {
   React.useEffect(() => {
     listInventory(auth.token, 25, 1).then((list) => {
       const newRows = list!.docs.map((item) => {
-        let on_hand = 0;
-        let on_order = 0;
-        let quarantined = 0;
-        let allocated = 0;
-        item!.stock.map((stock: { on_hand: any; on_order: any; quarantined: any; allocated: any; }) => {
-          on_hand += stock.on_hand ? stock.on_hand : 0;
-          on_order += stock.on_order ? stock.on_order : 0;
-          quarantined += stock.quarantined ? stock.quarantined : 0;
-          allocated += stock.allocated ? stock.allocated : 0;
-        });
+
+
         return {
           id: item._id,
           product_id: item.product_code,
           name: item.name,
           cost: item.cost,
-          reorder_amount: item.reorder_amount ? item.reorder_amount : 0,
-          on_hand: item.on_hand ? item.on_hand : 0,
-          on_order: item.on_order ? item.on_order : 0,
-          quarantined: item.quarantined ? item.quarantined : 0,
-          allocated: item.allocated ? item.allocated : 0,
+          reorder_amount: item.reorder_amount ?? 0,
+          on_hand: item.on_hand ?? 0,
+          on_order: item.on_order ?? 0,
+          quarantined: item.quarantined ?? 0,
+          allocated: item.allocated ?? 0,
         };
       });
       setDataOptions({ rows: newRows, listOptions: list! });
     });
   }, []);
+  const createNewMaterial = () => {
+    navigate(`/inventory/new`, { replace: false });
+  };
+
 
   if (dataOptions == null) return null;
 
   return (
+    <>
+    <Card
+    variant="outlined"
+    sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
+  >
+    <Button variant="contained" color="primary" onClick={createNewMaterial}>
+      + New Product
+    </Button>
+  </Card>
     <DataTable
       rows={dataOptions.rows}
       columns={columns}
       listOptions={dataOptions.listOptions}
     ></DataTable>
+    </>
   );
 };
 

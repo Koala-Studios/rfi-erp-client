@@ -15,6 +15,7 @@ export interface IFormula {
   product_code: string;
   product_id: string;
   version: number;
+  yield: number;
   date_created: Date;
   formula_items: IFormulaItem[];
 }
