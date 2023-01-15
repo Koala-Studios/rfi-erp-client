@@ -148,7 +148,6 @@ export const ProjectDetails = () => {
                   setProject({ ...project, customer: value });
                 }}
                 label={"Customer"}
-                placeholder={""} //current customer
                 letterMin={0}
                 dbOption={"customer"}
                 getOptionLabel={(item: ICustomer) => item.name}

@@ -8,7 +8,7 @@ interface Props {
 
   getOptionLabel: (option: any) => string;
   label: string;
-  placeholder: string;
+  placeholder?: string;
   letterMin: number;
   dbOption: "customer" | "inventory" | "user";
   onChange?: (event: React.SyntheticEvent<Element, Event>, value: any) => void;

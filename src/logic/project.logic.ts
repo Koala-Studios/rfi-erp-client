@@ -153,9 +153,7 @@ export const updateProject = async (
   await api
     .post("/update", formData, config)
     .then((res) => {
-      console.log(res);
       if (res.status === apiStatus.OK) {
-        console.log(res.data);
         rtn = true;
       }
     })

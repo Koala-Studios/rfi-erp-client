@@ -8,7 +8,7 @@ export const lookup = async (
   dbOption: "customer" | "inventory" | "user",
   letterMin: number
 ) => {
-  if (query.length < letterMin) return;
+  if (query.length < letterMin) return [];
 
   if (dbOption === "customer") {
     return await lookupCustomer(token, query);
@@ -18,5 +18,5 @@ export const lookup = async (
     return await lookupUser(token, query);
   }
 
-  return null;
+  return [];
 };

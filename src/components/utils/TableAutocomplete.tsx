@@ -25,7 +25,7 @@ const TableAutocomplete: React.FC<Props> = ({
   const [optionList, setOptionList] = React.useState<any>([]);
   const auth = React.useContext(AuthContext);
 
-  const handleInputChange = (
+  const handleInputChange = async (
     event: React.SyntheticEvent<Element, Event>,
     value: string
   ) => {
