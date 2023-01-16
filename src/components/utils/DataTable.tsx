@@ -8,7 +8,7 @@ import {
   GridToolbarFilterButton,
   GridValueGetterParams,
 } from "@mui/x-data-grid";
-import { Typography } from "@mui/material";
+import { Pagination, Typography } from "@mui/material";
 import { IListOptions } from "../../logic/utils";
 
 interface Props {
@@ -18,6 +18,8 @@ interface Props {
   auto_height?: boolean;
   listOptions?: IListOptions;
   handleDBClick?: GridEventListener<"rowClick">;
+  setCurrentPage?: (page: number) => void;
+  currentPage?: number;
 }
 
 export const DataTable: React.FC<Props> = ({
@@ -27,6 +29,8 @@ export const DataTable: React.FC<Props> = ({
   auto_height = false,
   listOptions,
   handleDBClick,
+  setCurrentPage,
+  currentPage,
 }) => {
   const CustomToolbar: React.FC = () => {
     return (
@@ -41,9 +45,34 @@ export const DataTable: React.FC<Props> = ({
     );
   };
 
+  const CustomPagination = () => {
+    return (
+      <div style={{ display: "flex", alignItems: "center" }}>
+        <Pagination
+          color="primary"
+          count={listOptions!.totalPages - 1}
+          page={currentPage!}
+          shape="rounded"
+          variant="outlined"
+          sx={{ mr: 2 }}
+          //@ts-ignore
+          onChange={(event, value) => setCurrentPage(value)}
+        />
+        <Typography variant="subtitle2" sx={{ mr: 2 }}>{`${
+          listOptions!.pagingCounter
+        }-${listOptions!.pagingCounter + listOptions!.limit} of ${
+          listOptions!.totalDocs
+        }`}</Typography>
+      </div>
+    );
+  };
+
   return (
-    <div style={{ height: "100%", width: "100%", minHeight: 100 }}>
+    <div
+      style={{ height: "calc(100% - 100px)", width: "100%", minHeight: 100 }}
+    >
       <DataGrid
+        // onPageChange={(page) => setCurrentPage(page)}
         onRowDoubleClick={handleDBClick}
         style={{
           border: "1px solid #c9c9c9",
@@ -54,10 +83,11 @@ export const DataTable: React.FC<Props> = ({
         rowHeight={39}
         pageSize={25}
         pagination
-        // rowCount={listOptions!.totalDocs}
+        rowCount={listOptions!.totalDocs}
         rowsPerPageOptions={[25]}
         components={{
           Toolbar: CustomToolbar,
+          Pagination: CustomPagination,
         }}
       />
     </div>

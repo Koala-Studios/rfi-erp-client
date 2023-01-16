@@ -122,18 +122,17 @@ const FormulaDevPage = () => {
       renderCell: (params: GridRenderCellParams<string>) => (
         <strong>
           <Button
-            variant="contained"
+            variant="outlined"
             color="error"
             size="small"
             style={{
-              backgroundColor: "rgba(182,85,80,0.94)",
-              fontSize: "18px",
-              color: "black",
+              backgroundColor: "#ff221115",
+              fontSize: "25px",
               maxWidth: "40px",
               maxHeight: "30px",
               minWidth: "40px",
               minHeight: "30px",
-              marginRight: "10px",
+              marginRight: "12px",
             }}
             onClick={() => handleDeleteRow(params.row.id)}
           >
@@ -144,9 +143,8 @@ const FormulaDevPage = () => {
             color="success"
             size="small"
             style={{
-              backgroundColor: "rgba(102,182,80,0.94)",
-              fontSize: "14px",
-              color: "black",
+              backgroundColor: "#44ff1115",
+              fontSize: "19px",
               maxWidth: "40px",
               maxHeight: "30px",
               minWidth: "40px",
