@@ -9,6 +9,7 @@ import { listCustomers } from "../logic/customer.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { Button, Card } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { IListData } from "../logic/utils";
 
 const CustomerListPage = () => {
   const navigate = useNavigate();
@@ -47,12 +48,12 @@ const CustomerListPage = () => {
   ];
 
   const auth = React.useContext(AuthContext);
-  const [rows, setRows] = React.useState<any>(null);
+  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listCustomers(auth.token, 25, 1).then((customerList) => {
-      console.log(customerList);
-      const newRows = customerList.map((customer) => {
+    listCustomers(auth.token, 25, 1).then((list) => {
+      console.log(list);
+      const newRows = list!.docs.map((customer) => {
         return {
           id: customer._id,
           code: customer.code,
@@ -62,7 +63,7 @@ const CustomerListPage = () => {
           // address_two: customer.address_two,
         };
       });
-      setRows(newRows);
+      setDataOptions({ rows: newRows, listOptions: list! });
     });
   }, []);
   const createNewCustomer = () => {
@@ -71,7 +72,8 @@ const CustomerListPage = () => {
 
 
 
-  if (rows == null) return null;
+  if (dataOptions == null) return null;
+  
 
   return (
     <>
@@ -80,13 +82,13 @@ const CustomerListPage = () => {
     sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
   >
     <Button variant="contained" color="primary" onClick={createNewCustomer}>
-      + New Product
+      + New Customer
     </Button>
   </Card>
     <DataTable
-      rows={rows!}
+      rows={dataOptions.rows}
       columns={columns}
-      listOptions={undefined}
+      listOptions={dataOptions.listOptions}
     ></DataTable>
     </>
   );

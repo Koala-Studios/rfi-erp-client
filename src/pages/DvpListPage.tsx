@@ -104,24 +104,10 @@ const DvpListPage = () => {
     });
   }, []);
 
-  const createNewFormula= () => {
-    navigate(`/inventory/new`, { replace: false });
-  };
-
-
-
   if (dataOptions == null) return null;
   
   return (
     <>
-    <Card
-    variant="outlined"
-    sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
-  >
-    <Button variant="contained" color="primary" onClick={createNewFormula}>
-      + New Product
-    </Button>
-  </Card>
     <DataTable
       rows={dataOptions.rows}
       columns={columns}

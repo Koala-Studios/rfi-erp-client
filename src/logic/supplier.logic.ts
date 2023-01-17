@@ -5,10 +5,13 @@ export interface ISupplier {
   _id: string;
   name: string;
   code: string;
+  email:string;
   contact_name: string;
-  address_one: string;
-  address_two: string;
-  //date_added: Date;
+  address_one?: string;
+  address_two?: string;
+  lead_time?:string;
+  phone?:string;
+  createdAt?:string;
 }
 
 const api = axios.create({
@@ -69,4 +72,52 @@ export const getSupplier = async (
     });
 
   return supplier;
+};
+
+export const createSupplier = async (
+  token: string,
+  formData: ISupplier
+): Promise<string | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  let rtn = null;
+  await api
+    .post("/create", formData, config)
+    .then((res) => {
+      console.log(res);
+      if (res.status === apiStatus.CREATED) {
+        console.log(res.data);
+        rtn = res.data;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
+};
+export const updateSupplier = async (
+  token: string,
+  formData: ISupplier
+): Promise<boolean> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  let rtn = false;
+
+  await api
+    .post("/update", formData, config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        rtn = true;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
 };

@@ -9,6 +9,7 @@ import { listUsers } from "../logic/user.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { Box, Button, Card, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
+import { IListData } from "../logic/utils";
 
 const UserListPage = () => {
   const navigate = useNavigate();
@@ -28,9 +29,9 @@ const UserListPage = () => {
             variant="contained"
             color="primary"
             size="small"
-            // onClick={() =>
-            //   navigate(`/users/${params.value}`, { replace: false })
-            // }
+            onClick={() =>
+              navigate(`/users/${params.value}`, { replace: false })
+            }
           >
             View Details
           </Button>
@@ -40,18 +41,18 @@ const UserListPage = () => {
   ];
 
   const auth = React.useContext(AuthContext);
-  const [rows, setRows] = React.useState<any>(null);
+  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listUsers(auth.token, 25, 1).then((userList) => {
-      const newRows = userList.map((user) => {
+    listUsers(auth.token, 25, 1).then((list) => {
+      const newRows = list!.docs.map((user) => {
         return {
           id: user._id,
           username: user.username,
           email: user.email,
         };
       });
-      setRows(newRows);
+      setDataOptions({ rows: newRows, listOptions: list! });
     });
   }, []);
   const createNewUser = () => {
@@ -59,7 +60,7 @@ const UserListPage = () => {
   };
 
 
-  if (rows == null) return null;
+  if (dataOptions == null) return null;
 
   return (
     <Box>
@@ -70,9 +71,9 @@ const UserListPage = () => {
       </Card>
       <DataTable
         auto_height={true}
-        rows={rows!}
+        rows={dataOptions.rows!}
         columns={columns}
-        listOptions={undefined}
+        listOptions={dataOptions.listOptions}
       ></DataTable>
     </Box>
   );

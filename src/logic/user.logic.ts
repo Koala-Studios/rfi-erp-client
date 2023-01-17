@@ -11,61 +11,70 @@ export interface IUser {
   _id: string;
   email: string;
   username: string;
+  user_code: string;
+  created_date:string;
+  //TODO:ROLES & DATES
 }
 
 const api = axios.create({
   baseURL: "http://localhost:5000/user",
 });
 
-export const getUser = async (token: string | null, SetStoreCallback: any) => {
-  if (!token) return false;
-  let success = false;
+export const getUser = async (
+  token: string,
+  id: string
+): Promise<IUser | null> => {
 
-  const config = {
+    const config = {
     headers: { Authorization: `Bearer ${token}` },
+    params: {
+      id: id,
+    },
   };
+  
+  let user: IUser | null = null;
   await api
     .get("/getUser", config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
-        success = true;
-        SetStoreCallback(res.data);
+        user = res.data;
       }
     })
     .catch((err) => {
       console.log(err);
     });
-  return success;
+  return user;
 };
 
 export const listUsers = async (
   token: string,
   count: number,
   page: number
-): Promise<IUser[]> => {
+): Promise<IListOptions | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
     params: {
-      count: count,
-      page: page,
+      count,
+      page,
     },
   };
 
-  let users: IUser[] = [];
+  let list: IListOptions | null = null;
 
   await api
     .get("/list", config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
-        users = res.data;
+        list = res.data.res;
       }
     })
     .catch((err) => {
       console.log(err);
     });
 
-  return users;
+  return list;
 };
+
 
 // export const getNotifications = async (
 // 	Store: IStore
@@ -114,4 +123,55 @@ export const lookupUser = async (
       console.log(err);
     });
   return list;
+};
+
+
+
+export const createUser = async (
+  token: string,
+  formData: IUser
+): Promise<string | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  let rtn = null;
+
+  await api
+    .post("/create", formData, config)
+    .then((res) => {
+      console.log(res);
+      if (res.status === apiStatus.CREATED) {
+        console.log(res.data);
+        rtn = res.data;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
+};
+export const updateUser = async (
+  token: string,
+  formData: IUser
+): Promise<boolean> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  let rtn = false;
+
+  await api
+    .post("/update", formData, config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        rtn = true;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
 };

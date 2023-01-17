@@ -78,7 +78,7 @@ const SalesListPage = () => {
     sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
   >
     <Button variant="contained" color="primary" onClick={createNewSalesOrder}>
-      + New Product
+      + New Sales Order
     </Button>
   </Card>
     <DataTable

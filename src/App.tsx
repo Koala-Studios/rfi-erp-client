@@ -21,6 +21,9 @@ import { ProductDetailPage } from "./pages/ProductDetailPage";
 import { ForecastPage } from "./pages/ForecastPage";
 import InventoryListPage from "./pages/InventoryListPage";
 import SupplierListPage from "./pages/SupplierListPage";
+import {SupplierDetailPage} from "./pages/SupplierDetailPage";
+import {CustomerDetailPage} from "./pages/CustomerDetailPage";
+import {UserDetailPage} from "./pages/UserDetailPage";
 import UserListPage from "./pages/UserListPage";
 import DvpListPage from "./pages/DvpListPage";
 import FormulaPage from "./pages/FormulaPage";
@@ -150,6 +153,16 @@ function App() {
                 </RequireAuth>
               }
             />
+                        <Route
+              path="/users/:id"
+              element={
+                <RequireAuth>
+                  <Navbar title="User Details">
+                    <UserDetailPage />
+                  </Navbar>
+                </RequireAuth>
+              }
+            />
             <Route
               path="/customers"
               element={
@@ -160,12 +173,32 @@ function App() {
                 </RequireAuth>
               }
             />
+                        <Route
+              path="/customers/:id"
+              element={
+                <RequireAuth>
+                  <Navbar title="Customer Details">
+                    <CustomerDetailPage />
+                  </Navbar>
+                </RequireAuth>
+              }
+            />
             <Route
               path="/suppliers"
               element={
                 <RequireAuth>
                   <Navbar title="Suppliers">
                     <SupplierListPage />
+                  </Navbar>
+                </RequireAuth>
+              }
+            />
+                        <Route
+              path="/suppliers/:id"
+              element={
+                <RequireAuth>
+                  <Navbar title="Supplier Details">
+                    <SupplierDetailPage />
                   </Navbar>
                 </RequireAuth>
               }

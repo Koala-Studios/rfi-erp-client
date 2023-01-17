@@ -11,40 +11,39 @@ export interface ICustomer {
   phone?: string;
   email?: string;
   lead_time?: string;
+  createdAt?:string;
 }
 
 const api = axios.create({
   baseURL: "http://localhost:5000/customers",
 });
-
 export const listCustomers = async (
   token: string,
   count: number,
   page: number
-): Promise<ICustomer[]> => {
+): Promise<IListOptions | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
     params: {
-      count: count,
-      page: page,
+      count,
+      page,
     },
   };
 
-  let customers: ICustomer[] = [];
+  let list: IListOptions | null = null;
 
   await api
     .get("/list", config)
     .then((res) => {
-      console.log(res.data);
       if (res.status === apiStatus.OK) {
-        customers = res.data.res.docs;
+        list = res.data.res;
       }
     })
     .catch((err) => {
       console.log(err);
     });
 
-  return customers;
+  return list;
 };
 
 export const getCustomer = async (
@@ -101,7 +100,6 @@ export const lookupCustomer = async (
   return list;
 };
 
-//returns an Id
 export const createCustomer = async (
   token: string,
   formData: ICustomer
@@ -111,7 +109,6 @@ export const createCustomer = async (
   };
 
   let rtn = null;
-
   await api
     .post("/create", formData, config)
     .then((res) => {
@@ -119,6 +116,29 @@ export const createCustomer = async (
       if (res.status === apiStatus.CREATED) {
         console.log(res.data);
         rtn = res.data;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
+};
+export const updateCustomer = async (
+  token: string,
+  formData: ICustomer
+): Promise<boolean> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  let rtn = false;
+
+  await api
+    .post("/update", formData, config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        rtn = true;
       }
     })
     .catch((err) => {

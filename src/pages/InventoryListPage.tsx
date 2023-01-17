@@ -93,7 +93,7 @@ const InventoryListPage = () => {
     sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
   >
     <Button variant="contained" color="primary" onClick={createNewMaterial}>
-      + New Product
+      + New Material
     </Button>
   </Card>
     <DataTable
