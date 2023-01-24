@@ -140,10 +140,10 @@ const FormulaDevPage = () => {
           </Button>
           <Button
             variant="outlined"
-            color="success"
+            color="info"
             size="small"
             style={{
-              backgroundColor: "#44ff1115",
+              backgroundColor: "#1144ff15",
               fontSize: "19px",
               maxWidth: "40px",
               maxHeight: "30px",

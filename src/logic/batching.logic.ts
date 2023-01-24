@@ -1,5 +1,11 @@
 import axios from "axios";
-import { apiStatus, getQuery, IListOptions, paramsToObject } from "./utils";
+import {
+  apiStatus,
+  FilterElement,
+  getQuery,
+  IListOptions,
+  paramsToObject,
+} from "./utils";
 
 export interface IBatching {
   _id: string;
@@ -20,9 +26,10 @@ export const listBatching = async (
   token: string,
   count: number,
   page: number,
-  q: URLSearchParams | undefined
+  q: URLSearchParams | undefined,
+  filters: FilterElement[]
 ): Promise<IListOptions | null> => {
-  let query = getQuery(q);
+  let query = getQuery(q, filters);
 
   const config = {
     headers: { Authorization: `Bearer ${token}` },
