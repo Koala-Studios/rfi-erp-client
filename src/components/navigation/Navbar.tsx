@@ -42,6 +42,7 @@ import { useEffect } from "react";
 import NotificationHandler from "./NotificationHandler";
 import Button from "@mui/material/Button";
 import FormHandler from "./FormHandler";
+import OilBarrelIcon from '@mui/icons-material/OilBarrel';
 
 const drawerWidth = 190;
 
@@ -60,6 +61,11 @@ const LinkItems = [
     text: "Inventory",
     link: "/inventory",
     icon: <StorageIcon></StorageIcon>,
+  },
+  {
+    text: "Inventory Containers",
+    link: "/inventory-stock",
+    icon: <OilBarrelIcon></OilBarrelIcon>,
   },
   {
     text: "Products",

@@ -35,6 +35,7 @@ import { SalesDetailPage } from "./pages/SalesDetailPage";
 import FormulaDevPage from "./pages/FormulaDevPage";
 import { ProjectDetails } from "./components/project/ProjectDetails";
 import CustomerListPage from "./pages/CustomerListPage";
+import InventoryStockListPage from "./pages/InventoryStockListPage";
 
 const mainTheme = createTheme({
   palette: {
@@ -69,6 +70,16 @@ function App() {
                 <RequireAuth>
                   <Navbar title="Inventory">
                     <InventoryListPage />
+                  </Navbar>
+                </RequireAuth>
+              }
+            />
+            <Route
+              path="/inventory-stock"
+              element={
+                <RequireAuth>
+                  <Navbar title="Inventory Stock">
+                    <InventoryStockListPage />
                   </Navbar>
                 </RequireAuth>
               }
