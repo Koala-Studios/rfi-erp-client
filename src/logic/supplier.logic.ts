@@ -18,6 +18,34 @@ const api = axios.create({
   baseURL: "http://localhost:5000/suppliers",
 });
 
+
+export const lookupSupplier = async (
+  //TODO: Not finished
+  token: string,
+  search_value: string
+): Promise<ISupplier[] | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {
+      search_value,
+    },
+  };
+
+  let list: ISupplier[] | null = null;
+
+  await api
+    .get("/lookup", config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        list = res.data.res;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  return list;
+};
+
 export const listSuppliers = async (
   token: string,
   count: number,

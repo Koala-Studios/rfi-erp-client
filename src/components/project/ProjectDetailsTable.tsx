@@ -271,6 +271,13 @@ export const ProjectDetailsTable: React.FC<Props> = ({
         editMode="cell"
         getRowId={(row) => row._id}
         experimentalFeatures={{ newEditingApi: true }}
+        onCellKeyDown={(params, event) => {
+          if (event.code == "Space") {
+            event.stopPropagation();
+            
+          
+          }
+        }}
         processRowUpdate={(newRow) => {
           let pList = projectItems.slice();
           const rowIdx = projectItems.findIndex((r) => r._id === newRow._id);

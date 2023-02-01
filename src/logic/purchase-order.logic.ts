@@ -1,25 +1,27 @@
 import axios from "axios";
 import { apiStatus, IListOptions } from "./utils";
 
-interface IOrderItem {
+export interface IOrderItem {
+  _id:string;
+  product_id: string;
   product_code: string;
-  material_name: string;
-  lot_number: string;
-  amount: number;
-  price: number;
-  status: number;
-  material_id: string;
+  product_name: string;
+  purchased_amount: number;
+  received_amount: number;
+  unit_price: number;
 }
 export interface IPurchaseOrder {
   _id: string;
-  supplier_code: string;
-  supplier: string;
-  date_arrived: Date;
-  date_purchased: Date;
+  supplier: {
+    name: string,
+    supplier_id: string
+  },
+  date_arrived: string;
+  date_purchased: string;
   status: number;
   order_code: string;
   notes: string;
-  order_items: [IOrderItem];
+  order_items: IOrderItem[];
 }
 
 const api = axios.create({
@@ -83,4 +85,55 @@ export const getPurchase = async (
     });
 
   return purchase;
+};
+
+
+
+export const createPurchase = async (
+  token: string,
+  formData: IPurchaseOrder
+): Promise<string | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  let rtn = null;
+
+  await api
+    .post("/create", formData, config)
+    .then((res) => {
+      console.log(res);
+      if (res.status === apiStatus.CREATED) {
+        console.log(res.data);
+        rtn = res.data;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
+};
+export const updatePurchase = async (
+  token: string,
+  formData: IPurchaseOrder
+): Promise<boolean> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  let rtn = false;
+
+  await api
+    .post("/update", formData, config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        rtn = true;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
 };
