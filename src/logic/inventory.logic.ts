@@ -1,6 +1,13 @@
 import axios from "axios";
 import { apiStatus, IListOptions } from "./utils";
 
+
+interface IProductTypes {
+  product_type_id:string,
+  name:string,
+  for_sale:boolean,
+  is_raw:boolean
+}
 interface IInventoryContainer {
   batch_code: string;
   supplier_id: string;
@@ -30,6 +37,7 @@ export interface IInventory {
   reorder_amount: number;
   stock: [IInventoryContainer];
   regulatory: IRegulatoryContainer;
+  product_type: {name:string, _id:string} | null
 }
 
 const api = axios.create({
@@ -106,6 +114,35 @@ export const lookupInventory = async ( //TODO: Not finished
   };
 
   let list: IInventory[] | null = null;
+
+  await api
+    .get("/lookup", config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        list = res.data.res;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  return list;
+};
+
+
+export const lookupProductTypes= async ( //TODO: Not finished
+  token: string,
+  search_value:string,
+  for_sale:boolean
+): Promise<IProductTypes | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {
+      search_value,
+      for_sale
+    },
+  };
+
+  let list: IProductTypes[] | null = null;
 
   await api
     .get("/lookup", config)

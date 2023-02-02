@@ -10,7 +10,7 @@ interface Props {
   label: string;
   placeholder?: string;
   letterMin: number;
-  dbOption: "customer" | "inventory" | "user" | "supplier";
+  dbOption: "customer" | "inventory" | "user" | "supplier" | "product-type";
   onChange?: (event: React.SyntheticEvent<Element, Event>, value: any) => void;
 }
 

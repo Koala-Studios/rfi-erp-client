@@ -1,12 +1,13 @@
 import { lookupCustomer } from "./customer.logic";
 import { lookupInventory } from "./inventory.logic";
+import { lookupProductType } from "./product-type.logic";
 import { lookupSupplier } from "./supplier.logic";
 import { lookupUser } from "./user.logic";
 
 export const lookup = async (
   token: string,
   query: string,
-  dbOption: "customer" | "inventory" | "user" | "products" | "supplier",
+  dbOption: "customer" | "inventory" | "user" | "products" | "supplier" | "product-type",
   letterMin: number
 ) => {
   if (query.length < letterMin) return [];
@@ -23,6 +24,9 @@ export const lookup = async (
     return await lookupUser(token, query);
   }  else if (dbOption === "products") {
     return await lookupInventory(token, query, true);
+  }
+  else if (dbOption === "product-type") {
+    return await lookupProductType(token, query);
   }
 
   return [];
