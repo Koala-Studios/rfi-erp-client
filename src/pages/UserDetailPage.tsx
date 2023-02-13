@@ -102,50 +102,7 @@ export const UserDetailPage = () => {
         </Button>
         <div style={{ display: "flex", gap: 16, marginBottom: 10 }}>
           <Grid container spacing={3}>
-            <Grid item xs={2}>
-              <TextField
-                onChange={(e) =>
-                  setUser({ ...user, created_date: e.target.value })
-                }
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                size="small"
-                variant="outlined"
-                label={"Created Date"}
-                type={"date"}
-                value={user.created_date}
-              ></TextField>
-            </Grid>
-            <Grid item xs={2}>
-              <TextField
-                onChange={(e) => {
-                  setUser({ ...user, user_code: e.target.value });
-                }}
-                spellCheck="false"
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-                size="small"
-                variant="outlined"
-                value={user.user_code}
-                label={"User Code"}
-              ></TextField>
-            </Grid>
-            <Grid item xs={5}>
-              <TextField
-                onChange={(e) => {
-                  setUser({ ...user, username: e.target.value });
-                }}
-                spellCheck="false"
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-                size="small"
-                variant="outlined"
-                label={"User Name"}
-                value={user.username}
-                InputProps={{}}
-              ></TextField>
-            </Grid>
-            <Grid item xs={5}>
+            <Grid item xs={3}>
               <TextField
                 onChange={(e) => {
                   setUser({ ...user, email: e.target.value });
@@ -161,7 +118,52 @@ export const UserDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
-            <Grid item xs={5}></Grid>
+
+            <Grid item xs={3}>
+              <TextField
+                onChange={(e) => {
+                  setUser({ ...user, username: e.target.value });
+                }}
+                spellCheck="false"
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+                size="small"
+                variant="outlined"
+                label={"User Name"}
+                value={user.username}
+                InputProps={{}}
+              ></TextField>
+            </Grid>
+            <Grid item xs={6}></Grid>
+
+            <Grid item xs={3}>
+              <TextField
+                onChange={(e) =>
+                  setUser({ ...user, created_date: e.target.value })
+                }
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                size="small"
+                variant="outlined"
+                label={"Created Date"}
+                type={"date"}
+                value={user.created_date}
+              ></TextField>
+            </Grid>
+            <Grid item xs={3}>
+              <TextField
+                onChange={(e) => {
+                  setUser({ ...user, user_code: e.target.value });
+                }}
+                spellCheck="false"
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+                size="small"
+                variant="outlined"
+                value={user.user_code}
+                label={"User Code"}
+              ></TextField>
+            </Grid>
           </Grid>
 
           <Card

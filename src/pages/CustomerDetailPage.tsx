@@ -109,7 +109,7 @@ export const CustomerDetailPage = () => {
         </Button>
         <div style={{ display: "flex", gap: 16, marginBottom: 10 }}>
           <Grid container spacing={3}>
-            <Grid item xs={2}>
+            <Grid item xs={3}>
               <TextField
                 onChange={(e) =>
                   setCustomer({ ...customer, createdAt: e.target.value })
@@ -123,7 +123,7 @@ export const CustomerDetailPage = () => {
                 value={customer.createdAt}
               ></TextField>
             </Grid>
-            <Grid item xs={2}>
+            <Grid item xs={3}>
               <TextField
                 onChange={(e) => {
                   setCustomer({ ...customer, code: e.target.value });
@@ -137,7 +137,8 @@ export const CustomerDetailPage = () => {
                 label={"Customer Code"}
               ></TextField>
             </Grid>
-            <Grid item xs={5}>
+            <Grid item xs={6} />
+            <Grid item xs={3}>
               <TextField
                 onChange={(e) => {
                   setCustomer({ ...customer, name: e.target.value });
@@ -152,7 +153,7 @@ export const CustomerDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
-            <Grid item xs={5}>
+            <Grid item xs={3}>
               <TextField
                 onChange={(e) => {
                   setCustomer({ ...customer, contact_name: e.target.value });
@@ -167,7 +168,8 @@ export const CustomerDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
-            <Grid item xs={5}>
+            <Grid item xs={6} />
+            <Grid item xs={3}>
               <TextField
                 onChange={(e) => {
                   setCustomer({ ...customer, email: e.target.value });
@@ -182,7 +184,7 @@ export const CustomerDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
-            <Grid item xs={5}>
+            <Grid item xs={3}>
               <TextField
                 onChange={(e) => {
                   setCustomer({ ...customer, phone: e.target.value });
@@ -197,7 +199,8 @@ export const CustomerDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
-            <Grid item xs={5}>
+            <Grid item xs={6} />
+            <Grid item xs={3}>
               <TextField
                 onChange={(e) => {
                   setCustomer({ ...customer, address_one: e.target.value });
@@ -212,7 +215,7 @@ export const CustomerDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
-            <Grid item xs={5}>
+            <Grid item xs={3}>
               <TextField
                 onChange={(e) => {
                   setCustomer({ ...customer, address_two: e.target.value });
@@ -227,7 +230,7 @@ export const CustomerDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
-            <Grid item xs={5}></Grid>
+            <Grid item xs={3}></Grid>
           </Grid>
 
           <Card
