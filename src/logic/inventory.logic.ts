@@ -1,5 +1,5 @@
 import axios from "axios";
-import { apiStatus, IListOptions } from "./utils";
+import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
 
 interface IInventoryContainer {
   batch_code: string;
@@ -38,13 +38,18 @@ const api = axios.create({
 export const listInventory = async (
   token: string,
   count: number,
-  page: number
+  page: number,
+  q: URLSearchParams | undefined,
+  filters: FilterElement[]
 ): Promise<IListOptions | null> => {
+  let query = getQuery(q, filters);
+
   const config = {
     headers: { Authorization: `Bearer ${token}` },
     params: {
       count,
       page,
+      query,
     },
   };
 
@@ -91,17 +96,17 @@ export const getProduct = async (
   return inventory_item;
 };
 
-
-export const lookupInventory = async ( //TODO: Not finished
+export const lookupInventory = async (
+  //TODO: Not finished
   token: string,
-  search_value:string,
-  for_sale:boolean
+  search_value: string,
+  for_sale: boolean
 ): Promise<IInventory[] | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
     params: {
       search_value,
-      for_sale
+      for_sale,
     },
   };
 

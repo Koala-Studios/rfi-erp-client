@@ -1,16 +1,20 @@
 import {
   Button,
+  Divider,
   Grid,
   MenuItem,
   OutlinedInput,
   Select,
   TextField,
+  Tooltip,
 } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FilterElement, paramsToObject } from "../../logic/utils";
 import { redirect } from "react-router-dom";
 import SimpleSelect from "./SimpleSelect";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import SearchIcon from "@mui/icons-material/Search";
 
 interface Props {
   filters: FilterElement[];
@@ -22,9 +26,16 @@ let paramsObj: any;
 const DataFilter: React.FC<Props> = ({ params, filters }) => {
   const navigate = useNavigate();
   const filterEls = useRef<any[]>([]);
+  const [open, setOpen] = useState(false);
 
   useEffect(() => {
+    if (open === false) {
+      filterEls.current = [];
+
+      return;
+    }
     paramsObj = paramsToObject(params);
+
     if (Object.keys(paramsObj).length === 0) return;
 
     for (let i = 0; i < filters.length; i++) {
@@ -32,7 +43,7 @@ const DataFilter: React.FC<Props> = ({ params, filters }) => {
         ? paramsObj[filters[i].field]
         : "";
     }
-  }, []);
+  }, [open]);
 
   const handleSearchClicked = () => {
     // if (!paramsObj) return;
@@ -53,17 +64,17 @@ const DataFilter: React.FC<Props> = ({ params, filters }) => {
     for (let i = 0; i < filters.length; i++) {
       filterEls.current[i].value = "";
     }
-    navigate("", { replace: true });
+    navigate("", { replace: false });
+    setOpen(false);
   };
 
   const createFields = () => {
     return filters.map((item, idx) => {
       if (item.type === "dropdown") {
         return (
-          <Grid item xs={2}>
+          <Grid key={idx} item xs={2}>
             <SimpleSelect
               label={item.label}
-              key={idx}
               options={item.options!}
               inputRef={(element: any) => filterEls.current.push(element)}
             />
@@ -72,10 +83,9 @@ const DataFilter: React.FC<Props> = ({ params, filters }) => {
       }
 
       return (
-        <Grid item xs={2}>
+        <Grid key={idx} item xs={2}>
           <TextField
             inputRef={(element: any) => filterEls.current.push(element)}
-            key={idx}
             spellCheck="false"
             InputLabelProps={{ shrink: true }}
             fullWidth
@@ -92,6 +102,22 @@ const DataFilter: React.FC<Props> = ({ params, filters }) => {
     });
   };
 
+  if (open === false) {
+    return (
+      <Tooltip title="Search and Filter" arrow>
+        <Button
+          onClick={() => setOpen(true)}
+          variant="outlined"
+          color="primary"
+          sx={{ mr: 2, pl: 0.8, pr: 0.8 }}
+        >
+          <SearchIcon fontSize="medium" />
+          <FilterListIcon fontSize="medium" />
+        </Button>
+      </Tooltip>
+    );
+  }
+
   return (
     <Grid container spacing={2} sx={{ mb: 2 }}>
       {createFields()}
@@ -100,13 +126,16 @@ const DataFilter: React.FC<Props> = ({ params, filters }) => {
           onClick={handleSearchClicked}
           variant="contained"
           color="primary"
-          sx={{ mr: 2 }}
+          sx={{ mr: 2, pl: 1.2 }}
         >
+          <SearchIcon fontSize="small" sx={{ mr: 0.5 }} />
           Search
         </Button>
+
         <Button onClick={handleClearAll} variant="outlined" color="primary">
           Clear All
         </Button>
+        <Divider sx={{ mt: 2 }} />
       </Grid>
     </Grid>
   );

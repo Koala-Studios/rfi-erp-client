@@ -27,7 +27,7 @@ const ProjectListPage = () => {
   const columns: GridColDef[] = [
     { field: "project_code", headerName: "Code", width: 100 },
     { field: "name", headerName: "Name", width: 300 },
-    
+
     {
       field: "status",
       headerName: "Status",
@@ -46,7 +46,12 @@ const ProjectListPage = () => {
       ),
     },
     { field: "assigned_user", headerName: "Assigned Rep", width: 100 },
-    { field: "request_size", headerName: "Req Size", width: 80, align:'center' },
+    {
+      field: "request_size",
+      headerName: "Req Size",
+      width: 80,
+      align: "center",
+    },
     { field: "start_date", headerName: "Start Date", width: 120 },
     { field: "due_date", headerName: "Due Date", width: 120 },
     { field: "finish_date", headerName: "Finish Date", width: 120 },
@@ -80,15 +85,14 @@ const ProjectListPage = () => {
     listProjects(auth.token, 25, 1).then((list) => {
       console.log(list);
       const newRows = list!.docs.map((project) => {
-        
         return {
           id: project._id,
           name: project.name,
           project_code: project.project_code,
           status: project.status,
-          assigned_user: project.assigned_user ?? 'None' ,
+          assigned_user: project.assigned_user ?? "None",
           notes: project.notes,
-          request_size: project.project_items.length 
+          request_size: project.project_items.length,
         };
       });
       setDataOptions({ rows: newRows, listOptions: list! });

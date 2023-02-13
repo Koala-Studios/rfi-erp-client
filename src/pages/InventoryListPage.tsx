@@ -8,12 +8,29 @@ import {
 import { listInventory } from "../logic/inventory.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { Button, Card } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { setTokenSourceMapRange } from "typescript";
-import { IListData } from "../logic/utils";
+import { FilterElement, IListData } from "../logic/utils";
+import DataFilter from "../components/utils/DataFilter";
+
+//label,field,type
+const filterArray: FilterElement[] = [
+  { label: "Item Name", field: "name", type: "text" },
+  {
+    label: "Item Code",
+    field: "product_code",
+    type: "text",
+    regexOption: null,
+  },
+];
 
 const InventoryListPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const auth = React.useContext(AuthContext);
+  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
+  const [currPage, setCurrPage] = React.useState<number>(1);
 
   const columns: GridColDef[] = [
     { field: "product_id", headerName: "Item Code", width: 120 },
@@ -56,51 +73,49 @@ const InventoryListPage = () => {
     },
   ];
 
-  const auth = React.useContext(AuthContext);
-  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
-
   React.useEffect(() => {
-    listInventory(auth.token, 25, 1).then((list) => {
-      const newRows = list!.docs.map((item) => {
-
-
-        return {
-          id: item._id,
-          product_id: item.product_code,
-          name: item.name,
-          cost: item.cost,
-          reorder_amount: item.reorder_amount ?? 0,
-          on_hand: item.on_hand ?? 0,
-          on_order: item.on_order ?? 0,
-          quarantined: item.quarantined ?? 0,
-          allocated: item.allocated ?? 0,
-        };
-      });
-      setDataOptions({ rows: newRows, listOptions: list! });
-    });
-  }, []);
+    listInventory(auth.token, 25, currPage, searchParams, filterArray).then(
+      (list) => {
+        const newRows = list!.docs.map((item) => {
+          return {
+            id: item._id,
+            product_id: item.product_code,
+            name: item.name,
+            cost: item.cost,
+            reorder_amount: item.reorder_amount ?? 0,
+            on_hand: item.on_hand ?? 0,
+            on_order: item.on_order ?? 0,
+            quarantined: item.quarantined ?? 0,
+            allocated: item.allocated ?? 0,
+          };
+        });
+        setDataOptions({ rows: newRows, listOptions: list! });
+      }
+    );
+  }, [currPage, location.key]);
   const createNewMaterial = () => {
     navigate(`/inventory/new`, { replace: false });
   };
-
 
   if (dataOptions == null) return null;
 
   return (
     <>
-    <Card
-    variant="outlined"
-    sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
-  >
-    <Button variant="contained" color="primary" onClick={createNewMaterial}>
-      + New Material
-    </Button>
-  </Card>
-    <DataTable
-      rows={dataOptions.rows}
-      columns={columns}
-      listOptions={dataOptions.listOptions}
-    ></DataTable>
+      <Card
+        variant="outlined"
+        sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
+      >
+        <DataFilter params={searchParams} filters={filterArray}></DataFilter>
+
+        <Button variant="contained" color="primary" onClick={createNewMaterial}>
+          + New Material
+        </Button>
+      </Card>
+      <DataTable
+        rows={dataOptions.rows}
+        columns={columns}
+        listOptions={dataOptions.listOptions}
+      ></DataTable>
     </>
   );
 };

@@ -29,6 +29,7 @@ export interface IListData {
 export interface FilterElement {
   label: string;
   field: string;
+  regexOption?: null | string;
   type: "text" | "date" | "number" | "dropdown";
   options?: OptionItem[];
 }
@@ -55,12 +56,21 @@ export function paramsToObjectRegex(entries: any, filters: FilterElement[]) {
 
     if (!fe) continue;
 
-    if (fe.type === "number" || fe.type === "dropdown") {
+    if (fe.regexOption === undefined) {
+      fe.regexOption = "i";
+    }
+
+    if (fe.type === "number") {
       //@ts-ignore
       result[key] = parseFloat(value);
     } else {
-      //@ts-ignore
-      result[key] = { $regex: value, $options: "i" };
+      if (fe.regexOption === null) {
+        //@ts-ignore
+        result[key] = value;
+      } else {
+        //@ts-ignore
+        result[key] = { $regex: value, $options: fe.regexOption };
+      }
     }
   }
 

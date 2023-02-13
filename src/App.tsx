@@ -21,9 +21,9 @@ import { ProductDetailPage } from "./pages/ProductDetailPage";
 import { ForecastPage } from "./pages/ForecastPage";
 import InventoryListPage from "./pages/InventoryListPage";
 import SupplierListPage from "./pages/SupplierListPage";
-import {SupplierDetailPage} from "./pages/SupplierDetailPage";
-import {CustomerDetailPage} from "./pages/CustomerDetailPage";
-import {UserDetailPage} from "./pages/UserDetailPage";
+import { SupplierDetailPage } from "./pages/SupplierDetailPage";
+import { CustomerDetailPage } from "./pages/CustomerDetailPage";
+import { UserDetailPage } from "./pages/UserDetailPage";
 import UserListPage from "./pages/UserListPage";
 import DvpListPage from "./pages/DvpListPage";
 import FormulaPage from "./pages/FormulaPage";
@@ -53,6 +53,7 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
+            <Route path="/" element={<SignInPage />} />
             <Route path="/login" element={<SignInPage />} />
 
             {/* <Route
@@ -153,7 +154,7 @@ function App() {
                 </RequireAuth>
               }
             />
-                        <Route
+            <Route
               path="/users/:id"
               element={
                 <RequireAuth>
@@ -173,7 +174,7 @@ function App() {
                 </RequireAuth>
               }
             />
-                        <Route
+            <Route
               path="/customers/:id"
               element={
                 <RequireAuth>
@@ -193,7 +194,7 @@ function App() {
                 </RequireAuth>
               }
             />
-                        <Route
+            <Route
               path="/suppliers/:id"
               element={
                 <RequireAuth>

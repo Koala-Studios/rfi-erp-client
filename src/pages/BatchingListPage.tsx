@@ -24,19 +24,24 @@ const columns: GridColDef[] = [
 
 //label,field,type
 const filterArray: FilterElement[] = [
-  { label: "Product Code", field: "product_code", type: "text" },
-  { label: "Batch Code", field: "batch_code", type: "text" },
-  { label: "Quantity", field: "quantity", type: "number" },
   {
-    label: "Status",
-    field: "status",
-    type: "dropdown",
-    options: [
-      { value: 1, text: "Pending" },
-      { value: 2, text: "In Progress" },
-      { value: 3, text: "Completed" },
-    ],
+    label: "Product Code",
+    field: "product_code",
+    type: "text",
+    regexOption: null,
   },
+  { label: "Batch Code", field: "batch_code", type: "text" },
+  { label: "Quantity", field: "quantity", type: "number", regexOption: null },
+  // {
+  //   label: "Status",
+  //   field: "status",
+  //   type: "dropdown",
+  //   options: [
+  //     { value: 1, text: "Pending" },
+  //     { value: 2, text: "In Progress" },
+  //     { value: 3, text: "Completed" },
+  //   ],
+  // },
 ];
 
 const BatchingListPage = () => {
@@ -77,7 +82,7 @@ const BatchingListPage = () => {
         sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
       >
         <DataFilter params={searchParams} filters={filterArray}></DataFilter>
-        <Divider sx={{ mb: 2 }} />
+
         <Button variant="contained" color="primary" onClick={createNewBatching}>
           + New Product
         </Button>
