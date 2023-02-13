@@ -237,7 +237,7 @@ export const ForecastPage = () => {
 
   return (
     <>
-      <Card variant="outlined" sx={{ p: 4 }}>
+      <Card variant="outlined" sx={{ p: 3 }}>
         <Box sx={{ mb: 2 }}>
           <Button
             size="medium"
