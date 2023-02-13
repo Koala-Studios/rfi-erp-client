@@ -75,7 +75,7 @@ export const getSalesOrder = async (
         sales_order = res.data.res;
       }
       window.dispatchEvent(
-        new CustomEvent("NotificationEvent", { detail: res.data.message })
+        new CustomEvent("NotificationEvent", {  detail: {text: res.data.message} })
       );
     })
     .catch((err) => {

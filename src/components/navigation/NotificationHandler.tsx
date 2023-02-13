@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import Snackbar from "@mui/material/Snackbar";
-import MuiAlert, { AlertProps } from "@mui/material/Alert";
+import MuiAlert, { AlertColor, AlertProps } from "@mui/material/Alert";
 
 const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
   props,
@@ -11,19 +11,21 @@ const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 
 interface INotificationEvent {
   detail: any;
+  color?: AlertColor;
 }
 
 const NotificationHandler = () => {
   useEffect(() => {
     // Update the document title using the browser API
-
     window.addEventListener("NotificationEvent", (e: any) => {
-      setNotificationText(e.detail);
+      setNotificationText(e.detail.text);
+      setNotificationColor(e.detail.color ? e.detail.color : "success")
       setNotification(true);
     });
   }, []);
 
   const [notificationText, setNotificationText] = React.useState<string>("");
+  const [notificationColor, setNotificationColor] = React.useState<AlertColor | undefined>("warning");
   const [showNotification, setNotification] = React.useState(false);
 
   return (
@@ -35,7 +37,7 @@ const NotificationHandler = () => {
     >
       <Alert
         onClose={() => setNotification(false)}
-        severity="success"
+        severity={notificationColor}
         sx={{ width: "100%" }}
       >
         {notificationText}

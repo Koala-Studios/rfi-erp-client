@@ -107,7 +107,7 @@ export const ProductDetailPage = () => {
       }
     }
     window.dispatchEvent(
-      new CustomEvent("NotificationEvent", { detail: "Changes Saved" })
+      new CustomEvent("NotificationEvent", { detail: {text: "Changes Saved"} })
     );
     setProductSaved(true);
   };
@@ -214,7 +214,7 @@ export const ProductDetailPage = () => {
                 label={"Product Type"}
                 letterMin={0}
                 dbOption={"product-type"}
-                getOptionLabel={(item: IProductType) => item.name}
+                getOptionLabel={(item: IProductType) => item.code + ' | ' + item.name}
               />
           </Grid>
           <Grid item xs={8}/>  

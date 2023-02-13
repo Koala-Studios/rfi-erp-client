@@ -2,7 +2,7 @@ import React from "react";
 import { DataTable } from "../components/utils/DataTable";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { AuthContext } from "../components/navigation/AuthProvider";
-import { getFormula } from "../logic/formula.logic";
+import { getFormula, submitFormula } from "../logic/formula.logic";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Autocomplete,
@@ -29,6 +29,7 @@ import { IProduct } from "../logic/product.logic";
 import WarningIcon from "@mui/icons-material/Warning";
 
 const FormulaDevPage = () => {
+  const navigate = useNavigate();
   const [invLookupCatalog, setInvLookupCatalog] = React.useState<any>(null);
   const auth = React.useContext(AuthContext);
   const [rowCount, setRowCount] = React.useState<any>(0);
@@ -38,16 +39,20 @@ const FormulaDevPage = () => {
   const [rows, setRows] = React.useState<any>(null);
   const [editMode, setEditMode] = React.useState<string | null>(null);
   const [carrier, setCarrier] = React.useState<string | null>(null);
+  
+  const [base100, setBase100] = React.useState<boolean>(true);
   const [prodYield, setYield] = React.useState<number>(1.0);
+
+
   const [changedYield, setChangedYield] = React.useState<boolean>(true);
   const [approveonSubmit, setApproveonSubmit] = React.useState<boolean>(false);
 
   const { id } = useParams();
   const { version } = useParams();
-  // const { approved_version } = useParams();
   React.useEffect(() => {
     getFormula(auth.token, id!, version!).then((formula) => {
       setYield(formula!.yield ? formula!.yield : 1.0);
+      setBase100(formula!.base_hundred ? formula!.base_hundred : true);
       if (!formula?.formula_items) {
         setRows([
           {
@@ -351,8 +356,9 @@ const FormulaDevPage = () => {
     }
   };
 
-  const handleSubmit = () => {
-    const newVersion = {
+  const handleSubmit = async () => {
+    const newVersion:IFormula = {
+      product_code: product!.product_code,
       formula_items: rows.map((material: IFormulaDevRow) => {
         return {
           material_code: material.material_code,
@@ -362,13 +368,16 @@ const FormulaDevPage = () => {
           material_name: material.material_name,
         };
       }),
-      product_id: product?._id,
-      approved: approveonSubmit,
-      formula_factor: totalAmt / 100,
+      product_id: product!._id,
       yield: prodYield,
+      base_hundred:base100
     };
-    //TODO: handle submitting the version!
-    console.log(newVersion);
+    //TODO: WHOLE PAGE NEEDS SLIGHT REWORK LOL.
+    const new_formula = await submitFormula(auth.token, approveonSubmit, newVersion);
+    
+    if (new_formula) {
+      navigate(`/formulas/develop/${new_formula._id}/${version ?? 0 + 1}`, { replace: true });
+    }
   };
 
   function filterChanges(string: string) {
@@ -548,12 +557,11 @@ const FormulaDevPage = () => {
                 control={
                   <Checkbox
                     onClick={() => {
-                      if (changedYield) {
-                        setYield(1.0);
+                      if (base100) {
                       } /* <-- this portion doesn't work atm because of field below*/
-                      setChangedYield(!changedYield);
+                      setBase100(!base100);
                     }}
-                    checked={changedYield}
+                    checked={base100}
                   />
                 }
                 label="Base100?"
@@ -567,7 +575,6 @@ const FormulaDevPage = () => {
                 size="small"
                 variant="outlined"
                 label={"Yield Ratio"}
-                disabled={changedYield}
                 defaultValue={prodYield.toFixed(2)}
                 onChange={(e) => {
                   setYield(parseFloat(e.target.value));

@@ -8,14 +8,14 @@ interface IProductTypes {
   for_sale:boolean,
   is_raw:boolean
 }
-interface IInventoryContainer {
-  batch_code: string;
-  supplier_id: string;
+interface IStockSummary {
+  on_hold: number;
   on_hand: number;
   on_order: number;
   quarantined: number;
   allocated: number;
-  price: number;
+  average_price: number;
+  reorder_amount: number;
 }
 interface IRegulatoryContainer {
   fda_status?: number;
@@ -35,7 +35,7 @@ export interface IInventory {
   date_created: Date;
   cas_number: string;
   reorder_amount: number;
-  stock: [IInventoryContainer];
+  stock: IStockSummary;
   regulatory: IRegulatoryContainer;
   product_type: {name:string, _id:string} | null
 }

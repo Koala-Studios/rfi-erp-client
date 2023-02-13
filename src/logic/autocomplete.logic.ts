@@ -24,9 +24,11 @@ export const lookup = async (
     return await lookupUser(token, query);
   }  else if (dbOption === "products") {
     return await lookupInventory(token, query, true);
+  } else if (dbOption === "product-type") {
+    return await lookupProductType(token, query, true);
   }
-  else if (dbOption === "product-type") {
-    return await lookupProductType(token, query);
+  else if (dbOption === "product-type-mat") {
+    return await lookupProductType(token, query, false);
   }
 
   return [];

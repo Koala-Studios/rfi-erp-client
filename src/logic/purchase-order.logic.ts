@@ -1,6 +1,8 @@
 import axios from "axios";
 import { apiStatus, IListOptions } from "./utils";
 
+
+
 export interface IOrderItem {
   _id:string;
   product_id: string;
@@ -10,8 +12,18 @@ export interface IOrderItem {
   received_amount: number;
   unit_price: number;
 }
+
+export interface IOrderItemProcess extends IOrderItem {
+  lot_number:string,
+  process_amount:number,
+  container_size:number,
+  expiry_date:Date,
+}
+
+
 export interface IPurchaseOrder {
   _id: string;
+  notes: string;
   supplier: {
     name: string,
     supplier_id: string
@@ -20,7 +32,7 @@ export interface IPurchaseOrder {
   date_purchased: string;
   status: number;
   order_code: string;
-  notes: string;
+  shipping_code:string;
   order_items: IOrderItem[];
 }
 
@@ -77,7 +89,7 @@ export const getPurchase = async (
         purchase = res.data.res;
       }
       window.dispatchEvent(
-        new CustomEvent("NotificationEvent", { detail: res.data.message })
+        new CustomEvent("NotificationEvent", { detail: { text: res.data.message} })
       );
     })
     .catch((err) => {
@@ -136,4 +148,82 @@ export const updatePurchase = async (
     });
 
   return rtn;
+};
+
+export const confirmPurchase = async (
+  token: string,
+  purchase: IPurchaseOrder,
+  po_id:string,
+): Promise<IPurchaseOrder | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {po_id: po_id}
+  };
+
+  await api
+    .post("/confirm-purchase", purchase, config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        return res.data;
+      }
+
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return null;
+};
+
+export const markPurchaseReceived = async (
+  token: string,
+  po_id:string,
+): Promise<IPurchaseOrder | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {po_id: po_id}
+  };
+
+  await api
+    .put("/mark-received", config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        window.dispatchEvent(
+          new CustomEvent("NotificationEvent", { detail: { text: res.data.message} })
+        );
+        return res.data;
+      }
+
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return null;
+};
+
+
+
+export const handlePurchaseItem = async (
+  token: string,
+  purchaseItem: IOrderItemProcess,
+  quarantine:boolean,
+): Promise<IOrderItem | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {quarantine: quarantine}
+  };
+
+  await api
+    .post("/receive-item", purchaseItem, config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        return res.data;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return null;
 };

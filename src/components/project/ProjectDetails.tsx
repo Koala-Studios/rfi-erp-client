@@ -90,7 +90,7 @@ export const ProjectDetails = () => {
       }
     }
     window.dispatchEvent(
-      new CustomEvent("NotificationEvent", { detail: "Changes Saved" })
+      new CustomEvent("NotificationEvent", { detail: {text: "Changes Saved"} })
     );
     setProjectSaved(true);
   };
@@ -150,7 +150,7 @@ export const ProjectDetails = () => {
                 label={"Customer"}
                 letterMin={0}
                 dbOption={"customer"}
-                getOptionLabel={(item: ICustomer) => item.name}
+                getOptionLabel={(item: ICustomer) => item.code + ' | ' + item.name}
               />
             </Grid>
             <Grid item xs={6}>

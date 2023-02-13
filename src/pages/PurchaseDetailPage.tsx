@@ -1,6 +1,8 @@
 import {
+  Autocomplete,
   Button,
   Card,
+  Chip,
   Grid,
   IconButton,
   TextField,
@@ -9,14 +11,12 @@ import {
 import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../components/navigation/AuthProvider";
-import { createPurchase, getPurchase, IPurchaseOrder, updatePurchase } from "../logic/purchase-order.logic";
+import { confirmPurchase, createPurchase, getPurchase, handlePurchaseItem, IOrderItemProcess, IPurchaseOrder, markPurchaseReceived, updatePurchase } from "../logic/purchase-order.logic";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { DataTable } from "../components/utils/DataTable";
 import {
   DataGrid,
   GridColDef,
   GridRenderCellParams,
-  GridValueGetterParams,
 } from "@mui/x-data-grid";
 
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
@@ -30,7 +30,14 @@ import { ISupplier } from "../logic/supplier.logic";
 
 let savedPurchase: IPurchaseOrder | null = null;
 
-
+const PurchaseStatus = [
+  ['AWAITING SHIPPING', "warning"],
+  ['AWAITING ARRIVAL', "warning"],
+  ['PARTIALLY RECEIVED',"success"],
+  ['RECEIVED',"success"],
+  ['ABANDONED',"error"],
+  ['DRAFT', "warning"],
+];
 
 
 export const PurchaseDetailPage = () => {
@@ -38,7 +45,7 @@ export const PurchaseDetailPage = () => {
   const { id } = useParams();
   const auth = React.useContext(AuthContext);
 
-  
+
   const handleEditProductRow = (rowid: string, value: IInventory) => {
     let pList = rows!.slice();
     const rowIdx = rows!.findIndex((r:any) => r._id === rowid);
@@ -55,8 +62,9 @@ export const PurchaseDetailPage = () => {
     _id: "",
     supplier: {supplier_id:"", name:""},
     date_arrived:"",
+    shipping_code:"",
     date_purchased:"",
-    status: 0,
+    status:6,
     order_code: "",
     order_items:[],
     notes:"",
@@ -69,7 +77,7 @@ export const PurchaseDetailPage = () => {
 
 
   const [rows, setRows] = React.useState<IOrderItem[]>([]);
-  const [status, setStatus] = React.useState<number>(1);
+  const [editMode, setEditMode] = React.useState<boolean>(false);
 
   useEffect(() => {
     if (id === "new") {
@@ -97,7 +105,10 @@ export const PurchaseDetailPage = () => {
         //     remaining_amount: item.purchased_amount - item.received_amount,
         //   };
         // });
-        setRows(p!.order_items.map((item) => {return item}));
+        setRows(p!.order_items.map((item) => {
+          item._id = item._id ? item._id : new ObjectID().toHexString();
+          return item}));
+        setEditMode(p!.status <= 3)
         // setPurchaseSaved(true);
       });
     }
@@ -116,7 +127,7 @@ export const PurchaseDetailPage = () => {
 
 
   useEffect(() => { //temp maybe
-    if(rows.length != 0 && rows != null) {
+    if(rows.length != 0 && rows != null && !editMode) {
       if(JSON.stringify(savedPurchase?.order_items) !== JSON.stringify(rows)) {
         setPurchaseSaved(false);
       }
@@ -130,7 +141,7 @@ export const PurchaseDetailPage = () => {
 
 
 
-  const nonEditColumns: GridColDef[] = [
+  const editColumns: GridColDef[] = [
     { field: "product_code", headerName: "Product Code", width: 150 },
     { field: "product_name", headerName: "Product Name", width: 280 },
     {
@@ -153,6 +164,7 @@ export const PurchaseDetailPage = () => {
       type: "number",
       width: 100,
       align: "center",
+      valueGetter: (params) => params.row.purchased_amount - params.row.received_amount,
     },
     {
       field: "unit_price",
@@ -204,17 +216,17 @@ export const PurchaseDetailPage = () => {
             variant="contained"
             color="primary"
             size="small"
-            onClick={() => console.log("send to QC")}
+            onClick={() => handleReceiveRow(params.row, false)}
           >
             Send to Qc
           </Button>
 
           <Button
             variant="outlined"
-            color="error"
+            color="warning"
             size="small"
             style={{ marginLeft: 16 }}
-            onClick={() => console.log("send to gulag")}
+            onClick={() => handleReceiveRow(params.row, true)}
           >
             Quarantine
           </Button>
@@ -222,7 +234,7 @@ export const PurchaseDetailPage = () => {
       ),
     },
   ];
-  const editColumns: GridColDef[] = [
+  const nonEditColumns: GridColDef[] = [
     {
       field: "id",
       headerName: "Actions",
@@ -231,6 +243,7 @@ export const PurchaseDetailPage = () => {
       renderCell: (params: GridRenderCellParams<string>) => (
         <div>
         <IconButton
+          disabled={purchase!.status !== 6}
           onClick={() => handleDeleteRow(params.row._id)}
           aria-label="delete"
           color="error"
@@ -276,9 +289,38 @@ export const PurchaseDetailPage = () => {
       align: "center",
       editable: true,
     },
+    {
+      field: "received_amount",
+      headerName: "Received Qty",
+      type: "number",
+      
+      width: 100,
+      align: "center",
+      editable: true,
+    }
   ];
 
+  const handleReceiveRow = (row:IOrderItemProcess,quarantine:boolean) => {
+    if(!row.container_size || !row.expiry_date || !row.lot_number || !row.process_amount) {
+      
+      window.dispatchEvent(
+        new CustomEvent("NotificationEvent", {detail: {color:"warning", text : 'Missing Fields in this Row'} })
+      );
+    } else {
+      handlePurchaseItem(auth.token, row, quarantine)
+    }
+    console.log(row, purchase?._id)
+  }
 
+  const handleConfirmPurchase = () => {
+    confirmPurchase(auth.token,purchase! , purchase!._id).then((_purchase) =>{
+      if(_purchase) {
+        console.log(_purchase)
+        navigate(`/purchase-orders/${_purchase._id}`, { replace: true });
+        setPurchaseOrder(_purchase);
+      }
+    })
+  }
 
   const handleDeleteRow = (row_id: string) => {
     setRows([...rows.filter((m:IOrderItem) => m._id !== row_id)]);
@@ -334,7 +376,6 @@ export const PurchaseDetailPage = () => {
     //send new purchase to server
     if (id === "new") {
       const newPurchaseId = await createPurchase(auth.token, purchase!);
-
       if (newPurchaseId) {
         navigate(`/purchase-orders/${newPurchaseId}`, { replace: true });
         setPurchaseOrder({ ...purchase!, _id: newPurchaseId });
@@ -347,7 +388,7 @@ export const PurchaseDetailPage = () => {
       }
     }
     window.dispatchEvent(
-      new CustomEvent("NotificationEvent", { detail: "Changes Saved" })
+      new CustomEvent("NotificationEvent", { detail: {text: "Changes Saved"} })
     );
     setPurchaseSaved(true);
   };
@@ -372,6 +413,9 @@ export const PurchaseDetailPage = () => {
         onCancel={cancelSavePurchase}
       ></SaveForm>
       <Card variant="outlined" sx={{ padding: 3 }}>
+        
+    <div style={{ display: "flex", gap: 16, marginBottom: 10}}>
+      <div>
         <Button
           sx={{ marginBottom: 4 }}
           aria-label="go back"
@@ -385,18 +429,8 @@ export const PurchaseDetailPage = () => {
               marginRight: 1,
             }}
           />
-          Back to Products
+          Purchase Orders
         </Button>
-        <Button
-          sx={{ marginBottom: 4 }}
-          aria-label="go back"
-          size="large"
-          variant="contained"
-          onClick={() => setStatus(status === 1 ? 0 : 1)}
-        >
-          Toggle Edit (TESTING)
-        </Button>
-
         <Grid container spacing={3}>
           <Grid item xs={2}>
             <TextField
@@ -409,7 +443,7 @@ export const PurchaseDetailPage = () => {
               fullWidth
               size="small"
               variant="outlined"
-              label={"purchase Code"}
+              label={"Purchase Code"}
               value={purchase.order_code}
             ></TextField>
           </Grid>
@@ -441,21 +475,33 @@ export const PurchaseDetailPage = () => {
               value={purchase.date_arrived}
             ></TextField>
           </Grid>
-          <Grid item xs={2}>
-            <TextField
-              onChange={
-                (e) =>
-                setPurchaseOrder({ ...purchase, status: e.target.value ? parseInt(e.target.value) : 0 })
-              }
-              spellCheck="false"
-              InputLabelProps={{ shrink: true }}
-              fullWidth
-              size="small"
-              variant="outlined"
-              label={"Status"}
-              value={purchase.status}
-            ></TextField>
+          <Grid item xs={2.5}>
+          <Chip
+            label={PurchaseStatus[purchase?.status ? purchase?.status - 1: 5][0]}
+            sx={{
+              width:'100%',
+              height:'100%',
+              fontWeight: 600,
+            }}
+            //@ts-ignore
+            color={PurchaseStatus[purchase?.status ? purchase?.status - 1: 5][1]}
+            variant="outlined"
+              />
           </Grid>
+          <Grid item xs={5}>
+              <TextField
+                onChange={(e) =>
+                  setPurchaseOrder({ ...purchase, shipping_code: e.target.value })
+                }
+                spellCheck="false"
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+                size="small"
+                variant="outlined"
+                label={"Tracking Number"}
+                value={purchase.shipping_code}
+              ></TextField>
+            </Grid>
 
           <Grid item xs={3}>
               <StandaloneAutocomplete
@@ -473,7 +519,7 @@ export const PurchaseDetailPage = () => {
           <Grid item xs={12}>
             <TextField
               onChange={
-                (e) =>setPurchaseOrder({ ...purchase, notes: e.target.value })
+                (e) => setPurchaseOrder({ ...purchase, notes: e.target.value })
               }
               spellCheck="false"
               InputLabelProps={{ shrink: true }}
@@ -487,10 +533,47 @@ export const PurchaseDetailPage = () => {
             ></TextField>
           </Grid>
         </Grid>
-      </Card>
-      <Card variant="outlined" sx={{ padding: 5, overflowY: "auto" }}>
+        </div>
+      <Card
+        variant="outlined"
+        style={{ width: "40%", minWidth: "40%", padding: 16 }}
+      >
+        <div>
+          <Typography variant="h6">Action Board</Typography>
+        </div>
         <Button
-          style={{ marginBottom: 10 }}
+          style={{ marginBottom: 10, marginLeft:10, display: `${purchase.status === 6 ? 'box' : 'none'}`}}
+          disabled={id === "new"}
+          variant="contained"
+          onClick={() => handleConfirmPurchase()}
+        >
+          Confirm
+        </Button>
+
+        <Button
+          style={{ marginBottom: 10, marginLeft:10, backgroundColor: "#58ad5a",}}
+          variant="contained"
+          disabled={id === "new"}
+          onClick={() => markPurchaseReceived(auth.token,purchase._id)}
+        >
+          Set as Received
+        </Button>
+        <Button
+          style={{ marginBottom: 10, marginLeft:10, backgroundColor: "#f07067",}}
+          variant="contained"
+          disabled={id === "new"}
+          // onClick={() => setEditMode(editMode === 1 ? 0 : 1)}
+        >
+          Cancer Order
+        </Button>
+      </Card>
+      </div>
+      </Card>
+
+      <Card variant="outlined" sx={{ padding: 5, overflowY: "auto" }}>
+      <div>
+        <Button
+          style={{ marginBottom: 10, marginRight:10, display: `${purchase.status === 6 ? "block" : "none" }`}}
           variant="contained"
           onClick={() => {
             handleAddRow();
@@ -498,10 +581,16 @@ export const PurchaseDetailPage = () => {
         >
           Add Row
         </Button>
+          {/* <Switch color="primary"
+          disabled={id=== "new"}
+          onChange={() => setEditMode(!editMode)}/>
+          Receive Mode */}
+        </div>
         <DataGrid
           autoHeight={true}
           rows={rows!}
           getRowId={(row) => row._id}
+          
           processRowUpdate={(newRow) => {
             console.log(newRow)
             let pList = rows.slice();
@@ -534,7 +623,11 @@ export const PurchaseDetailPage = () => {
             //   }
             // }
           }}
-          columns={status === 1 ? editColumns : nonEditColumns}
+          initialState={{columns: {            columnVisibilityModel: {
+            // Hide columns status and traderName, the other columns will remain visible
+            received_amount: id != "new",}}}}
+          columns={editMode ? editColumns : nonEditColumns}
+
           onCellEditCommit={(e, value) => {
             handleEditCell(e.id.toString(), e.field, e.value);
             console.log('test', rows)

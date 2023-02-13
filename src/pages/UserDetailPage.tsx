@@ -68,7 +68,7 @@ export const UserDetailPage = () => {
           }
         }
         window.dispatchEvent(
-          new CustomEvent("NotificationEvent", { detail: "Changes Saved" })
+          new CustomEvent("NotificationEvent", { detail: {text:  "Changes Saved" }})
         );
         setUserSaved(true);
       };

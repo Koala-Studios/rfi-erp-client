@@ -71,12 +71,13 @@ export const getproductType = async (
 export const lookupProductType = async (
   //TODO: Not finished
   token: string,
-  search_value: string
+  search_value: string,
+  f_sale:boolean
 ): Promise<IProductType[] | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
     params: {
-      search_value,
+      search_value,f_sale
     },
   };
 
