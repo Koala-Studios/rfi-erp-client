@@ -1,14 +1,20 @@
 import axios from "axios";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
 
-interface IInventoryContainer {
-  batch_code: string;
-  supplier_id: string;
+interface IProductTypes {
+  product_type_id: string;
+  name: string;
+  for_sale: boolean;
+  is_raw: boolean;
+}
+interface IStockSummary {
+  on_hold: number;
   on_hand: number;
   on_order: number;
   quarantined: number;
   allocated: number;
-  price: number;
+  average_price: number;
+  reorder_amount: number;
 }
 interface IRegulatoryContainer {
   fda_status?: number;
@@ -28,8 +34,9 @@ export interface IInventory {
   date_created: Date;
   cas_number: string;
   reorder_amount: number;
-  stock: [IInventoryContainer];
+  stock: IStockSummary;
   regulatory: IRegulatoryContainer;
+  product_type: { name: string; _id: string } | null;
 }
 
 const api = axios.create({
@@ -111,6 +118,35 @@ export const lookupInventory = async (
   };
 
   let list: IInventory[] | null = null;
+
+  await api
+    .get("/lookup", config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        list = res.data.res;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  return list;
+};
+
+export const lookupProductTypes = async (
+  //TODO: Not finished
+  token: string,
+  search_value: string,
+  for_sale: boolean
+): Promise<IProductTypes | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {
+      search_value,
+      for_sale,
+    },
+  };
+
+  let list: IProductTypes[] | null = null;
 
   await api
     .get("/lookup", config)

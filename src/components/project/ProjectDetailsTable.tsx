@@ -145,7 +145,7 @@ export const ProjectDetailsTable: React.FC<Props> = ({
       filterable: false,
       renderCell: (row_params: GridRenderCellParams<string>) => (
         <TableAutocomplete
-          dbOption="inventory"
+          dbOption="products"
           handleEditRow={handleEditProductRow}
           rowParams={row_params}
           initialValue={row_params.row.product_name}
@@ -271,6 +271,13 @@ export const ProjectDetailsTable: React.FC<Props> = ({
         editMode="cell"
         getRowId={(row) => row._id}
         experimentalFeatures={{ newEditingApi: true }}
+        onCellKeyDown={(params, event) => {
+          if (event.code == "Space") {
+            event.stopPropagation();
+            
+          
+          }
+        }}
         processRowUpdate={(newRow) => {
           let pList = projectItems.slice();
           const rowIdx = projectItems.findIndex((r) => r._id === newRow._id);

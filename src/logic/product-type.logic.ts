@@ -1,52 +1,18 @@
 import axios from "axios";
 import { apiStatus, IListOptions } from "./utils";
 
-export interface ISupplier {
+export interface IProductType {
   _id: string;
   name: string;
   code: string;
-  email:string;
-  contact_name: string;
-  address_one?: string;
-  address_two?: string;
-  lead_time?:string;
-  phone?:string;
-  createdAt?:string;
+  is_raw:boolean;
+  for_sale:boolean
 }
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/suppliers",
+  baseURL: "http://localhost:5000/product-types",
 });
-
-
-export const lookupSupplier = async (
-  //TODO: Not finished
-  token: string,
-  search_value: string
-): Promise<ISupplier[] | null> => {
-  const config = {
-    headers: { Authorization: `Bearer ${token}` },
-    params: {
-      search_value,
-    },
-  };
-
-  let list: ISupplier[] | null = null;
-
-  await api
-    .get("/lookup", config)
-    .then((res) => {
-      if (res.status === apiStatus.OK) {
-        list = res.data.res;
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-  return list;
-};
-
-export const listSuppliers = async (
+export const listproductTypes = async (
   token: string,
   count: number,
   page: number
@@ -75,10 +41,10 @@ export const listSuppliers = async (
   return list;
 };
 
-export const getSupplier = async (
+export const getproductType = async (
   token: string,
   id: string
-): Promise<ISupplier | null> => {
+): Promise<IProductType | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
     params: {
@@ -86,25 +52,53 @@ export const getSupplier = async (
     },
   };
 
-  let supplier: ISupplier | null = null;
+  let customer: IProductType | null = null;
 
   await api
     .get("/get", config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
-        supplier = res.data;
+        customer = res.data;
       }
     })
     .catch((err) => {
       console.log(err);
     });
 
-  return supplier;
+  return customer;
 };
 
-export const createSupplier = async (
+export const lookupProductType = async (
+  //TODO: Not finished
   token: string,
-  formData: ISupplier
+  search_value: string,
+  f_sale:boolean
+): Promise<IProductType[] | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {
+      search_value,f_sale
+    },
+  };
+
+  let list: IProductType[] | null = null;
+
+  await api
+    .get("/lookup", config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        list = res.data.res;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  return list;
+};
+
+export const createproductType = async (
+  token: string,
+  formData: IProductType
 ): Promise<string | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
@@ -126,9 +120,9 @@ export const createSupplier = async (
 
   return rtn;
 };
-export const updateSupplier = async (
+export const updateproductType = async (
   token: string,
-  formData: ISupplier
+  formData: IProductType
 ): Promise<boolean> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },

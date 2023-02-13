@@ -1,16 +1,17 @@
 import axios from "axios";
+import { ObjectId } from "bson";
 import { apiStatus, IListOptions } from "./utils";
 
-export interface IProduct {
-  _id: string;
-  product_code: string;
-  name: string;
-  versions: number;
-  approved_version: number;
-  cost: number;
-  date_created: Date;
-  status: number;
-}
+// export interface IProduct {
+//   _id: string;
+//   product_code: string;
+//   name: string;
+//   versions: number;
+//   approved_version: number;
+//   cost: number;
+//   date_created?: string;
+//   status: number;
+// }
 
 
 interface IRegulatoryContainer {
@@ -23,6 +24,11 @@ interface IRegulatoryContainer {
   kosher?:boolean;
 }
 
+
+interface IProductCustomers {
+  customer_id:ObjectId,
+  name:string
+}
 interface IProductContainer {
   batch_code: string;
   on_hand: number;
@@ -34,19 +40,22 @@ interface IProductContainer {
 }
 
 export interface IProduct{
+  _id:string;
   name:string;
   description:string;
-  rating:number;
+  rating:number | null;
   product_code: string;
-  is_raw_mat?: boolean,
+  is_raw_mat?: boolean;
+  for_sale?:boolean;
   cost: number;
   stock?: IProductContainer;
-  customers: [string];
+  customers: IProductCustomers[];
   regulatory:IRegulatoryContainer;
   versions: number;
   status: number;
   approved_version: number;
   rec_dose_rate?:number;
+  product_type:{name:string,_id:string} | null
 }
 
 
@@ -112,4 +121,53 @@ export const getProduct = async (
     });
 
   return product;
+};
+
+export const createProduct = async (
+  token: string,
+  formData: IProduct
+): Promise<string | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  let rtn = null;
+
+  await api
+    .post("/create", formData, config)
+    .then((res) => {
+      console.log(res);
+      if (res.status === apiStatus.CREATED) {
+        console.log(res.data);
+        rtn = res.data;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
+};
+export const updateProduct = async (
+  token: string,
+  formData: IProduct
+): Promise<boolean> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  let rtn = false;
+
+  await api
+    .post("/update", formData, config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        rtn = true;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
 };

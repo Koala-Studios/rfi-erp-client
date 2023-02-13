@@ -1,6 +1,14 @@
-import { Box, Button, Card, TextField, Typography } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  Divider,
+  IconButton,
+  TextField,
+  Typography,
+} from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { GridColDef } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import React from "react";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { DataTable } from "../components/utils/DataTable";
@@ -10,36 +18,118 @@ import {
   IProductLine,
 } from "../logic/forecast.logic";
 import Delete from "@mui/icons-material/Delete";
-
-const materialColumns: GridColDef[] = [
-  { field: "product_code", headerName: "Product Code", width: 150 },
-  { field: "amount", headerName: "Quantity", type: "number", width: 150 },
-];
+import TableAutocomplete from "../components/utils/TableAutocomplete";
+import { IInventory } from "../logic/inventory.logic";
+import { ObjectID } from "bson";
+import { useNavigate } from "react-router-dom";
 
 export const ForecastPage = () => {
+  const navigate = useNavigate();
   const auth = React.useContext(AuthContext);
+  const [rowCount, setRowCount] = React.useState(0);
+  const forecastColumns: GridColDef[] = [
+    { field: "product_code", headerName: "Product Code", width: 150 },
+    {
+      field: "product_name",
+      headerName: "Internal Product",
+      width: 350,
+      sortable: false,
+      filterable: false,
+      renderCell: (row_params: GridRenderCellParams<string>) => (
+        <TableAutocomplete
+          dbOption="products"
+          handleEditRow={handleEditProductRow}
+          rowParams={row_params}
+          initialValue={row_params.row.product_name}
+          letterMin={3}
+          getOptionLabel={(item: IInventory) =>
+            `${item.product_code} | ${item.name}`
+          }
+        />
+      ),
+    },
+    {
+      field: "amount",
+      headerName: "Quantity",
+      type: "number",
+      width: 150,
+      editable: true,
+    },
+    {
+      field: "product_id",
+      headerName: "Actions",
+      align: "left",
+      width: 250,
+      renderCell: (params: GridRenderCellParams<string>) => {
+        // const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+        return (
+          <div>
+            <Button
+              color="primary"
+              variant="contained"
+              size="small"
+              onClick={() =>
+                navigate(`/products/${params.value}`, { replace: false })
+              }
+            >
+              View Product
+            </Button>
+            <IconButton
+              onClick={() => handleDeleteRow(params.row._id)}
+              aria-label="delete"
+              color="error"
+            >
+              <DeleteIcon />
+            </IconButton>
+          </div>
+        );
+      },
+    },
+  ];
+
+  const materialColumns: GridColDef[] = [
+    { field: "product_code", headerName: "Product Code", width: 150 },
+    {
+      field: "product_name",
+      headerName: "Material Name",
+      width: 300,
+      sortable: false,
+      filterable: false,
+    },
+    { field: "amount", headerName: "Quantity", type: "number", width: 150 },
+  ];
 
   const [lineItems, SetLineItems] = React.useState<IProductLine[]>([
     {
+      _id: new ObjectID().toHexString(),
       product_id: "",
       product_code: "",
-      name: "",
-      amount: "",
+      product_name: "",
+      amount: 0,
     },
   ]);
   const [materialRows, setMaterialRows] = React.useState<IForecast[] | null>(
     null
   );
 
+  const handleDeleteRow = (row_id: string) => {
+    const rowIdx = lineItems.findIndex((r) => r._id === row_id);
+
+    let pList = lineItems.slice();
+    pList.splice(rowIdx, 1);
+    SetLineItems(pList);
+  };
+
   const handleAddLine = (lineProduct: IProductLine) => {
     const index = lineItems.indexOf(lineProduct) + 1;
     SetLineItems([
       ...lineItems.slice(0, index),
       {
+        _id: new ObjectID().toHexString(),
         product_id: "",
         product_code: "",
-        name: "",
-        amount: "",
+        product_name: "",
+        amount: 0,
       },
       ...lineItems.slice(index, lineItems.length),
     ]);
@@ -54,16 +144,42 @@ export const ForecastPage = () => {
     }
   };
 
-  const handleTextOnChange = (index: number, type: number, value: string) => {
-    if (type === 1) {
-      lineItems.at(index)!.product_code = value.toUpperCase();
-    } else if (type === 2) {
-      lineItems.at(index)!.name = value;
-    } else if (type === 3 && (value === "" || Number(value))) {
-      lineItems.at(index)!.amount = value;
-    }
+  const handleEditProductRow = (rowid: string, value: IInventory) => {
+    let pList = lineItems!.slice();
+    const rowIdx = lineItems!.findIndex((r) => r._id === rowid);
+    pList[rowIdx].product_code = value.product_code;
+    pList[rowIdx].product_id = value._id;
+    pList[rowIdx].product_name = value.name;
 
-    SetLineItems([...lineItems]);
+    SetLineItems(pList);
+  };
+
+  const handleEditCell = (row_id: string, field: string, value: any) => {
+    const rowIndex = lineItems.findIndex((r: IProductLine) => r._id === row_id);
+    SetLineItems([
+      ...lineItems.slice(0, rowIndex),
+      {
+        ...lineItems[rowIndex],
+        [field]: value,
+      },
+      ...lineItems.slice(
+        rowIndex == lineItems.length ? rowIndex : rowIndex + 1
+      ),
+    ]);
+  };
+
+  const handleAddRow = () => {
+    SetLineItems([
+      ...lineItems,
+      {
+        _id: new ObjectID().toHexString(),
+        product_id: "",
+        product_name: "",
+        product_code: "",
+        amount: 0,
+      },
+    ]);
+    setRowCount(rowCount + 1);
   };
 
   const handleCalculate = () => {
@@ -72,15 +188,22 @@ export const ForecastPage = () => {
     //TODO:Remove elements that are not filled in
 
     const forecastList: IForecast[] = lineItems.map((line) => {
-      return { product_code: line.product_code, amount: Number(line.amount) };
+      return {
+        product_id: line.product_id,
+        product_name: line.product_name,
+        product_code: line.product_code,
+        amount: line.amount,
+      };
     });
 
     calculateForecast(auth.token, forecastList).then((result: IForecast[]) => {
-      console.log(result)
+      console.log(result);
       const newRows = result.map((item, idx) => {
         return {
           id: idx,
+          product_id: item.product_id,
           product_code: item.product_code,
+          product_name: item.product_name,
           amount: item.amount,
         };
       });
@@ -89,93 +212,97 @@ export const ForecastPage = () => {
     });
   };
 
-  return (
-    <Box component="div">
-      <Card
-        variant="outlined"
-        sx={{ padding: 4, marginBottom: 3 }}
-        component="div"
+  const CustomPagination = () => {
+    return (
+      <div
+        style={{
+          padding: "8px 0",
+          width: "100%",
+          display: "flex",
+          justifyContent: "flex-start",
+          borderTop: "0.5px solid #e0e0e0",
+        }}
       >
-        <Box component="div" sx={{ display: "inline" }}>
-          {/* <Button
-            size="large"
+        <Button
+          size="medium"
+          variant="outlined"
+          onClick={handleAddRow}
+          sx={{ ml: 1, borderRadius: 10, borderStyle: "dashed" }}
+        >
+          + Add Row
+        </Button>
+      </div>
+    );
+  };
+
+  return (
+    <>
+      <Card variant="outlined" sx={{ p: 4 }}>
+        <Box sx={{ mb: 2 }}>
+          <Button
+            size="medium"
             variant="outlined"
-            onClick={handleAddLine}
-            sx={{ marginRight: 4 }}
+            onClick={handleAddRow}
+            sx={{ mr: 2 }}
           >
-            + Add Line
-          </Button> */}
-          <Button size="large" variant="contained" onClick={handleCalculate}>
+            + Add Row
+          </Button>
+          <Button size="medium" variant="contained" onClick={handleCalculate}>
             Calculate
           </Button>
         </Box>
-        {lineItems.map((lineProduct: IProductLine, index) => {
-          return (
-            <Box sx={{ marginTop: 3 }} key={index}>
-              <Box component="div" sx={{ display: "flex", gridGap: 30 }}>
-                <Button
-                  sx={{ borderColor: "red!important", color: "red!important" }}
-                  variant="outlined"
-                  onClick={() => handleRemoveLine(lineProduct)}
-                >
-                  <DeleteIcon />
-                </Button>
-                <Button
-                  size="large"
-                  variant="outlined"
-                  onClick={() => handleAddLine(lineProduct)}
-                  sx={{
-                    borderColor: "green!important",
-                    color: "green!important",
-                  }}
-                >
-                  +
-                </Button>
-                <TextField
-                  size="small"
-                  label="Product Code"
-                  variant="outlined"
-                  value={lineProduct.product_code}
-                  onChange={(event) =>
-                    handleTextOnChange(index, 1, event.target.value)
-                  }
-                />
-                <TextField
-                  sx={{ width: 450 }}
-                  size="small"
-                  label="Name"
-                  variant="outlined"
-                  value={lineProduct.name}
-                  onChange={(event) =>
-                    handleTextOnChange(index, 2, event.target.value)
-                  }
-                />
-                <TextField
-                  size="small"
-                  type="number"
-                  label="Quantity (KG)"
-                  variant="outlined"
-                  value={lineProduct.amount}
-                  onChange={(event) =>
-                    handleTextOnChange(index, 3, event.target.value)
-                  }
-                />
-              </Box>
-            </Box>
-          );
-        })}
+        <DataGrid
+          style={{
+            border: "1px solid #c9c9c9",
+          }}
+          rows={lineItems}
+          columns={forecastColumns}
+          autoHeight={true}
+          rowHeight={45}
+          // editMode="cell"
+          getRowId={(row) => row._id}
+          // experimentalFeatures={{ newEditingApi: true }}
+          processRowUpdate={(newRow) => {
+            let pList = lineItems.slice();
+            const rowIdx = lineItems.findIndex(
+              (r) => r.product_id === newRow._id
+            );
+            pList[rowIdx] = newRow;
+            SetLineItems(pList);
+            return newRow;
+          }}
+          onProcessRowUpdateError={(e) => {
+            console.error("onProcessRowUpdateError", e);
+          }}
+          onCellEditCommit={(e, value) => {
+            console.log("test", e, value);
+            handleEditCell(e.id.toString(), e.field, e.value);
+          }}
+          // hideFooterPagination
+          components={{
+            Footer: CustomPagination,
+          }}
+          // hideFooter
+          // rowCount={listOptions!.totalDocs}
+        />
       </Card>
       {materialRows ? (
-        <Box>
-          <DataTable
-            title="Forecast Results"
+        <Box
+          sx={{
+            mt: 2,
+          }}
+        >
+          <Typography variant="h6" sx={{ textAlign: "center", mb: 0.5 }}>
+            Forecast Results
+          </Typography>
+          <DataGrid
             rows={materialRows!}
             columns={materialColumns}
-            auto_height={true}
-            listOptions={undefined}
-          ></DataTable>
+            autoHeight={true}
+            rowHeight={45}
+          />
         </Box>
       ) : null}
-    </Box>
+    </>
   );
 };

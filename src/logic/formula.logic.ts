@@ -1,4 +1,5 @@
 import axios from "axios";
+import { IProduct } from "./product.logic";
 import { apiStatus, IListOptions } from "./utils";
 
 export interface IFormulaItem {
@@ -11,12 +12,13 @@ export interface IFormulaItem {
 }
 
 export interface IFormula {
-  _id: string;
+  _id?: string;
   product_code: string;
   product_id: string;
-  version: number;
+  version?: number;
   yield: number;
-  date_created: Date;
+  base_hundred?:boolean;
+  date_created?: Date;
   formula_items: IFormulaItem[];
 }
 
@@ -47,7 +49,7 @@ export const getFormula = async (
       }
       // console.log('hello')
       window.dispatchEvent(
-        new CustomEvent("NotificationEvent", { detail: res.data.message })
+        new CustomEvent("NotificationEvent", { detail: {text: res.data.message} })
       );
     })
     .catch((err) => {
@@ -55,4 +57,36 @@ export const getFormula = async (
     });
 
   return formula;
+};
+
+export const submitFormula = async (
+  token: string,
+  approved:boolean,
+  formula:IFormula,
+): Promise<IProduct | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {
+      approved
+    },
+  };
+  // console.log(id, version, 'testing it all')
+  let product: IProduct | null = null;
+
+  await api
+    .post("/submit", formula, config )
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        product = res.data.res;
+      }
+      // console.log('hello')
+      window.dispatchEvent(
+        new CustomEvent("NotificationEvent", { detail: { text: res.data.message} })
+      );
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return product;
 };

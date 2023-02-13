@@ -2,13 +2,16 @@ import axios from "axios";
 import { apiStatus, IListOptions } from "./utils";
 
 export interface IProductLine {
+  _id:string;
   product_id: string;
   product_code: string;
-  name: string;
-  amount: string;
+  product_name: string;
+  amount: number;
 }
 export interface IForecast {
+  product_id: string;
   product_code: string;
+  product_name: string;
   amount: number;
 }
 

@@ -42,6 +42,8 @@ import { useEffect } from "react";
 import NotificationHandler from "./NotificationHandler";
 import Button from "@mui/material/Button";
 import FormHandler from "./FormHandler";
+import OilBarrelIcon from "@mui/icons-material/OilBarrel";
+import AccountMenu from "../menus/AccountMenu";
 
 const drawerWidth = 190;
 
@@ -60,6 +62,11 @@ const LinkItems = [
     text: "Inventory",
     link: "/inventory",
     icon: <StorageIcon></StorageIcon>,
+  },
+  {
+    text: "Inv Containers",
+    link: "/inventory-stock",
+    icon: <OilBarrelIcon></OilBarrelIcon>,
   },
   {
     text: "Products",
@@ -182,6 +189,8 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
   const location = useLocation();
   const auth = React.useContext(AuthContext);
 
+  const [accountAnchorEl, setAccountAnchorEl] = React.useState(null);
+
   const theme = useTheme();
   const [open, setOpen] = React.useState(true);
 
@@ -232,6 +241,9 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
             color="inherit"
           >
             <div
+              onClick={(event: any) => {
+                setAccountAnchorEl(event.currentTarget);
+              }}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -264,6 +276,10 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
                 </Typography>
               </div>
             </div>
+            <AccountMenu
+              anchorEl={accountAnchorEl}
+              setAnchorEl={setAccountAnchorEl}
+            />
           </div>
         </Toolbar>
       </AppBar>

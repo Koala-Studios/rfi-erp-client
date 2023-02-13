@@ -1,5 +1,5 @@
 import { Autocomplete, Paper, TextField } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import { lookup } from "../../logic/autocomplete.logic";
 import { AuthContext } from "../navigation/AuthProvider";
 
@@ -10,7 +10,7 @@ interface Props {
   label: string;
   placeholder?: string;
   letterMin: number;
-  dbOption: "customer" | "inventory" | "user";
+  dbOption: "customer" | "inventory" | "user" | "supplier" | "product-type";
   onChange?: (event: React.SyntheticEvent<Element, Event>, value: any) => void;
 }
 
@@ -25,6 +25,14 @@ const StandaloneAutocomplete: React.FC<Props> = ({
 }) => {
   const [optionList, setOptionList] = React.useState<any>([]);
   const auth = React.useContext(AuthContext);
+
+  useEffect(() => {
+    if (letterMin === 0) {
+      lookup(auth.token, "", dbOption, letterMin).then((result) => {
+        setOptionList(result);
+      });
+    }
+  }, []);
 
   const handleInputChange = (
     event: React.SyntheticEvent<Element, Event>,

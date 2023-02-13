@@ -14,7 +14,7 @@ export const SalesDetailPage = () => {
   const [order, setSalesOrder] = React.useState<ISalesOrder | null>(null);
   const [rows, setRows] = React.useState<any>(null);
 
-const columns: GridColDef[] = [
+  const columns: GridColDef[] = [
     { field: "material_code", headerName: "Material Code", width: 150 },
     { field: "material_name", headerName: "Material Name", width: 300 },
     { field: "quantity", headerName: "Qty(%)", type: "number", width: 90 },
@@ -32,11 +32,10 @@ const columns: GridColDef[] = [
           cost: item.price,
           quantity: item.amount,
           status: item.status,
-
         };
       });
       setRows(newRows);
-      console.log(order)
+      console.log(order);
     });
   }, []);
 
@@ -45,9 +44,9 @@ const columns: GridColDef[] = [
   return (
     <Card variant="outlined" sx={{ padding: 3 }}>
       <Button
-        sx={{ marginBottom: 4 }}
+        sx={{ mb: 2 }}
         aria-label="go back"
-        size="large"
+        size="medium"
         variant="outlined"
         onClick={() => navigate(-1)}
       >
@@ -67,11 +66,14 @@ const columns: GridColDef[] = [
       <Button sx={{ marginTop: 3 }} variant="contained" size="large">
         View Formula
       </Button>
-
-      <Card variant="outlined" sx={{ padding: 5, overflowY: 'auto' }}>
-    
-    <DataTable  auto_height={true} rows={rows!} columns={columns}></DataTable>
-  </Card>;
+      <Card variant="outlined" sx={{ padding: 5, overflowY: "auto" }}>
+        <DataTable
+          auto_height={true}
+          rows={rows!}
+          columns={columns}
+        ></DataTable>
+      </Card>
+      ;
     </Card>
   );
 };

@@ -84,7 +84,7 @@ const BatchingListPage = () => {
         <DataFilter params={searchParams} filters={filterArray}></DataFilter>
 
         <Button variant="contained" color="primary" onClick={createNewBatching}>
-          + New Product
+          + New Production
         </Button>
       </Card>
       <DataTable

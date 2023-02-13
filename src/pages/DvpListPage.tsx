@@ -89,7 +89,7 @@ const DvpListPage = () => {
 
   React.useEffect(() => {
     listProducts(auth.token, 25, 1, false).then((list) => {
-      const newRows = list!.docs.map((product /*, idx*/) => {
+      const newRows = list!.docs.map((product) => {
         return {
           id: product._id,
           product_code: product.product_code,

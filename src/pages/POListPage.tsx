@@ -51,10 +51,8 @@ const POListPage = () => {
         return {
           id: purchase._id,
           order_code: purchase.order_code,
-          supplier: purchase.supplier,
-          date_purchased: purchase.date_purchased
-            .toString()
-            .replace(/\T.+/, ""),
+          supplier: purchase.supplier.name,
+          date_purchased: purchase.date_purchased ? purchase.date_purchased.toString().replace(/\T.+/, "") : 'Not Set',
           status: purchase.status,
           item_count: purchase.order_items.length,
         };

@@ -1,25 +1,39 @@
 import axios from "axios";
 import { apiStatus, IListOptions } from "./utils";
 
-interface IOrderItem {
+
+
+export interface IOrderItem {
+  _id:string;
+  product_id: string;
   product_code: string;
-  material_name: string;
-  lot_number: string;
-  amount: number;
-  price: number;
-  status: number;
-  material_id: string;
+  product_name: string;
+  purchased_amount: number;
+  received_amount: number;
+  unit_price: number;
 }
+
+export interface IOrderItemProcess extends IOrderItem {
+  lot_number:string,
+  process_amount:number,
+  container_size:number,
+  expiry_date:Date,
+}
+
+
 export interface IPurchaseOrder {
   _id: string;
-  supplier_code: string;
-  supplier: string;
-  date_arrived: Date;
-  date_purchased: Date;
+  notes: string;
+  supplier: {
+    name: string,
+    supplier_id: string
+  },
+  date_arrived: string;
+  date_purchased: string;
   status: number;
   order_code: string;
-  notes: string;
-  order_items: [IOrderItem];
+  shipping_code:string;
+  order_items: IOrderItem[];
 }
 
 const api = axios.create({
@@ -75,7 +89,7 @@ export const getPurchase = async (
         purchase = res.data.res;
       }
       window.dispatchEvent(
-        new CustomEvent("NotificationEvent", { detail: res.data.message })
+        new CustomEvent("NotificationEvent", { detail: { text: res.data.message} })
       );
     })
     .catch((err) => {
@@ -83,4 +97,133 @@ export const getPurchase = async (
     });
 
   return purchase;
+};
+
+
+
+export const createPurchase = async (
+  token: string,
+  formData: IPurchaseOrder
+): Promise<string | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  let rtn = null;
+
+  await api
+    .post("/create", formData, config)
+    .then((res) => {
+      console.log(res);
+      if (res.status === apiStatus.CREATED) {
+        console.log(res.data);
+        rtn = res.data;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
+};
+export const updatePurchase = async (
+  token: string,
+  formData: IPurchaseOrder
+): Promise<boolean> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  let rtn = false;
+
+  await api
+    .post("/update", formData, config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        rtn = true;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
+};
+
+export const confirmPurchase = async (
+  token: string,
+  purchase: IPurchaseOrder,
+  po_id:string,
+): Promise<IPurchaseOrder | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {po_id: po_id}
+  };
+
+  await api
+    .post("/confirm-purchase", purchase, config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        return res.data;
+      }
+
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return null;
+};
+
+export const markPurchaseReceived = async (
+  token: string,
+  po_id:string,
+): Promise<IPurchaseOrder | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {po_id: po_id}
+  };
+
+  await api
+    .put("/mark-received", config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        window.dispatchEvent(
+          new CustomEvent("NotificationEvent", { detail: { text: res.data.message} })
+        );
+        return res.data;
+      }
+
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return null;
+};
+
+
+
+export const handlePurchaseItem = async (
+  token: string,
+  purchaseItem: IOrderItemProcess,
+  quarantine:boolean,
+): Promise<IOrderItem | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {quarantine: quarantine}
+  };
+
+  await api
+    .post("/receive-item", purchaseItem, config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        return res.data;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return null;
 };
