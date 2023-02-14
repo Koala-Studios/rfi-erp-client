@@ -157,14 +157,15 @@ export const confirmPurchase = async (
 ): Promise<IPurchaseOrder | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
-    params: {po_id: po_id}
+    // params: {po_id: po_id}
   };
-
+  let rtn = null
   await api
     .post("/confirm-purchase", purchase, config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
-        return res.data;
+        console.log(res);
+        rtn = res.data;
       }
 
     })
@@ -172,7 +173,7 @@ export const confirmPurchase = async (
       console.log(err);
     });
 
-  return null;
+  return rtn;
 };
 
 export const markPurchaseReceived = async (
@@ -184,14 +185,17 @@ export const markPurchaseReceived = async (
     params: {po_id: po_id}
   };
 
+
+  let rtn = null;
+
   await api
-    .put("/mark-received", config)
+    .post("/mark-received", po_id,config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
         window.dispatchEvent(
           new CustomEvent("NotificationEvent", { detail: { text: res.data.message} })
         );
-        return res.data;
+        rtn = res.data;
       }
 
     })
@@ -199,8 +203,38 @@ export const markPurchaseReceived = async (
       console.log(err);
     });
 
-  return null;
+  return rtn;
 };
+
+export const markPurchaseCancelled = async (
+  token: string,
+  po_id:string,
+): Promise<IPurchaseOrder | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+    params: {po_id: po_id}
+  };
+
+  let rtn = null;
+
+  await api
+    .post("/mark-cancelled", po_id, config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        window.dispatchEvent(
+          new CustomEvent("NotificationEvent", { detail: { text: res.data.message} })
+        );
+        rtn =  res.data;
+      }
+
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
+};
+
 
 
 
