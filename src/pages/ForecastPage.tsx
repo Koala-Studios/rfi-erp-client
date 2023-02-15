@@ -7,7 +7,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import React from "react";
 import { AuthContext } from "../components/navigation/AuthProvider";
@@ -63,11 +63,19 @@ export const ForecastPage = () => {
       renderCell: (params: GridRenderCellParams<string>) => {
         // const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
         return (
-          <div>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              width: "100%",
+              alignItems: "center",
+            }}
+          >
             <Button
               color="primary"
               variant="contained"
               size="small"
+              sx={{ height: 32 }}
               onClick={() =>
                 navigate(`/products/${params.value}`, { replace: false })
               }

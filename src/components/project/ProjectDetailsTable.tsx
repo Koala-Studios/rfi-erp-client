@@ -1,4 +1,5 @@
 import {
+  Avatar,
   Box,
   Button,
   Chip,
@@ -173,7 +174,12 @@ export const ProjectDetailsTable: React.FC<Props> = ({
               : ""
           }
           letterMin={1}
-          getOptionLabel={(item: IUser) => item.username}
+          getOptionLabel={(item: IUser) => (
+            <>
+              <Avatar sx={{ mr: 2 }} />
+              {item.username}
+            </>
+          )}
         />
       ),
     },
@@ -274,8 +280,6 @@ export const ProjectDetailsTable: React.FC<Props> = ({
         onCellKeyDown={(params, event) => {
           if (event.code == "Space") {
             event.stopPropagation();
-            
-          
           }
         }}
         processRowUpdate={(newRow) => {

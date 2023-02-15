@@ -28,3 +28,19 @@ a {
 /* .MuiDataGrid-row {
   pointer-events: none !important;
 } */
+.SnackbarItem-variantSuccess {
+  background-color: #008060 !important;
+}
+.SnackbarItem-variantWarning {
+  background-color: #ed6c02 !important;
+}
+.SnackbarItem-variantInfo {
+  background-color: #0288d1 !important;
+}
+.SnackbarItem-variantError {
+  background-color: #d32f2f !important;
+}
+
+.SnackbarContent-root {
+  box-shadow: 0 5px 10px 0 rgb(200, 200, 200)!important;
+}

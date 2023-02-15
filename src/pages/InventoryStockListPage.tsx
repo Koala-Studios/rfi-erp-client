@@ -7,22 +7,57 @@ import {
 } from "@mui/x-data-grid";
 import { listInventoryStock } from "../logic/inventory-stock.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
-import { Box, Button, Card, Collapse, IconButton, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import {
+  Box,
+  Button,
+  Card,
+  Collapse,
+  IconButton,
+  Pagination,
+  Paper,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from "@mui/material";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { setTokenSourceMapRange } from "typescript";
-import { IListData } from "../logic/utils";
-import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
-import { IInventoryStock, IInventoryStockGrouped} from "../logic/inventory-stock.logic"
+import { FilterElement, IListData } from "../logic/utils";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
+import {
+  IInventoryStock,
+  IInventoryStockGrouped,
+} from "../logic/inventory-stock.logic";
+import DataFilter from "../components/utils/DataFilter";
+import TablePagination from "@mui/material/TablePagination";
 
-const ExpandableRow = (props: { row:IInventoryStockGrouped }) => {
-  const row  = props.row;
+const filterArray: FilterElement[] = [
+  {
+    label: "Product Code",
+    field: "product_code",
+    type: "text",
+    regexOption: null,
+  },
+  { label: "Product Name", field: "name", type: "text" },
+];
+
+const ExpandableRow = (props: { row: IInventoryStockGrouped }) => {
+  const row = props.row;
   const [open, setOpen] = React.useState(false);
 
-  return ( //THIS IS FOR TEST OF CONCEPT, WILL BE CHANGED!!! 
-    <React.Fragment>
-      <TableRow  sx={{'& > *': { borderBottom: 'unset' }  }}>
-        <TableCell sx={{padding: "0px 16px"}} width={50} >
+  return (
+    //THIS IS FOR TEST OF CONCEPT, WILL BE CHANGED!!!
+    <>
+      <TableRow
+        sx={{
+          "& > *": { borderBottom: "none!important" },
+        }}
+      >
+        <TableCell sx={{ p: 0.7 }} width={50}>
           <IconButton
             aria-label="expand row"
             size="small"
@@ -31,55 +66,86 @@ const ExpandableRow = (props: { row:IInventoryStockGrouped }) => {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        <TableCell sx={{padding: "0px 16px"}} width={120}>{row.product_code}</TableCell>
-        <TableCell sx={{padding: "0px 16px", width:"40%"}}>{row.name}</TableCell>
-        <TableCell sx={{padding: "0px 16px"}} >{row.average_cost}</TableCell>
-        <TableCell sx={{padding: "0px 16px"}} >{row.received_amount}</TableCell>
-        <TableCell sx={{padding: "0px 16px"}} >{row.used_amount}</TableCell>
-        <TableCell sx={{padding: "0px 16px"}} >{row.allocated_amount}</TableCell>
-        <TableCell sx={{padding: "0px 16px"}} >{row.quarantined_containers}</TableCell>
+        <TableCell sx={{ p: 1 }} width={120}>
+          <Typography variant="subtitle2">{row.product_code}</Typography>
+        </TableCell>
+        <TableCell sx={{ p: "0px 16px", width: "35%" }}>
+          <Typography variant="subtitle2">{row.name}</Typography>
+        </TableCell>
+        <TableCell sx={{ p: 1 }}>{row.average_cost}</TableCell>
+        <TableCell sx={{ p: 1 }}>{row.received_amount}</TableCell>
+        <TableCell sx={{ p: 1 }}>{row.used_amount}</TableCell>
+        <TableCell sx={{ p: 1 }}>{row.allocated_amount}</TableCell>
+        <TableCell sx={{ p: 1 }}>{row.quarantined_containers}</TableCell>
       </TableRow>
       <TableRow>
-        <TableCell sx={{padding: "0px 16px"}} style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={8}>
-          <Collapse in={open} timeout="auto" unmountOnExit sx={{ background: "#e4e6ee"}}>
-            <Box sx={{ margin: 1 }}>
+        <TableCell
+          sx={{ p: 0 }}
+          // style={{ paddingBottom: 0, paddingTop: 0 }}
+          colSpan={8}
+        >
+          <Collapse
+            in={open}
+            timeout="auto"
+            unmountOnExit
+            sx={{ background: "#ededed", pl: 3.5 }}
+          >
+            <Box sx={{ margin: 1, p: "0 16px" }}>
               <Table size="small" aria-label="purchases">
                 <TableHead>
                   <TableRow>
-                    <TableCell sx={{padding: "0px 16px"}}>Lot#</TableCell>
-                    <TableCell sx={{padding: "0px 16px"}}>Supplier</TableCell>
-                    <TableCell sx={{padding: "0px 16px"}}>Unit Cost ($/KG)</TableCell>
-                    <TableCell sx={{padding: "0px 16px"}}>Received Amt</TableCell>
-                    <TableCell sx={{padding: "0px 16px"}}>Container Size</TableCell>
-                    <TableCell sx={{padding: "0px 16px"}}>Used Amt</TableCell>
-                    <TableCell sx={{padding: "0px 16px"}}>Allocated Amt</TableCell>
-                    <TableCell sx={{padding: "0px 16px"}}>Qrntn Amt</TableCell>
-                    <TableCell sx={{padding: "0px 16px"}}>Received Date</TableCell>
-                    <TableCell sx={{padding: "0px 16px"}}>Expiry Date</TableCell>
-                    <TableCell sx={{padding: "0px 16px"}}>Notes</TableCell>
-                    <TableCell sx={{padding: "0px 16px"}}>Extensions</TableCell>
-                    <TableCell sx={{padding: "0px 16px"}}>Supplier SKU#</TableCell>
+                    <TableCell sx={{ p: 1 }}>Lot#</TableCell>
+                    <TableCell sx={{ p: 1 }}>Supplier</TableCell>
+                    <TableCell sx={{ p: 1 }}>Unit Cost ($/KG)</TableCell>
+                    <TableCell sx={{ p: 1 }}>Received Amt</TableCell>
+                    <TableCell sx={{ p: 1 }}>Container Size</TableCell>
+                    <TableCell sx={{ p: 1 }}>Used Amt</TableCell>
+                    <TableCell sx={{ p: 1 }}>Allocated Amt</TableCell>
+                    <TableCell sx={{ p: 1 }}>Qrntn Amt</TableCell>
+                    <TableCell sx={{ p: 1 }}>Received Date</TableCell>
+                    <TableCell sx={{ p: 1 }}>Expiry Date</TableCell>
+                    <TableCell sx={{ p: 1 }}>Notes</TableCell>
+                    <TableCell sx={{ p: 1 }}>Extensions</TableCell>
+                    <TableCell sx={{ p: 1 }}>Supplier SKU#</TableCell>
                     {/*//TODO: QC stuff */}
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {row.items.map((item:IInventoryStock) => (
-                    <TableRow key={item._id.toString() }>
-                      <TableCell width={120} >
+                  {row.items.map((item: IInventoryStock) => (
+                    <TableRow key={item._id.toString()}>
+                      <TableCell sx={{ p: 1 }} width={120}>
                         {item.lot_number}
                       </TableCell>
-                      <TableCell  sx={{padding: "0px 16px"}} >{item.supplier_code}</TableCell>
-                      <TableCell >{(item.unit_cost + 0).toFixed(2)}</TableCell>
-                      <TableCell >{item.received_amount}</TableCell>
-                      <TableCell >{item.container_size}</TableCell>
-                      <TableCell >{item.used_amount}</TableCell>
-                      <TableCell >{item.allocated_amount}</TableCell>
-                      <TableCell >{item.quarantined_containers}</TableCell>
-                      <TableCell width={120}>{item.received_date}</TableCell> 
-                      <TableCell width={120}>{item.expiry_date}</TableCell>
-                      <TableCell >{item.notes}</TableCell>
-                      <TableCell >{item.extensions.length}</TableCell>
-                      <TableCell >{item.supplier_sku}</TableCell>
+                      <TableCell sx={{ p: 1 }}>
+                        <Typography variant="subtitle2">
+                          {item.supplier_code}
+                        </Typography>
+                      </TableCell>
+                      <TableCell sx={{ p: 1 }}>
+                        {(item.unit_cost + 0).toFixed(2)}
+                      </TableCell>
+                      <TableCell sx={{ p: 1 }}>
+                        {item.received_amount}
+                      </TableCell>
+                      <TableCell sx={{ p: 1 }}>{item.container_size}</TableCell>
+                      <TableCell sx={{ p: 1 }}>{item.used_amount}</TableCell>
+                      <TableCell sx={{ p: 1 }}>
+                        {item.allocated_amount}
+                      </TableCell>
+                      <TableCell sx={{ p: 1 }}>
+                        {item.quarantined_containers}
+                      </TableCell>
+                      <TableCell sx={{ p: 1 }} width={120}>
+                        {item.received_date}
+                      </TableCell>
+                      <TableCell sx={{ p: 1 }} width={120}>
+                        {item.expiry_date}
+                      </TableCell>
+                      <TableCell sx={{ p: 1 }}>{item.notes}</TableCell>
+                      <TableCell sx={{ p: 1 }}>
+                        {item.extensions.length}
+                      </TableCell>
+                      <TableCell sx={{ p: 1 }}>{item.supplier_sku}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
@@ -88,14 +154,14 @@ const ExpandableRow = (props: { row:IInventoryStockGrouped }) => {
           </Collapse>
         </TableCell>
       </TableRow>
-    </React.Fragment>
+    </>
   );
-}
-
+};
 
 const InventoryStockListPage = () => {
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const columns: GridColDef[] = [
     { field: "product_id", headerName: "Item Code", width: 120 },
@@ -143,10 +209,10 @@ const InventoryStockListPage = () => {
 
   React.useEffect(() => {
     listInventoryStock(auth.token, 25, 1, true).then((list) => {
-      console.log(list)
+      console.log(list);
       const newRows = list!.docs.map((item) => {
-
-        return { //grouped
+        return {
+          //grouped
           id: item._id.toString(),
           product_id: item.product_id,
           product_code: item.product_code,
@@ -156,45 +222,50 @@ const InventoryStockListPage = () => {
           used_amount: item.used_amount,
           allocated_amount: item.allocated_amount,
           quarantined_containers: item.quarantined_containers,
-          items: item.items.map((container:IInventoryStock) => {
+          items: item.items.map((container: IInventoryStock) => {
             return {
-              _id:container._id,
-              product_id:container.product_id,
-              product_code:container.product_code,
-              name:container.name,
-              unit_cost:container.unit_cost,
-              container_size:container.container_size,
-              received_amount:container.received_amount,
-              used_amount:container.used_amount,
-              allocated_amount:container.allocated_amount,
-              quarantined_containers:container.quarantined_containers,
-              
+              _id: container._id,
+              product_id: container.product_id,
+              product_code: container.product_code,
+              name: container.name,
+              unit_cost: container.unit_cost,
+              container_size: container.container_size,
+              received_amount: container.received_amount,
+              used_amount: container.used_amount,
+              allocated_amount: container.allocated_amount,
+              quarantined_containers: container.quarantined_containers,
+
               lot_number: container.lot_number,
-            
+
               supplier_code: container.supplier_code,
               supplier_id: container.supplier_id,
               supplier_sku: container.supplier_sku,
-            
-              received_date: container.received_date ?container.received_date.toString().split("T")[0] : 'unknown',
-              expiry_date: container.expiry_date ? container.expiry_date.toString().split("T")[0] : 'unknown',
-              notes: container.notes,
-              extensions: container.extensions.length ,
-              qc_tests: container.qc_tests.length
-            }
-          })
-        }
 
-        return { //regular
-          id: item._id,
-          product_id: item.product_code,
-          name: item.name,
-          cost: item.cost,
-          reorder_amount: item.reorder_amount ?? 0,
-          on_hand: item.on_hand ?? 0,
-          on_order: item.on_order ?? 0,
-          quarantined: item.quarantined ?? 0,
-          allocated: item.allocated ?? 0,
+              received_date: container.received_date
+                ? container.received_date.toString().split("T")[0]
+                : "unknown",
+              expiry_date: container.expiry_date
+                ? container.expiry_date.toString().split("T")[0]
+                : "unknown",
+              notes: container.notes,
+              extensions: container.extensions.length,
+              qc_tests: container.qc_tests.length,
+            };
+          }),
         };
+
+        // return {
+        //   //regular
+        //   id: item._id,
+        //   product_id: item.product_code,
+        //   name: item.name,
+        //   cost: item.cost,
+        //   reorder_amount: item.reorder_amount ?? 0,
+        //   on_hand: item.on_hand ?? 0,
+        //   on_order: item.on_order ?? 0,
+        //   quarantined: item.quarantined ?? 0,
+        //   allocated: item.allocated ?? 0,
+        // };
       });
       setDataOptions({ rows: newRows, listOptions: list! });
     });
@@ -203,41 +274,83 @@ const InventoryStockListPage = () => {
     navigate(`/inventory-stock/new`, { replace: false });
   };
 
-
   if (dataOptions == null) return null;
 
   return (
     <>
-    <Card
-    variant="outlined"
-    sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
-  >
-  </Card>
-  <TableContainer component={Paper}>
-      <Table aria-label="collapsible table">
-        <TableHead>
-          <TableRow sx={{maxHeight:39, height:39}}>
-            <TableCell sx={{padding: "0px 16px"}} />
-            <TableCell sx={{padding: "0px 16px"}}>Product Code</TableCell>
-            <TableCell sx={{padding: "0px 16px"}}>Name</TableCell>
-            <TableCell sx={{padding: "0px 16px"}}>Avg Cost ($/KG)</TableCell>
-            <TableCell sx={{padding: "0px 16px"}}>Received Amount</TableCell>
-            <TableCell sx={{padding: "0px 16px"}}>Used Amount</TableCell>
-            <TableCell sx={{padding: "0px 16px"}}>Allocated Amount</TableCell>
-            <TableCell sx={{padding: "0px 16px"}}>Quarantined Containers</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {dataOptions.rows.map((row:IInventoryStockGrouped) => (
-            <ExpandableRow key={row.name} row={row} />
-          ))}
-        </TableBody>
-      </Table>
-    </TableContainer>
+      <Card
+        variant="outlined"
+        sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
+      >
+        <DataFilter filters={filterArray} params={searchParams} />
+      </Card>
+      <div
+        style={{ height: "calc(100% - 140px)", maxHeight: "calc(100% - 85px)" }}
+      >
+        <TableContainer
+          component={Paper}
+          style={{
+            width: "100%",
+            minHeight: 100,
+            height: "100%",
+            border: "1px solid #c9c9c9",
+            borderRadius: "5px 5px 0 0",
+          }}
+        >
+          <Table
+            aria-label="collapsible table"
+            style={{ position: "relative" }}
+          >
+            <TableHead
+              style={{
+                position: "sticky",
+                top: 0,
+                background: "white",
+                boxShadow: "0 1px 0 0 #e1e1e1",
+                zIndex: 10,
+              }}
+            >
+              <TableRow
+                sx={{
+                  maxHeight: 50,
+                  height: 50,
+                }}
+              >
+                <TableCell sx={{ p: 1 }} />
+                <TableCell sx={{ p: 1 }}>Product Code</TableCell>
+                <TableCell sx={{ p: 1 }}>Name</TableCell>
+                <TableCell sx={{ p: 1 }}>Avg Cost ($/KG)</TableCell>
+                <TableCell sx={{ p: 1 }}>Received Amount</TableCell>
+                <TableCell sx={{ p: 1 }}>Used Amount</TableCell>
+                <TableCell sx={{ p: 1 }}>Allocated Amount</TableCell>
+                <TableCell sx={{ p: 1 }}>Quarantined Containers</TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody style={{ overflowY: "scroll" }}>
+              {dataOptions.rows.map((row: IInventoryStockGrouped) => (
+                <ExpandableRow key={row.name} row={row} />
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
 
-
-
-    {/* <DataTable
+        <Pagination
+          color="primary"
+          count={10}
+          page={1}
+          shape="rounded"
+          variant="outlined"
+          sx={{
+            p: 1,
+            borderRadius: "0 0 5px 5px",
+            background: "white",
+            border: "1px solid #c9c9c9",
+            borderTop: "none",
+            ul: { justifyContent: "end" },
+          }}
+        />
+      </div>
+      {/* <DataTable
       rows={dataOptions.rows}
       columns={columns}
       listOptions={dataOptions.listOptions}
