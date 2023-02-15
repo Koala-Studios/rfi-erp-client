@@ -88,7 +88,7 @@ const ExpandableRow = (props: { row: IInventoryStockGrouped }) => {
             in={open}
             timeout="auto"
             unmountOnExit
-            sx={{ background: "#ededed", pl: 3.5 }}
+            sx={{ background: "#ebedf0", pl: 3.5 }}
           >
             <Box sx={{ margin: 1, p: "0 16px" }}>
               <Table size="small" aria-label="purchases">
