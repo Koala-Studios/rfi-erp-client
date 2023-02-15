@@ -59,12 +59,11 @@ const UserListPage = () => {
     navigate(`/users/new`, { replace: false });
   };
 
-
   if (dataOptions == null) return null;
 
   return (
     <Box>
-      <Card variant="outlined" sx={{ mb: 3, p: 3 }}>
+      <Card variant="outlined" sx={{ mb: 2, p: 2 }}>
         <Button variant="contained" color="primary" onClick={createNewUser}>
           + New User
         </Button>

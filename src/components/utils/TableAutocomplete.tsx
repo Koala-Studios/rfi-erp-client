@@ -10,7 +10,7 @@ interface Props {
   rowParams: GridRenderCellParams<string>;
   initialValue: string;
   letterMin: number;
-  getOptionLabel: (option: any) => string;
+  getOptionLabel: (option: any) => any;
 }
 
 const TableAutocomplete: React.FC<Props> = ({

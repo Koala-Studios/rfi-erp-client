@@ -1,8 +1,10 @@
 import {
   Autocomplete,
+  Box,
   Button,
   Card,
   Chip,
+  Divider,
   Grid,
   IconButton,
   TextField,
@@ -89,6 +91,7 @@ export const PurchaseDetailPage = () => {
         const tempPurchase = { ...p! };
         savedPurchase = tempPurchase;
         setPurchaseOrder(p!);
+        console.log(p);
         // newRows = purchase!.order_items.map((item) => { //!check soon for further changes
         //   return {
         //     _id: item._id ? item._id : new ObjectID().toHexString(),
@@ -118,7 +121,10 @@ export const PurchaseDetailPage = () => {
   }, []);
 
   useEffect(() => {
-    if (purchase == null || purchaseSaved === false) return;
+    if (purchase == null) return;
+    setEditMode(purchase.status <= 3);
+
+    if (purchaseSaved === false) return;
 
     if (JSON.stringify(savedPurchase) !== JSON.stringify(purchase)) {
       setPurchaseSaved(false);
@@ -318,12 +324,14 @@ export const PurchaseDetailPage = () => {
 
   const handleConfirmPurchase = () => {
     confirmPurchase(auth.token, purchase!, purchase!._id).then((_purchase) => {
-      
-      console.log(_purchase);
+      console.log("confirm purchase", _purchase, _purchase?.status);
       if (_purchase) {
-        window.location.reload();
+        // window.location.reload();
+        savedPurchase = _purchase;
+        setPurchaseOrder(_purchase);
+        setPurchaseSaved(true);
       } else {
-        console.log('Purchase Not Updated')
+        console.log("Purchase Not Updated");
       }
     });
   };
@@ -333,7 +341,7 @@ export const PurchaseDetailPage = () => {
       if (_purchase) {
         window.location.reload();
       } else {
-        console.log('Purchase Not Updated')
+        console.log("Purchase Not Updated");
       }
     });
   };
@@ -343,7 +351,7 @@ export const PurchaseDetailPage = () => {
       if (_purchase) {
         window.location.reload();
       } else {
-        console.log('Purchase Not Updated')
+        console.log("Purchase Not Updated");
       }
     });
   };
@@ -434,9 +442,17 @@ export const PurchaseDetailPage = () => {
         display={!purchaseSaved}
         onSave={savePurchase}
         onCancel={cancelSavePurchase}
-      ></SaveForm>
+      />
+
       <Card variant="outlined" sx={{ padding: 2 }}>
-        <div style={{ display: "flex", gap: 16, marginBottom: 10 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 100,
+            marginBottom: 10,
+          }}
+        >
           <div>
             <Button
               sx={{ mb: 3 }}
@@ -453,7 +469,7 @@ export const PurchaseDetailPage = () => {
               />
               Purchase Orders
             </Button>
-            <Grid container spacing={3}>
+            <Grid sx={{ maxWidth: "85%" }} container spacing={3}>
               <Grid item xs={3}>
                 <TextField
                   onChange={(e) =>
@@ -578,15 +594,22 @@ export const PurchaseDetailPage = () => {
           </div>
           <Card
             variant="outlined"
-            style={{ width: "40%", minWidth: "40%", padding: 16 }}
+            style={{
+              width: 260,
+              minWidth: 260,
+              padding: 16,
+              display: "flex",
+
+              flexDirection: "column",
+              gap: 12,
+            }}
           >
             <div>
               <Typography variant="h6">Action Board</Typography>
             </div>
+            <Divider></Divider>
             <Button
               style={{
-                marginBottom: 10,
-                marginRight: 10,
                 display: `${purchase.status === 6 ? "box" : "none"}`,
               }}
               disabled={id === "new"}
@@ -598,21 +621,14 @@ export const PurchaseDetailPage = () => {
 
             <Button
               color="success"
-              style={{
-                marginBottom: 10,
-              }}
               variant="contained"
               disabled={id === "new"}
-              onClick={() => handleMarkPurchaseReceived() }
+              onClick={() => handleMarkPurchaseReceived()}
             >
               Set as Received
             </Button>
             <Button
               color="error"
-              style={{
-                marginBottom: 10,
-                marginLeft: 10,
-              }}
               variant="outlined"
               disabled={id === "new"}
               onClick={() => handleMarkPurchaseCancelled()}
@@ -695,7 +711,6 @@ export const PurchaseDetailPage = () => {
           }}
         ></DataGrid>
       </Card>
-      ;
     </>
   );
 };

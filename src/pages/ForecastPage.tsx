@@ -7,7 +7,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import React from "react";
 import { AuthContext } from "../components/navigation/AuthProvider";
@@ -76,7 +76,6 @@ export const ForecastPage = () => {
       width: 150,
       editable: true,
     },
-
   ];
 
   const materialColumns: GridColDef[] = [
@@ -235,7 +234,7 @@ export const ForecastPage = () => {
 
   return (
     <>
-      <Card variant="outlined" sx={{ p: 4 }}>
+      <Card variant="outlined" sx={{ p: 3 }}>
         <Box sx={{ mb: 2 }}>
           <Button
             size="medium"

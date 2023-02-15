@@ -68,9 +68,7 @@ export const DataTable: React.FC<Props> = ({
   };
 
   return (
-    <div
-      style={{ height: "calc(100% - 100px)", width: "100%", minHeight: 100 }}
-    >
+    <div style={{ height: "calc(100% - 85px)", width: "100%", minHeight: 100 }}>
       <DataGrid
         // onPageChange={(page) => setCurrentPage(page)}
         onRowDoubleClick={handleDBClick}
