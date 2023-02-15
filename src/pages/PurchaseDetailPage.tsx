@@ -18,6 +18,7 @@ import {
   handlePurchaseItem,
   IOrderItemProcess,
   IPurchaseOrder,
+  markPurchaseCancelled,
   markPurchaseReceived,
   updatePurchase,
 } from "../logic/purchase-order.logic";
@@ -317,10 +318,32 @@ export const PurchaseDetailPage = () => {
 
   const handleConfirmPurchase = () => {
     confirmPurchase(auth.token, purchase!, purchase!._id).then((_purchase) => {
+      
+      console.log(_purchase);
       if (_purchase) {
-        console.log(_purchase);
-        navigate(`/purchase-orders/${_purchase._id}`, { replace: true });
-        setPurchaseOrder(_purchase);
+        window.location.reload();
+      } else {
+        console.log('Purchase Not Updated')
+      }
+    });
+  };
+
+  const handleMarkPurchaseReceived = () => {
+    markPurchaseReceived(auth.token, purchase!._id).then((_purchase) => {
+      if (_purchase) {
+        window.location.reload();
+      } else {
+        console.log('Purchase Not Updated')
+      }
+    });
+  };
+
+  const handleMarkPurchaseCancelled = () => {
+    markPurchaseCancelled(auth.token, purchase!._id).then((_purchase) => {
+      if (_purchase) {
+        window.location.reload();
+      } else {
+        console.log('Purchase Not Updated')
       }
     });
   };
@@ -580,7 +603,7 @@ export const PurchaseDetailPage = () => {
               }}
               variant="contained"
               disabled={id === "new"}
-              onClick={() => markPurchaseReceived(auth.token, purchase._id)}
+              onClick={() => handleMarkPurchaseReceived() }
             >
               Set as Received
             </Button>
@@ -592,7 +615,7 @@ export const PurchaseDetailPage = () => {
               }}
               variant="outlined"
               disabled={id === "new"}
-              // onClick={() => setEditMode(editMode === 1 ? 0 : 1)}
+              onClick={() => handleMarkPurchaseCancelled()}
             >
               Cancel Order
             </Button>
