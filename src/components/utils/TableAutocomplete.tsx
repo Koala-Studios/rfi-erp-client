@@ -5,7 +5,7 @@ import { lookup } from "../../logic/autocomplete.logic";
 import { AuthContext } from "../navigation/AuthProvider";
 
 interface Props {
-  dbOption: "customer" | "inventory" | "user" | "products";
+  dbOption: "customer" | "inventory" | "user" | "products" | "supplier" | "product-type" | "product-type-mat" | "approved-products",
   handleEditRow: (id: string, newItem: any) => void;
   rowParams: GridRenderCellParams<string>;
   initialValue: string;

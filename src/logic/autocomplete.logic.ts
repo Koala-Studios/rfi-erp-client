@@ -7,7 +7,7 @@ import { lookupUser } from "./user.logic";
 export const lookup = async (
   token: string,
   query: string,
-  dbOption: "customer" | "inventory" | "user" | "products" | "supplier" | "product-type",
+  dbOption: "customer" | "inventory" | "user" | "products" | "supplier" | "product-type" | "product-type-mat" | "approved-products",
   letterMin: number
 ) => {
   if (query.length < letterMin) return [];
@@ -24,7 +24,11 @@ export const lookup = async (
     return await lookupUser(token, query);
   }  else if (dbOption === "products") {
     return await lookupInventory(token, query, true);
-  } else if (dbOption === "product-type") {
+  }
+   else if (dbOption === "approved-products") {
+    return await lookupInventory(token, query, true, true);
+  }
+   else if (dbOption === "product-type") {
     return await lookupProductType(token, query, true);
   }
   else if (dbOption === "product-type-mat") {

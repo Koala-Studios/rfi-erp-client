@@ -107,13 +107,15 @@ export const lookupInventory = async (
   //TODO: Not finished
   token: string,
   search_value: string,
-  for_sale: boolean
+  for_sale: boolean,
+  approved?:boolean,
 ): Promise<IInventory[] | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
     params: {
       search_value,
       for_sale,
+      approved
     },
   };
 

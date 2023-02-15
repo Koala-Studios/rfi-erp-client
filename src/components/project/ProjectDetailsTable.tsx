@@ -274,8 +274,6 @@ export const ProjectDetailsTable: React.FC<Props> = ({
         onCellKeyDown={(params, event) => {
           if (event.code == "Space") {
             event.stopPropagation();
-            
-          
           }
         }}
         processRowUpdate={(newRow) => {

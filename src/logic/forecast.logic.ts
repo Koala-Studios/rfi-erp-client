@@ -15,6 +15,16 @@ export interface IForecast {
   amount: number;
 }
 
+export interface IForecastResults {
+  product_id:string;
+  product_code: string;
+  product_name:string;
+  required_amount: number;
+  available_amount: number;
+  on_order_amount: number;
+  on_hand_amount: number;
+
+}
 const api = axios.create({
   baseURL: "http://localhost:5000/forecast",
 });
@@ -22,7 +32,7 @@ const api = axios.create({
 export const calculateForecast = async (
   token: string,
   productLines: IForecast[]
-): Promise<IForecast[]> => {
+): Promise<IForecastResults[]> => {
   const data = {
     products: productLines,
   };
@@ -31,7 +41,7 @@ export const calculateForecast = async (
     headers: { Authorization: `Bearer ${token}` },
   };
 
-  let forecastResult: IForecast[] = [];
+  let forecastResult: IForecastResults[] = [];
 
   await api
     .post("/calculate", data, config)

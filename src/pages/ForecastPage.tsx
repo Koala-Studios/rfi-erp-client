@@ -15,6 +15,7 @@ import { DataTable } from "../components/utils/DataTable";
 import {
   calculateForecast,
   IForecast,
+  IForecastResults,
   IProductLine,
 } from "../logic/forecast.logic";
 import Delete from "@mui/icons-material/Delete";
@@ -28,6 +29,26 @@ export const ForecastPage = () => {
   const auth = React.useContext(AuthContext);
   const [rowCount, setRowCount] = React.useState(0);
   const forecastColumns: GridColDef[] = [
+    {
+      field: "product_id",
+      headerName: "Actions",
+      align: "left",
+      width: 70,
+      renderCell: (params: GridRenderCellParams<string>) => {
+        // const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+        return (
+          <div>
+            <IconButton
+              onClick={() => handleDeleteRow(params.row._id)}
+              aria-label="delete"
+              color="error"
+            >
+              <DeleteIcon />
+            </IconButton>
+          </div>
+        );
+      },
+    },
     { field: "product_code", headerName: "Product Code", width: 150 },
     {
       field: "product_name",
@@ -55,36 +76,7 @@ export const ForecastPage = () => {
       width: 150,
       editable: true,
     },
-    {
-      field: "product_id",
-      headerName: "Actions",
-      align: "left",
-      width: 250,
-      renderCell: (params: GridRenderCellParams<string>) => {
-        // const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-        return (
-          <div>
-            <Button
-              color="primary"
-              variant="contained"
-              size="small"
-              onClick={() =>
-                navigate(`/products/${params.value}`, { replace: false })
-              }
-            >
-              View Product
-            </Button>
-            <IconButton
-              onClick={() => handleDeleteRow(params.row._id)}
-              aria-label="delete"
-              color="error"
-            >
-              <DeleteIcon />
-            </IconButton>
-          </div>
-        );
-      },
-    },
+
   ];
 
   const materialColumns: GridColDef[] = [
@@ -96,7 +88,10 @@ export const ForecastPage = () => {
       sortable: false,
       filterable: false,
     },
-    { field: "amount", headerName: "Quantity", type: "number", width: 150 },
+    { field: "required_amount", headerName: "Required Qty", type: "number", width: 150 },
+    { field: "available_amount", headerName: "Available Qty", type: "number", width: 150 },
+    { field: "on_order_amount", headerName: "Ordered Qty", type: "number", width: 150 },
+    { field: "on_hand_amount", headerName: "On Hand Qty", type: "number", width: 150 },
   ];
 
   const [lineItems, SetLineItems] = React.useState<IProductLine[]>([
@@ -108,7 +103,7 @@ export const ForecastPage = () => {
       amount: 0,
     },
   ]);
-  const [materialRows, setMaterialRows] = React.useState<IForecast[] | null>(
+  const [materialRows, setMaterialRows] = React.useState<IForecastResults[] | null>(
     null
   );
 
@@ -196,7 +191,7 @@ export const ForecastPage = () => {
       };
     });
 
-    calculateForecast(auth.token, forecastList).then((result: IForecast[]) => {
+    calculateForecast(auth.token, forecastList).then((result: IForecastResults[]) => {
       console.log(result);
       const newRows = result.map((item, idx) => {
         return {
@@ -204,7 +199,10 @@ export const ForecastPage = () => {
           product_id: item.product_id,
           product_code: item.product_code,
           product_name: item.product_name,
-          amount: item.amount,
+          required_amount: item.required_amount,
+          available_amount: item.available_amount,
+          on_order_amount: item.on_order_amount,
+          on_hand_amount: item.on_hand_amount          
         };
       });
 
@@ -259,9 +257,12 @@ export const ForecastPage = () => {
           columns={forecastColumns}
           autoHeight={true}
           rowHeight={45}
-          // editMode="cell"
+          onCellKeyDown={(params, event) => {
+            if (event.code == "Space") {
+              event.stopPropagation();
+            }
+          }}
           getRowId={(row) => row._id}
-          // experimentalFeatures={{ newEditingApi: true }}
           processRowUpdate={(newRow) => {
             let pList = lineItems.slice();
             const rowIdx = lineItems.findIndex(
@@ -297,6 +298,7 @@ export const ForecastPage = () => {
           </Typography>
           <DataGrid
             rows={materialRows!}
+            getRowId={(row) => row.product_id}
             columns={materialColumns}
             autoHeight={true}
             rowHeight={45}
