@@ -1,6 +1,7 @@
 import { Logout, Settings } from "@mui/icons-material";
 import { Avatar, Divider, ListItemIcon, Menu, MenuItem } from "@mui/material";
 import React from "react";
+import { AuthContext } from "../navigation/AuthProvider";
 
 interface Props {
   anchorEl: null | HTMLElement;
@@ -10,6 +11,7 @@ interface Props {
 const AccountMenu: React.FC<Props> = ({ anchorEl, setAnchorEl }) => {
   //   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
+  const auth = React.useContext(AuthContext);
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
   };
@@ -64,7 +66,7 @@ const AccountMenu: React.FC<Props> = ({ anchorEl, setAnchorEl }) => {
         </ListItemIcon>
         Settings
       </MenuItem>
-      <MenuItem onClick={handleClose}>
+      <MenuItem onClick={auth.signout}>
         <ListItemIcon>
           <Logout fontSize="small" />
         </ListItemIcon>

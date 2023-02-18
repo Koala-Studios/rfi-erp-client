@@ -2,11 +2,14 @@ import React, { useEffect } from "react";
 import { useLocation, Navigate, useNavigate } from "react-router-dom";
 
 import { ISignIn, signIn } from "../../logic/auth.logic";
+import { IUser } from "../../logic/user.logic";
+import { socketDisconnect, initClientSocket } from "../../logic/user.socket";
 
 interface AuthContextType {
   token: any;
+  user: IUser;
   signin: (user: ISignIn, callback: VoidFunction) => void;
-  signout: (callback: VoidFunction) => void;
+  signout: () => void;
   loadLocalToken: (callback: Function) => void;
 }
 
@@ -14,6 +17,7 @@ export let AuthContext = React.createContext<AuthContextType>(null!);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   let [token, setToken] = React.useState<any>(null);
+  let [currentUser, setCurrentUser] = React.useState<any>(null);
 
   const loadLocalToken = (callback: Function) => {
     const local_token = localStorage.getItem("auth_token");
@@ -26,18 +30,27 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const signin = (user: ISignIn, callback: VoidFunction) => {
     return signIn(user, (data: any) => {
       setToken(data.token);
+
+      console.log(data.user);
+
+      setCurrentUser(data.user);
+      initClientSocket(data.user._id);
+
       callback();
     });
   };
 
-  const signout = (callback: VoidFunction) => {
+  const signout = () => {
+    socketDisconnect();
+    localStorage.removeItem("auth_token");
+    window.location.replace("/");
     // return fakeAuthProvider.signout(() => {
     //   setUser(null);
     //   callback();
     // });
   };
 
-  let value = { token, loadLocalToken, signin, signout };
+  let value = { token, user: currentUser, loadLocalToken, signin, signout };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
