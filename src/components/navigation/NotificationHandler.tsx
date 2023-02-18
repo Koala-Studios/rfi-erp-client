@@ -4,7 +4,8 @@ import MuiAlert, { AlertColor, AlertProps } from "@mui/material/Alert";
 import { SnackbarProvider, VariantType, useSnackbar } from "notistack";
 import { listenToNotifications } from "../../logic/user.socket";
 import { INotification } from "../../logic/user.logic";
-import notification_sound from "../../resources/rfi_logo.svg";
+import { AuthContext } from "./AuthProvider";
+// import gfae from "../../resources/rfi_logo.svg";
 
 // const Alert = React.forwardRef<HTMLDivElement, AlertProps>(function Alert(
 //   props,
@@ -18,27 +19,49 @@ interface INotificationEvent {
   color?: AlertColor;
 }
 
+const notification_sound = require("../../resources/notification_sound.mp3");
 const playNotificationSound = () => {
   new Audio(notification_sound).play();
 };
 
 const NotificationHandler = () => {
   const { enqueueSnackbar } = useSnackbar();
+  const auth = React.useContext(AuthContext);
 
   useEffect(() => {
     // Update the document title using the browser API
-    window.addEventListener("NotificationEvent", (e: any) => {
+
+    const handler = (e: any) => {
       enqueueSnackbar(e.detail.text, {
         variant: e.detail.color ? e.detail.color : "success",
       });
       playNotificationSound();
-    });
+    };
 
-    listenToNotifications((n: INotification) => {
-      enqueueSnackbar(n.text);
-      playNotificationSound();
-    });
+    window.addEventListener("NotificationEvent", handler);
+
+    // listenToNotifications((n: INotification) => {
+    //   enqueueSnackbar(n.text, {
+    //     variant: "info",
+    //   });
+    //   playNotificationSound();
+    // });
+    return () => {
+      window.removeEventListener("NotificationEvent", handler);
+    };
   }, []);
+
+  useEffect(() => {
+    console.log("notifications");
+    if (auth.connected) {
+      listenToNotifications((n: INotification) => {
+        enqueueSnackbar(n.text, {
+          variant: "info",
+        });
+        playNotificationSound();
+      });
+    }
+  }, [auth.connected]);
 
   return <></>;
 };

@@ -1,6 +1,7 @@
 const send = {
   //initial handshake
-  connection: "connection",
+  connection: "connect",
+  disconnection: "disconnect",
   initial_data: "id",
 
   //notification

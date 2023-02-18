@@ -1,13 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useLocation, Navigate, useNavigate } from "react-router-dom";
 
 import { ISignIn, signIn } from "../../logic/auth.logic";
-import { IUser } from "../../logic/user.logic";
+import { IUser, loadUser } from "../../logic/user.logic";
 import { socketDisconnect, initClientSocket } from "../../logic/user.socket";
 
 interface AuthContextType {
   token: any;
-  user: IUser;
+  user: IUser | undefined;
+  connected: boolean;
   signin: (user: ISignIn, callback: VoidFunction) => void;
   signout: () => void;
   loadLocalToken: (callback: Function) => void;
@@ -17,9 +18,37 @@ export let AuthContext = React.createContext<AuthContextType>(null!);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   let [token, setToken] = React.useState<any>(null);
-  let [currentUser, setCurrentUser] = React.useState<any>(null);
+  let [currentUser, setCurrentUser] = React.useState<IUser | undefined>();
+  let [connected, setConnected] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    console.log("helloweoadfodsn");
+    if (currentUser) {
+      console.log("user", currentUser);
+      initClientSocket(token, currentUser._id, setConnected);
+    } else {
+      console.log(token);
+      loadLocalToken((local_token: string) => {
+        console.log("token", local_token);
+
+        loadUser(local_token).then((res: IUser | undefined) => {
+          if (res) {
+            setToken(local_token);
+            setCurrentUser(res);
+
+            navigate("/projects");
+          } else {
+            localStorage.removeItem("auth_token");
+            navigate("/");
+          }
+        });
+      });
+    }
+  }, [currentUser]);
 
   const loadLocalToken = (callback: Function) => {
+    console.log("hello");
     const local_token = localStorage.getItem("auth_token");
 
     if (local_token) {
@@ -31,10 +60,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return signIn(user, (data: any) => {
       setToken(data.token);
 
-      console.log(data.user);
+      console.log(data.user._doc._id);
 
-      setCurrentUser(data.user);
-      initClientSocket(data.user._id);
+      setCurrentUser(data.user._doc);
 
       callback();
     });
@@ -50,7 +78,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     // });
   };
 
-  let value = { token, user: currentUser, loadLocalToken, signin, signout };
+  let value = {
+    token,
+    user: currentUser,
+    connected: connected,
+    loadLocalToken,
+    signin,
+    signout,
+  };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
@@ -65,10 +100,10 @@ export const RequireAuth = ({ children }: { children: JSX.Element }) => {
   const navigate = useNavigate();
 
   if (!auth.token) {
-    auth.loadLocalToken((local_token: string) => {
-      auth.token = local_token;
-      navigate(location);
-    });
+    // auth.loadLocalToken((local_token: string) => {
+    //   auth.token = local_token;
+    //   navigate(location);
+    // });
     // Redirect them to the /login page, but save the current location they were
     // trying to go to when they were redirected. This allows us to send them
     // along to that page after they login, which is a nicer user experience

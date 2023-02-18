@@ -13,9 +13,9 @@ export interface IUser {
   _id: string;
   email: string;
   username: string;
-  user_code: string;
+  user_code?: string;
   created_date: string;
-  notifications: INotification[];
+  notifications?: INotification[];
   //TODO:ROLES & DATES
 }
 
@@ -75,6 +75,26 @@ export const listUsers = async (
     });
 
   return list;
+};
+
+export const loadUser = async (token: string): Promise<IUser | undefined> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
+
+  let user: IUser | undefined;
+  await api
+    .get("/loadUser", config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        console.log("load user", res.data);
+        user = res.data;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  return user;
 };
 
 export const lookupUser = async (
