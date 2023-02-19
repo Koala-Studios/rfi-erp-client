@@ -8,6 +8,7 @@ import { socketDisconnect, initClientSocket } from "../../logic/user.socket";
 interface AuthContextType {
   token: any;
   user: IUser | undefined;
+  setUser: any;
   connected: boolean;
   signin: (user: ISignIn, callback: VoidFunction) => void;
   signout: () => void;
@@ -23,7 +24,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    console.log("helloweoadfodsn");
+    if (connected) return;
+
     if (currentUser) {
       console.log("user", currentUser);
       initClientSocket(token, currentUser._id, setConnected);
@@ -60,9 +62,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return signIn(user, (data: any) => {
       setToken(data.token);
 
-      console.log(data.user._doc._id);
+      console.log(data.user);
 
-      setCurrentUser(data.user._doc);
+      setCurrentUser(data.user);
 
       callback();
     });
@@ -81,6 +83,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   let value = {
     token,
     user: currentUser,
+    setUser: setCurrentUser,
     connected: connected,
     loadLocalToken,
     signin,

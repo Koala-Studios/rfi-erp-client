@@ -3,7 +3,7 @@ import { apiStatus, IListOptions } from "./utils";
 
 export interface INotification {
   _id: string;
-  type: number; //notification type;
+  n_type: number; //notification type;
   text?: string;
   ref?: string; //any reference id needed for notification
   sender?: string;

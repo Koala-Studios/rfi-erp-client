@@ -3,7 +3,7 @@ import Snackbar from "@mui/material/Snackbar";
 import MuiAlert, { AlertColor, AlertProps } from "@mui/material/Alert";
 import { SnackbarProvider, VariantType, useSnackbar } from "notistack";
 import { listenToNotifications } from "../../logic/user.socket";
-import { INotification } from "../../logic/user.logic";
+import { INotification, IUser } from "../../logic/user.logic";
 import { AuthContext } from "./AuthProvider";
 // import gfae from "../../resources/rfi_logo.svg";
 
@@ -52,9 +52,15 @@ const NotificationHandler = () => {
   }, []);
 
   useEffect(() => {
-    console.log("notifications");
-    if (auth.connected) {
+    if (auth.connected && auth.user) {
       listenToNotifications((n: INotification) => {
+        let _user: IUser = {
+          ...auth.user!,
+          notifications: [...auth.user!.notifications!, n],
+        };
+
+        auth.setUser(_user);
+
         enqueueSnackbar(n.text, {
           variant: "info",
         });
