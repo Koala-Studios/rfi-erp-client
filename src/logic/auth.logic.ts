@@ -1,4 +1,5 @@
 import axios from "axios";
+import { IUser } from "./user.logic";
 import { apiStatus } from "./utils";
 
 const api = axios.create({

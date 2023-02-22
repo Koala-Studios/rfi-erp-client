@@ -44,6 +44,7 @@ import Button from "@mui/material/Button";
 import FormHandler from "./FormHandler";
 import OilBarrelIcon from "@mui/icons-material/OilBarrel";
 import AccountMenu from "../menus/AccountMenu";
+import NotificationMenu from "../menus/NotificationMenu";
 
 const drawerWidth = 190;
 
@@ -190,6 +191,7 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
   const auth = React.useContext(AuthContext);
 
   const [accountAnchorEl, setAccountAnchorEl] = React.useState(null);
+  const [notificationAnchorEl, setNotificationAnchorEl] = React.useState(null);
 
   const theme = useTheme();
   const [open, setOpen] = React.useState(true);
@@ -224,14 +226,28 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             {title}
           </Typography>
-          <IconButton size="large" color="primary" sx={{ mr: 1 }}>
-            <StyledBadge badgeContent={6} color="info">
+          <IconButton
+            size="large"
+            color="primary"
+            sx={{ mr: 1 }}
+            onClick={(event: any) => {
+              setNotificationAnchorEl(event.currentTarget);
+            }}
+          >
+            <StyledBadge
+              badgeContent={auth.user?.notifications?.length}
+              color="info"
+            >
               <NotificationsIcon
                 color="primary"
                 sx={{ height: 30, width: 30 }}
               />
             </StyledBadge>
           </IconButton>
+          <NotificationMenu
+            anchorEl={notificationAnchorEl}
+            setAnchorEl={setNotificationAnchorEl}
+          />
           <div
             style={{ padding: 5 }}
             aria-label="account of current user"

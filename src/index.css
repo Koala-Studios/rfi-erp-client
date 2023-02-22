@@ -35,7 +35,9 @@ a {
   background: #ed6c02 !important;
 }
 .SnackbarItem-variantInfo {
-  background-color: #0288d1 !important;
+  background-color: #061e3d !important;
+  /* border:1px solid #bcbcbc; */
+  /* color: black!important; */
 }
 .SnackbarItem-variantError {
   background: #d32f2f !important;
