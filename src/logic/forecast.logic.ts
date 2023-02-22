@@ -23,7 +23,8 @@ export interface IForecastResults {
   available_amount: number;
   on_order_amount: number;
   on_hand_amount: number;
-
+  in_transit_amount: number;
+  reorder_amount: number;
 }
 const api = axios.create({
   baseURL: "http://localhost:5000/forecast",
