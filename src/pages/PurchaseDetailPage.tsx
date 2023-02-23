@@ -79,7 +79,7 @@ export const PurchaseDetailPage = () => {
   );
 
   const [rows, setRows] = React.useState<IOrderItem[]>([]);
-  const [editMode, setEditMode] = React.useState<boolean>(false);
+  const [receiveMode, setReceiveMode] = React.useState<boolean>(false);
 
   useEffect(() => {
     if (id === "new") {
@@ -114,7 +114,7 @@ export const PurchaseDetailPage = () => {
             return item;
           })
         );
-        setEditMode(p!.status <= 3);
+        setReceiveMode(p!.status <= 3);
         // setPurchaseSaved(true);
       });
     }
@@ -122,7 +122,7 @@ export const PurchaseDetailPage = () => {
 
   useEffect(() => {
     if (purchase == null) return;
-    setEditMode(purchase.status <= 3);
+    setReceiveMode(purchase.status <= 3);
 
     if (purchaseSaved === false) return;
 
@@ -133,7 +133,7 @@ export const PurchaseDetailPage = () => {
 
   useEffect(() => {
     //temp maybe
-    if (rows.length != 0 && rows != null && !editMode) {
+    if (rows.length != 0 && rows != null && !receiveMode) {
       if (JSON.stringify(savedPurchase?.order_items) !== JSON.stringify(rows)) {
         setPurchaseSaved(false);
       }
@@ -144,23 +144,24 @@ export const PurchaseDetailPage = () => {
     }
   }, [rows]);
 
-  const editColumns: GridColDef[] = [
-    { field: "product_code", headerName: "Product Code", width: 150 },
-    { field: "product_name", headerName: "Product Name", width: 280 },
+  const receiveColumns: GridColDef[] = [
+    { field: "product_code", headerName: "Product Code", width: 150, editable: false },
+    { field: "product_name", headerName: "Product Name", width: 280, editable: false, renderCell: undefined },
     {
       field: "purchased_amount",
       headerName: "Order Qty(KG)",
       type: "number",
       width: 110,
       align: "center",
+      editable: false
     },
     {
       field: "received_amount",
       headerName: "Received Qty",
       type: "number",
-      editable: false,
       width: 100,
       align: "center",
+      editable: false
     },
     {
       field: "remaining_amount",
@@ -168,6 +169,7 @@ export const PurchaseDetailPage = () => {
       type: "number",
       width: 100,
       align: "center",
+      editable: false,
       valueGetter: (params) =>
         params.row.purchased_amount - params.row.received_amount,
     },
@@ -177,6 +179,7 @@ export const PurchaseDetailPage = () => {
       type: "number",
       width: 100,
       align: "center",
+      editable: false
     },
     {
       field: "lot_number",
@@ -239,7 +242,7 @@ export const PurchaseDetailPage = () => {
       ),
     },
   ];
-  const nonEditColumns: GridColDef[] = [
+  const draftColumns: GridColDef[] = [
     {
       field: "id",
       headerName: "Actions",
@@ -683,7 +686,7 @@ export const PurchaseDetailPage = () => {
           </Button>
           {/* <Switch color="primary"
           disabled={id=== "new"}
-          onChange={() => setEditMode(!editMode)}/>
+          onChange={() => setReceiveMode(!receiveMode)}/>
           Receive Mode */}
         </div>
         <DataGrid
@@ -705,10 +708,10 @@ export const PurchaseDetailPage = () => {
             if (event.code == "Space") {
               event.stopPropagation();
             }
-            // if (editMode !== null) {
+            // if (receiveMode !== null) {
             //   switch (event.code) {
             //     case "Escape": {
-            //       setEditMode(null);
+            //       setReceiveMode(null);
             //       break;
             //     }
             //     // case("Enter"):
@@ -732,7 +735,7 @@ export const PurchaseDetailPage = () => {
               },
             },
           }}
-          columns={editMode ? editColumns : nonEditColumns}
+          columns={receiveMode ? receiveColumns : draftColumns}
           onCellEditCommit={(e, value) => {
             handleEditCell(e.id.toString(), e.field, e.value);
             console.log("test", rows);
