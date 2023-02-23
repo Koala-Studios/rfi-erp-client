@@ -99,8 +99,8 @@ const NotificationMenu: React.FC<Props> = ({ anchorEl, setAnchorEl }) => {
       </Typography>
       <Divider sx={{ mt: 1, mb: 1 }} />
       <div style={{ maxHeight: 600, overflowY: "scroll" }}>
-        {auth.user?.notifications?.map((n: INotification) => (
-          <>
+        {auth.user?.notifications?.map((n: INotification, idx) => (
+          <div key={idx}>
             <MenuItem dense sx={{ justifyContent: "space-between" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
                 <InfoIcon />
@@ -116,7 +116,7 @@ const NotificationMenu: React.FC<Props> = ({ anchorEl, setAnchorEl }) => {
               </IconButton>
             </MenuItem>
             <Divider />
-          </>
+          </div>
         ))}
       </div>
 

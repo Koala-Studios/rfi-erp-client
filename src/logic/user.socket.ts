@@ -12,6 +12,8 @@ export const initClientSocket = (
   userId: string,
   setConnected: any
 ) => {
+  console.log("connecting, userId:", userId);
+
   socket = io(base_url, {
     autoConnect: false,
     auth: { token: token },

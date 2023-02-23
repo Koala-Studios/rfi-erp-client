@@ -34,7 +34,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       loadLocalToken((local_token: string) => {
         console.log("token", local_token);
 
-        loadUser(local_token).then((res: IUser | undefined) => {
+        loadUser(local_token).then((res: any) => {
           if (res) {
             setToken(local_token);
             setCurrentUser(res);
@@ -64,7 +64,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       console.log(data.user);
 
-      setCurrentUser(data.user);
+      let newUser: IUser = {
+        _id: data.user._doc._id,
+        notifications: data.user.notifications,
+        email: data.user._doc.email,
+        username: data.user._doc.username,
+      };
+
+      setCurrentUser(newUser);
 
       callback();
     });

@@ -14,7 +14,7 @@ export interface IUser {
   email: string;
   username: string;
   user_code?: string;
-  created_date: string;
+  created_date?: string;
   notifications?: INotification[];
   //TODO:ROLES & DATES
 }
