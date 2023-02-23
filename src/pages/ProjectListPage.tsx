@@ -18,7 +18,7 @@ const ProjectStatus = [
   ["In Progress", "warning"],
   ["Awaiting Feedback", "info"],
   ["Finished", "success"],
-  ["Error", "error"],
+  ["Draft", "error"],
 ];
 
 const ProjectListPage = () => {

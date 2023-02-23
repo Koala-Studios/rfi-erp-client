@@ -1,4 +1,5 @@
 import { Card, Grid, TextField, Typography } from "@mui/material";
+import Button from "@mui/material/Button";
 import { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { ICustomer } from "../../logic/customer.logic";
@@ -13,6 +14,7 @@ import SaveForm from "../forms/SaveForm";
 import { AuthContext } from "../navigation/AuthProvider";
 import StandaloneAutocomplete from "../utils/StandaloneAutocomplete";
 import { ProjectDetailsTable } from "./ProjectDetailsTable";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 
 // const yyyymmdd = (date: Date) => {
 //   var mm = date.getMonth() + 1; // getMonth() is zero-based
@@ -112,6 +114,15 @@ export const ProjectDetails = () => {
       ></SaveForm>
       {/* <div style={{ height: 50 }}></div> */}
       <Card variant="outlined" style={{ padding: 16 }}>
+        <Button
+          sx={{ mb: 3 }}
+          aria-label="go back"
+          size="medium"
+          variant="outlined"
+          onClick={() => navigate(-1)}
+        >
+          <ArrowBackIcon fontSize="small" />
+        </Button>
         <div style={{ display: "flex", gap: 16 }}>
           <Grid container spacing={3}>
             <Grid item xs={12}>
