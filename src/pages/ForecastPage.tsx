@@ -23,6 +23,18 @@ import TableAutocomplete from "../components/utils/TableAutocomplete";
 import { IInventory } from "../logic/inventory.logic";
 import { ObjectID } from "bson";
 import { useNavigate } from "react-router-dom";
+import { darken, lighten } from '@mui/material/styles';
+
+const getClassName = (row:IForecastResults) => {
+  if(row.required_amount <= row.available_amount) {
+    return (row.available_amount + row.in_transit_amount + row.on_hand_amount) - row.required_amount <= row.reorder_amount ? 'BlueRow' : ''
+  }
+  else if (row.required_amount <= row.available_amount + row.on_order_amount) {
+    return 'YellowRow'
+  } else {
+    return 'RedRow'
+  }
+} 
 
 export const ForecastPage = () => {
   const navigate = useNavigate();
@@ -201,7 +213,9 @@ export const ForecastPage = () => {
           required_amount: item.required_amount,
           available_amount: item.available_amount,
           on_order_amount: item.on_order_amount,
-          on_hand_amount: item.on_hand_amount          
+          on_hand_amount: item.on_hand_amount,
+          in_transit_amount: item.in_transit_amount,
+          reorder_amount: item.reorder_amount  
         };
       });
 
@@ -297,6 +311,7 @@ export const ForecastPage = () => {
           </Typography>
           <DataGrid
             rows={materialRows!}
+            getRowClassName={(params) => getClassName(params.row)}
             getRowId={(row) => row.product_id}
             columns={materialColumns}
             autoHeight={true}

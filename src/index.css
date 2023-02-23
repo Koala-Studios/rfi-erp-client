@@ -35,11 +35,35 @@ a {
   background: #ed6c02 !important;
 }
 .SnackbarItem-variantInfo {
-  background-color: #0288d1 !important;
+  background-color: #061e3d !important;
+  /* border:1px solid #bcbcbc; */
+  /* color: black!important; */
 }
 .SnackbarItem-variantError {
   background: #d32f2f !important;
 }
+
+.BlueRow {
+  background: #787dbd!important
+}
+.BlueRow:hover {
+  background: #908fb6!important
+}
+.YellowRow {
+  background: #ffec81!important
+}
+.YellowRow:hover {
+  background: #fff1a2!important
+}
+.RedRow {
+  background: #d58e8e!important
+}
+.RedRow:hover {
+  background: #d69a9a!important
+}
+
+
+
 
 .SnackbarContent-root {
   box-shadow: 0 5px 10px 0 rgb(200, 200, 200)!important;

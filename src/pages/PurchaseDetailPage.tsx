@@ -158,6 +158,7 @@ export const PurchaseDetailPage = () => {
       field: "received_amount",
       headerName: "Received Qty",
       type: "number",
+      editable:false,
       width: 100,
       align: "center",
     },

@@ -3,16 +3,19 @@ import { apiStatus, IListOptions } from "./utils";
 
 export interface INotification {
   _id: string;
-  action: number;
-  object: string;
+  n_type: number; //notification type;
+  text?: string;
+  ref?: string; //any reference id needed for notification
+  sender?: string;
 }
 
 export interface IUser {
   _id: string;
   email: string;
   username: string;
-  user_code: string;
-  created_date:string;
+  user_code?: string;
+  created_date: string;
+  notifications?: INotification[];
   //TODO:ROLES & DATES
 }
 
@@ -24,14 +27,13 @@ export const getUser = async (
   token: string,
   id: string
 ): Promise<IUser | null> => {
-
-    const config = {
+  const config = {
     headers: { Authorization: `Bearer ${token}` },
     params: {
       id: id,
     },
   };
-  
+
   let user: IUser | null = null;
   await api
     .get("/getUser", config)
@@ -75,28 +77,25 @@ export const listUsers = async (
   return list;
 };
 
+export const loadUser = async (token: string): Promise<IUser | undefined> => {
+  const config = {
+    headers: { Authorization: `Bearer ${token}` },
+  };
 
-// export const getNotifications = async (
-// 	Store: IStore
-// ): Promise<INotification[]> => {
-// 	let notifications: INotification[] = [];
-
-// 	const config = {
-// 		headers: { Authorization: `Bearer ${Store.token}` },
-// 	};
-// 	await api
-// 		.get("/user/getNotifications", config)
-// 		.then((res) => {
-// 			if (res.status === apiStatus.OK) {
-// 				notifications = res.data;
-// 			}
-// 		})
-// 		.catch((err) => {
-// 			console.log(err);
-// 		});
-
-// 	return notifications;
-// };
+  let user: IUser | undefined;
+  await api
+    .get("/loadUser", config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        console.log("load user", res.data);
+        user = res.data;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  return user;
+};
 
 export const lookupUser = async (
   //TODO: Not finished
@@ -124,8 +123,6 @@ export const lookupUser = async (
     });
   return list;
 };
-
-
 
 export const createUser = async (
   token: string,

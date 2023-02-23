@@ -52,16 +52,16 @@ const mainTheme = createTheme({
 function App() {
   return (
     <ThemeProvider theme={mainTheme}>
-      <AuthProvider>
-        <SnackbarProvider
-          anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "right",
-          }}
-          autoHideDuration={2000}
-          maxSnack={4}
-        >
-          <BrowserRouter>
+      <SnackbarProvider
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "right",
+        }}
+        autoHideDuration={2000}
+        maxSnack={4}
+      >
+        <BrowserRouter>
+          <AuthProvider>
             <Routes>
               <Route path="/" element={<SignInPage />} />
               <Route path="/login" element={<SignInPage />} />
@@ -299,9 +299,9 @@ function App() {
                 }
               />
             </Routes>
-          </BrowserRouter>
-        </SnackbarProvider>
-      </AuthProvider>
+          </AuthProvider>
+        </BrowserRouter>
+      </SnackbarProvider>
     </ThemeProvider>
   );
 }
