@@ -158,7 +158,7 @@ export const PurchaseDetailPage = () => {
       field: "received_amount",
       headerName: "Received Qty",
       type: "number",
-      editable:false,
+      editable: false,
       width: 100,
       align: "center",
     },
@@ -318,14 +318,35 @@ export const PurchaseDetailPage = () => {
         })
       );
     } else {
-      handlePurchaseItem(auth.token, row, quarantine);
+      handlePurchaseItem(auth.token, row, quarantine).then((_purchase) => {
+        if (_purchase) {
+          savedPurchase = _purchase;
+          setPurchaseOrder(_purchase);
+          setPurchaseSaved(true);
+          const newRows = rows.map((r) => {
+            if (r._id === row._id) {
+              return ({
+                ...r,
+                received_amount: r.received_amount + row.process_amount,
+                lot_number: '',
+                process_amount: null,
+                container_size: null,
+                expiry_date: null,
+              })
+            }
+            return r
+          })
+          setRows(newRows)
+        } else {
+          console.log("Purchase Not Updated");
+        }
+      });
+
     }
-    console.log(row, purchase?._id);
   };
 
   const handleConfirmPurchase = () => {
     confirmPurchase(auth.token, purchase!, purchase!._id).then((_purchase) => {
-      console.log("confirm purchase", _purchase, _purchase?.status);
       if (_purchase) {
         // window.location.reload();
         savedPurchase = _purchase;
@@ -340,7 +361,10 @@ export const PurchaseDetailPage = () => {
   const handleMarkPurchaseReceived = () => {
     markPurchaseReceived(auth.token, purchase!._id).then((_purchase) => {
       if (_purchase) {
-        window.location.reload();
+        // window.location.reload();
+        savedPurchase = _purchase;
+        setPurchaseOrder(_purchase);
+        setPurchaseSaved(true);
       } else {
         console.log("Purchase Not Updated");
       }
@@ -349,8 +373,11 @@ export const PurchaseDetailPage = () => {
 
   const handleMarkPurchaseCancelled = () => {
     markPurchaseCancelled(auth.token, purchase!._id).then((_purchase) => {
+      console.log("cancel purchase", _purchase, _purchase?.status);
       if (_purchase) {
-        window.location.reload();
+        savedPurchase = _purchase;
+        setPurchaseOrder(_purchase);
+        setPurchaseSaved(true);
       } else {
         console.log("Purchase Not Updated");
       }
@@ -526,7 +553,7 @@ export const PurchaseDetailPage = () => {
                 <Chip
                   label={
                     PurchaseStatus[
-                      purchase?.status ? purchase?.status - 1 : 5
+                    purchase?.status ? purchase?.status - 1 : 5
                     ][0]
                   }
                   sx={{
@@ -538,7 +565,7 @@ export const PurchaseDetailPage = () => {
                   //@ts-ignore
                   color={
                     PurchaseStatus[
-                      purchase?.status ? purchase?.status - 1 : 5
+                    purchase?.status ? purchase?.status - 1 : 5
                     ][1]
                   }
                   variant="outlined"

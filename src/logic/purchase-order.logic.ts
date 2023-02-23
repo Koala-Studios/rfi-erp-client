@@ -4,7 +4,7 @@ import { apiStatus, IListOptions } from "./utils";
 
 
 export interface IOrderItem {
-  _id:string;
+  _id: string;
   product_id: string;
   product_code: string;
   product_name: string;
@@ -14,10 +14,10 @@ export interface IOrderItem {
 }
 
 export interface IOrderItemProcess extends IOrderItem {
-  lot_number:string,
-  process_amount:number,
-  container_size:number,
-  expiry_date:Date,
+  lot_number: string,
+  process_amount: number,
+  container_size: number,
+  expiry_date: Date,
 }
 
 
@@ -32,7 +32,7 @@ export interface IPurchaseOrder {
   date_purchased: string;
   status: number;
   order_code: string;
-  shipping_code:string;
+  shipping_code: string;
   order_items: IOrderItem[];
 }
 
@@ -89,7 +89,7 @@ export const getPurchase = async (
         purchase = res.data.res;
       }
       window.dispatchEvent(
-        new CustomEvent("NotificationEvent", { detail: { text: res.data.message} })
+        new CustomEvent("NotificationEvent", { detail: { text: res.data.message } })
       );
     })
     .catch((err) => {
@@ -153,19 +153,21 @@ export const updatePurchase = async (
 export const confirmPurchase = async (
   token: string,
   purchase: IPurchaseOrder,
-  po_id:string,
+  po_id: string,
 ): Promise<IPurchaseOrder | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
     // params: {po_id: po_id}
   };
-  let rtn = null
+  let rtn = null;
   await api
     .post("/confirm-purchase", purchase, config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
-        console.log(res);
-        rtn = res.data;
+        window.dispatchEvent(
+          new CustomEvent("NotificationEvent", { detail: { text: res.data.message } })
+        );
+        rtn = res.data.res;
       }
 
     })
@@ -178,24 +180,24 @@ export const confirmPurchase = async (
 
 export const markPurchaseReceived = async (
   token: string,
-  po_id:string,
+  po_id: string,
 ): Promise<IPurchaseOrder | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
-    params: {po_id: po_id}
+    params: { po_id: po_id }
   };
 
 
   let rtn = null;
 
   await api
-    .post("/mark-received", po_id,config)
+    .post("/mark-received", po_id, config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
         window.dispatchEvent(
-          new CustomEvent("NotificationEvent", { detail: { text: res.data.message} })
+          new CustomEvent("NotificationEvent", { detail: { text: res.data.message } })
         );
-        rtn = res.data;
+        rtn = res.data.res;
       }
 
     })
@@ -208,11 +210,11 @@ export const markPurchaseReceived = async (
 
 export const markPurchaseCancelled = async (
   token: string,
-  po_id:string,
+  po_id: string,
 ): Promise<IPurchaseOrder | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
-    params: {po_id: po_id}
+    params: { po_id: po_id }
   };
 
   let rtn = null;
@@ -222,9 +224,9 @@ export const markPurchaseCancelled = async (
     .then((res) => {
       if (res.status === apiStatus.OK) {
         window.dispatchEvent(
-          new CustomEvent("NotificationEvent", { detail: { text: res.data.message} })
+          new CustomEvent("NotificationEvent", { detail: { text: res.data.message } })
         );
-        rtn =  res.data;
+        rtn = res.data.res;
       }
 
     })
@@ -241,23 +243,28 @@ export const markPurchaseCancelled = async (
 export const handlePurchaseItem = async (
   token: string,
   purchaseItem: IOrderItemProcess,
-  quarantine:boolean,
-): Promise<IOrderItem | null> => {
+  quarantine: boolean,
+): Promise<IPurchaseOrder | null> => {
   const config = {
     headers: { Authorization: `Bearer ${token}` },
-    params: {quarantine: quarantine}
+    params: { quarantine: quarantine }
   };
+
+  let rtn = null;
 
   await api
     .post("/receive-item", purchaseItem, config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
-        return res.data;
+        window.dispatchEvent(
+          new CustomEvent("NotificationEvent", { detail: { text: res.data.message } })
+        );
+        rtn = res.data.res;
       }
     })
     .catch((err) => {
       console.log(err);
     });
 
-  return null;
+  return rtn;
 };
