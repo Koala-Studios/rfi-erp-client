@@ -96,7 +96,7 @@ const LinkItems = [
   },
   {
     text: "Stock Count",
-    link: "/stock-count",
+    link: "/stock-counts",
     icon: <ContentPasteIcon></ContentPasteIcon>,
   },
   {

@@ -27,7 +27,7 @@ import { UserDetailPage } from "./pages/UserDetailPage";
 import UserListPage from "./pages/UserListPage";
 import DvpListPage from "./pages/DvpListPage";
 import FormulaPage from "./pages/FormulaPage";
-import POListPage from "./pages/POListPage";
+import PurchaseListPage from "./pages/PurchaseListPage";
 import ProjectListPage from "./pages/ProjectListPage";
 import { PurchaseDetailPage } from "./pages/PurchaseDetailPage";
 import SalesListPage from "./pages/SalesListPage";
@@ -37,6 +37,8 @@ import { ProjectDetails } from "./components/project/ProjectDetails";
 import CustomerListPage from "./pages/CustomerListPage";
 import InventoryStockListPage from "./pages/InventoryStockListPage";
 import { SnackbarProvider } from "notistack";
+import StockCountListPage from "./pages/StockCountListPage";
+import { StockCountDetailPage } from "./pages/StockCountDetailPage";
 
 const mainTheme = createTheme({
   palette: {
@@ -119,7 +121,7 @@ function App() {
                 element={
                   <RequireAuth>
                     <Navbar title="Purchase Orders">
-                      <POListPage />
+                      <PurchaseListPage />
                     </Navbar>
                   </RequireAuth>
                 }
@@ -155,11 +157,21 @@ function App() {
                 }
               />
               <Route
-                path="/stock-count"
+                path="/stock-counts"
+                element={
+                  <RequireAuth>
+                    <Navbar title="Stock Counts">
+                      <StockCountListPage />
+                    </Navbar>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/stock-counts:id"
                 element={
                   <RequireAuth>
                     <Navbar title="Stock Count">
-                      <UserListPage />
+                      <StockCountDetailPage />
                     </Navbar>
                   </RequireAuth>
                 }

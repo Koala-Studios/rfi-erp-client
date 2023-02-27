@@ -11,7 +11,7 @@ import { Button, Card, Chip } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { IListData } from "../logic/utils";
 
-const POListPage = () => {
+const PurchaseListPage = () => {
   const navigate = useNavigate();
 
   const columns: GridColDef[] = [
@@ -65,7 +65,7 @@ const POListPage = () => {
   };
 
   if (dataOptions == null) return null;
-  
+
   return (
     <>
       <Card
@@ -76,14 +76,14 @@ const POListPage = () => {
           + New Purchase Order
         </Button>
       </Card>
-        <DataTable
-      rows={dataOptions.rows}
-      columns={columns}
-      listOptions={dataOptions.listOptions}
-    ></DataTable>
-      </>
+      <DataTable
+        rows={dataOptions.rows}
+        columns={columns}
+        listOptions={dataOptions.listOptions}
+      ></DataTable>
+    </>
 
   );
 };
 
-export default POListPage;
+export default PurchaseListPage;
