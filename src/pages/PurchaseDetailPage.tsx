@@ -731,7 +731,7 @@ export const PurchaseDetailPage = () => {
             columns: {
               columnVisibilityModel: {
                 // Hide columns status and traderName, the other columns will remain visible
-                received_amount: id != "new",
+                received_amount: purchase.status != 6,
               },
             },
           }}

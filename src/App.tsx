@@ -167,7 +167,7 @@ function App() {
                 }
               />
               <Route
-                path="/stock-counts:id"
+                path="/stock-counts/:id"
                 element={
                   <RequireAuth>
                     <Navbar title="Stock Count">

@@ -5,15 +5,15 @@ import {
   GridRenderCellParams,
   GridValueGetterParams,
 } from "@mui/x-data-grid";
-import { listStockCounts } from "../logic/stock-count.logic";
+import { IStockCount, listStockCounts } from "../logic/stock-count.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { Button, Card, Chip } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { IListData } from "../logic/utils";
-
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { FilterElement, IListData } from "../logic/utils";
 const StockCountListPage = () => {
   const navigate = useNavigate();
-
+  const [currPage, setCurrPage] = React.useState<number>(1);
+  const [searchParams, setSearchParams] = useSearchParams();
   const columns: GridColDef[] = [
     { field: "order_code", headerName: "SC Code", width: 200 },
     { field: "customer", headerName: "Customer Name", width: 200 },
@@ -32,7 +32,7 @@ const StockCountListPage = () => {
             color="primary"
             size="small"
             onClick={() =>
-              navigate(`/sales-orders/${params.value}`, { replace: false })
+              navigate(`/stock-counts/${params.value}`, { replace: false })
             }
           >
             View Details
@@ -45,26 +45,38 @@ const StockCountListPage = () => {
   const auth = React.useContext(AuthContext);
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
+  const filterArray: FilterElement[] = [
+    { label: "Item Name", field: "name", type: "text" },
+    {
+      label: "Item Code",
+      field: "product_code",
+      type: "text",
+      regexOption: null,
+    },
+  ];
+  
   React.useEffect(() => {
-    listStockCounts(auth.token, 25, 1).then((list) => {
-      const newRows = list!.docs.map((count) => {
-        return {
-          id: count._id,
-          order_code: count.order_code,
-          customer: count.customer,
-          date_orderd: count.date_orderd
-            .toString()
-            .replace(/\T.+/, ""),
-          status: count.status,
-          item_count: count.order_items.length,
-        };
-      });
-      setDataOptions({ rows: newRows, listOptions: list! });
+    listStockCounts(auth.token, 25, currPage, searchParams, filterArray).then((list) => {
+      if(list) {
+        const newRows = list!.docs.map((count:IStockCount) => {
+          return {
+            id: count._id,
+            order_code: count.order_code,
+            date_orderd: count.date_proposed
+              .toString()
+              .replace(/\T.+/, ""),
+            status: count.status,
+            item_count: count.count_items.length,
+          };
+        });
+        setDataOptions({ rows: newRows, listOptions: list! });
+      }
+      
     });
   }, []);
 
   const createNewStockCount = () => {
-    navigate(`/sales/new`, { replace: false });
+    navigate(`/stock-counts/new`, { replace: false });
   };
 
 
