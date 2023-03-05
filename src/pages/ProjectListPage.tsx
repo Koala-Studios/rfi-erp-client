@@ -82,7 +82,7 @@ const ProjectListPage = () => {
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listProjects(auth.token, 25, 1).then((list) => {
+    listProjects(25, 1).then((list) => {
       console.log(list);
       const newRows = list!.docs.map((project) => {
         return {
@@ -108,7 +108,7 @@ const ProjectListPage = () => {
         detail: {
           formType: formTypes.CreateProject,
           onSubmit: (formData: any) => {
-            createProject(auth.token, formData);
+            createProject(formData);
             console.log("hello", formData);
           },
         },

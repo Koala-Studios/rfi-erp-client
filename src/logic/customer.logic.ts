@@ -11,19 +11,18 @@ export interface ICustomer {
   phone?: string;
   email?: string;
   lead_time?: string;
-  createdAt?:string;
+  createdAt?: string;
 }
 
 const api = axios.create({
   baseURL: "http://localhost:5000/customers",
 });
 export const listCustomers = async (
-  token: string,
   count: number,
   page: number
 ): Promise<IListOptions | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       count,
       page,
@@ -46,12 +45,9 @@ export const listCustomers = async (
   return list;
 };
 
-export const getCustomer = async (
-  token: string,
-  id: string
-): Promise<ICustomer | null> => {
+export const getCustomer = async (id: string): Promise<ICustomer | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       id: id,
     },
@@ -74,12 +70,10 @@ export const getCustomer = async (
 };
 
 export const lookupCustomer = async (
-  //TODO: Not finished
-  token: string,
   search_value: string
 ): Promise<ICustomer[] | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       search_value,
     },
@@ -101,11 +95,10 @@ export const lookupCustomer = async (
 };
 
 export const createCustomer = async (
-  token: string,
   formData: ICustomer
 ): Promise<string | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
 
   let rtn = null;
@@ -124,12 +117,9 @@ export const createCustomer = async (
 
   return rtn;
 };
-export const updateCustomer = async (
-  token: string,
-  formData: ICustomer
-): Promise<boolean> => {
+export const updateCustomer = async (formData: ICustomer): Promise<boolean> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
 
   let rtn = false;

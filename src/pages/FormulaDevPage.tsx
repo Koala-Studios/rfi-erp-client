@@ -39,10 +39,9 @@ const FormulaDevPage = () => {
   const [rows, setRows] = React.useState<any>(null);
   const [editMode, setEditMode] = React.useState<string | null>(null);
   const [carrier, setCarrier] = React.useState<string | null>(null);
-  
+
   const [base100, setBase100] = React.useState<boolean>(true);
   const [prodYield, setYield] = React.useState<number>(1.0);
-
 
   const [changedYield, setChangedYield] = React.useState<boolean>(true);
   const [approveonSubmit, setApproveonSubmit] = React.useState<boolean>(false);
@@ -50,7 +49,7 @@ const FormulaDevPage = () => {
   const { id } = useParams();
   const { version } = useParams();
   React.useEffect(() => {
-    getFormula(auth.token, id!, version!).then((formula) => {
+    getFormula(id!, version!).then((formula) => {
       setYield(formula!.yield ? formula!.yield : 1.0);
       setBase100(formula!.base_hundred ? formula!.base_hundred : true);
       if (!formula?.formula_items) {
@@ -90,7 +89,7 @@ const FormulaDevPage = () => {
   const [product, setProduct] = React.useState<IProduct | null>(null);
 
   React.useEffect(() => {
-    getProduct(auth.token, id!).then((product) => {
+    getProduct(id!).then((product) => {
       setProduct(product);
     });
   }, []);
@@ -357,7 +356,7 @@ const FormulaDevPage = () => {
   };
 
   const handleSubmit = async () => {
-    const newVersion:IFormula = {
+    const newVersion: IFormula = {
       product_code: product!.product_code,
       formula_items: rows.map((material: IFormulaDevRow) => {
         return {
@@ -370,18 +369,20 @@ const FormulaDevPage = () => {
       }),
       product_id: product!._id,
       yield: prodYield,
-      base_hundred:base100
+      base_hundred: base100,
     };
     //TODO: WHOLE PAGE NEEDS SLIGHT REWORK LOL.
-    const new_formula = await submitFormula(auth.token, approveonSubmit, newVersion);
-    
+    const new_formula = await submitFormula(approveonSubmit, newVersion);
+
     if (new_formula) {
-      navigate(`/formulas/develop/${new_formula._id}/${version ?? 0 + 1}`, { replace: true });
+      navigate(`/formulas/develop/${new_formula._id}/${version ?? 0 + 1}`, {
+        replace: true,
+      });
     }
   };
 
-  function filterChanges(string: string) {
-    lookupInventory(auth.token, string, false).then((result) => {
+  function filterChanges(str: string) {
+    lookupInventory(str, false).then((result) => {
       const newCatalog = result?.map((item, key) => {
         return {
           id: key,

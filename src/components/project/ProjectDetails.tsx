@@ -59,7 +59,7 @@ export const ProjectDetails = () => {
       savedProject = emptyProject;
       setProject(emptyProject);
     } else {
-      getProject(auth.token, id!).then((p) => {
+      getProject(id!).then((p) => {
         savedProject = p;
         setProject(p!);
         // setProjectSaved(true);
@@ -78,14 +78,14 @@ export const ProjectDetails = () => {
   const saveProject = async () => {
     //send new project to server
     if (id === "new") {
-      const newProjectId = await createProject(auth.token, project!);
+      const newProjectId = await createProject(project!);
 
       if (newProjectId) {
         navigate(`/projects/${newProjectId}`, { replace: true });
         setProject({ ...project!, _id: newProjectId });
       }
     } else {
-      const updated = await updateProject(auth.token, project!);
+      const updated = await updateProject(project!);
 
       if (updated === false) {
         throw Error("Update Project Error");

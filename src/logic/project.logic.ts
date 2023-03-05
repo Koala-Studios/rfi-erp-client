@@ -35,12 +35,11 @@ const api = axios.create({
 });
 
 export const listProjects = async (
-  token: string,
   count: number,
   page: number
 ): Promise<IListOptions | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       count,
       page,
@@ -63,12 +62,9 @@ export const listProjects = async (
   return list;
 };
 
-export const getProject = async (
-  token: string,
-  id: string
-): Promise<IProject | null> => {
+export const getProject = async (id: string): Promise<IProject | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       id: id,
     },
@@ -95,7 +91,7 @@ export const getProject = async (
 //   formData: string
 // ): Promise<IProject | null> => {
 //   const config = {
-//     headers: { Authorization: `Bearer ${token}` },
+//     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
 //   };
 
 //   let project: IProject | null = null;
@@ -116,11 +112,10 @@ export const getProject = async (
 // };
 
 export const createProject = async (
-  token: string,
   formData: IProject
 ): Promise<string | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
 
   let rtn = null;
@@ -140,12 +135,9 @@ export const createProject = async (
 
   return rtn;
 };
-export const updateProject = async (
-  token: string,
-  formData: IProject
-): Promise<boolean> => {
+export const updateProject = async (formData: IProject): Promise<boolean> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
 
   let rtn = false;

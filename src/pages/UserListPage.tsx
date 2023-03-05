@@ -44,7 +44,7 @@ const UserListPage = () => {
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listUsers(auth.token, 25, 1).then((list) => {
+    listUsers(25, 1).then((list) => {
       const newRows = list!.docs.map((user) => {
         return {
           id: user._id,

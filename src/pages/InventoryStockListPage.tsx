@@ -208,7 +208,7 @@ const InventoryStockListPage = () => {
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listInventoryStock(auth.token, 25, 1, true).then((list) => {
+    listInventoryStock(25, 1, true).then((list) => {
       console.log(list);
       const newRows = list!.docs.map((item) => {
         return {
@@ -282,7 +282,7 @@ const InventoryStockListPage = () => {
         variant="outlined"
         sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
       >
-        <DataFilter filters={filterArray} params={searchParams} />
+        <DataFilter filters={filterArray} />
       </Card>
       <div
         style={{ height: "calc(100% - 140px)", maxHeight: "calc(100% - 85px)" }}

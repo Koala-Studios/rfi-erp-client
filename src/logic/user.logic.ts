@@ -23,12 +23,9 @@ const api = axios.create({
   baseURL: "http://localhost:5000/user",
 });
 
-export const getUser = async (
-  token: string,
-  id: string
-): Promise<IUser | null> => {
+export const getUser = async (id: string): Promise<IUser | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       id: id,
     },
@@ -49,12 +46,11 @@ export const getUser = async (
 };
 
 export const listUsers = async (
-  token: string,
   count: number,
   page: number
 ): Promise<IListOptions | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       count,
       page,
@@ -79,7 +75,7 @@ export const listUsers = async (
 
 export const loadUser = async (token: string): Promise<IUser | undefined> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
 
   let user: IUser | undefined;
@@ -98,12 +94,10 @@ export const loadUser = async (token: string): Promise<IUser | undefined> => {
 };
 
 export const lookupUser = async (
-  //TODO: Not finished
-  token: string,
   search_value: string
 ): Promise<IUser[] | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       search_value,
     },
@@ -124,12 +118,9 @@ export const lookupUser = async (
   return list;
 };
 
-export const createUser = async (
-  token: string,
-  formData: IUser
-): Promise<string | null> => {
+export const createUser = async (formData: IUser): Promise<string | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
 
   let rtn = null;
@@ -149,12 +140,9 @@ export const createUser = async (
 
   return rtn;
 };
-export const updateUser = async (
-  token: string,
-  formData: IUser
-): Promise<boolean> => {
+export const updateUser = async (formData: IUser): Promise<boolean> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
 
   let rtn = false;

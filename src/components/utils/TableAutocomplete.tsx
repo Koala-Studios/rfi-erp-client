@@ -5,7 +5,15 @@ import { lookup } from "../../logic/autocomplete.logic";
 import { AuthContext } from "../navigation/AuthProvider";
 
 interface Props {
-  dbOption: "customer" | "inventory" | "user" | "products" | "supplier" | "product-type" | "product-type-mat" | "approved-products",
+  dbOption:
+    | "customer"
+    | "inventory"
+    | "user"
+    | "products"
+    | "supplier"
+    | "product-type"
+    | "product-type-mat"
+    | "approved-products";
   handleEditRow: (id: string, newItem: any) => void;
   rowParams: GridRenderCellParams<string>;
   initialValue: string;
@@ -29,11 +37,9 @@ const TableAutocomplete: React.FC<Props> = ({
     event: React.SyntheticEvent<Element, Event>,
     value: string
   ) => {
-    lookup(auth.token, value.toUpperCase(), dbOption, letterMin).then(
-      (result) => {
-        setOptionList(result);
-      }
-    );
+    lookup(value.toUpperCase(), dbOption, letterMin).then((result) => {
+      setOptionList(result);
+    });
   };
 
   if (editMode) {
@@ -128,7 +134,7 @@ export default TableAutocomplete;
 // }
 
 // function filterChanges(string: string) {
-//   lookupInventory(auth.token, string, false).then((result) => {
+//   lookupInventory(string, false).then((result) => {
 //     const newCatalog = result?.map((item, key) => {
 //       return {
 //         id: key,

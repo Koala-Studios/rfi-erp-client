@@ -28,7 +28,7 @@ const StandaloneAutocomplete: React.FC<Props> = ({
 
   useEffect(() => {
     if (letterMin === 0) {
-      lookup(auth.token, "", dbOption, letterMin).then((result) => {
+      lookup("", dbOption, letterMin).then((result) => {
         setOptionList(result);
       });
     }
@@ -38,11 +38,9 @@ const StandaloneAutocomplete: React.FC<Props> = ({
     event: React.SyntheticEvent<Element, Event>,
     value: string
   ) => {
-    lookup(auth.token, value.toUpperCase(), dbOption, letterMin).then(
-      (result) => {
-        setOptionList(result);
-      }
-    );
+    lookup(value.toUpperCase(), dbOption, letterMin).then((result) => {
+      setOptionList(result);
+    });
   };
 
   return (
@@ -101,7 +99,7 @@ export default StandaloneAutocomplete;
 //       _id: "",
 //       name: textValue,
 //     };
-//     createCustomer(auth.token, newCustomer).then((customerId) => {
+//     createCustomer(newCustomer).then((customerId) => {
 //       if (customerId) {
 //         newCustomer._id = customerId;
 //         setDisplayList([newCustomer, ...displayList]);

@@ -46,15 +46,13 @@ const SalesListPage = () => {
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listSalesOrders(auth.token, 25, 1).then((list) => {
+    listSalesOrders(25, 1).then((list) => {
       const newRows = list!.docs.map((order) => {
         return {
           id: order._id,
           order_code: order.order_code,
           customer: order.customer,
-          date_orderd: order.date_orderd
-            .toString()
-            .replace(/\T.+/, ""),
+          date_orderd: order.date_orderd.toString().replace(/\T.+/, ""),
           status: order.status,
           item_count: order.order_items.length,
         };
@@ -67,25 +65,27 @@ const SalesListPage = () => {
     navigate(`/sales/new`, { replace: false });
   };
 
-
-
   if (dataOptions == null) return null;
-  
+
   return (
     <>
-    <Card
-    variant="outlined"
-    sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
-  >
-    <Button variant="contained" color="primary" onClick={createNewSalesOrder}>
-      + New Sales Order
-    </Button>
-  </Card>
-    <DataTable
-      rows={dataOptions.rows}
-      columns={columns}
-      listOptions={dataOptions.listOptions}
-    ></DataTable>
+      <Card
+        variant="outlined"
+        sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
+      >
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={createNewSalesOrder}
+        >
+          + New Sales Order
+        </Button>
+      </Card>
+      <DataTable
+        rows={dataOptions.rows}
+        columns={columns}
+        listOptions={dataOptions.listOptions}
+      ></DataTable>
     </>
   );
 };

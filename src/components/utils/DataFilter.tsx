@@ -9,7 +9,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { FilterElement, paramsToObject } from "../../logic/utils";
 import { redirect } from "react-router-dom";
 import SimpleSelect from "./SimpleSelect";
@@ -18,13 +18,13 @@ import SearchIcon from "@mui/icons-material/Search";
 
 interface Props {
   filters: FilterElement[];
-  params: URLSearchParams;
 }
 
 let paramsObj: any;
 
-const DataFilter: React.FC<Props> = ({ params, filters }) => {
+const DataFilter: React.FC<Props> = ({ filters }) => {
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const filterEls = useRef<any[]>([]);
   const [open, setOpen] = useState(false);
 
@@ -34,30 +34,32 @@ const DataFilter: React.FC<Props> = ({ params, filters }) => {
 
       return;
     }
-    paramsObj = paramsToObject(params);
-
-    if (Object.keys(paramsObj).length === 0) return;
 
     for (let i = 0; i < filters.length; i++) {
-      filterEls.current[i].value = paramsObj[filters[i].field]
-        ? paramsObj[filters[i].field]
-        : "";
+      const val = searchParams.get(filters[i].field);
+      if (val) {
+        filterEls.current[i].value = val;
+      }
     }
   }, [open]);
 
   const handleSearchClicked = () => {
-    // if (!paramsObj) return;
-
-    let query = "?";
-
     for (let i = 0; i < filters.length; i++) {
       const filterVal = filterEls.current[i].value;
-      if (filterVal !== "") {
-        query += `${filters[i].field}=${filterEls.current[i].value}&`;
+      if (filterVal && filterVal !== "") {
+        if (searchParams.has(filters[i].field)) {
+          searchParams.set(filters[i].field, filterVal);
+          console.log("set value");
+        } else {
+          searchParams.append(filters[i].field, filterVal);
+          console.log("added value");
+        }
+      } else if (searchParams.has(filters[i].field)) {
+        searchParams.delete(filters[i].field);
       }
     }
-    navigate(query, { replace: false });
-    console.log(query);
+    setSearchParams(searchParams);
+    console.log(searchParams);
   };
 
   const handleClearAll = () => {

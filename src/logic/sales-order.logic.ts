@@ -27,12 +27,11 @@ const api = axios.create({
 });
 
 export const listSalesOrders = async (
-  token: string,
   count: number,
   page: number
 ): Promise<IListOptions | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       count,
       page,
@@ -56,11 +55,10 @@ export const listSalesOrders = async (
 };
 
 export const getSalesOrder = async (
-  token: string,
   id: string
 ): Promise<ISalesOrder | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       id: id,
     },
@@ -75,7 +73,9 @@ export const getSalesOrder = async (
         sales_order = res.data.res;
       }
       window.dispatchEvent(
-        new CustomEvent("NotificationEvent", {  detail: {text: res.data.message} })
+        new CustomEvent("NotificationEvent", {
+          detail: { text: res.data.message },
+        })
       );
     })
     .catch((err) => {

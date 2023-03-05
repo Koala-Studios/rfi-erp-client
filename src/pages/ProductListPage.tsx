@@ -70,7 +70,7 @@ const ProductListPage = () => {
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listProducts(auth.token, 25, 1,true).then((list) => {
+    listProducts(25, 1, true).then((list) => {
       const newRows = list!.docs.map((product) => {
         return {
           id: product._id,
@@ -91,25 +91,23 @@ const ProductListPage = () => {
     navigate(`/products/new`, { replace: false });
   };
 
-
-
   if (dataOptions == null) return null;
-  
+
   return (
     <>
-    <Card
-    variant="outlined"
-    sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
-  >
-    <Button variant="contained" color="primary" onClick={createNewProduct}>
-      + New Product
-    </Button>
-  </Card>
-    <DataTable
-      rows={dataOptions.rows}
-      columns={columns}
-      listOptions={dataOptions.listOptions}
-    ></DataTable>
+      <Card
+        variant="outlined"
+        sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
+      >
+        <Button variant="contained" color="primary" onClick={createNewProduct}>
+          + New Product
+        </Button>
+      </Card>
+      <DataTable
+        rows={dataOptions.rows}
+        columns={columns}
+        listOptions={dataOptions.listOptions}
+      ></DataTable>
     </>
   );
 };

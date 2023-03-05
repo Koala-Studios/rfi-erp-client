@@ -22,7 +22,7 @@ export const SalesDetailPage = () => {
   ];
 
   useEffect(() => {
-    getSalesOrder(auth.token, id!).then((order) => {
+    getSalesOrder(id!).then((order) => {
       setSalesOrder(order);
       const newRows = order!.order_items.map((item) => {
         return {
@@ -67,11 +67,11 @@ export const SalesDetailPage = () => {
         View Formula
       </Button>
       <Card variant="outlined" sx={{ padding: 5, overflowY: "auto" }}>
-        <DataTable
+        {/* <DataTable
           auto_height={true}
           rows={rows!}
           columns={columns}
-        ></DataTable>
+        ></DataTable> */}
       </Card>
       ;
     </Card>

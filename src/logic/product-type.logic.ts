@@ -5,20 +5,19 @@ export interface IProductType {
   _id: string;
   name: string;
   code: string;
-  is_raw:boolean;
-  for_sale:boolean
+  is_raw: boolean;
+  for_sale: boolean;
 }
 
 const api = axios.create({
   baseURL: "http://localhost:5000/product-types",
 });
 export const listproductTypes = async (
-  token: string,
   count: number,
   page: number
 ): Promise<IListOptions | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       count,
       page,
@@ -42,11 +41,10 @@ export const listproductTypes = async (
 };
 
 export const getproductType = async (
-  token: string,
   id: string
 ): Promise<IProductType | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       id: id,
     },
@@ -69,15 +67,14 @@ export const getproductType = async (
 };
 
 export const lookupProductType = async (
-  //TODO: Not finished
-  token: string,
   search_value: string,
-  f_sale:boolean
+  f_sale: boolean
 ): Promise<IProductType[] | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
-      search_value,f_sale
+      search_value,
+      f_sale,
     },
   };
 
@@ -97,11 +94,10 @@ export const lookupProductType = async (
 };
 
 export const createproductType = async (
-  token: string,
   formData: IProductType
 ): Promise<string | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
 
   let rtn = null;
@@ -121,11 +117,10 @@ export const createproductType = async (
   return rtn;
 };
 export const updateproductType = async (
-  token: string,
   formData: IProductType
 ): Promise<boolean> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
 
   let rtn = false;

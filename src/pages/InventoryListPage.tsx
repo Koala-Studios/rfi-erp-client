@@ -74,24 +74,22 @@ const InventoryListPage = () => {
   ];
 
   React.useEffect(() => {
-    listInventory(auth.token, 25, currPage, searchParams, filterArray).then(
-      (list) => {
-        const newRows = list!.docs.map((item) => {
-          return {
-            id: item._id,
-            product_id: item.product_code,
-            name: item.name,
-            cost: item.cost,
-            reorder_amount: item.reorder_amount ?? 0,
-            on_hand: item.on_hand ?? 0,
-            on_order: item.on_order ?? 0,
-            quarantined: item.quarantined ?? 0,
-            allocated: item.allocated ?? 0,
-          };
-        });
-        setDataOptions({ rows: newRows, listOptions: list! });
-      }
-    );
+    listInventory(25, currPage, searchParams, filterArray).then((list) => {
+      const newRows = list!.docs.map((item) => {
+        return {
+          id: item._id,
+          product_id: item.product_code,
+          name: item.name,
+          cost: item.cost,
+          reorder_amount: item.reorder_amount ?? 0,
+          on_hand: item.on_hand ?? 0,
+          on_order: item.on_order ?? 0,
+          quarantined: item.quarantined ?? 0,
+          allocated: item.allocated ?? 0,
+        };
+      });
+      setDataOptions({ rows: newRows, listOptions: list! });
+    });
   }, [currPage, location.key]);
   const createNewMaterial = () => {
     navigate(`/inventory/new`, { replace: false });
@@ -105,7 +103,7 @@ const InventoryListPage = () => {
         variant="outlined"
         sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
       >
-        <DataFilter params={searchParams} filters={filterArray}></DataFilter>
+        <DataFilter filters={filterArray}></DataFilter>
 
         <Button variant="contained" color="primary" onClick={createNewMaterial}>
           + New Material

@@ -87,7 +87,7 @@ export const PurchaseDetailPage = () => {
       setPurchaseOrder(emptyPurchase);
       setRows([]);
     } else {
-      getPurchase(auth.token, id!).then((p) => {
+      getPurchase(id!).then((p) => {
         const tempPurchase = { ...p! };
         savedPurchase = tempPurchase;
         setPurchaseOrder(p!);
@@ -145,15 +145,26 @@ export const PurchaseDetailPage = () => {
   }, [rows]);
 
   const receiveColumns: GridColDef[] = [
-    { field: "product_code", headerName: "Product Code", width: 150, editable: false },
-    { field: "product_name", headerName: "Product Name", width: 280, editable: false, renderCell: undefined },
+    {
+      field: "product_code",
+      headerName: "Product Code",
+      width: 150,
+      editable: false,
+    },
+    {
+      field: "product_name",
+      headerName: "Product Name",
+      width: 280,
+      editable: false,
+      renderCell: undefined,
+    },
     {
       field: "purchased_amount",
       headerName: "Order Qty(KG)",
       type: "number",
       width: 110,
       align: "center",
-      editable: false
+      editable: false,
     },
     {
       field: "received_amount",
@@ -161,7 +172,7 @@ export const PurchaseDetailPage = () => {
       type: "number",
       width: 100,
       align: "center",
-      editable: false
+      editable: false,
     },
     {
       field: "remaining_amount",
@@ -179,7 +190,7 @@ export const PurchaseDetailPage = () => {
       type: "number",
       width: 100,
       align: "center",
-      editable: false
+      editable: false,
     },
     {
       field: "lot_number",
@@ -321,35 +332,34 @@ export const PurchaseDetailPage = () => {
         })
       );
     } else {
-      handlePurchaseItem(auth.token, row, quarantine).then((_purchase) => {
+      handlePurchaseItem(row, quarantine).then((_purchase) => {
         if (_purchase) {
           savedPurchase = _purchase;
           setPurchaseOrder(_purchase);
           setPurchaseSaved(true);
           const newRows = rows.map((r) => {
             if (r._id === row._id) {
-              return ({
+              return {
                 ...r,
                 received_amount: r.received_amount + row.process_amount,
-                lot_number: '',
+                lot_number: "",
                 process_amount: null,
                 container_size: null,
                 expiry_date: null,
-              })
+              };
             }
-            return r
-          })
-          setRows(newRows)
+            return r;
+          });
+          setRows(newRows);
         } else {
           console.log("Purchase Not Updated");
         }
       });
-
     }
   };
 
   const handleConfirmPurchase = () => {
-    confirmPurchase(auth.token, purchase!, purchase!._id).then((_purchase) => {
+    confirmPurchase(purchase!, purchase!._id).then((_purchase) => {
       if (_purchase) {
         // window.location.reload();
         savedPurchase = _purchase;
@@ -362,7 +372,7 @@ export const PurchaseDetailPage = () => {
   };
 
   const handleMarkPurchaseReceived = () => {
-    markPurchaseReceived(auth.token, purchase!._id).then((_purchase) => {
+    markPurchaseReceived(purchase!._id).then((_purchase) => {
       if (_purchase) {
         // window.location.reload();
         savedPurchase = _purchase;
@@ -375,7 +385,7 @@ export const PurchaseDetailPage = () => {
   };
 
   const handleMarkPurchaseCancelled = () => {
-    markPurchaseCancelled(auth.token, purchase!._id).then((_purchase) => {
+    markPurchaseCancelled(purchase!._id).then((_purchase) => {
       console.log("cancel purchase", _purchase, _purchase?.status);
       if (_purchase) {
         savedPurchase = _purchase;
@@ -439,13 +449,13 @@ export const PurchaseDetailPage = () => {
   const savePurchase = async () => {
     //send new purchase to server
     if (id === "new") {
-      const newPurchaseId = await createPurchase(auth.token, purchase!);
+      const newPurchaseId = await createPurchase(purchase!);
       if (newPurchaseId) {
         navigate(`/purchase-orders/${newPurchaseId}`, { replace: true });
         setPurchaseOrder({ ...purchase!, _id: newPurchaseId });
       }
     } else {
-      const updated = await updatePurchase(auth.token, purchase!);
+      const updated = await updatePurchase(purchase!);
 
       if (updated === false) {
         throw Error("Update Purchase Error");
@@ -556,7 +566,7 @@ export const PurchaseDetailPage = () => {
                 <Chip
                   label={
                     PurchaseStatus[
-                    purchase?.status ? purchase?.status - 1 : 5
+                      purchase?.status ? purchase?.status - 1 : 5
                     ][0]
                   }
                   sx={{
@@ -568,7 +578,7 @@ export const PurchaseDetailPage = () => {
                   //@ts-ignore
                   color={
                     PurchaseStatus[
-                    purchase?.status ? purchase?.status - 1 : 5
+                      purchase?.status ? purchase?.status - 1 : 5
                     ][1]
                   }
                   variant="outlined"

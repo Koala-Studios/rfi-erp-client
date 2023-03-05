@@ -79,8 +79,6 @@ const StockCountListPage = () => {
     navigate(`/stock-counts/new`, { replace: false });
   };
 
-
-
   if (dataOptions == null) return null;
 
   return (
@@ -89,7 +87,11 @@ const StockCountListPage = () => {
         variant="outlined"
         sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
       >
-        <Button variant="contained" color="primary" onClick={createNewStockCount}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={createNewStockCount}
+        >
           + New Stock Count
         </Button>
       </Card>

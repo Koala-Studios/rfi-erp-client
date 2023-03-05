@@ -28,7 +28,6 @@ const filterArray: FilterElement[] = [
     label: "Product Code",
     field: "product_code",
     type: "text",
-    regexOption: null,
   },
   { label: "Batch Code", field: "batch_code", type: "text" },
   { label: "Quantity", field: "quantity", type: "number", regexOption: null },
@@ -48,27 +47,23 @@ const BatchingListPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const auth = React.useContext(AuthContext);
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
-  const [currPage, setCurrPage] = React.useState<number>(1);
 
   React.useEffect(() => {
-    listBatching(auth.token, 25, currPage, searchParams, filterArray).then(
-      (list) => {
-        const newRows = list!.docs.map((batch) => {
-          return {
-            id: batch._id,
-            batch_code: batch.batch_code,
-            date: batch.date_created.toString().replace(/\T.+/, ""),
-            quantity: batch.quantity,
-            product_code: batch.product_code,
-            product_name: batch.product_name,
-          };
-        });
-        setDataOptions({ rows: newRows, listOptions: list! });
-      }
-    );
-  }, [currPage, location.key]);
+    listBatching(searchParams, filterArray).then((list) => {
+      const newRows = list!.docs.map((batch) => {
+        return {
+          id: batch._id,
+          batch_code: batch.batch_code,
+          date: batch.date_created.toString().replace(/\T.+/, ""),
+          quantity: batch.quantity,
+          product_code: batch.product_code,
+          product_name: batch.product_name,
+        };
+      });
+      setDataOptions({ rows: newRows, listOptions: list! });
+    });
+  }, [location.key]);
   const createNewBatching = () => {
     navigate(`/batching/new`, { replace: false });
   };
@@ -81,7 +76,7 @@ const BatchingListPage = () => {
         variant="outlined"
         sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
       >
-        <DataFilter params={searchParams} filters={filterArray}></DataFilter>
+        <DataFilter filters={filterArray}></DataFilter>
 
         <Button variant="contained" color="primary" onClick={createNewBatching}>
           + New Production
@@ -91,8 +86,6 @@ const BatchingListPage = () => {
         rows={dataOptions.rows}
         columns={columns}
         listOptions={dataOptions.listOptions}
-        setCurrentPage={setCurrPage}
-        currentPage={currPage}
       ></DataTable>
     </>
   );

@@ -13,21 +13,19 @@ import { apiStatus, IListOptions } from "./utils";
 //   status: number;
 // }
 
-
 interface IRegulatoryContainer {
-  fda_status?:number;
-  cpl_hazard?:string;
-  fema_number?:number;
-  ttb_status?:string;
-  eu_status?:number;
-  organic?:boolean;
-  kosher?:boolean;
+  fda_status?: number;
+  cpl_hazard?: string;
+  fema_number?: number;
+  ttb_status?: string;
+  eu_status?: number;
+  organic?: boolean;
+  kosher?: boolean;
 }
 
-
 interface IProductCustomers {
-  customer_id:ObjectId,
-  name:string
+  customer_id: ObjectId;
+  name: string;
 }
 interface IProductContainer {
   batch_code: string;
@@ -39,44 +37,40 @@ interface IProductContainer {
   quarantined: number;
 }
 
-export interface IProduct{
-  _id:string;
-  name:string;
-  description:string;
-  rating:number | null;
+export interface IProduct {
+  _id: string;
+  name: string;
+  description: string;
+  rating: number | null;
   product_code: string;
   is_raw_mat?: boolean;
-  for_sale?:boolean;
+  for_sale?: boolean;
   cost: number;
   stock?: IProductContainer;
   customers: IProductCustomers[];
-  regulatory:IRegulatoryContainer;
+  regulatory: IRegulatoryContainer;
   versions: number;
   status: number;
   approved_version: number;
-  rec_dose_rate?:number;
-  product_type:{name:string,_id:string} | null
+  rec_dose_rate?: number;
+  product_type: { name: string; _id: string } | null;
 }
-
 
 const api = axios.create({
   baseURL: "http://localhost:5000/products",
 });
 
-
-
 export const listProducts = async (
-  token: string,
   count: number,
   page: number,
   approved?: boolean
 ): Promise<IListOptions | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       count,
       page,
-      approved
+      approved,
     },
   };
 
@@ -96,12 +90,9 @@ export const listProducts = async (
   return list;
 };
 
-export const getProduct = async (
-  token: string,
-  id: string
-): Promise<IProduct | null> => {
+export const getProduct = async (id: string): Promise<IProduct | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       id: id,
     },
@@ -124,11 +115,10 @@ export const getProduct = async (
 };
 
 export const createProduct = async (
-  token: string,
   formData: IProduct
 ): Promise<string | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
 
   let rtn = null;
@@ -148,12 +138,9 @@ export const createProduct = async (
 
   return rtn;
 };
-export const updateProduct = async (
-  token: string,
-  formData: IProduct
-): Promise<boolean> => {
+export const updateProduct = async (formData: IProduct): Promise<boolean> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
 
   let rtn = false;

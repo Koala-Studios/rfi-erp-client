@@ -10,16 +10,15 @@ import {
 } from "@mui/x-data-grid";
 import { Pagination, Typography } from "@mui/material";
 import { IListOptions } from "../../logic/utils";
+import { useSearchParams } from "react-router-dom";
 
 interface Props {
   title?: string;
   rows: any[];
   columns: GridColDef[];
   auto_height?: boolean;
-  listOptions?: IListOptions;
+  listOptions: IListOptions;
   handleDBClick?: GridEventListener<"rowClick">;
-  setCurrentPage?: (page: number) => void;
-  currentPage?: number;
 }
 
 export const DataTable: React.FC<Props> = ({
@@ -29,8 +28,6 @@ export const DataTable: React.FC<Props> = ({
   auto_height = false,
   listOptions,
   handleDBClick,
-  setCurrentPage,
-  currentPage,
 }) => {
   const CustomToolbar: React.FC = () => {
     return (
@@ -46,22 +43,37 @@ export const DataTable: React.FC<Props> = ({
   };
 
   const CustomPagination = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
+
+    let currPage = 1;
+
+    if (searchParams.has("page")) {
+      currPage = parseInt(searchParams.get("page")!);
+    }
+
     return (
       <div style={{ display: "flex", alignItems: "center" }}>
         <Pagination
           color="primary"
           count={listOptions!.totalPages - 1}
-          page={currentPage!}
+          page={currPage}
           shape="rounded"
           variant="outlined"
           sx={{ mr: 2 }}
-          //@ts-ignore
-          onChange={(event, value) => setCurrentPage(value)}
+          onChange={(event, value) => {
+            if (searchParams.has("page")) {
+              searchParams.set("page", value.toString());
+            } else {
+              searchParams.append("page", value.toString());
+            }
+
+            setSearchParams(searchParams);
+          }}
         />
         <Typography variant="subtitle2" sx={{ mr: 2 }}>{`${
-          listOptions!.pagingCounter
-        }-${listOptions!.pagingCounter + listOptions!.limit} of ${
-          listOptions!.totalDocs
+          listOptions.pagingCounter
+        }-${listOptions.pagingCounter + listOptions.limit} of ${
+          listOptions.totalDocs
         }`}</Typography>
       </div>
     );
@@ -81,7 +93,7 @@ export const DataTable: React.FC<Props> = ({
         rowHeight={39}
         pageSize={25}
         pagination
-        rowCount={listOptions!.totalDocs}
+        rowCount={listOptions.totalDocs}
         rowsPerPageOptions={[25]}
         components={{
           Toolbar: CustomToolbar,

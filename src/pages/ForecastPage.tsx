@@ -23,18 +23,26 @@ import TableAutocomplete from "../components/utils/TableAutocomplete";
 import { IInventory } from "../logic/inventory.logic";
 import { ObjectID } from "bson";
 import { useNavigate } from "react-router-dom";
-import { darken, lighten } from '@mui/material/styles';
+import { darken, lighten } from "@mui/material/styles";
 
-const getClassName = (row:IForecastResults) => {
-  if(row.required_amount <= row.available_amount) {
-    return (row.available_amount + row.in_transit_amount + row.on_hand_amount) - row.required_amount <= row.reorder_amount ? 'BlueRow' : ''
-  }
-  else if (row.required_amount <= row.available_amount + row.on_order_amount) {
-    return 'YellowRow'
+const getClassName = (row: IForecastResults) => {
+  if (row.required_amount <= row.available_amount) {
+    return row.available_amount +
+      row.in_transit_amount +
+      row.on_hand_amount -
+      row.required_amount <=
+      row.reorder_amount
+      ? "BlueRow"
+      : "";
+  } else if (
+    row.required_amount <=
+    row.available_amount + row.on_order_amount
+  ) {
+    return "YellowRow";
   } else {
-    return 'RedRow'
+    return "RedRow";
   }
-} 
+};
 
 export const ForecastPage = () => {
   const navigate = useNavigate();
@@ -99,10 +107,30 @@ export const ForecastPage = () => {
       sortable: false,
       filterable: false,
     },
-    { field: "required_amount", headerName: "Required Qty", type: "number", width: 150 },
-    { field: "available_amount", headerName: "Available Qty", type: "number", width: 150 },
-    { field: "on_order_amount", headerName: "Ordered Qty", type: "number", width: 150 },
-    { field: "on_hand_amount", headerName: "On Hand Qty", type: "number", width: 150 },
+    {
+      field: "required_amount",
+      headerName: "Required Qty",
+      type: "number",
+      width: 150,
+    },
+    {
+      field: "available_amount",
+      headerName: "Available Qty",
+      type: "number",
+      width: 150,
+    },
+    {
+      field: "on_order_amount",
+      headerName: "Ordered Qty",
+      type: "number",
+      width: 150,
+    },
+    {
+      field: "on_hand_amount",
+      headerName: "On Hand Qty",
+      type: "number",
+      width: 150,
+    },
   ];
 
   const [lineItems, SetLineItems] = React.useState<IProductLine[]>([
@@ -114,9 +142,9 @@ export const ForecastPage = () => {
       amount: 0,
     },
   ]);
-  const [materialRows, setMaterialRows] = React.useState<IForecastResults[] | null>(
-    null
-  );
+  const [materialRows, setMaterialRows] = React.useState<
+    IForecastResults[] | null
+  >(null);
 
   const handleDeleteRow = (row_id: string) => {
     const rowIdx = lineItems.findIndex((r) => r._id === row_id);
@@ -202,7 +230,7 @@ export const ForecastPage = () => {
       };
     });
 
-    calculateForecast(auth.token, forecastList).then((result: IForecastResults[]) => {
+    calculateForecast(forecastList).then((result: IForecastResults[]) => {
       console.log(result);
       const newRows = result.map((item, idx) => {
         return {
@@ -215,7 +243,7 @@ export const ForecastPage = () => {
           on_order_amount: item.on_order_amount,
           on_hand_amount: item.on_hand_amount,
           in_transit_amount: item.in_transit_amount,
-          reorder_amount: item.reorder_amount  
+          reorder_amount: item.reorder_amount,
         };
       });
 
