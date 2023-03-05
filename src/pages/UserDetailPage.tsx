@@ -30,7 +30,7 @@ export const UserDetailPage = () => {
       savedUser = emptyUser;
       setUser(emptyUser);
     } else {
-      getUser(auth.token, id!).then((p) => {
+      getUser(id!).then((p) => {
         savedUser = p;
         setUser(p!);
         // setUserSaved(true);
@@ -50,14 +50,14 @@ export const UserDetailPage = () => {
   const saveUser = async () => {
     // send new user to server
     if (id === "new") {
-      const newUserId = await createUser(auth.token, user!);
+      const newUserId = await createUser(user!);
 
       if (newUserId) {
         navigate(`/users/${newUserId}`, { replace: true });
         setUser({ ...user!, _id: newUserId });
       }
     } else {
-      const updated = await updateUser(auth.token, user!);
+      const updated = await updateUser(user!);
 
       if (updated === false) {
         throw Error("Update Project Error");

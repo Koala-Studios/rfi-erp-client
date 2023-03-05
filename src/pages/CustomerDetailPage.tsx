@@ -38,7 +38,7 @@ export const CustomerDetailPage = () => {
       savedCustomer = emptyCustomer;
       setCustomer(emptyCustomer);
     } else {
-      getCustomer(auth.token, id!).then((p) => {
+      getCustomer(id!).then((p) => {
         savedCustomer = p;
         setCustomer(p!);
         // setCustomerSaved(true);
@@ -57,14 +57,14 @@ export const CustomerDetailPage = () => {
   const saveCustomer = async () => {
     // send new project to server
     if (id === "new") {
-      const newCustomerId = await createCustomer(auth.token, customer!);
+      const newCustomerId = await createCustomer(customer!);
 
       if (newCustomerId) {
         navigate(`/customers/${newCustomerId}`, { replace: true });
         setCustomer({ ...customer!, _id: newCustomerId });
       }
     } else {
-      const updated = await updateCustomer(auth.token, customer!);
+      const updated = await updateCustomer(customer!);
 
       if (updated === false) {
         throw Error("Update Customer Error");

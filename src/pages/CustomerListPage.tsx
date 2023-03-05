@@ -51,7 +51,7 @@ const CustomerListPage = () => {
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listCustomers(auth.token, 25, 1).then((list) => {
+    listCustomers(25, 1).then((list) => {
       console.log(list);
       const newRows = list!.docs.map((customer) => {
         return {
@@ -70,26 +70,23 @@ const CustomerListPage = () => {
     navigate(`/customers/new`, { replace: false });
   };
 
-
-
   if (dataOptions == null) return null;
-  
 
   return (
     <>
-    <Card
-    variant="outlined"
-    sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
-  >
-    <Button variant="contained" color="primary" onClick={createNewCustomer}>
-      + New Customer
-    </Button>
-  </Card>
-    <DataTable
-      rows={dataOptions.rows}
-      columns={columns}
-      listOptions={dataOptions.listOptions}
-    ></DataTable>
+      <Card
+        variant="outlined"
+        sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
+      >
+        <Button variant="contained" color="primary" onClick={createNewCustomer}>
+          + New Customer
+        </Button>
+      </Card>
+      <DataTable
+        rows={dataOptions.rows}
+        columns={columns}
+        listOptions={dataOptions.listOptions}
+      ></DataTable>
     </>
   );
 };

@@ -23,19 +23,14 @@ const api = axios.create({
 });
 
 export const listBatching = async (
-  token: string,
-  count: number,
-  page: number,
   q: URLSearchParams | undefined,
   filters: FilterElement[]
 ): Promise<IListOptions | null> => {
   let query = getQuery(q, filters);
 
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
-      count,
-      page,
       query,
     },
   };

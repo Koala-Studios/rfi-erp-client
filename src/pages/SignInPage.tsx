@@ -6,12 +6,13 @@ import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import "../styles/SignIn.css";
 import { ISignIn } from "../logic/auth.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import RFI_Logo from "../resources/rfi_logo_R.svg";
 
 export const SignInPage: React.FC = () => {
   const auth = useContext(AuthContext);
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
 
   return (
     <Card
@@ -40,9 +41,12 @@ export const SignInPage: React.FC = () => {
           onSubmit={(values: ISignIn) => {
             console.log(values);
             auth.signin(values, () => {
-              navigate("/batching", { replace: true });
+              if (searchParams.has("returnUrl")) {
+                navigate(searchParams.get("returnUrl")!, { replace: true });
+              } else {
+                navigate("/projects", { replace: true });
+              }
             });
-            // signUp();
           }}
         >
           {({ values, handleChange, handleBlur }) => (

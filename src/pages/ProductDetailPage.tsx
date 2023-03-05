@@ -81,7 +81,7 @@ export const ProductDetailPage = () => {
       savedProduct = emptyProduct;
       setProduct(emptyProduct);
     } else {
-      getProduct(auth.token, id!).then((p) => {
+      getProduct(id!).then((p) => {
         savedProduct = p;
         setProduct(p!);
         // setProductSaved(true);
@@ -100,14 +100,14 @@ export const ProductDetailPage = () => {
   const saveProduct = async () => {
     //send new product to server
     if (id === "new") {
-      const newProductId = await createProduct(auth.token, product!);
+      const newProductId = await createProduct(product!);
 
       if (newProductId) {
         navigate(`/products/${newProductId}`, { replace: true });
         setProduct({ ...product!, _id: newProductId });
       }
     } else {
-      const updated = await updateProduct(auth.token, product!);
+      const updated = await updateProduct(product!);
 
       if (updated === false) {
         throw Error("Update Product Error");

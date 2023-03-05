@@ -38,7 +38,7 @@ export const SupplierDetailPage = () => {
       savedSupplier = emptySupplier;
       setSupplier(emptySupplier);
     } else {
-      getSupplier(auth.token, id!).then((p) => {
+      getSupplier(id!).then((p) => {
         savedSupplier = p;
         setSupplier(p!);
         // setSupplierSaved(true);
@@ -57,14 +57,14 @@ export const SupplierDetailPage = () => {
   const saveSupplier = async () => {
     // send new project to server
     if (id === "new") {
-      const newSupplierId = await createSupplier(auth.token, supplier!);
+      const newSupplierId = await createSupplier(supplier!);
 
       if (newSupplierId) {
         navigate(`/suppliers/${newSupplierId}`, { replace: true });
         setSupplier({ ...supplier!, _id: newSupplierId });
       }
     } else {
-      const updated = await updateSupplier(auth.token, supplier!);
+      const updated = await updateSupplier(supplier!);
 
       if (updated === false) {
         throw Error("Update Supplier Error");

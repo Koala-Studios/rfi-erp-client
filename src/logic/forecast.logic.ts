@@ -2,7 +2,7 @@ import axios from "axios";
 import { apiStatus, IListOptions } from "./utils";
 
 export interface IProductLine {
-  _id:string;
+  _id: string;
   product_id: string;
   product_code: string;
   product_name: string;
@@ -16,9 +16,9 @@ export interface IForecast {
 }
 
 export interface IForecastResults {
-  product_id:string;
+  product_id: string;
   product_code: string;
-  product_name:string;
+  product_name: string;
   required_amount: number;
   available_amount: number;
   on_order_amount: number;
@@ -31,7 +31,6 @@ const api = axios.create({
 });
 
 export const calculateForecast = async (
-  token: string,
   productLines: IForecast[]
 ): Promise<IForecastResults[]> => {
   const data = {
@@ -39,7 +38,7 @@ export const calculateForecast = async (
   };
 
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
 
   let forecastResult: IForecastResults[] = [];

@@ -1,5 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useLocation, Navigate, useNavigate } from "react-router-dom";
+import {
+  useLocation,
+  Navigate,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 
 import { ISignIn, signIn } from "../../logic/auth.logic";
 import { IUser, loadUser } from "../../logic/user.logic";
@@ -22,6 +27,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   let [currentUser, setCurrentUser] = React.useState<IUser | undefined>();
   let [connected, setConnected] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     if (connected) return;
@@ -38,11 +44,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           if (res) {
             setToken(local_token);
             setCurrentUser(res);
-
-            navigate("/projects");
+            navigate(location.pathname + location.search);
           } else {
             localStorage.removeItem("auth_token");
-            navigate("/");
+            navigate("/login?returnUrl=" + location.pathname + location.search);
           }
         });
       });

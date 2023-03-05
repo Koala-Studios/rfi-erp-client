@@ -70,11 +70,15 @@ const DvpListPage = () => {
             color="primary"
             size="small"
             style={{ marginLeft: 16 }}
-            onClick={() => 
-            navigate(`/formula/develop/${params.value}/${params.row.versions}`, { //TODO: TEMPORARY FOR DEVELOPMENT
-              // navigate(`/formula/${params.value}/${params.row.versions}`, {
-                replace: false,
-              })
+            onClick={() =>
+              navigate(
+                `/formula/develop/${params.value}/${params.row.versions}`,
+                {
+                  //TODO: TEMPORARY FOR DEVELOPMENT
+                  // navigate(`/formula/${params.value}/${params.row.versions}`, {
+                  replace: false,
+                }
+              )
             }
           >
             Formula
@@ -88,7 +92,7 @@ const DvpListPage = () => {
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listProducts(auth.token, 25, 1, false).then((list) => {
+    listProducts(25, 1, false).then((list) => {
       const newRows = list!.docs.map((product) => {
         return {
           id: product._id,
@@ -105,14 +109,14 @@ const DvpListPage = () => {
   }, []);
 
   if (dataOptions == null) return null;
-  
+
   return (
     <>
-    <DataTable
-      rows={dataOptions.rows}
-      columns={columns}
-      listOptions={dataOptions.listOptions}
-    ></DataTable>
+      <DataTable
+        rows={dataOptions.rows}
+        columns={columns}
+        listOptions={dataOptions.listOptions}
+      ></DataTable>
     </>
   );
 };

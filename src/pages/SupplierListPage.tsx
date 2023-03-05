@@ -52,7 +52,7 @@ const SupplierListPage = () => {
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listSuppliers(auth.token, 25, 1).then((list) => {
+    listSuppliers(25, 1).then((list) => {
       const newRows = list!.docs.map((supplier) => {
         return {
           id: supplier._id,
@@ -71,22 +71,22 @@ const SupplierListPage = () => {
   };
 
   if (dataOptions == null) return null;
-  
+
   return (
     <>
-    <Card
-    variant="outlined"
-    sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
-  >
-    <Button variant="contained" color="primary" onClick={createNewSupplier}>
-      + New Supplier
-    </Button>
-  </Card>
-    <DataTable
-      rows={dataOptions.rows}
-      columns={columns}
-      listOptions={dataOptions.listOptions}
-    ></DataTable>
+      <Card
+        variant="outlined"
+        sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
+      >
+        <Button variant="contained" color="primary" onClick={createNewSupplier}>
+          + New Supplier
+        </Button>
+      </Card>
+      <DataTable
+        rows={dataOptions.rows}
+        columns={columns}
+        listOptions={dataOptions.listOptions}
+      ></DataTable>
     </>
   );
 };

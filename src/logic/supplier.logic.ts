@@ -5,27 +5,24 @@ export interface ISupplier {
   _id: string;
   name: string;
   code: string;
-  email:string;
+  email: string;
   contact_name: string;
   address_one?: string;
   address_two?: string;
-  lead_time?:string;
-  phone?:string;
-  createdAt?:string;
+  lead_time?: string;
+  phone?: string;
+  createdAt?: string;
 }
 
 const api = axios.create({
   baseURL: "http://localhost:5000/suppliers",
 });
 
-
 export const lookupSupplier = async (
-  //TODO: Not finished
-  token: string,
   search_value: string
 ): Promise<ISupplier[] | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       search_value,
     },
@@ -47,12 +44,11 @@ export const lookupSupplier = async (
 };
 
 export const listSuppliers = async (
-  token: string,
   count: number,
   page: number
 ): Promise<IListOptions | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       count,
       page,
@@ -75,12 +71,9 @@ export const listSuppliers = async (
   return list;
 };
 
-export const getSupplier = async (
-  token: string,
-  id: string
-): Promise<ISupplier | null> => {
+export const getSupplier = async (id: string): Promise<ISupplier | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       id: id,
     },
@@ -103,11 +96,10 @@ export const getSupplier = async (
 };
 
 export const createSupplier = async (
-  token: string,
   formData: ISupplier
 ): Promise<string | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
 
   let rtn = null;
@@ -126,12 +118,9 @@ export const createSupplier = async (
 
   return rtn;
 };
-export const updateSupplier = async (
-  token: string,
-  formData: ISupplier
-): Promise<boolean> => {
+export const updateSupplier = async (formData: ISupplier): Promise<boolean> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
 
   let rtn = false;

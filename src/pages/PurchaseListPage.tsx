@@ -46,13 +46,15 @@ const PurchaseListPage = () => {
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listPOs(auth.token, 25, 1).then((list) => {
+    listPOs(25, 1).then((list) => {
       const newRows = list!.docs.map((purchase) => {
         return {
           id: purchase._id,
           order_code: purchase.order_code,
           supplier: purchase.supplier.name,
-          date_purchased: purchase.date_purchased ? purchase.date_purchased.toString().replace(/\T.+/, "") : 'Not Set',
+          date_purchased: purchase.date_purchased
+            ? purchase.date_purchased.toString().replace(/\T.+/, "")
+            : "Not Set",
           status: purchase.status,
           item_count: purchase.order_items.length,
         };
@@ -72,7 +74,11 @@ const PurchaseListPage = () => {
         variant="outlined"
         sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
       >
-        <Button variant="contained" color="primary" onClick={createNewPurchaseOrder}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={createNewPurchaseOrder}
+        >
           + New Purchase Order
         </Button>
       </Card>
@@ -82,7 +88,6 @@ const PurchaseListPage = () => {
         listOptions={dataOptions.listOptions}
       ></DataTable>
     </>
-
   );
 };
 

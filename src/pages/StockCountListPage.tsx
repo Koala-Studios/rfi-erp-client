@@ -46,15 +46,13 @@ const StockCountListPage = () => {
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listStockCounts(auth.token, 25, 1).then((list) => {
+    listStockCounts(25, 1).then((list) => {
       const newRows = list!.docs.map((count) => {
         return {
           id: count._id,
           order_code: count.order_code,
           customer: count.customer,
-          date_orderd: count.date_orderd
-            .toString()
-            .replace(/\T.+/, ""),
+          date_orderd: count.date_orderd.toString().replace(/\T.+/, ""),
           status: count.status,
           item_count: count.order_items.length,
         };
@@ -67,8 +65,6 @@ const StockCountListPage = () => {
     navigate(`/sales/new`, { replace: false });
   };
 
-
-
   if (dataOptions == null) return null;
 
   return (
@@ -77,7 +73,11 @@ const StockCountListPage = () => {
         variant="outlined"
         sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
       >
-        <Button variant="contained" color="primary" onClick={createNewStockCount}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={createNewStockCount}
+        >
           + New Stock Count
         </Button>
       </Card>

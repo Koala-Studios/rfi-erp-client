@@ -43,7 +43,6 @@ const api = axios.create({
   baseURL: "http://localhost:5000/inventory",
 });
 export const listInventory = async (
-  token: string,
   count: number,
   page: number,
   q: URLSearchParams | undefined,
@@ -52,7 +51,7 @@ export const listInventory = async (
   let query = getQuery(q, filters);
 
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       count,
       page,
@@ -76,12 +75,9 @@ export const listInventory = async (
   return list;
 };
 
-export const getProduct = async (
-  token: string,
-  id: string
-): Promise<IInventory | null> => {
+export const getProduct = async (id: string): Promise<IInventory | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       id: id,
     },
@@ -104,18 +100,16 @@ export const getProduct = async (
 };
 
 export const lookupInventory = async (
-  //TODO: Not finished
-  token: string,
   search_value: string,
   for_sale: boolean,
-  approved?:boolean,
+  approved?: boolean
 ): Promise<IInventory[] | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       search_value,
       for_sale,
-      approved
+      approved,
     },
   };
 
@@ -135,13 +129,11 @@ export const lookupInventory = async (
 };
 
 export const lookupProductTypes = async (
-  //TODO: Not finished
-  token: string,
   search_value: string,
   for_sale: boolean
 ): Promise<IProductTypes | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       search_value,
       for_sale,

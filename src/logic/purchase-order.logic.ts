@@ -1,8 +1,6 @@
 import axios from "axios";
 import { apiStatus, IListOptions } from "./utils";
 
-
-
 export interface IOrderItem {
   _id: string;
   product_id: string;
@@ -14,20 +12,19 @@ export interface IOrderItem {
 }
 
 export interface IOrderItemProcess extends IOrderItem {
-  lot_number: string,
-  process_amount: number,
-  container_size: number,
-  expiry_date: Date,
+  lot_number: string;
+  process_amount: number;
+  container_size: number;
+  expiry_date: Date;
 }
-
 
 export interface IPurchaseOrder {
   _id: string;
   notes: string;
   supplier: {
-    name: string,
-    supplier_id: string
-  },
+    name: string;
+    supplier_id: string;
+  };
   date_arrived: string;
   date_purchased: string;
   status: number;
@@ -41,12 +38,11 @@ const api = axios.create({
 });
 
 export const listPOs = async (
-  token: string,
   count: number,
   page: number
 ): Promise<IListOptions | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       count,
       page,
@@ -70,11 +66,10 @@ export const listPOs = async (
 };
 
 export const getPurchase = async (
-  token: string,
   id: string
 ): Promise<IPurchaseOrder | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       id: id,
     },
@@ -89,7 +84,9 @@ export const getPurchase = async (
         purchase = res.data.res;
       }
       window.dispatchEvent(
-        new CustomEvent("NotificationEvent", { detail: { text: res.data.message } })
+        new CustomEvent("NotificationEvent", {
+          detail: { text: res.data.message },
+        })
       );
     })
     .catch((err) => {
@@ -99,14 +96,11 @@ export const getPurchase = async (
   return purchase;
 };
 
-
-
 export const createPurchase = async (
-  token: string,
   formData: IPurchaseOrder
 ): Promise<string | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
 
   let rtn = null;
@@ -127,11 +121,10 @@ export const createPurchase = async (
   return rtn;
 };
 export const updatePurchase = async (
-  token: string,
   formData: IPurchaseOrder
 ): Promise<boolean> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
 
   let rtn = false;
@@ -151,12 +144,11 @@ export const updatePurchase = async (
 };
 
 export const confirmPurchase = async (
-  token: string,
   purchase: IPurchaseOrder,
-  po_id: string,
+  po_id: string
 ): Promise<IPurchaseOrder | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     // params: {po_id: po_id}
   };
   let rtn = null;
@@ -165,11 +157,12 @@ export const confirmPurchase = async (
     .then((res) => {
       if (res.status === apiStatus.OK) {
         window.dispatchEvent(
-          new CustomEvent("NotificationEvent", { detail: { text: res.data.message } })
+          new CustomEvent("NotificationEvent", {
+            detail: { text: res.data.message },
+          })
         );
         rtn = res.data.res;
       }
-
     })
     .catch((err) => {
       console.log(err);
@@ -179,14 +172,12 @@ export const confirmPurchase = async (
 };
 
 export const markPurchaseReceived = async (
-  token: string,
-  po_id: string,
+  po_id: string
 ): Promise<IPurchaseOrder | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
-    params: { po_id: po_id }
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+    params: { po_id: po_id },
   };
-
 
   let rtn = null;
 
@@ -195,11 +186,12 @@ export const markPurchaseReceived = async (
     .then((res) => {
       if (res.status === apiStatus.OK) {
         window.dispatchEvent(
-          new CustomEvent("NotificationEvent", { detail: { text: res.data.message } })
+          new CustomEvent("NotificationEvent", {
+            detail: { text: res.data.message },
+          })
         );
         rtn = res.data.res;
       }
-
     })
     .catch((err) => {
       console.log(err);
@@ -209,12 +201,11 @@ export const markPurchaseReceived = async (
 };
 
 export const markPurchaseCancelled = async (
-  token: string,
-  po_id: string,
+  po_id: string
 ): Promise<IPurchaseOrder | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
-    params: { po_id: po_id }
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+    params: { po_id: po_id },
   };
 
   let rtn = null;
@@ -224,11 +215,12 @@ export const markPurchaseCancelled = async (
     .then((res) => {
       if (res.status === apiStatus.OK) {
         window.dispatchEvent(
-          new CustomEvent("NotificationEvent", { detail: { text: res.data.message } })
+          new CustomEvent("NotificationEvent", {
+            detail: { text: res.data.message },
+          })
         );
         rtn = res.data.res;
       }
-
     })
     .catch((err) => {
       console.log(err);
@@ -237,17 +229,13 @@ export const markPurchaseCancelled = async (
   return rtn;
 };
 
-
-
-
 export const handlePurchaseItem = async (
-  token: string,
   purchaseItem: IOrderItemProcess,
-  quarantine: boolean,
+  quarantine: boolean
 ): Promise<IPurchaseOrder | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
-    params: { quarantine: quarantine }
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+    params: { quarantine: quarantine },
   };
 
   let rtn = null;
@@ -257,7 +245,9 @@ export const handlePurchaseItem = async (
     .then((res) => {
       if (res.status === apiStatus.OK) {
         window.dispatchEvent(
-          new CustomEvent("NotificationEvent", { detail: { text: res.data.message } })
+          new CustomEvent("NotificationEvent", {
+            detail: { text: res.data.message },
+          })
         );
         rtn = res.data.res;
       }

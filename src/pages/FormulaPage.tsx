@@ -22,7 +22,7 @@ const FormulaPage = () => {
   const { id, version } = useParams();
   // const { approved_version } = useParams();
   React.useEffect(() => {
-    getFormula(auth.token, id!, version!).then((formula) => {
+    getFormula(id!, version!).then((formula) => {
       console.log(formula, " TEST");
       if (!formula?.formula_items) {
         setRows({});
@@ -46,7 +46,7 @@ const FormulaPage = () => {
 
   return (
     <Card variant="outlined" sx={{ padding: 3, overflowY: "auto" }}>
-      <DataTable auto_height={true} rows={rows!} columns={columns}></DataTable>
+      {/* <DataTable auto_height={true} rows={rows!} columns={columns}></DataTable> */}
     </Card>
   );
 };

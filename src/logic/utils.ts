@@ -49,9 +49,17 @@ export function paramsToObject(entries: any) {
   return result;
 }
 export function paramsToObjectRegex(entries: any, filters: FilterElement[]) {
-  const result = {};
+  const result: any = {};
 
   for (const [key, value] of entries) {
+    if (key === "page" || key === "count") {
+      result[key] = value;
+
+      continue;
+    }
+
+    //textfields
+
     const fe = filters.find((f) => f.field === key);
 
     if (!fe) continue;
@@ -61,21 +69,16 @@ export function paramsToObjectRegex(entries: any, filters: FilterElement[]) {
     }
 
     if (fe.type === "number") {
-      //@ts-ignore
       result[key] = parseFloat(value);
     } else {
       if (fe.regexOption === null) {
-        //@ts-ignore
         result[key] = value;
       } else {
-        //@ts-ignore
         result[key] = { $regex: value, $options: fe.regexOption };
       }
     }
   }
-
   console.log(result);
-
   return result;
 }
 

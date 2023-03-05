@@ -3,68 +3,66 @@ import { ObjectId } from "bson";
 import { apiStatus, IListOptions } from "./utils";
 
 interface IStockExtension {
-    extension_date:Date;
-    passed:boolean;
-  }
-  
-interface IQATest {
-    test_date:Date;
-    passed:boolean;
-  }
+  extension_date: Date;
+  passed: boolean;
+}
 
+interface IQATest {
+  test_date: Date;
+  passed: boolean;
+}
 
 export interface IInventoryStockGrouped {
-    _id: {product_id:string , product_code:string },
-    product_code: string,
-    name:  string,
-    average_cost: number,
-    received_amount: number,
-    used_amount: number,
-    allocated_amount: number,
-    quarantined_containers: number,
-    items:[IInventoryStock]
-  }
+  _id: { product_id: string; product_code: string };
+  product_code: string;
+  name: string;
+  average_cost: number;
+  received_amount: number;
+  used_amount: number;
+  allocated_amount: number;
+  quarantined_containers: number;
+  items: [IInventoryStock];
+}
 
 export interface IInventoryStock {
-    _id:ObjectId;
-    product_id:string;
-    product_code: string;
-    name: string;
-    unit_cost: number;
-    container_size:number;
-    received_amount:number;
-    used_amount: number;
-    allocated_amount: number;
-    quarantined_containers: number;
-    
-    lot_number:string;
-  
-    supplier_code:string;
-    supplier_id:ObjectId;
-    supplier_sku:ObjectId;
-  
-    received_date:Date;
-    expiry_date:Date;
-    notes:string;
-    extensions: [IStockExtension];
-    qc_tests:[IQATest]
-  }
-  
+  _id: ObjectId;
+  product_id: string;
+  product_code: string;
+  name: string;
+  unit_cost: number;
+  container_size: number;
+  received_amount: number;
+  used_amount: number;
+  allocated_amount: number;
+  quarantined_containers: number;
+
+  lot_number: string;
+
+  supplier_code: string;
+  supplier_id: ObjectId;
+  supplier_sku: ObjectId;
+
+  received_date: Date;
+  expiry_date: Date;
+  notes: string;
+  extensions: [IStockExtension];
+  qc_tests: [IQATest];
+}
+
 const api = axios.create({
   baseURL: "http://localhost:5000/inventory-stock",
 });
 export const listInventoryStock = async (
-  token: string,
   count: number,
   page: number,
-  grouped:boolean
+  grouped: boolean
 ): Promise<IListOptions | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       count,
       page,
-      grouped
+      grouped,
     },
   };
 
@@ -84,11 +82,10 @@ export const listInventoryStock = async (
 };
 
 export const getStockItem = async (
-  token: string,
   id: string
 ): Promise<IInventoryStock | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       id: id,
     },
@@ -110,17 +107,17 @@ export const getStockItem = async (
   return inventory_stock_item;
 };
 
-
-export const lookupInventoryStock = async ( //TODO: Not finished
+export const lookupInventoryStock = async (
+  //TODO: Not finished
   token: string,
-  search_value:string,
-  for_sale:boolean
+  search_value: string,
+  for_sale: boolean
 ): Promise<IInventoryStock[] | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       search_value,
-      for_sale
+      for_sale,
     },
   };
 
