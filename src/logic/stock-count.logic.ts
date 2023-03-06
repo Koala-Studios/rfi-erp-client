@@ -30,7 +30,6 @@ const api = axios.create({
 });
 
 export const listStockCounts = async (
-<<<<<<< HEAD
     token: string,
     count: number,
     page: number,
@@ -231,36 +230,3 @@ export const listStockCounts = async (
   
     return rtn;
   };
-=======
-  count: number,
-  page: number
-  // q: URLSearchParams | undefined,
-  // filters: FilterElement[]
-): Promise<IListOptions | null> => {
-  // let query = getQuery(q, filters);
-
-  const config = {
-    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
-    params: {
-      count,
-      page,
-      // query,
-    },
-  };
-
-  let list: IListOptions | null = null;
-
-  await api
-    .get("/list", config)
-    .then((res) => {
-      if (res.status === apiStatus.OK) {
-        list = res.data.res;
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-
-  return list;
-};
->>>>>>> 572cf6f71366841540a96650648c6c557eb6c1da
