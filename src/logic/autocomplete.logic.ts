@@ -10,7 +10,7 @@ export const lookup = async (
     | "customer"
     | "inventory"
     | "user"
-    | "products"
+    | "product"
     | "supplier"
     | "product-type"
     | "product-type-mat"
@@ -27,7 +27,7 @@ export const lookup = async (
     return await lookupInventory(query, false);
   } else if (dbOption === "user") {
     return await lookupUser(query);
-  } else if (dbOption === "products") {
+  } else if (dbOption === "product") {
     return await lookupInventory(query, true);
   } else if (dbOption === "approved-products") {
     return await lookupInventory(query, true, true);

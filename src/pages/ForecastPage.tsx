@@ -78,7 +78,7 @@ export const ForecastPage = () => {
       filterable: false,
       renderCell: (row_params: GridRenderCellParams<string>) => (
         <TableAutocomplete
-          dbOption="products"
+          dbOption="product"
           handleEditRow={handleEditProductRow}
           rowParams={row_params}
           initialValue={row_params.row.product_name}

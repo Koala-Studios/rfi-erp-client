@@ -39,6 +39,7 @@ import InventoryStockListPage from "./pages/InventoryStockListPage";
 import { SnackbarProvider } from "notistack";
 import StockCountListPage from "./pages/StockCountListPage";
 import { StockCountDetailPage } from "./pages/StockCountDetailPage";
+import { BatchingDetailPage } from "./pages/BatchingDetailPage";
 
 const mainTheme = createTheme({
   palette: {
@@ -242,6 +243,16 @@ function App() {
                   <RequireAuth>
                     <Navbar title="Batching">
                       <BatchingListPage />
+                    </Navbar>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/batching/:id"
+                element={
+                  <RequireAuth>
+                    <Navbar title="Batching">
+                      <BatchingDetailPage />
                     </Navbar>
                   </RequireAuth>
                 }

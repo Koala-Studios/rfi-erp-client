@@ -147,11 +147,11 @@ export const listStockCounts = async (
   export const confirmStockCount = async (
     token: string,
     stockCount: IStockCount,
-    po_id: string,
+    stockCount_id: string,
   ): Promise<IStockCount | null> => {
     const config = {
       headers: { Authorization: `Bearer ${token}` },
-      // params: {po_id: po_id}
+      // params: {stockCount_id: stockCount_id}
     };
     let rtn = null;
     await api
@@ -174,18 +174,18 @@ export const listStockCounts = async (
   
   export const markStockCountReceived = async (
     token: string,
-    po_id: string,
+    stockCount_id: string,
   ): Promise<IStockCount | null> => {
     const config = {
       headers: { Authorization: `Bearer ${token}` },
-      params: { po_id: po_id }
+      params: { stockCount_id: stockCount_id }
     };
   
   
     let rtn = null;
   
     await api
-      .post("/mark-received", po_id, config)
+      .post("/mark-received", stockCount_id, config)
       .then((res) => {
         if (res.status === apiStatus.OK) {
           window.dispatchEvent(
@@ -204,17 +204,17 @@ export const listStockCounts = async (
   
   export const markStockCountCancelled = async (
     token: string,
-    po_id: string,
+    stockCount_id: string,
   ): Promise<IStockCount | null> => {
     const config = {
       headers: { Authorization: `Bearer ${token}` },
-      params: { po_id: po_id }
+      params: { stockCount_id: stockCount_id }
     };
   
     let rtn = null;
   
     await api
-      .post("/mark-cancelled", po_id, config)
+      .post("/mark-cancelled", stockCount_id, config)
       .then((res) => {
         if (res.status === apiStatus.OK) {
           window.dispatchEvent(

@@ -9,7 +9,7 @@ interface Props {
     | "customer"
     | "inventory"
     | "user"
-    | "products"
+    | "product"
     | "supplier"
     | "product-type"
     | "product-type-mat"

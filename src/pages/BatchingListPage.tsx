@@ -1,6 +1,6 @@
 import React from "react";
 import { DataTable } from "../components/utils/DataTable";
-import { GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
+import { GridColDef, GridRenderCellParams, GridValueGetterParams } from "@mui/x-data-grid";
 import { listBatching } from "../logic/batching.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { FilterElement, IListData } from "../logic/utils";
@@ -13,15 +13,6 @@ import {
 } from "react-router-dom";
 import DataFilter from "../components/utils/DataFilter";
 
-const columns: GridColDef[] = [
-  // { field: "id", headerName: "ID", width: 300 },
-  { field: "date", headerName: "Date Created", width: 120 },
-  { field: "product_code", headerName: "Product Code", width: 120 },
-  { field: "product_name", headerName: "Product Name", width: 320 },
-  { field: "batch_code", headerName: "Batch Code", width: 120 },
-  { field: "quantity", headerName: "Quantity", type: "number", width: 90 },
-];
-
 //label,field,type
 const filterArray: FilterElement[] = [
   {
@@ -31,16 +22,7 @@ const filterArray: FilterElement[] = [
   },
   { label: "Batch Code", field: "batch_code", type: "text" },
   { label: "Quantity", field: "quantity", type: "number", regexOption: null },
-  // {
-  //   label: "Status",
-  //   field: "status",
-  //   type: "dropdown",
-  //   options: [
-  //     { value: 1, text: "Pending" },
-  //     { value: 2, text: "In Progress" },
-  //     { value: 3, text: "Completed" },
-  //   ],
-  // },
+
 ];
 
 const BatchingListPage = () => {
@@ -48,6 +30,37 @@ const BatchingListPage = () => {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
+
+  const columns: GridColDef[] = [
+    // { field: "id", headerName: "ID", width: 300 },
+    { field: "date", headerName: "Date Created", width: 120 },
+    { field: "product_code", headerName: "Product Code", width: 120 },
+    { field: "product_name", headerName: "Product Name", width: 320 },
+    { field: "batch_code", headerName: "Batch Code", width: 120 },
+    { field: "quantity", headerName: "Quantity", type: "number", width: 90 },
+    {
+      field: "id",
+      headerName: "Actions",
+      align: "left",
+      width: 250,
+      renderCell: (params: GridRenderCellParams<string>) => (
+        <strong>
+          <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={() =>
+              navigate(`/batching/${params.value}`, { replace: false })
+            }
+          >
+            View Details
+          </Button>
+        </strong>
+      ),
+    },
+  ];
+  
+
 
   React.useEffect(() => {
     listBatching(searchParams, filterArray).then((list) => {

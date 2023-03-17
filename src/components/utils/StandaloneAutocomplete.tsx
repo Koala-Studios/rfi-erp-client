@@ -10,7 +10,7 @@ interface Props {
   label: string;
   placeholder?: string;
   letterMin: number;
-  dbOption: "customer" | "inventory" | "user" | "supplier" | "product-type";
+  dbOption: "customer" | "inventory" | "product" | "user" | "supplier" | "product-type";
   onChange?: (event: React.SyntheticEvent<Element, Event>, value: any) => void;
 }
 
@@ -46,6 +46,7 @@ const StandaloneAutocomplete: React.FC<Props> = ({
   return (
     <Autocomplete
       value={initialValue}
+      isOptionEqualToValue={(option, value) => option._id === value || option._id === value._id}
       clearOnBlur={true}
       blurOnSelect={false}
       onChange={onChange}
