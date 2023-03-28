@@ -98,7 +98,7 @@ export const getPurchase = async (
 
 export const createPurchase = async (
   formData: IPurchaseOrder
-): Promise<string | null> => {
+): Promise<IPurchaseOrder | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };

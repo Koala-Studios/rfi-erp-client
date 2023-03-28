@@ -116,7 +116,7 @@ export const getProduct = async (id: string): Promise<IProduct | null> => {
 
 export const createProduct = async (
   formData: IProduct
-): Promise<string | null> => {
+): Promise<IProduct  | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };

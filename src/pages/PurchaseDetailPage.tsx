@@ -66,7 +66,7 @@ export const PurchaseDetailPage = () => {
     supplier: { supplier_id: "", name: "" },
     date_arrived: "",
     shipping_code: "",
-    date_purchased: "",
+    date_purchased: new Date().toISOString().split('T')[0],
     status: 6,
     order_code: "",
     order_items: [],
@@ -449,11 +449,17 @@ export const PurchaseDetailPage = () => {
   const savePurchase = async () => {
     //send new purchase to server
     if (id === "new") {
-      const newPurchaseId = await createPurchase(purchase!);
-      if (newPurchaseId) {
-        navigate(`/purchase-orders/${newPurchaseId}`, { replace: true });
-        setPurchaseOrder({ ...purchase!, _id: newPurchaseId });
-      }
+      await createPurchase(purchase!).then((_purchase) => {
+        if (_purchase) {
+          navigate(`/purchase-orders/${_purchase._id}`, { replace: true });
+          savedPurchase = _purchase;
+          setPurchaseOrder(_purchase);
+          setPurchaseSaved(true);
+        } else {
+          console.log("Purchase Not Saved");
+        }
+      })
+
     } else {
       const updated = await updatePurchase(purchase!);
 
@@ -610,6 +616,7 @@ export const PurchaseDetailPage = () => {
                   }}
                   label={"Supplier"}
                   letterMin={0}
+                  readOnly={purchase.status != 6}
                   dbOption={"supplier"}
                   getOptionLabel={(item: ISupplier) => item.name}
                 />

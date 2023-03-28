@@ -15,6 +15,7 @@ interface Props {
     | "product-type-mat"
     | "approved-products";
   handleEditRow: (id: string, newItem: any) => void;
+  readOnly?:boolean,
   rowParams: GridRenderCellParams<string>;
   initialValue: string;
   letterMin: number;
@@ -28,6 +29,7 @@ const TableAutocomplete: React.FC<Props> = ({
   letterMin,
   dbOption,
   getOptionLabel,
+  readOnly = false
 }) => {
   const [editMode, setEditMode] = React.useState(false);
   const [optionList, setOptionList] = React.useState<any>([]);
@@ -49,6 +51,7 @@ const TableAutocomplete: React.FC<Props> = ({
         filterOptions={(x) => x}
         openOnFocus
         selectOnFocus
+        readOnly={readOnly}
         options={optionList}
         getOptionLabel={getOptionLabel}
         PaperComponent={({ children }) => (
