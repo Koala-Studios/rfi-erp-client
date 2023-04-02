@@ -8,6 +8,7 @@ interface Props {
 
   getOptionLabel: (option: any) => string;
   label: string;
+  readOnly?:boolean;
   placeholder?: string;
   letterMin: number;
   dbOption: "customer" | "inventory" | "product" | "user" | "supplier" | "product-type";
@@ -22,6 +23,7 @@ const StandaloneAutocomplete: React.FC<Props> = ({
   dbOption,
   getOptionLabel,
   initialValue,
+  readOnly = false
 }) => {
   const [optionList, setOptionList] = React.useState<any>([]);
   const auth = React.useContext(AuthContext);
@@ -49,6 +51,7 @@ const StandaloneAutocomplete: React.FC<Props> = ({
       isOptionEqualToValue={(option, value) => option._id === value || option._id === value._id}
       clearOnBlur={true}
       blurOnSelect={false}
+      readOnly={readOnly}
       onChange={onChange}
       openOnFocus
       selectOnFocus

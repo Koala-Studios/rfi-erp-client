@@ -100,12 +100,17 @@ export const ProductDetailPage = () => {
   const saveProduct = async () => {
     //send new product to server
     if (id === "new") {
-      const newProductId = await createProduct(product!);
-
-      if (newProductId) {
-        navigate(`/products/${newProductId}`, { replace: true });
-        setProduct({ ...product!, _id: newProductId });
-      }
+      createProduct(product!).then((_product) => {
+        if (_product) {
+          console.log(_product)
+          navigate(`/products/${_product._id}`, { replace: true });
+          savedProduct = _product;
+          setProduct(_product);
+          setProductSaved(true);
+        } else {
+          console.log("Product Not Saved");
+        }
+      })
     } else {
       const updated = await updateProduct(product!);
 
@@ -237,8 +242,9 @@ export const ProductDetailPage = () => {
             <Grid item xs={4} />
 
             <Grid item xs={4}>
-              <StandaloneAutocomplete //!TODO: implement non editable mode for autocomplete / dropdowns
+              <StandaloneAutocomplete
                 initialValue={product.product_type}
+                readOnly={!isNewId}
                 onChange={(e, value) => {
                   setProduct({ ...product, product_type: value });
                 }}
