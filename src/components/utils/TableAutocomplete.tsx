@@ -18,6 +18,7 @@ interface Props {
   rowParams: GridRenderCellParams<string>;
   initialValue: string;
   letterMin: number;
+  viewOnly?: boolean;
   getOptionLabel: (option: any) => any;
 }
 
