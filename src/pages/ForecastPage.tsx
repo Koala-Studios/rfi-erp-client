@@ -72,7 +72,7 @@ export const ForecastPage = () => {
     { field: "product_code", headerName: "Product Code", width: 150 },
     {
       field: "product_name",
-      headerName: "Internal Product",
+      headerName: "Product Name",
       width: 350,
       sortable: false,
       filterable: false,
@@ -277,15 +277,12 @@ export const ForecastPage = () => {
   return (
     <>
       <Card variant="outlined" sx={{ p: 3 }}>
+
         <Box sx={{ mb: 2 }}>
-          <Button
-            size="medium"
-            variant="outlined"
-            onClick={handleAddRow}
-            sx={{ mr: 2 }}
-          >
-            + Add Row
-          </Button>
+        <div style={{marginBottom:15}}>
+          <Button style={{marginRight:"15px"}}  size="medium" variant="contained">IMPORT CSV</Button>
+          <input type={"file"} accept={".csv"} />
+      </div>
           <Button size="medium" variant="contained" onClick={handleCalculate}>
             Calculate
           </Button>
