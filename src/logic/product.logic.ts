@@ -90,6 +90,30 @@ export const listProducts = async (
   return list;
 };
 
+export const lookupProducts = async (code_list:string[]):Promise<IProduct[] | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+    params: {
+      code_list: code_list
+    },
+  };
+
+  let products: IProduct[] | null = null;
+
+  await api
+    .get("/lookup-list", config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        products = res.data;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return products;
+}
+
 export const getProduct = async (id: string): Promise<IProduct | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },

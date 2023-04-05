@@ -24,6 +24,7 @@ import { IInventory } from "../logic/inventory.logic";
 import { ObjectID } from "bson";
 import { useNavigate } from "react-router-dom";
 import { darken, lighten } from "@mui/material/styles";
+import { IProduct, lookupProducts } from "../logic/product.logic";
 
 const getClassName = (row: IForecastResults) => {
   if (row.required_amount <= row.available_amount) {
@@ -48,6 +49,8 @@ export const ForecastPage = () => {
   const navigate = useNavigate();
   const auth = React.useContext(AuthContext);
   const [rowCount, setRowCount] = React.useState(0);
+  
+  const [file, setFile] = React.useState();
   const forecastColumns: GridColDef[] = [
     {
       field: "product_id",
@@ -133,7 +136,7 @@ export const ForecastPage = () => {
     },
   ];
 
-  const [lineItems, SetLineItems] = React.useState<IProductLine[]>([
+  const [rows, setRows] = React.useState<IProductLine[]>([
     {
       _id: new ObjectID().toHexString(),
       product_id: "",
@@ -147,17 +150,17 @@ export const ForecastPage = () => {
   >(null);
 
   const handleDeleteRow = (row_id: string) => {
-    const rowIdx = lineItems.findIndex((r) => r._id === row_id);
+    const rowIdx = rows.findIndex((r) => r._id === row_id);
 
-    let pList = lineItems.slice();
+    let pList = rows.slice();
     pList.splice(rowIdx, 1);
-    SetLineItems(pList);
+    setRows(pList);
   };
 
   const handleAddLine = (lineProduct: IProductLine) => {
-    const index = lineItems.indexOf(lineProduct) + 1;
-    SetLineItems([
-      ...lineItems.slice(0, index),
+    const index = rows.indexOf(lineProduct) + 1;
+    setRows([
+      ...rows.slice(0, index),
       {
         _id: new ObjectID().toHexString(),
         product_id: "",
@@ -165,46 +168,46 @@ export const ForecastPage = () => {
         product_name: "",
         amount: 0,
       },
-      ...lineItems.slice(index, lineItems.length),
+      ...rows.slice(index, rows.length),
     ]);
   };
   const handleRemoveLine = (lineProduct: IProductLine) => {
-    if (lineItems.length <= 1) return;
-    const index = lineItems.indexOf(lineProduct);
+    if (rows.length <= 1) return;
+    const index = rows.indexOf(lineProduct);
 
     if (index >= 0) {
-      lineItems.splice(index, 1);
-      SetLineItems([...lineItems]);
+      rows.splice(index, 1);
+      setRows([...rows]);
     }
   };
 
   const handleEditProductRow = (rowid: string, value: IInventory) => {
-    let pList = lineItems!.slice();
-    const rowIdx = lineItems!.findIndex((r) => r._id === rowid);
+    let pList = rows!.slice();
+    const rowIdx = rows!.findIndex((r) => r._id === rowid);
     pList[rowIdx].product_code = value.product_code;
     pList[rowIdx].product_id = value._id;
     pList[rowIdx].product_name = value.name;
 
-    SetLineItems(pList);
+    setRows(pList);
   };
 
   const handleEditCell = (row_id: string, field: string, value: any) => {
-    const rowIndex = lineItems.findIndex((r: IProductLine) => r._id === row_id);
-    SetLineItems([
-      ...lineItems.slice(0, rowIndex),
+    const rowIndex = rows.findIndex((r: IProductLine) => r._id === row_id);
+    setRows([
+      ...rows.slice(0, rowIndex),
       {
-        ...lineItems[rowIndex],
+        ...rows[rowIndex],
         [field]: value,
       },
-      ...lineItems.slice(
-        rowIndex == lineItems.length ? rowIndex : rowIndex + 1
+      ...rows.slice(
+        rowIndex == rows.length ? rowIndex : rowIndex + 1
       ),
     ]);
   };
 
   const handleAddRow = () => {
-    SetLineItems([
-      ...lineItems,
+    setRows([
+      ...rows,
       {
         _id: new ObjectID().toHexString(),
         product_id: "",
@@ -216,12 +219,78 @@ export const ForecastPage = () => {
     setRowCount(rowCount + 1);
   };
 
+
+  const fileReader = new FileReader();
+
+  const handleOnChange = (e:any) => {
+      setFile(e.target.files[0]);
+      console.log(e.target.files[0])
+  };
+
+  const csvFileToArray = async (textFile:string) => {
+    const csvHeader = textFile.slice(0, textFile.indexOf("\n")).split(",");
+    const csvRows = textFile.slice(textFile.indexOf("\n") + 1).split("\n");
+    let product_codes: any[] = [];
+    let unfound_products:any[] = [];
+    const array = csvRows.map(i => {
+      
+      const values = i.split(",");
+      const obj = csvHeader.reduce((object:any, header, index) => {
+        object[header] = values[index];
+        return object;
+      }, {});
+      product_codes = [...product_codes, obj.CODE];
+      return obj;
+    });
+    //looking up imported values
+    lookupProducts(product_codes).then((products:IProduct[] | null) => {
+      //setting rows to imported values
+
+      if(products!.length < array.length) {
+        array.map((element1) => {
+          if(!products?.find((element => element.product_code == element1.CODE))){
+            unfound_products = [...unfound_products, element1.CODE]
+          }
+        });
+        window.dispatchEvent(
+          new CustomEvent("NotificationEvent", {
+            detail: { color: "warning", text: "Could not find: " + unfound_products },
+          })
+        );
+      }
+
+      setRows(products!.map((product:IProduct) => {
+        const imported_value = array.find(element => element.CODE == product.product_code);
+
+        return {
+          _id: new ObjectID().toHexString(),
+          product_id: product._id,
+          product_code: product.product_code,
+          product_name: product.name,
+          amount: imported_value.AMOUNT,
+        }}));
+    });
+    };
+
+  const handleOnSubmit = (e:any) => {
+      e.preventDefault();
+
+      if (file) {
+        fileReader.onload = function (event:any) {
+          const text = event?.target.result;
+          csvFileToArray(text);
+        };
+  
+        fileReader.readAsText(file);
+      }
+  };
+
   const handleCalculate = () => {
-    if (lineItems.length === 0) return;
+    if (rows.length === 0) return;
 
     //TODO:Remove elements that are not filled in
 
-    const forecastList: IForecast[] = lineItems.map((line) => {
+    const forecastList: IForecast[] = rows.map((line) => {
       return {
         product_id: line.product_id,
         product_name: line.product_name,
@@ -279,10 +348,21 @@ export const ForecastPage = () => {
       <Card variant="outlined" sx={{ p: 3 }}>
 
         <Box sx={{ mb: 2 }}>
-        <div style={{marginBottom:15}}>
-          <Button style={{marginRight:"15px"}}  size="medium" variant="contained">IMPORT CSV</Button>
-          <input type={"file"} accept={".csv"} />
-      </div>
+        <div>
+        <Button size="medium" variant="contained" sx={{marginBottom:2, marginRight:1}}
+                    onClick={(e) => {
+                        handleOnSubmit(e);
+                    }}
+                >
+                    IMPORT CSV
+                </Button>
+                <input
+                    type={"file"}
+                    id={"csvFileInput"}
+                    accept={".csv"}
+                    onChange={handleOnChange}
+                />
+          </div>
           <Button size="medium" variant="contained" onClick={handleCalculate}>
             Calculate
           </Button>
@@ -291,7 +371,7 @@ export const ForecastPage = () => {
           style={{
             border: "1px solid #c9c9c9",
           }}
-          rows={lineItems}
+          rows={rows}
           columns={forecastColumns}
           autoHeight={true}
           rowHeight={45}
@@ -302,12 +382,12 @@ export const ForecastPage = () => {
           }}
           getRowId={(row) => row._id}
           processRowUpdate={(newRow) => {
-            let pList = lineItems.slice();
-            const rowIdx = lineItems.findIndex(
+            let pList = rows.slice();
+            const rowIdx = rows.findIndex(
               (r) => r.product_id === newRow._id
             );
             pList[rowIdx] = newRow;
-            SetLineItems(pList);
+            setRows(pList);
             return newRow;
           }}
           onProcessRowUpdateError={(e) => {
