@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar } from "@mui/x-data-grid";
 import React from "react";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { DataTable } from "../components/utils/DataTable";
@@ -49,7 +49,7 @@ export const ForecastPage = () => {
   const navigate = useNavigate();
   const auth = React.useContext(AuthContext);
   const [rowCount, setRowCount] = React.useState(0);
-  
+  let testRef = React.useRef<HTMLDivElement>();
   const [file, setFile] = React.useState();
   const forecastColumns: GridColDef[] = [
     {
@@ -107,14 +107,13 @@ export const ForecastPage = () => {
       field: "product_name",
       headerName: "Material Name",
       width: 300,
-      sortable: false,
-      filterable: false,
     },
     {
       field: "required_amount",
       headerName: "Required Qty",
       type: "number",
       width: 150,
+      valueGetter: (params) => params.row.required_amount.toFixed(15)
     },
     {
       field: "available_amount",
@@ -224,20 +223,24 @@ export const ForecastPage = () => {
 
   const handleOnChange = (e:any) => {
       setFile(e.target.files[0]);
-      console.log(e.target.files[0])
+      // console.log(e.target.files[0])
   };
 
   const csvFileToArray = async (textFile:string) => {
+    // console.log(JSON.stringify(textFile), "testFile")
+    textFile = textFile.replace( /[\r\n]+/gm, "\n" );
     const csvHeader = textFile.slice(0, textFile.indexOf("\n")).split(",");
+    // console.log(csvHeader, "BRUH")
     const csvRows = textFile.slice(textFile.indexOf("\n") + 1).split("\n");
     let product_codes: any[] = [];
     let unfound_products:any[] = [];
-    const array = csvRows.map(i => {
+    let final_array:any[] =[];
+    const value_array = csvRows.map(i => {
       
       const values = i.split(",");
       const obj = csvHeader.reduce((object:any, header, index) => {
         object[header] = values[index];
-        return object;
+          return object;
       }, {});
       product_codes = [...product_codes, obj.CODE];
       return obj;
@@ -245,32 +248,34 @@ export const ForecastPage = () => {
     //looking up imported values
     lookupProducts(product_codes).then((products:IProduct[] | null) => {
       //setting rows to imported values
+      value_array.map((element1) => {
 
-      if(products!.length < array.length) {
-        array.map((element1) => {
-          if(!products?.find((element => element.product_code == element1.CODE))){
-            unfound_products = [...unfound_products, element1.CODE]
+        if(products?.find((element => element1.CODE === element.product_code)) === undefined){
+          unfound_products = [...unfound_products, element1.CODE + '\n']
+        }
+      });
+      window.dispatchEvent(
+        new CustomEvent("NotificationEvent", {
+          detail: { color: "warning", text: "Could not find: " + unfound_products },
+        })
+      );
+      for(const imported_product of value_array) {
+        const product:IProduct | undefined = products!.find(element => imported_product.AMOUNT !== undefined && element.product_code === imported_product.CODE);
+        if(product) {
+          final_array.push({
+            _id: new ObjectID().toHexString(),
+            product_id: product!._id,
+            product_code: product!.product_code,
+            product_name: product!.name,
+            amount: imported_product.AMOUNT,
           }
-        });
-        window.dispatchEvent(
-          new CustomEvent("NotificationEvent", {
-            detail: { color: "warning", text: "Could not find: " + unfound_products },
-          })
-        );
+          );
+        }
+
       }
-
-      setRows(products!.map((product:IProduct) => {
-        const imported_value = array.find(element => element.CODE == product.product_code);
-
-        return {
-          _id: new ObjectID().toHexString(),
-          product_id: product._id,
-          product_code: product.product_code,
-          product_name: product.name,
-          amount: imported_value.AMOUNT,
-        }}));
-    });
-    };
+      // const imported_rows = value_array!.map((imported_product:{CODE:string, AMOUNT:number}) => {
+      setRows(final_array);
+    })};
 
   const handleOnSubmit = (e:any) => {
       e.preventDefault();
@@ -300,7 +305,7 @@ export const ForecastPage = () => {
     });
 
     calculateForecast(forecastList).then((result: IForecastResults[]) => {
-      console.log(result);
+      // console.log(result);
       const newRows = result.map((item, idx) => {
         return {
           id: idx,
@@ -317,6 +322,8 @@ export const ForecastPage = () => {
       });
 
       setMaterialRows(newRows);
+      // console.log(testRef)
+      testRef.current?.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
     });
   };
 
@@ -374,7 +381,9 @@ export const ForecastPage = () => {
           rows={rows}
           columns={forecastColumns}
           autoHeight={true}
-          rowHeight={45}
+          pagination
+          density={'compact'}
+          // rowHeight={45}
           onCellKeyDown={(params, event) => {
             if (event.code == "Space") {
               event.stopPropagation();
@@ -394,21 +403,27 @@ export const ForecastPage = () => {
             console.error("onProcessRowUpdateError", e);
           }}
           onCellEditCommit={(e, value) => {
-            console.log("test", e, value);
+            // console.log("test", e, value);
             handleEditCell(e.id.toString(), e.field, e.value);
           }}
           // hideFooterPagination
           components={{
-            Footer: CustomPagination,
+            // Footer: CustomPagination,
+            Toolbar:GridToolbar,
           }}
           // hideFooter
           // rowCount={listOptions!.totalDocs}
         />
       </Card>
       {materialRows ? (
-        <Box
-          sx={{
-            mt: 2,
+        
+        <Card
+          ref={(element: any) => testRef!.current = (element)}
+          style={{
+            marginTop:2,
+            padding:5,
+            scrollMarginTop:350,
+            overflow:'clip'
           }}
         >
           <Typography variant="h6" sx={{ textAlign: "center", mb: 0.5 }}>
@@ -420,9 +435,10 @@ export const ForecastPage = () => {
             getRowId={(row) => row.product_id}
             columns={materialColumns}
             autoHeight={true}
-            rowHeight={45}
+            density={'compact'}
+            components={{Toolbar:GridToolbar}}
           />
-        </Box>
+        </Card>
       ) : null}
     </>
   );
