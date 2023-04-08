@@ -93,3 +93,53 @@ export const getQuery = (
 
   return JSON.stringify(q);
 };
+
+export interface ValidationInfo {
+  required: boolean;
+  genericVal?: "Text" | "Date";
+  validateCustom?: any; //takes in a value and returns boolean
+}
+
+const errorMessage = {
+  TextEmpty: "Text is Empty",
+  InvalidDate: "Invalid Date",
+  RequiredField: "Required Field",
+};
+
+export const isValid = (
+  value: any,
+  validation: ValidationInfo
+): { valid: boolean; msg?: string } => {
+  let isValid = true;
+  let message: string = "";
+
+  if (validation.required && (value === undefined || value === null)) {
+    return { valid: false, msg: errorMessage.RequiredField };
+  }
+
+  if (validation.validateCustom) {
+    isValid = validation.validateCustom(value);
+    if (isValid === false) return { valid: isValid, msg: message };
+  }
+
+  if (validation.genericVal) {
+    if (validation.genericVal === "Text") {
+      if (validation.required && !value) {
+        isValid = false;
+        message = errorMessage.TextEmpty;
+      }
+    } else if (validation.genericVal === "Date") {
+    }
+  }
+
+  if (isValid === false) return { valid: false, msg: message };
+
+  return { valid: true };
+};
+
+const validateText = (value: string): boolean => {
+  return true;
+};
+const validateDate = (value: string): boolean => {
+  return true;
+};
