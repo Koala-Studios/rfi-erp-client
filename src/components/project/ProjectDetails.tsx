@@ -15,7 +15,13 @@ import { AuthContext } from "../navigation/AuthProvider";
 import StandaloneAutocomplete from "../utils/StandaloneAutocomplete";
 import { ProjectDetailsTable } from "./ProjectDetailsTable";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { ValidationInfo, isValid } from "../../logic/utils";
+import {
+  InputInfo,
+  InputVisual,
+  ValidationInfo,
+  isValid,
+  validateInput,
+} from "../../logic/validation.logic";
 
 // const yyyymmdd = (date: Date) => {
 //   var mm = date.getMonth() + 1; // getMonth() is zero-based
@@ -40,15 +46,10 @@ const emptyProject: IProject = {
 
 let savedProject: IProject | null = null;
 
-interface InputInfo {
-  label: string;
-  ref: number;
-  validation: ValidationInfo;
-}
-
 const inputRefMap = {
   name: 0,
-  product_code: 1,
+  project_code: 1,
+  start_date: 2,
 };
 
 const inputMap: InputInfo[] = [
@@ -58,12 +59,17 @@ const inputMap: InputInfo[] = [
     ref: 1,
     validation: { required: true, genericVal: "Text" },
   },
+  {
+    label: "start_date",
+    ref: 2,
+    validation: { required: true, genericVal: "Text" },
+  },
+  {
+    label: "project_code",
+    ref: 1,
+    validation: { required: true, genericVal: "Text" },
+  },
 ];
-
-interface InputInfoItem {
-  error?: boolean;
-  helperText?: string;
-}
 
 export const ProjectDetails = () => {
   const navigate = useNavigate();
@@ -75,14 +81,9 @@ export const ProjectDetails = () => {
   const [projectSaved, setProjectSaved] = useState<boolean>(true);
 
   const inputRefs = useRef<any[]>([]);
-  const [inputStates, setInputStates] = useState<InputInfoItem[]>(
-    Array(inputMap.length).fill({ error: false })
+  const [inputVisuals, setInputVisuals] = useState<InputVisual[]>(
+    Array(inputMap.length).fill({ helperText: "", error: false })
   );
-
-  // usePrompt(
-  //   "You have unsaved changes. Are you sure you want to leave?",
-  //   !projectSaved
-  // );
 
   useEffect(() => {
     if (id === "new") {
@@ -110,25 +111,16 @@ export const ProjectDetails = () => {
     event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement, Element>,
     input: InputInfo
   ) => {
-    //check valid
-    //save to project
     const _input = inputRefs.current[input.ref];
 
-    const inputValidation = isValid(
-      _input.value,
-      inputMap[input.ref].validation
-    );
+    const inputVal = isValid(_input.value, inputMap[input.ref].validation);
+    inputVisuals[input.ref] = {
+      helperText: inputVal.msg,
+      error: !inputVal.valid,
+    };
 
-    console.log(_input.value, inputValidation);
-    if (inputValidation.valid === false) {
-      inputStates[input.ref].helperText = inputValidation.msg;
-      inputStates[input.ref].error = true;
-    } else {
-      inputStates[input.ref].helperText = "";
-      inputStates[input.ref].error = false;
-    }
+    setInputVisuals({ ...inputVisuals });
 
-    setInputStates({ ...inputStates });
     const label = inputMap[input.ref].label;
     //@ts-ignore
     project[label] = event.target.value;
@@ -143,21 +135,28 @@ export const ProjectDetails = () => {
     for (let i = 0; i < inputRefs.current.length; i++) {
       const _input = inputRefs.current[i];
 
-      const inputValidation = isValid(_input.value, inputMap[i].validation);
+      const inputVal = isValid(_input.value, inputMap[i].validation);
+      inputVisuals[i] = {
+        helperText: inputVal.msg,
+        error: !inputVal.valid,
+      };
 
-      // console.log(_input.value, inputValidation);
-      if (inputValidation.valid === false) {
-        inputStates[i].helperText = inputValidation.msg;
-        inputStates[i].error = true;
-
-        setInputStates({ ...inputStates });
-
+      if (inputVal.valid === false) {
         allValid = false;
-      } else {
       }
     }
 
+    setInputVisuals({ ...inputVisuals });
+
     if (allValid === false) {
+      window.dispatchEvent(
+        new CustomEvent("NotificationEvent", {
+          detail: {
+            text: "Changes Not Saved. Some inputs are invalid",
+            color: "error",
+          },
+        })
+      );
       return;
     }
 
@@ -213,32 +212,37 @@ export const ProjectDetails = () => {
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <TextField
+                defaultValue={project.name}
                 inputRef={(el: any) =>
                   (inputRefs.current[inputRefMap.name] = el)
                 }
-                error={inputStates[inputRefMap.name].error}
-                helperText={inputStates[inputRefMap.name].helperText}
+                error={inputVisuals[inputRefMap.name].error}
+                helperText={inputVisuals[inputRefMap.name].helperText}
                 onBlur={(event) =>
                   onInputBlur(event, inputMap[inputRefMap.name])
                 }
                 required={inputMap[inputRefMap.name].validation.required}
-                // onChange={(e) =>
-                //   setProject({ ...project, name: e.target.value })
-                // }
                 spellCheck="false"
                 InputLabelProps={{ shrink: true }}
                 fullWidth
                 size="small"
                 variant="outlined"
                 label={"Project Title"}
-                // value={project.name}
-                defaultValue={project.name}
               ></TextField>
             </Grid>
             <Grid item xs={6}>
               <TextField
-                onChange={(e) =>
-                  setProject({ ...project, project_code: e.target.value })
+                defaultValue={project.project_code}
+                inputRef={(el: any) =>
+                  (inputRefs.current[inputRefMap.project_code] = el)
+                }
+                error={inputVisuals[inputRefMap.project_code].error}
+                helperText={inputVisuals[inputRefMap.project_code].helperText}
+                onBlur={(event) =>
+                  onInputBlur(event, inputMap[inputRefMap.project_code])
+                }
+                required={
+                  inputMap[inputRefMap.project_code].validation.required
                 }
                 spellCheck="false"
                 InputLabelProps={{ shrink: true }}
@@ -246,7 +250,6 @@ export const ProjectDetails = () => {
                 size="small"
                 variant="outlined"
                 label={"Project Code"}
-                value={project.project_code}
               ></TextField>
             </Grid>
 
@@ -265,18 +268,25 @@ export const ProjectDetails = () => {
             </Grid>
             <Grid item xs={6}>
               <TextField
-                onChange={(e) =>
-                  setProject({ ...project, start_date: e.target.value })
+                defaultValue={project.start_date}
+                inputRef={(el: any) =>
+                  (inputRefs.current[inputRefMap.start_date] = el)
                 }
-                helperText="Incorrect entry."
-                error
+                error={inputVisuals[inputRefMap.start_date].error}
+                helperText={inputVisuals[inputRefMap.start_date].helperText}
+                onBlur={(event) =>
+                  onInputBlur(event, inputMap[inputRefMap.start_date])
+                }
+                required={inputMap[inputRefMap.start_date].validation.required}
+                // onChange={(e) =>
+                //   setProject({ ...project, start_date: e.target.value })
+                // }
                 fullWidth
                 InputLabelProps={{ shrink: true }}
                 size="small"
                 variant="outlined"
                 label={"Start Date"}
                 type={"date"}
-                value={project.start_date}
               ></TextField>
             </Grid>
             <Grid item xs={6}>
