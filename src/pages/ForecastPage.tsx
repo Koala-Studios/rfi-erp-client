@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar } from "@mui/x-data-grid";
 import React from "react";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { DataTable } from "../components/utils/DataTable";
@@ -24,6 +24,7 @@ import { IInventory } from "../logic/inventory.logic";
 import { ObjectID } from "bson";
 import { useNavigate } from "react-router-dom";
 import { darken, lighten } from "@mui/material/styles";
+import { IProduct, lookupProducts } from "../logic/product.logic";
 
 const getClassName = (row: IForecastResults) => {
   if (row.required_amount <= row.available_amount) {
@@ -48,6 +49,8 @@ export const ForecastPage = () => {
   const navigate = useNavigate();
   const auth = React.useContext(AuthContext);
   const [rowCount, setRowCount] = React.useState(0);
+  let testRef = React.useRef<HTMLDivElement>();
+  const [file, setFile] = React.useState();
   const forecastColumns: GridColDef[] = [
     {
       field: "product_id",
@@ -72,7 +75,7 @@ export const ForecastPage = () => {
     { field: "product_code", headerName: "Product Code", width: 150 },
     {
       field: "product_name",
-      headerName: "Internal Product",
+      headerName: "Product Name",
       width: 350,
       sortable: false,
       filterable: false,
@@ -104,14 +107,13 @@ export const ForecastPage = () => {
       field: "product_name",
       headerName: "Material Name",
       width: 300,
-      sortable: false,
-      filterable: false,
     },
     {
       field: "required_amount",
       headerName: "Required Qty",
       type: "number",
       width: 150,
+      valueGetter: (params) => params.row.required_amount.toFixed(15)
     },
     {
       field: "available_amount",
@@ -133,7 +135,7 @@ export const ForecastPage = () => {
     },
   ];
 
-  const [lineItems, SetLineItems] = React.useState<IProductLine[]>([
+  const [rows, setRows] = React.useState<IProductLine[]>([
     {
       _id: new ObjectID().toHexString(),
       product_id: "",
@@ -147,17 +149,17 @@ export const ForecastPage = () => {
   >(null);
 
   const handleDeleteRow = (row_id: string) => {
-    const rowIdx = lineItems.findIndex((r) => r._id === row_id);
+    const rowIdx = rows.findIndex((r) => r._id === row_id);
 
-    let pList = lineItems.slice();
+    let pList = rows.slice();
     pList.splice(rowIdx, 1);
-    SetLineItems(pList);
+    setRows(pList);
   };
 
   const handleAddLine = (lineProduct: IProductLine) => {
-    const index = lineItems.indexOf(lineProduct) + 1;
-    SetLineItems([
-      ...lineItems.slice(0, index),
+    const index = rows.indexOf(lineProduct) + 1;
+    setRows([
+      ...rows.slice(0, index),
       {
         _id: new ObjectID().toHexString(),
         product_id: "",
@@ -165,46 +167,46 @@ export const ForecastPage = () => {
         product_name: "",
         amount: 0,
       },
-      ...lineItems.slice(index, lineItems.length),
+      ...rows.slice(index, rows.length),
     ]);
   };
   const handleRemoveLine = (lineProduct: IProductLine) => {
-    if (lineItems.length <= 1) return;
-    const index = lineItems.indexOf(lineProduct);
+    if (rows.length <= 1) return;
+    const index = rows.indexOf(lineProduct);
 
     if (index >= 0) {
-      lineItems.splice(index, 1);
-      SetLineItems([...lineItems]);
+      rows.splice(index, 1);
+      setRows([...rows]);
     }
   };
 
   const handleEditProductRow = (rowid: string, value: IInventory) => {
-    let pList = lineItems!.slice();
-    const rowIdx = lineItems!.findIndex((r) => r._id === rowid);
+    let pList = rows!.slice();
+    const rowIdx = rows!.findIndex((r) => r._id === rowid);
     pList[rowIdx].product_code = value.product_code;
     pList[rowIdx].product_id = value._id;
     pList[rowIdx].product_name = value.name;
 
-    SetLineItems(pList);
+    setRows(pList);
   };
 
   const handleEditCell = (row_id: string, field: string, value: any) => {
-    const rowIndex = lineItems.findIndex((r: IProductLine) => r._id === row_id);
-    SetLineItems([
-      ...lineItems.slice(0, rowIndex),
+    const rowIndex = rows.findIndex((r: IProductLine) => r._id === row_id);
+    setRows([
+      ...rows.slice(0, rowIndex),
       {
-        ...lineItems[rowIndex],
+        ...rows[rowIndex],
         [field]: value,
       },
-      ...lineItems.slice(
-        rowIndex == lineItems.length ? rowIndex : rowIndex + 1
+      ...rows.slice(
+        rowIndex == rows.length ? rowIndex : rowIndex + 1
       ),
     ]);
   };
 
   const handleAddRow = () => {
-    SetLineItems([
-      ...lineItems,
+    setRows([
+      ...rows,
       {
         _id: new ObjectID().toHexString(),
         product_id: "",
@@ -216,12 +218,84 @@ export const ForecastPage = () => {
     setRowCount(rowCount + 1);
   };
 
+
+  const fileReader = new FileReader();
+
+  const handleOnChange = (e:any) => {
+      setFile(e.target.files[0]);
+      // console.log(e.target.files[0])
+  };
+
+  const csvFileToArray = async (textFile:string) => {
+    // console.log(JSON.stringify(textFile), "testFile")
+    textFile = textFile.replace( /[\r\n]+/gm, "\n" );
+    const csvHeader = textFile.slice(0, textFile.indexOf("\n")).split(",");
+    // console.log(csvHeader, "BRUH")
+    const csvRows = textFile.slice(textFile.indexOf("\n") + 1).split("\n");
+    let product_codes: any[] = [];
+    let unfound_products:any[] = [];
+    let final_array:any[] =[];
+    const value_array = csvRows.map(i => {
+      
+      const values = i.split(",");
+      const obj = csvHeader.reduce((object:any, header, index) => {
+        object[header] = values[index];
+          return object;
+      }, {});
+      product_codes = [...product_codes, obj.CODE];
+      return obj;
+    });
+    //looking up imported values
+    lookupProducts(product_codes).then((products:IProduct[] | null) => {
+      //setting rows to imported values
+      value_array.map((element1) => {
+
+        if(products?.find((element => element1.CODE === element.product_code)) === undefined){
+          unfound_products = [...unfound_products, element1.CODE + '\n']
+        }
+      });
+      window.dispatchEvent(
+        new CustomEvent("NotificationEvent", {
+          detail: { color: "warning", text: "Could not find: " + unfound_products },
+        })
+      );
+      for(const imported_product of value_array) {
+        const product:IProduct | undefined = products!.find(element => imported_product.AMOUNT !== undefined && element.product_code === imported_product.CODE);
+        if(product) {
+          final_array.push({
+            _id: new ObjectID().toHexString(),
+            product_id: product!._id,
+            product_code: product!.product_code,
+            product_name: product!.name,
+            amount: imported_product.AMOUNT,
+          }
+          );
+        }
+
+      }
+      // const imported_rows = value_array!.map((imported_product:{CODE:string, AMOUNT:number}) => {
+      setRows(final_array);
+    })};
+
+  const handleOnSubmit = (e:any) => {
+      e.preventDefault();
+
+      if (file) {
+        fileReader.onload = function (event:any) {
+          const text = event?.target.result;
+          csvFileToArray(text);
+        };
+  
+        fileReader.readAsText(file);
+      }
+  };
+
   const handleCalculate = () => {
-    if (lineItems.length === 0) return;
+    if (rows.length === 0) return;
 
     //TODO:Remove elements that are not filled in
 
-    const forecastList: IForecast[] = lineItems.map((line) => {
+    const forecastList: IForecast[] = rows.map((line) => {
       return {
         product_id: line.product_id,
         product_name: line.product_name,
@@ -231,7 +305,7 @@ export const ForecastPage = () => {
     });
 
     calculateForecast(forecastList).then((result: IForecastResults[]) => {
-      console.log(result);
+      // console.log(result);
       const newRows = result.map((item, idx) => {
         return {
           id: idx,
@@ -248,6 +322,8 @@ export const ForecastPage = () => {
       });
 
       setMaterialRows(newRows);
+      // console.log(testRef)
+      testRef.current?.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
     });
   };
 
@@ -277,15 +353,23 @@ export const ForecastPage = () => {
   return (
     <>
       <Card variant="outlined" sx={{ p: 3 }}>
+
         <Box sx={{ mb: 2 }}>
-          <Button
-            size="medium"
-            variant="outlined"
-            onClick={handleAddRow}
-            sx={{ mr: 2 }}
-          >
-            + Add Row
-          </Button>
+        <div>
+        <Button size="medium" variant="contained" sx={{marginBottom:2, marginRight:1}}
+                    onClick={(e) => {
+                        handleOnSubmit(e);
+                    }}
+                >
+                    IMPORT CSV
+                </Button>
+                <input
+                    type={"file"}
+                    id={"csvFileInput"}
+                    accept={".csv"}
+                    onChange={handleOnChange}
+                />
+          </div>
           <Button size="medium" variant="contained" onClick={handleCalculate}>
             Calculate
           </Button>
@@ -294,10 +378,12 @@ export const ForecastPage = () => {
           style={{
             border: "1px solid #c9c9c9",
           }}
-          rows={lineItems}
+          rows={rows}
           columns={forecastColumns}
           autoHeight={true}
-          rowHeight={45}
+          pagination
+          density={'compact'}
+          // rowHeight={45}
           onCellKeyDown={(params, event) => {
             if (event.code == "Space") {
               event.stopPropagation();
@@ -305,33 +391,39 @@ export const ForecastPage = () => {
           }}
           getRowId={(row) => row._id}
           processRowUpdate={(newRow) => {
-            let pList = lineItems.slice();
-            const rowIdx = lineItems.findIndex(
+            let pList = rows.slice();
+            const rowIdx = rows.findIndex(
               (r) => r.product_id === newRow._id
             );
             pList[rowIdx] = newRow;
-            SetLineItems(pList);
+            setRows(pList);
             return newRow;
           }}
           onProcessRowUpdateError={(e) => {
             console.error("onProcessRowUpdateError", e);
           }}
           onCellEditCommit={(e, value) => {
-            console.log("test", e, value);
+            // console.log("test", e, value);
             handleEditCell(e.id.toString(), e.field, e.value);
           }}
           // hideFooterPagination
           components={{
-            Footer: CustomPagination,
+            // Footer: CustomPagination,
+            Toolbar:GridToolbar,
           }}
           // hideFooter
           // rowCount={listOptions!.totalDocs}
         />
       </Card>
       {materialRows ? (
-        <Box
-          sx={{
-            mt: 2,
+        
+        <Card
+          ref={(element: any) => testRef!.current = (element)}
+          style={{
+            marginTop:2,
+            padding:5,
+            scrollMarginTop:350,
+            overflow:'clip'
           }}
         >
           <Typography variant="h6" sx={{ textAlign: "center", mb: 0.5 }}>
@@ -343,9 +435,10 @@ export const ForecastPage = () => {
             getRowId={(row) => row.product_id}
             columns={materialColumns}
             autoHeight={true}
-            rowHeight={45}
+            density={'compact'}
+            components={{Toolbar:GridToolbar}}
           />
-        </Box>
+        </Card>
       ) : null}
     </>
   );

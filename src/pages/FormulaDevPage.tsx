@@ -27,7 +27,7 @@ import { fireEvent } from "@testing-library/react";
 import TableAutocomplete from "../components/utils/TableAutocomplete";
 import { IProduct } from "../logic/product.logic";
 import WarningIcon from "@mui/icons-material/Warning";
-
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 const FormulaDevPage = () => {
   const navigate = useNavigate();
   const [invLookupCatalog, setInvLookupCatalog] = React.useState<any>(null);
@@ -402,6 +402,15 @@ const FormulaDevPage = () => {
   return (
     <>
       <Card variant="outlined" style={{ padding: 16, marginBottom: 10 }}>
+      <Button
+          sx={{ mb: 3 }}
+          aria-label="go back"
+          size="medium"
+          variant="outlined"
+          onClick={() => navigate(-1)}
+        >
+          <ArrowBackIcon fontSize="small" />
+        </Button>
         <div style={{ display: "flex", gap: 16 }}>
           <Grid container spacing={3}>
             <Grid item xs={2.5}>
