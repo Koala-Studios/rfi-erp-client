@@ -149,7 +149,6 @@ export const confirmPurchase = async (
 ): Promise<IPurchaseOrder | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
-    // params: {po_id: po_id}
   };
   let rtn = null;
   await api
@@ -167,7 +166,7 @@ export const confirmPurchase = async (
     .catch((err) => {
       console.log(err);
     });
-
+    
   return rtn;
 };
 

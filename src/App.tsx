@@ -40,6 +40,8 @@ import { SnackbarProvider } from "notistack";
 import StockCountListPage from "./pages/StockCountListPage";
 import { StockCountDetailPage } from "./pages/StockCountDetailPage";
 import { BatchingDetailPage } from "./pages/BatchingDetailPage";
+import { ProductTypeDetailPage } from "./pages/ProductTypeDetailPage";
+import ProductTypeListPage from "./pages/ProductTypeListPage";
 
 const mainTheme = createTheme({
   palette: {
@@ -197,6 +199,26 @@ function App() {
                   </RequireAuth>
                 }
               />
+                            <Route
+                path="/product-types"
+                element={
+                  <RequireAuth>
+                    <Navbar title="Product Types">
+                      <ProductTypeListPage />
+                    </Navbar>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/product-types/:id"
+                element={
+                  <RequireAuth>
+                    <Navbar title="Product Type Details">
+                      <ProductTypeDetailPage />
+                    </Navbar>
+                  </RequireAuth>
+                }
+              />
               <Route
                 path="/customers"
                 element={
@@ -321,6 +343,7 @@ function App() {
                   </RequireAuth>
                 }
               />
+              
             </Routes>
           </AuthProvider>
         </BrowserRouter>

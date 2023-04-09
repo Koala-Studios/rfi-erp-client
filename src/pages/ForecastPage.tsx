@@ -2,13 +2,15 @@ import {
   Box,
   Button,
   Card,
+  CircularProgress,
   Divider,
+  Fade,
   IconButton,
   TextField,
   Typography,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import { DataGrid, GridColDef, GridRenderCellParams, GridToolbar } from "@mui/x-data-grid";
+import { DataGrid, GridColDef, GridFooter, GridFooterContainer, GridRenderCellParams, GridToolbar } from "@mui/x-data-grid";
 import React from "react";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { DataTable } from "../components/utils/DataTable";
@@ -25,6 +27,7 @@ import { ObjectID } from "bson";
 import { useNavigate } from "react-router-dom";
 import { darken, lighten } from "@mui/material/styles";
 import { IProduct, lookupProducts } from "../logic/product.logic";
+import LinearProgress from '@mui/material/LinearProgress';
 
 const getClassName = (row: IForecastResults) => {
   if (row.required_amount <= row.available_amount) {
@@ -46,6 +49,7 @@ const getClassName = (row: IForecastResults) => {
 };
 
 export const ForecastPage = () => {
+  const [loading, setLoading] = React.useState(false);
   const navigate = useNavigate();
   const auth = React.useContext(AuthContext);
   const [rowCount, setRowCount] = React.useState(0);
@@ -292,6 +296,7 @@ export const ForecastPage = () => {
 
   const handleCalculate = () => {
     if (rows.length === 0) return;
+    setLoading(true);
 
     //TODO:Remove elements that are not filled in
 
@@ -322,22 +327,22 @@ export const ForecastPage = () => {
       });
 
       setMaterialRows(newRows);
-      // console.log(testRef)
+      window.dispatchEvent(
+        new CustomEvent("NotificationEvent", {
+          detail: { color: "success", text: "Success!"},
+        })
+      );
+      setLoading(false);
+      
+      testRef.current?.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});//with just one it doesn't work sometimes lol..
       testRef.current?.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
     });
   };
 
   const CustomPagination = () => {
     return (
-      <div
-        style={{
-          padding: "8px 0",
-          width: "100%",
-          display: "flex",
-          justifyContent: "flex-start",
-          borderTop: "0.5px solid #e0e0e0",
-        }}
-      >
+      <GridFooterContainer>
+
         <Button
           size="medium"
           variant="outlined"
@@ -346,7 +351,10 @@ export const ForecastPage = () => {
         >
           + Add Row
         </Button>
-      </div>
+      <GridFooter sx={{
+        border: 'none', // To delete double border.
+        }} />
+      </GridFooterContainer>
     );
   };
 
@@ -370,10 +378,21 @@ export const ForecastPage = () => {
                     onChange={handleOnChange}
                 />
           </div>
+          <div style={{display:'flex', alignItems:'center', gap:15}}>
           <Button size="medium" variant="contained" onClick={handleCalculate}>
             Calculate
           </Button>
-        </Box>
+          <Fade
+          in={loading}
+          style={{
+            transitionDelay: loading ? '250ms' : '0ms',
+          }}
+          unmountOnExit
+        >
+          <CircularProgress  />
+        </Fade>
+          </div>
+      </Box>
         <DataGrid
           style={{
             border: "1px solid #c9c9c9",
@@ -408,7 +427,7 @@ export const ForecastPage = () => {
           }}
           // hideFooterPagination
           components={{
-            // Footer: CustomPagination,
+            Footer: CustomPagination,
             Toolbar:GridToolbar,
           }}
           // hideFooter

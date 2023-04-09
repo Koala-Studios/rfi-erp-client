@@ -7,12 +7,14 @@ export interface IProductType {
   code: string;
   is_raw: boolean;
   for_sale: boolean;
+  avoid_recur: boolean;
+  total:number;
 }
 
 const api = axios.create({
   baseURL: "http://localhost:5000/product-types",
 });
-export const listproductTypes = async (
+export const listProductTypes = async (
   count: number,
   page: number
 ): Promise<IListOptions | null> => {
@@ -40,7 +42,7 @@ export const listproductTypes = async (
   return list;
 };
 
-export const getproductType = async (
+export const getProductType = async (
   id: string
 ): Promise<IProductType | null> => {
   const config = {
@@ -93,7 +95,7 @@ export const lookupProductType = async (
   return list;
 };
 
-export const createproductType = async (
+export const createProductType = async (
   formData: IProductType
 ): Promise<string | null> => {
   const config = {
@@ -116,7 +118,7 @@ export const createproductType = async (
 
   return rtn;
 };
-export const updateproductType = async (
+export const updateProductType = async (
   formData: IProductType
 ): Promise<boolean> => {
   const config = {

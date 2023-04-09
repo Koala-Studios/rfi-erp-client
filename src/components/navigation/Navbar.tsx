@@ -45,6 +45,7 @@ import FormHandler from "./FormHandler";
 import OilBarrelIcon from "@mui/icons-material/OilBarrel";
 import AccountMenu from "../menus/AccountMenu";
 import NotificationMenu from "../menus/NotificationMenu";
+import CategoryIcon from '@mui/icons-material/Category';
 
 const drawerWidth = 190;
 
@@ -113,6 +114,11 @@ const LinkItems = [
     text: "Suppliers",
     link: "/suppliers",
     icon: <PersonPinCircleIcon></PersonPinCircleIcon>,
+  },
+  {
+    text: "Product Types",
+    link: "/product-types",
+    icon: <CategoryIcon></CategoryIcon>,
   },
 ];
 

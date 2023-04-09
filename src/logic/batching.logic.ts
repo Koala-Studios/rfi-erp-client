@@ -171,7 +171,7 @@ export const confirmBatching = async (
   };
   let rtn = null;
   await api
-    .post("/confirm-stock-count", batching, config)
+    .post("/confirm", batching, config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
         window.dispatchEvent(
@@ -184,7 +184,6 @@ export const confirmBatching = async (
     .catch((err) => {
       console.log(err);
     });
-
   return rtn;
 };
 
@@ -251,7 +250,7 @@ export const markBatchingAbandoned = async (
   let rtn = null;
 
   await api
-    .post("/mark-received", batching_id, config)
+    .post("/mark-abandoned", batching_id, config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
         window.dispatchEvent(
@@ -316,7 +315,7 @@ export const generateBatchingBOM = async (
         window.dispatchEvent(
           new CustomEvent("NotificationEvent", { detail: { text: res.data.message } })
         );
-        console.log(res.data.res, 'BATCH GENERATED BOM')
+        // console.log(res.data, 'BATCH GENERATED BOM')
         rtn = res.data.res;
       }
 

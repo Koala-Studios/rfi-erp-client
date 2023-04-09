@@ -28,6 +28,7 @@ import TableAutocomplete from "../components/utils/TableAutocomplete";
 import { IProduct } from "../logic/product.logic";
 import WarningIcon from "@mui/icons-material/Warning";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { ObjectID } from "bson";
 const FormulaDevPage = () => {
   const navigate = useNavigate();
   const [invLookupCatalog, setInvLookupCatalog] = React.useState<any>(null);
@@ -50,38 +51,45 @@ const FormulaDevPage = () => {
   const { version } = useParams();
   React.useEffect(() => {
     getFormula(id!, version!).then((formula) => {
-      setYield(formula!.yield ? formula!.yield : 1.0);
-      setBase100(formula!.base_hundred ? formula!.base_hundred : true);
-      if (!formula?.formula_items) {
-        setRows([
-          {
-            id: "row" + rowCount,
-            amount: 0,
-            last_amount: 0,
-            item_cost: 0,
-            cost: 0,
-          },
-        ]);
-        setRowCount(rowCount + 1);
+      if(formula){ 
+
+        setYield(formula!.yield ? formula!.yield : 1.0);
+        setBase100(formula!.base_hundred ? formula!.base_hundred : true);
+        if (!formula?.formula_items) {
+          setRows([
+            {
+              id: "row" + rowCount,
+              amount: 0,
+              last_amount: 0,
+              item_cost: 0,
+              cost: 0,
+            },
+          ]);
+          setRowCount(rowCount + 1);
+        } else {
+          let count = 0;
+          let amount = 0;
+          const newRows = formula!.formula_items.map((item, index) => {
+            return {
+              id: new ObjectID().toHexString(),
+              material_id: item.material_id,
+              material_code: item.material_code,
+              material_name: item.material_name,
+              item_cost: item.cost,
+              cost: 0,
+              amount: 0,
+              last_cost: (item.cost * item.amount) / 100,
+              last_amount: item.amount,
+              notes: item.notes,
+            };
+          });
+          setRows(newRows);
+          setRowCount(count);
+        }
       } else {
-        let count = 0;
-        let amount = 0;
-        const newRows = formula!.formula_items.map((item, index) => {
-          return {
-            id: item.material_id + "" + count++,
-            material_id: item.material_id,
-            material_code: item.material_code,
-            material_name: item.material_name,
-            item_cost: item.cost,
-            cost: 0,
-            amount: 0,
-            last_cost: (item.cost * item.amount) / 100,
-            last_amount: item.amount,
-            notes: item.notes,
-          };
-        });
-        setRows(newRows);
-        setRowCount(count);
+        setYield(1);
+        setBase100(true);
+        setRows([{id:new ObjectID().toHexString(), material_id: null, material_code: null, material_name: '', item_cost: 0, amount: 0, last_cost:0,last_amount: null, notes: ''}]);
       }
     });
   }, []);

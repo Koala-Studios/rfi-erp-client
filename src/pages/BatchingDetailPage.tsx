@@ -30,7 +30,7 @@ import {
   import SaveForm from "../components/forms/SaveForm";
   import StandaloneAutocomplete from "../components/utils/StandaloneAutocomplete";
   import { ISupplier } from "../logic/supplier.logic";
-  import { confirmBatching, createBatching, getBatching, IBatching, markBatchingCancelled, updateBatching, finishBatching, IBatchingIngredient, generateBatchingBOM }  from "../logic/batching.logic";
+  import { confirmBatching, createBatching, getBatching, IBatching, markBatchingCancelled, updateBatching, finishBatching, IBatchingIngredient, generateBatchingBOM, batchingStatus }  from "../logic/batching.logic";
 import { IProduct } from "../logic/product.logic";
 import { padding } from "@mui/system";
   
@@ -58,7 +58,11 @@ import { padding } from "@mui/system";
       pList[rowIdx].product_name = value.name;
       setRows(pList);
     };
-  
+    const addDays = (date:Date, days:number) => {
+      var result = new Date(date);
+      result.setDate(result.getDate() + days);
+      return result;
+    }
     const emptyBatching: IBatching = {
         _id: "",
         status: 6,
@@ -69,8 +73,8 @@ import { padding } from "@mui/system";
         product_name: "",
         product_id: null,
         quantity: 0,
-        date_created: "",
-        date_needed: ""
+        date_created: new Date().toISOString().split('T')[0],
+        date_needed: addDays(new Date(),5).toISOString().split('T')[0]
     };
   
     const [batchingSaved, setBatchingSaved] = React.useState<boolean>(true);
@@ -193,11 +197,12 @@ import { padding } from "@mui/system";
     ];
   
     const handleConfirmBatching = () => {
-        confirmBatching(auth.token, batching!).then((_batching: any) => {
+        confirmBatching(auth.token, batching!).then((_batching: IBatching | null) => {
         if (_batching) {
           savedBatching = _batching;
           setBatching(_batching);
           setBatchingSaved(true);
+          handleGenerateBatchingBOM();
         } else {
           console.log("Batching Not Updated");
         }
@@ -231,11 +236,11 @@ import { padding } from "@mui/system";
 
       const handleGenerateBatchingBOM = () => {
         generateBatchingBOM(auth.token, batching!._id).then((_batching) => {
-          console.log("gen BOM batching", _batching, _batching?.status);
           if (_batching) {
             savedBatching = _batching;
             setBatching(_batching);
             setBatchingSaved(true);
+            setRows(_batching.ingredients)
           } else {
             console.log("Batching Not Updated");
           }
@@ -379,10 +384,11 @@ import { padding } from "@mui/system";
                         console.log(e, value, 'TESTER')
                     setBatching({ ...batching, product_id: value._id, product_code: value.product_code, product_name: value.name});
                     }}
+                    readOnly={batching.status != batchingStatus.DRAFT}
                     label={"Product"}
                     letterMin={0}
                     dbOption={"product"}
-                    getOptionLabel={(item: IProduct) => item.product_code + ' ' + item.name }
+                    getOptionLabel={(item: IProduct) => item.product_code + ' | ' + item.name }
                 />
                 </Grid>
                 <Grid item xs={1.5}>
@@ -393,6 +399,10 @@ import { padding } from "@mui/system";
                         quantity: parseFloat(e.target.value),
                       })
                     }
+                    InputProps={{
+                      readOnly: batching.status != batchingStatus.DRAFT,
+                    }}
+          
                     fullWidth
                     InputLabelProps={{ shrink: true }}
                     size="small"
@@ -416,7 +426,7 @@ import { padding } from "@mui/system";
                     variant="outlined"
                     label={"Batching Date"}
                     type={"date"}
-                    value={batching.date_created}
+                    value={batching.date_created.split('T')[0]}
                   ></TextField>
                 </Grid>
                 <Grid item xs={3}>
@@ -431,9 +441,9 @@ import { padding } from "@mui/system";
                     InputLabelProps={{ shrink: true }}
                     size="small"
                     variant="outlined"
-                    label={"Arrival Date"}
+                    label={"Deadline Date"}
                     type={"date"}
-                    value={batching.date_needed}
+                    value={batching.date_needed.split('T')[0]}
                   ></TextField>
                 </Grid>
                 <Grid item xs={2}>
@@ -507,9 +517,9 @@ import { padding } from "@mui/system";
                 color="success"
                 variant="contained"
                 disabled={id === "new"}
-                onClick={() => handleMarkBatchingCancelled()}
+                onClick={() => handleMarkBatchingCancelled()}//TODO: CHANGE THIS
               >
-                Set as Received
+                Finish Batching
               </Button>
               <Button
                 color="error"
@@ -523,25 +533,6 @@ import { padding } from "@mui/system";
           </div>
         </Card>
         <Card variant="outlined" sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
-          <div>
-            <Button
-              style={{
-                marginBottom: 10,
-                marginRight: 10,
-                display: `${batching.status === 6 ? "block" : "none"}`,
-              }}
-              variant="contained"
-              onClick={() => {
-                handleGenerateBatchingBOM()
-              }}
-            >
-              Generate BOM
-            </Button>
-            {/* <Switch color="primary"
-            disabled={id=== "new"}
-            onChange={() => setReceiveMode(!receiveMode)}/>
-            Receive Mode */}
-          </div>
           <DataGrid
             autoHeight={true}
             rowHeight={46}
