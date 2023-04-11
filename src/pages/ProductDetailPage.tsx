@@ -25,6 +25,7 @@ import { IProductType } from "../logic/product-type.logic";
 const emptyProduct: IProduct = {
   _id: "",
   name: "",
+  aliases:"",
   description: "",
   rating: null,
   product_code: "",
@@ -151,7 +152,7 @@ export const ProductDetailPage = () => {
         </Button>
         <div style={{ display: "flex", gap: 16, marginBottom: 10 }}>
           <Grid container spacing={3}>
-            <Grid item xs={4}>
+            <Grid item xs={2}>
               <TextField
                 spellCheck="false"
                 InputLabelProps={{ shrink: true }}
@@ -165,7 +166,7 @@ export const ProductDetailPage = () => {
                 label={"Product Code"}
               ></TextField>
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={5}>
               <TextField
                 onChange={(e) =>
                   setProduct({ ...product, name: e.target.value })
@@ -180,7 +181,7 @@ export const ProductDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
-            <Grid item xs={2}>
+            <Grid item xs={1}>
               <TextField
                 spellCheck="false"
                 InputLabelProps={{ shrink: true }}
@@ -200,8 +201,8 @@ export const ProductDetailPage = () => {
                   ProductStatus[product?.status ? product.status - 1 : 4][0]
                 }
                 sx={{
-                  width: "100%",
-                  height: "100%",
+                  width: "80%",
+                  height: "80%",
                   borderRadius: 10,
                   fontWeight: 600,
                 }}
@@ -212,36 +213,20 @@ export const ProductDetailPage = () => {
                 variant="outlined"
               />
             </Grid>
-
-            <Grid item xs={4}>
-              <TextField
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                size="small"
-                variant="outlined"
-                label={"Created Date"}
-                InputProps={{
-                  readOnly: !isNewId,
+            <Grid item xs={2} sx={{ "& > legend": { mt: -0.5 }, }} >
+              <Typography component="legend">Rating</Typography>
+              <Rating
+                onChange={(e, value) => {
+                  console.log(value);
+                  setProduct({ ...product, rating: value });
                 }}
-                type={"date"}
-              ></TextField>
+                name="half-rating"
+                value={product.rating}
+                precision={0.5}
+              />
             </Grid>
-            <Grid item xs={4}>
-              <TextField
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                size="small"
-                variant="outlined"
-                label={"Approved Date"}
-                InputProps={{
-                  readOnly: true,
-                }}
-                type={"date"}
-              ></TextField>
-            </Grid>
-            <Grid item xs={4} />
 
-            <Grid item xs={4}>
+            <Grid item xs={2}>
               <StandaloneAutocomplete
                 initialValue={product.product_type}
                 readOnly={!isNewId}
@@ -257,23 +242,48 @@ export const ProductDetailPage = () => {
               />
             </Grid>
 
-            <Grid
-              item
-              xs={2}
-              sx={{
-                "& > legend": { mt: -0.5 },
-              }}
-            >
-              <Typography component="legend">Rating</Typography>
-              <Rating
-                onChange={(e, value) => {
-                  console.log(value);
-                  setProduct({ ...product, rating: value });
+            <Grid item xs={6} >
+            <TextField
+                onChange={(e) =>
+                  setProduct({ ...product, aliases: e.target.value })
+                }
+                spellCheck="false"
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+                size="small"
+                variant="outlined"
+                label={"Product Aliases"}
+                value={product.aliases}
+                multiline
+                rows={2}
+              ></TextField>
+            </Grid>
+
+            <Grid item xs={2}>
+              <TextField
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                size="small"
+                variant="outlined"
+                label={"Created Date"}
+                InputProps={{
+                  readOnly: !isNewId,
                 }}
-                name="half-rating"
-                value={product.rating}
-                precision={0.5}
-              />
+                type={"date"}
+              ></TextField>
+            </Grid>
+            <Grid item xs={2}>
+              <TextField
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                size="small"
+                variant="outlined"
+                label={"Approved Date"}
+                InputProps={{
+                  readOnly: true,
+                }}
+                type={"date"}
+              ></TextField>
             </Grid>
             <Grid item xs={12}>
               <TextField

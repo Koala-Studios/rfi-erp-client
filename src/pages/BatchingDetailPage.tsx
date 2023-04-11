@@ -158,7 +158,7 @@ import { padding } from "@mui/system";
         filterable: false,
         renderCell: (row_params: GridRenderCellParams<string>) => (
           <TableAutocomplete
-            dbOption="inventory"
+            dbOption="material"
             handleEditRow={handleEditProductRow}
             rowParams={row_params}
             initialValue={row_params.row.product_name}
@@ -387,8 +387,8 @@ import { padding } from "@mui/system";
                     readOnly={batching.status != batchingStatus.DRAFT}
                     label={"Product"}
                     letterMin={0}
-                    dbOption={"product"}
-                    getOptionLabel={(item: IProduct) => item.product_code + ' | ' + item.name }
+                    dbOption={"approved-product"}
+                    getOptionLabel={(item: IProduct) => item.product_code ? item.product_code + ' | ' + item.name : '' }
                 />
                 </Grid>
                 <Grid item xs={1.5}>

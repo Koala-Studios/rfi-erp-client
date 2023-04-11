@@ -11,7 +11,7 @@ export interface ISupplier {
   address_two?: string;
   lead_time?: string;
   phone?: string;
-  createdAt?: string;
+  created_date: string;
 }
 
 const api = axios.create({

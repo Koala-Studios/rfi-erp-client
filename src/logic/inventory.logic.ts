@@ -34,6 +34,7 @@ export interface IInventory {
   date_created: Date;
   cas_number: string;
   reorder_amount: number;
+  aliases:string;
   stock: IStockSummary;
   regulatory: IRegulatoryContainer;
   product_type: { name: string; _id: string } | null;
@@ -101,14 +102,16 @@ export const getProduct = async (id: string): Promise<IInventory | null> => {
 
 export const lookupInventory = async (
   search_value: string,
-  for_sale: boolean,
-  approved?: boolean
+  for_sale: boolean | null,
+  is_raw: boolean | null,
+  approved?: boolean | null
 ): Promise<IInventory[] | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       search_value,
       for_sale,
+      is_raw,
       approved,
     },
   };

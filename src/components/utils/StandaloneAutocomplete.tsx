@@ -11,7 +11,19 @@ interface Props {
   readOnly?:boolean;
   placeholder?: string;
   letterMin: number;
-  dbOption: "customer" | "inventory" | "product" | "user" | "supplier" | "product-type";
+  dbOption:
+  | "customer"
+  | "inventory"// all products and materials
+  | "material" // not for sale
+  | "raw-mat" //is raw, not for sale
+  | "non-raw-mat" //is not raw, not for sale
+  | "product" //for sale
+  | "approved-product" //approved and for sale
+  | "approved-product-all" //for sale and not for sale, just approved that matters
+  | "user"
+  | "supplier"
+  | "product-type"
+  | "product-type-mat";
   onChange?: (event: React.SyntheticEvent<Element, Event>, value: any) => void;
 }
 

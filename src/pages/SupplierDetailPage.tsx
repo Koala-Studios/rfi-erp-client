@@ -21,6 +21,7 @@ const emptySupplier: ISupplier = {
   address_two: "",
   code: "",
   phone: "",
+  created_date: new Date().toISOString().split('T')[0]
 };
 
 let savedSupplier: ISupplier | null = null;
@@ -111,20 +112,6 @@ export const SupplierDetailPage = () => {
           <Grid container spacing={3}>
             <Grid item xs={2}>
               <TextField
-                onChange={(e) =>
-                  setSupplier({ ...supplier, createdAt: e.target.value })
-                }
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                size="small"
-                variant="outlined"
-                label={"Created Date"}
-                type={"date"}
-                value={supplier.createdAt}
-              ></TextField>
-            </Grid>
-            <Grid item xs={2}>
-              <TextField
                 onChange={(e) => {
                   setSupplier({ ...supplier, code: e.target.value });
                 }}
@@ -152,7 +139,21 @@ export const SupplierDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
-            <Grid item xs={5}>
+            <Grid item xs={2}>
+              <TextField
+                onChange={(e) =>
+                  setSupplier({ ...supplier, created_date: e.target.value })
+                }
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                size="small"
+                variant="outlined"
+                label={"Created Date"}
+                type={"date"}
+                value={supplier.created_date.split('T')[0]}
+              ></TextField>
+            </Grid>
+            <Grid item xs={4}>
               <TextField
                 onChange={(e) => {
                   setSupplier({ ...supplier, contact_name: e.target.value });

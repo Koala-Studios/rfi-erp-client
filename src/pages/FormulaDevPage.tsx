@@ -192,7 +192,7 @@ const FormulaDevPage = () => {
       filterable: false,
       renderCell: (row_params: GridRenderCellParams<string>) => (
         <TableAutocomplete
-          dbOption="inventory"
+          dbOption="raw-mat"
           // editMode={editMode}
           // setEditMode={setEditMode}
           handleEditRow={handleEditRow}
@@ -389,21 +389,21 @@ const FormulaDevPage = () => {
     }
   };
 
-  function filterChanges(str: string) {
-    lookupInventory(str, false).then((result) => {
-      const newCatalog = result?.map((item, key) => {
-        return {
-          id: key,
-          material_id: item._id,
-          material_code: item.product_code,
-          material_name: item.name,
-          label: item.product_code + " |     " + item.name,
-          cost: item.cost,
-        };
-      });
-      setInvLookupCatalog(newCatalog);
-    });
-  }
+  // function filterChanges(str: string) {
+  //   lookupInventory(str, false).then((result) => {
+  //     const newCatalog = result?.map((item, key) => {
+  //       return {
+  //         id: key,
+  //         material_id: item._id,
+  //         material_code: item.product_code,
+  //         material_name: item.name,
+  //         label: item.product_code + " |     " + item.name,
+  //         cost: item.cost,
+  //       };
+  //     });
+  //     setInvLookupCatalog(newCatalog);
+  //   });
+  // }
 
   if (rows == null) return null;
 

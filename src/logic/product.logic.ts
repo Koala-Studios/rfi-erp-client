@@ -49,6 +49,7 @@ export interface IProduct {
   stock?: IProductContainer;
   customers: IProductCustomers[];
   regulatory: IRegulatoryContainer;
+  aliases:string;
   versions: number;
   status: number;
   approved_version: number;
@@ -87,6 +88,38 @@ export const listProducts = async (
       console.log(err);
     });
 
+  return list;
+};
+
+
+
+export const lookupProduct = async (
+  search_value: string,
+  for_sale: boolean | null,
+  approved: boolean | null
+): Promise<IProduct[] | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+    params: {
+      search_value,
+      for_sale,
+      approved,
+    },
+  };
+
+  let list: IProduct[] | null = null;
+
+  await api
+    .get("/lookup", config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        console.log(res, 'test')
+        list = res.data.res;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
   return list;
 };
 

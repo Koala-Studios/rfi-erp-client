@@ -281,7 +281,7 @@ export const PurchaseDetailPage = () => {
       filterable: false,
       renderCell: (row_params: GridRenderCellParams<string>) => (
         <TableAutocomplete
-          dbOption="inventory"
+          dbOption="raw-mat"
           handleEditRow={handleEditProductRow}
           rowParams={row_params}
           initialValue={row_params.row.product_name}
