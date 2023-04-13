@@ -54,8 +54,6 @@ const api = axios.create({
   baseURL: "http://localhost:5000/inventory",
 });
 export const listInventory = async (
-  count: number,
-  page: number,
   q: URLSearchParams | undefined,
   filters: FilterElement[]
 ): Promise<IListOptions | null> => {
@@ -64,8 +62,6 @@ export const listInventory = async (
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
-      count,
-      page,
       query,
     },
   };

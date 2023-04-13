@@ -1,5 +1,5 @@
 import axios from "axios";
-import { apiStatus, IListOptions } from "./utils";
+import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
 
 export interface ISupplier {
   _id: string;
@@ -43,15 +43,15 @@ export const lookupSupplier = async (
   return list;
 };
 
-export const listSuppliers = async (
-  count: number,
-  page: number
+export const listSuppliers = async (  q: URLSearchParams | undefined,
+  filters: FilterElement[]
 ): Promise<IListOptions | null> => {
+  let query = getQuery(q, filters);
+
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
-      count,
-      page,
+      query,
     },
   };
 

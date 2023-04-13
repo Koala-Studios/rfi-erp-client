@@ -8,12 +8,25 @@ import {
 import { listCustomers } from "../logic/customer.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { Button, Card } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { IListData } from "../logic/utils";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { FilterElement, IListData } from "../logic/utils";
+import DataFilter from "../components/utils/DataFilter";
 
 const CustomerListPage = () => {
   const navigate = useNavigate();
-
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
+  const filterArray: FilterElement[] = [
+    {
+      label: "Product Code",
+      field: "product_code",
+      type: "text",
+    },
+    { label: "Batch Code", field: "batch_code", type: "text" },
+    { label: "Quantity", field: "quantity", type: "number", regexOption: null },
+  
+  ];
   const columns: GridColDef[] = [
     { field: "name", headerName: "Customer Name", width: 250 },
     { field: "code", headerName: "Customer Code", width: 200 },
@@ -48,10 +61,9 @@ const CustomerListPage = () => {
   ];
 
   const auth = React.useContext(AuthContext);
-  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listCustomers(25, 1).then((list) => {
+    listCustomers(searchParams, filterArray).then((list) => {
       console.log(list);
       const newRows = list!.docs.map((customer) => {
         return {
@@ -65,7 +77,7 @@ const CustomerListPage = () => {
       });
       setDataOptions({ rows: newRows, listOptions: list! });
     });
-  }, []);
+  }, [location.key]);
   const createNewCustomer = () => {
     navigate(`/customers/new`, { replace: false });
   };
@@ -78,6 +90,7 @@ const CustomerListPage = () => {
         variant="outlined"
         sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
       >
+        <DataFilter filters={filterArray}></DataFilter>
         <Button variant="contained" color="primary" onClick={createNewCustomer}>
           + New Customer
         </Button>

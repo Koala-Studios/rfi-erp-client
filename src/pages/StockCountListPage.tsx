@@ -10,10 +10,13 @@ import { AuthContext } from "../components/navigation/AuthProvider";
 import { Button, Card, Chip } from "@mui/material";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { FilterElement, IListData } from "../logic/utils";
+import DataFilter from "../components/utils/DataFilter";
 const StockCountListPage = () => {
   const navigate = useNavigate();
   const [currPage, setCurrPage] = React.useState<number>(1);
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
   const columns: GridColDef[] = [
     { field: "order_code", headerName: "SC Code", width: 200 },
     { field: "customer", headerName: "Customer Name", width: 200 },
@@ -43,7 +46,6 @@ const StockCountListPage = () => {
   ];
 
   const auth = React.useContext(AuthContext);
-  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   const filterArray: FilterElement[] = [
     { label: "Item Name", field: "name", type: "text" },
@@ -56,7 +58,7 @@ const StockCountListPage = () => {
   ];
   
   React.useEffect(() => {
-    listStockCounts(auth.token, 25, currPage, searchParams, filterArray).then((list) => {
+    listStockCounts(searchParams, filterArray).then((list) => {
       if(list) {
         const newRows = list!.docs.map((count:IStockCount) => {
           return {
@@ -87,6 +89,8 @@ const StockCountListPage = () => {
         variant="outlined"
         sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
       >
+        <DataFilter filters={filterArray}></DataFilter>
+
         <Button
           variant="contained"
           color="primary"

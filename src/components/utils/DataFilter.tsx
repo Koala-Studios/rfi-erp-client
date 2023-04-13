@@ -9,7 +9,7 @@ import {
   Tooltip,
 } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { FilterElement, paramsToObject } from "../../logic/utils";
 import { redirect } from "react-router-dom";
 import SimpleSelect from "./SimpleSelect";

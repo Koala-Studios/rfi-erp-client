@@ -23,7 +23,7 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { setTokenSourceMapRange } from "typescript";
 import { FilterElement, IListData } from "../logic/utils";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
@@ -161,7 +161,9 @@ const ExpandableRow = (props: { row: IInventoryStockGrouped }) => {
 const InventoryStockListPage = () => {
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
+  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   const columns: GridColDef[] = [
     { field: "product_id", headerName: "Item Code", width: 120 },
@@ -205,10 +207,9 @@ const InventoryStockListPage = () => {
   ];
 
   const auth = React.useContext(AuthContext);
-  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listInventoryStock(25, 1, true).then((list) => {
+    listInventoryStock(searchParams, filterArray, true).then((list) => {
       console.log(list);
       const newRows = list!.docs.map((item) => {
         return {
@@ -253,23 +254,10 @@ const InventoryStockListPage = () => {
             };
           }),
         };
-
-        // return {
-        //   //regular
-        //   id: item._id,
-        //   product_id: item.product_code,
-        //   name: item.name,
-        //   cost: item.cost,
-        //   reorder_amount: item.reorder_amount ?? 0,
-        //   on_hand: item.on_hand ?? 0,
-        //   on_order: item.on_order ?? 0,
-        //   quarantined: item.quarantined ?? 0,
-        //   allocated: item.allocated ?? 0,
-        // };
       });
       setDataOptions({ rows: newRows, listOptions: list! });
     });
-  }, []);
+  }, [location.key]);
   const createNewMaterial = () => {
     navigate(`/inventory-stock/new`, { replace: false });
   };
@@ -336,8 +324,8 @@ const InventoryStockListPage = () => {
 
         <Pagination
           color="primary"
-          count={10}
-          page={1}
+          count={15}
+          page={dataOptions.listOptions.page}
           shape="rounded"
           variant="outlined"
           sx={{

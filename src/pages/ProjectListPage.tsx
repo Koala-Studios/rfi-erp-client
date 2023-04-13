@@ -9,9 +9,10 @@ import {
 import { createProject, listProjects } from "../logic/project.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { Button, Card, Chip } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { formTypes } from "../logic/form.logic";
-import { IListData } from "../logic/utils";
+import { FilterElement, IListData } from "../logic/utils";
+import DataFilter from "../components/utils/DataFilter";
 
 const ProjectStatus = [
   ["Draft", "error"],
@@ -23,7 +24,19 @@ const ProjectStatus = [
 
 const ProjectListPage = () => {
   const navigate = useNavigate();
-
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
+  const filterArray: FilterElement[] = [
+    {
+      label: "Product Code",
+      field: "product_code",
+      type: "text",
+    },
+    { label: "Batch Code", field: "batch_code", type: "text" },
+    { label: "Quantity", field: "quantity", type: "number", regexOption: null },
+  
+  ];
   const columns: GridColDef[] = [
     { field: "project_code", headerName: "Code", width: 100 },
     { field: "name", headerName: "Name", width: 300 },
@@ -79,10 +92,9 @@ const ProjectListPage = () => {
   ];
 
   const auth = React.useContext(AuthContext);
-  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listProjects(25, 1).then((list) => {
+    listProjects(searchParams, filterArray).then((list) => {
       console.log(list);
       const newRows = list!.docs.map((project) => {
         return {
@@ -97,7 +109,7 @@ const ProjectListPage = () => {
       });
       setDataOptions({ rows: newRows, listOptions: list! });
     });
-  }, []);
+  }, [location.key]);
 
   if (dataOptions == null) return null;
 
@@ -134,6 +146,7 @@ const ProjectListPage = () => {
         variant="outlined"
         sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
       >
+        <DataFilter filters={filterArray}></DataFilter>
         <Button variant="contained" color="primary" onClick={createNewProject}>
           + New Project
         </Button>

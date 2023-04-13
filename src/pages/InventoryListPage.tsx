@@ -74,7 +74,7 @@ const InventoryListPage = () => {
   ];
 
   React.useEffect(() => {
-    listInventory(25, currPage, searchParams, filterArray).then((list) => {
+    listInventory(searchParams, filterArray).then((list) => {
       const newRows = list!.docs.map((item) => {
         return {
           id: item._id,

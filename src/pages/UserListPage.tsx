@@ -8,12 +8,25 @@ import {
 import { listUsers } from "../logic/user.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { Box, Button, Card, Typography } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { IListData } from "../logic/utils";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { FilterElement, IListData } from "../logic/utils";
+import DataFilter from "../components/utils/DataFilter";
 
 const UserListPage = () => {
   const navigate = useNavigate();
-
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
+  const filterArray: FilterElement[] = [
+    {
+      label: "Product Code",
+      field: "product_code",
+      type: "text",
+    },
+    { label: "Batch Code", field: "batch_code", type: "text" },
+    { label: "Quantity", field: "quantity", type: "number", regexOption: null },
+  
+  ];
   const columns: GridColDef[] = [
     // { field: "id", headerName: "ID", width: 300 },
     { field: "username", headerName: "Username", width: 250 },
@@ -41,10 +54,9 @@ const UserListPage = () => {
   ];
 
   const auth = React.useContext(AuthContext);
-  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listUsers(25, 1).then((list) => {
+    listUsers(searchParams, filterArray).then((list) => {
       const newRows = list!.docs.map((user) => {
         return {
           id: user._id,
@@ -54,7 +66,7 @@ const UserListPage = () => {
       });
       setDataOptions({ rows: newRows, listOptions: list! });
     });
-  }, []);
+  }, [location.key]);
   const createNewUser = () => {
     navigate(`/users/new`, { replace: false });
   };
@@ -64,6 +76,7 @@ const UserListPage = () => {
   return (
     <Box>
       <Card variant="outlined" sx={{ mb: 2, p: 2 }}>
+      <DataFilter filters={filterArray}></DataFilter>
         <Button variant="contained" color="primary" onClick={createNewUser}>
           + New User
         </Button>

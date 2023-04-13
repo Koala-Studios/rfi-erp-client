@@ -43,7 +43,7 @@ export const DataTable: React.FC<Props> = ({
   };
 
   const CustomPagination = () => {
-    const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
 
     let currPage = 1;
 

@@ -8,12 +8,25 @@ import {
 import { listPOs } from "../logic/purchase-order.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { Button, Card, Chip } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { IListData } from "../logic/utils";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { FilterElement, IListData } from "../logic/utils";
+import DataFilter from "../components/utils/DataFilter";
 
 const PurchaseListPage = () => {
   const navigate = useNavigate();
-
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
+  const filterArray: FilterElement[] = [
+    {
+      label: "Product Code",
+      field: "product_code",
+      type: "text",
+    },
+    { label: "Batch Code", field: "batch_code", type: "text" },
+    { label: "Quantity", field: "quantity", type: "number", regexOption: null },
+  
+  ];
   const columns: GridColDef[] = [
     { field: "order_code", headerName: "Order Code", width: 200 },
     { field: "supplier", headerName: "Supplier Name", width: 200 },
@@ -43,10 +56,8 @@ const PurchaseListPage = () => {
   ];
 
   const auth = React.useContext(AuthContext);
-  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
-
   React.useEffect(() => {
-    listPOs(25, 1).then((list) => {
+    listPOs(searchParams, filterArray).then((list) => {
       const newRows = list!.docs.map((purchase) => {
         return {
           id: purchase._id,
@@ -61,7 +72,7 @@ const PurchaseListPage = () => {
       });
       setDataOptions({ rows: newRows, listOptions: list! });
     });
-  }, []);
+  }, [location.key]);
   const createNewPurchaseOrder = () => {
     navigate(`/purchase-orders/new`, { replace: false });
   };
@@ -74,6 +85,7 @@ const PurchaseListPage = () => {
         variant="outlined"
         sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
       >
+      <DataFilter filters={filterArray}></DataFilter>
         <Button
           variant="contained"
           color="primary"

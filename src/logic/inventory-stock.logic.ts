@@ -1,6 +1,6 @@
 import axios from "axios";
 import { ObjectId } from "bson";
-import { apiStatus, IListOptions } from "./utils";
+import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
 
 interface IStockExtension {
   extension_date: Date;
@@ -53,15 +53,15 @@ const api = axios.create({
   baseURL: "http://localhost:5000/inventory-stock",
 });
 export const listInventoryStock = async (
-  count: number,
-  page: number,
+  q: URLSearchParams | undefined,
+  filters: FilterElement[],
   grouped: boolean
 ): Promise<IListOptions | null> => {
+  let query = getQuery(q, filters);
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
-      count,
-      page,
+      query,
       grouped,
     },
   };

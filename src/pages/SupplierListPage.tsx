@@ -8,12 +8,25 @@ import {
 import { listSuppliers } from "../logic/supplier.logic";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { Button, Card } from "@mui/material";
-import { useNavigate } from "react-router-dom";
-import { IListData } from "../logic/utils";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { FilterElement, IListData } from "../logic/utils";
+import DataFilter from "../components/utils/DataFilter";
 
 const SupplierListPage = () => {
   const navigate = useNavigate();
-
+  const location = useLocation();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
+  const filterArray: FilterElement[] = [
+    {
+      label: "Product Code",
+      field: "product_code",
+      type: "text",
+    },
+    { label: "Batch Code", field: "batch_code", type: "text" },
+    { label: "Quantity", field: "quantity", type: "number", regexOption: null },
+  
+  ];
   const columns: GridColDef[] = [
     // { field: "id", headerName: "ID", width: 300 },
     { field: "name", headerName: "Supplier Name", width: 250 },
@@ -49,10 +62,9 @@ const SupplierListPage = () => {
   ];
 
   const auth = React.useContext(AuthContext);
-  const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   React.useEffect(() => {
-    listSuppliers(25, 1).then((list) => {
+    listSuppliers(searchParams, filterArray).then((list) => {
       const newRows = list!.docs.map((supplier) => {
         return {
           id: supplier._id,
@@ -65,7 +77,7 @@ const SupplierListPage = () => {
       });
       setDataOptions({ rows: newRows, listOptions: list! });
     });
-  }, []);
+  }, [location.key]);
   const createNewSupplier = () => {
     navigate(`/suppliers/new`, { replace: false });
   };
@@ -78,6 +90,7 @@ const SupplierListPage = () => {
         variant="outlined"
         sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
       >
+        <DataFilter filters={filterArray}></DataFilter>
         <Button variant="contained" color="primary" onClick={createNewSupplier}>
           + New Supplier
         </Button>
