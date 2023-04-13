@@ -5,6 +5,7 @@ export interface ICustomer {
   _id: string;
   name: string;
   code?: string;
+  created_date: string;
   contact_name?: string;
   address_one?: string;
   address_two?: string;

@@ -12,37 +12,39 @@ import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import {
-  createProduct,
-  getProduct,
-  IProduct,
-  updateProduct,
-} from "../logic/product.logic";
+  createInventory,
+  getInventory,
+  IInventory,
+  updateInventory,
+} from "../logic/inventory.logic";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SaveForm from "../components/forms/SaveForm";
 import StandaloneAutocomplete from "../components/utils/StandaloneAutocomplete";
 import { IProductType } from "../logic/product-type.logic";
 import { InputInfo, InputVisual, isValid } from "../logic/validation.logic";
 
-const emptyProduct: IProduct = {
+const emptyInventory: IInventory = {
   _id: "",
   name: "",
   aliases:"",
   description: "",
   rating: null,
   product_code: "",
-  is_raw_mat: false,
   date_created: new Date().toISOString().split('T')[0],
-  for_sale: true,
+  for_sale: false,
+  is_raw: false,
   cost: 0,
+  quantity:0,
   stock: {
     on_hand: 0,
-    in_transit: 0,
     on_order: 0,
     allocated: 0,
     on_hold: 0,
     quarantined: 0,
+    average_price:0,
+    reorder_amount:0
   },
-  customers: [],
+  suppliers: [],
   regulatory: {
     fda_status: 0,
     cpl_hazard: "",
@@ -52,14 +54,12 @@ const emptyProduct: IProduct = {
     organic: false,
     kosher: false,
   },
-  versions: 0,
-  status: 0,
-  approved_version: 0,
-  rec_dose_rate: 0,
   product_type: null,
+  cas_number:'',
+  reorder_amount:0
 };
 
-let savedProduct: IProduct | null = null;
+let savedInventory: IInventory | null = null;
 
 
 
@@ -81,13 +81,13 @@ const inputMap: InputInfo[] = [
 ];
 
 
-export const ProductDetailPage = () => {
+export const InventoryDetailPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const auth = React.useContext(AuthContext);
-  const [product, setProduct] = React.useState<IProduct | null>(null);
+  const [inventory, setInventory] = React.useState<IInventory | null>(null);
   const isNewId = id === "new";
-  const [productSaved, setProductSaved] = React.useState<boolean>(true);
+  const [productSaved, setInventorySaved] = React.useState<boolean>(true);
 
   const inputRefs = React.useRef<any[]>([]);
   const [inputVisuals, setInputVisuals] = React.useState<InputVisual[]>(
@@ -110,12 +110,12 @@ export const ProductDetailPage = () => {
 
     const label = inputMap[input.ref].label;
     //@ts-ignore
-    product[label] = event.target.value;
+    inventory[label] = event.target.value;
 
-    setProduct({ ...product! });
-    setProductSaved(false);
+    setInventory({ ...inventory! });
+    setInventorySaved(false);
   };
-  const ProductStatus = [
+  const InventoryStatus = [
     ["PENDING", "error"],
     ["IN PROGRESS", "warning"],
     ["AWAITING APPROVAL", "info"],
@@ -125,27 +125,27 @@ export const ProductDetailPage = () => {
 
   useEffect(() => {
     if (isNewId) {
-      //new product, create new on save
-      savedProduct = emptyProduct;
-      setProduct(emptyProduct);
+      //new inventory, create new on save
+      savedInventory = emptyInventory;
+      setInventory(emptyInventory);
     } else {
-      getProduct(id!).then((p) => {
-        savedProduct = p;
-        setProduct(p!);
-        // setProductSaved(true);
+      getInventory(id!).then((p) => {
+        savedInventory = p;
+        setInventory(p!);
+        // setInventorySaved(true);
       });
     }
   }, []);
 
   useEffect(() => {
-    if (product == null || productSaved === false) return;
+    if (inventory == null || productSaved === false) return;
 
-    if (JSON.stringify(savedProduct) !== JSON.stringify(product)) {
-      setProductSaved(false);
+    if (JSON.stringify(savedInventory) !== JSON.stringify(inventory)) {
+      setInventorySaved(false);
     }
-  }, [product]);
+  }, [inventory]);
 
-  const saveProduct = async () => {
+  const saveInventory = async () => {
     
     let allValid = true;
     //do client side validation
@@ -177,24 +177,24 @@ export const ProductDetailPage = () => {
       return;
     }
 
-    //send new product to server
+    //send new inventory to server
     if (id === "new") {
-      createProduct(product!).then((_product) => {
-        if (_product) {
-          console.log(_product)
-          navigate(`/products/${_product._id}`, { replace: true });
-          savedProduct = _product;
-          setProduct(_product); //THIS IS NOT WORKING ...
-          setProductSaved(true);
+      createInventory(inventory!).then((_inventory) => {
+        if (_inventory) {
+          console.log(_inventory)
+          navigate(`/products/${_inventory._id}`, { replace: true });
+          savedInventory = _inventory;
+          setInventory(_inventory); //THIS IS NOT WORKING ...
+          setInventorySaved(true);
         } else {
-          console.log("Product Not Saved");
+          console.log("Material Not Saved");
         }
       })
     } else {
-      const updated = await updateProduct(product!);
+      const updated = await updateInventory(inventory!);
 
       if (updated === false) {
-        throw Error("Update Product Error");
+        throw Error("Update Material Error");
       }
     }
     window.dispatchEvent(
@@ -202,21 +202,21 @@ export const ProductDetailPage = () => {
         detail: { text: "Changes Saved" },
       })
     );
-    setProductSaved(true);
+    setInventorySaved(true);
   };
-  const cancelSaveProduct = () => {
-    setProduct(savedProduct);
-    setProductSaved(true);
+  const cancelSaveInventory = () => {
+    setInventory(savedInventory);
+    setInventorySaved(true);
   };
 
-  if (product == null) return null;
+  if (inventory == null) return null;
 
   return (
     <>
       <SaveForm
         display={!productSaved}
-        onSave={saveProduct}
-        onCancel={cancelSaveProduct}
+        onSave={saveInventory}
+        onCancel={cancelSaveInventory}
       ></SaveForm>
       <Card variant="outlined" style={{ padding: 16, marginBottom: 10 }}>
         <Button
@@ -237,16 +237,16 @@ export const ProductDetailPage = () => {
                 fullWidth
                 size="small"
                 variant="outlined"
-                defaultValue={product.product_code}
+                defaultValue={inventory.product_code}
                 InputProps={{
                   readOnly: true,
                 }}
-                label={"Product Code"}
+                label={"Material Code"}
               ></TextField>
             </Grid>
             <Grid item xs={5}>
               <TextField
-                defaultValue={product.name}
+                defaultValue={inventory.name}
                 inputRef={(el: any) =>
                   (inputRefs.current[inputRefMap.name] = el)
                 }
@@ -264,65 +264,33 @@ export const ProductDetailPage = () => {
                 fullWidth
                 size="small"
                 variant="outlined"
-                label={"Product Name"}
+                label={"Material Name"}
                 InputProps={{}}
               ></TextField>
-            </Grid>
-            <Grid item xs={1}>
-              <TextField
-                spellCheck="false"
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-                size="small"
-                variant="outlined"
-                label={"V#"}
-                value={product.versions}
-                InputProps={{
-                  readOnly: true,
-                }}
-              ></TextField>
-            </Grid>
-            <Grid item xs={2}>
-              <Chip
-                label={
-                  ProductStatus[product?.status ? product.status - 1 : 4][0]
-                }
-                sx={{
-                  width: "80%",
-                  height: "80%",
-                  borderRadius: 10,
-                  fontWeight: 600,
-                }}
-                //@ts-ignore
-                color={
-                  ProductStatus[product?.status ? product.status - 1 : 4][1]
-                }
-                variant="outlined"
-              />
             </Grid>
             <Grid item xs={2} sx={{ "& > legend": { mt: -0.5 }, }} >
               <Typography component="legend">Rating</Typography>
               <Rating
                 onChange={(e, value) => {
                   console.log(value);
-                  setProduct({ ...product, rating: value });
+                  setInventory({ ...inventory, rating: value });
                 }}
                 name="half-rating"
-                value={product.rating}
+                value={inventory.rating}
                 precision={0.5}
               />
             </Grid>
 
-            <Grid item xs={2}>
+            <Grid item xs={2.5}>
               <StandaloneAutocomplete
-                initialValue={product.product_type}
+                initialValue={inventory.product_type}
                 readOnly={!isNewId}
                 onChange={(e, value) => {
-                  setProduct({ ...product, product_type: value });
+                  setInventory({ ...inventory, product_type: value });
                 }}
-                label={"Product Type"}
+                label={"Material Type"}
                 letterMin={0}
-                dbOption={"product-type"}
+                dbOption={"product-type-raw"}
                 getOptionLabel={(item: IProductType) =>
                   item.code + " | " + item.name
                 }
@@ -332,15 +300,15 @@ export const ProductDetailPage = () => {
             <Grid item xs={6} >
             <TextField
                 onChange={(e) =>
-                  setProduct({ ...product, aliases: e.target.value })
+                  setInventory({ ...inventory, aliases: e.target.value })
                 }
                 spellCheck="false"
                 InputLabelProps={{ shrink: true }}
                 fullWidth
                 size="small"
                 variant="outlined"
-                label={"Product Aliases"}
-                value={product.aliases}
+                label={"Material Aliases"}
+                value={inventory.aliases}
                 multiline
                 rows={2}
               ></TextField>
@@ -348,7 +316,7 @@ export const ProductDetailPage = () => {
 
             <Grid item xs={2}>
               <TextField
-                defaultValue={product.date_created}
+                defaultValue={inventory.date_created}
                 inputRef={(el: any) =>
                   (inputRefs.current[inputRefMap.date_created] = el)
                 }
@@ -387,7 +355,7 @@ export const ProductDetailPage = () => {
             <Grid item xs={12}>
               <TextField
                 onChange={(e) =>
-                  setProduct({ ...product, description: e.target.value })
+                  setInventory({ ...inventory, description: e.target.value })
                 }
                 spellCheck="false"
                 InputLabelProps={{ shrink: true }}
@@ -395,7 +363,7 @@ export const ProductDetailPage = () => {
                 size="small"
                 variant="outlined"
                 label={"Flavor Profile"}
-                value={product.description}
+                value={inventory.description}
                 multiline
                 rows={6}
               ></TextField>

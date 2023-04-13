@@ -70,13 +70,15 @@ export const getProductType = async (
 
 export const lookupProductType = async (
   search_value: string,
-  f_sale: boolean
+  f_sale: boolean | undefined,
+  i_raw: boolean | undefined,
 ): Promise<IProductType[] | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       search_value,
       f_sale,
+      i_raw
     },
   };
 

@@ -42,6 +42,7 @@ import { StockCountDetailPage } from "./pages/StockCountDetailPage";
 import { BatchingDetailPage } from "./pages/BatchingDetailPage";
 import { ProductTypeDetailPage } from "./pages/ProductTypeDetailPage";
 import ProductTypeListPage from "./pages/ProductTypeListPage";
+import { InventoryDetailPage } from "./pages/InventoryDetailPage";
 
 const mainTheme = createTheme({
   palette: {
@@ -85,6 +86,16 @@ function App() {
                   <RequireAuth>
                     <Navbar title="Inventory">
                       <InventoryListPage />
+                    </Navbar>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/inventory/:id"
+                element={
+                  <RequireAuth>
+                    <Navbar title="Inventory Details">
+                      <InventoryDetailPage />
                     </Navbar>
                   </RequireAuth>
                 }

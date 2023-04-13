@@ -35,6 +35,7 @@ import { ObjectID } from "bson";
 import SaveForm from "../components/forms/SaveForm";
 import StandaloneAutocomplete from "../components/utils/StandaloneAutocomplete";
 import { ISupplier } from "../logic/supplier.logic";
+import { InputInfo, InputVisual, isValid } from "../logic/validation.logic";
 
 let savedPurchase: IPurchaseOrder | null = null;
 
@@ -47,10 +48,140 @@ const PurchaseStatus = [
   ["DRAFT", "warning"],
 ];
 
+
+const emptyPurchase: IPurchaseOrder = {
+  _id: "",
+  supplier: { supplier_id: "", name: "" },
+  date_purchased: new Date().toISOString().split('T')[0],
+  date_arrived: "",
+  shipping_code: "",
+  status: 6,
+  order_code: "",
+  order_items: [],
+  notes: "",
+};
+
+const inputRefMap = {
+  order_code: 0,
+  date_purchased: 1,
+  //TODO: Supplier
+};
+
+const inputMap: InputInfo[] = [
+  { label: "order_code", ref: 0, validation: { required: true, genericVal: "Text" } },
+  {
+    label: "date_purchased",
+    ref: 1,
+    validation: { required: true, genericVal: "Date" },
+  },
+];
+
+
 export const PurchaseDetailPage = () => {
   const navigate = useNavigate();
   const { id } = useParams();
   const auth = React.useContext(AuthContext);
+  const [purchaseSaved, setPurchaseSaved] = React.useState<boolean>(true);
+  const [purchase, setPurchase] = React.useState<IPurchaseOrder | null>(
+    null
+  );
+  const [rows, setRows] = React.useState<IOrderItem[]>([]);
+  const [receiveMode, setReceiveMode] = React.useState<boolean>(false);
+
+  const inputRefs = React.useRef<any[]>([]);
+  const [inputVisuals, setInputVisuals] = React.useState<InputVisual[]>(
+    Array(inputMap.length).fill({ helperText: "", error: false })
+  );
+
+
+  
+  const onInputBlur = (
+    event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement, Element>,
+    input: InputInfo
+  ) => {
+    const _input = inputRefs.current[input.ref];
+
+    const inputVal = isValid(_input.value, inputMap[input.ref].validation);
+    inputVisuals[input.ref] = {
+      helperText: inputVal.msg,
+      error: !inputVal.valid,
+    };
+
+    setInputVisuals({ ...inputVisuals });
+
+    const label = inputMap[input.ref].label;
+    //@ts-ignore
+    purchase[label] = event.target.value;
+
+    setPurchase({ ...purchase! });
+    setPurchaseSaved(false);
+  };
+
+
+  
+  const savePurchase = async () => {
+    let allValid = true;
+    //do client side validation
+    for (let i = 0; i < inputRefs.current.length; i++) {
+      const _input = inputRefs.current[i];
+
+      const inputVal = isValid(_input.value, inputMap[i].validation);
+      inputVisuals[i] = {
+        helperText: inputVal.msg,
+        error: !inputVal.valid,
+      };
+
+      if (inputVal.valid === false) {
+        allValid = false;
+      }
+    }
+
+    setInputVisuals({ ...inputVisuals });
+
+    if (allValid === false) {
+      window.dispatchEvent(
+        new CustomEvent("NotificationEvent", {
+          detail: {
+            text: "Changes Not Saved. Some inputs are invalid",
+            color: "error",
+          },
+        })
+      );
+      return;
+    }
+    //send new purchase to server
+    if (id === "new") {
+      await createPurchase(purchase!).then((_purchase) => {
+        if (_purchase) {
+          navigate(`/purchase-orders/${_purchase._id}`, { replace: true });
+          savedPurchase = _purchase;
+          setPurchase(_purchase);
+          setPurchaseSaved(true);
+        } else {
+          console.log("Purchase Not Saved");
+        }
+      })
+
+    } else {
+      const updated = await updatePurchase(purchase!);
+
+      if (updated === false) {
+        throw Error("Update Purchase Error");
+      }
+    }
+    window.dispatchEvent(
+      new CustomEvent("NotificationEvent", {
+        detail: { text: "Changes Saved" },
+      })
+    );
+    setPurchaseSaved(true);
+  };
+  const cancelSavePurchase = () => {
+    setPurchase(savedPurchase);
+    let tempPur = { ...savedPurchase! };
+    setRows(tempPur.order_items);
+    setPurchaseSaved(true);
+  };
 
   const handleEditProductRow = (rowid: string, value: IInventory) => {
     let pList = rows!.slice();
@@ -61,53 +192,19 @@ export const PurchaseDetailPage = () => {
     setRows(pList);
   };
 
-  const emptyPurchase: IPurchaseOrder = {
-    _id: "",
-    supplier: { supplier_id: "", name: "" },
-    date_arrived: "",
-    shipping_code: "",
-    date_purchased: new Date().toISOString().split('T')[0],
-    status: 6,
-    order_code: "",
-    order_items: [],
-    notes: "",
-  };
 
-  const [purchaseSaved, setPurchaseSaved] = React.useState<boolean>(true);
-  const [purchase, setPurchaseOrder] = React.useState<IPurchaseOrder | null>(
-    null
-  );
 
-  const [rows, setRows] = React.useState<IOrderItem[]>([]);
-  const [receiveMode, setReceiveMode] = React.useState<boolean>(false);
 
   useEffect(() => {
     if (id === "new") {
       savedPurchase = emptyPurchase;
-      setPurchaseOrder(emptyPurchase);
+      setPurchase(emptyPurchase);
       setRows([]);
     } else {
       getPurchase(id!).then((p) => {
         const tempPurchase = { ...p! };
         savedPurchase = tempPurchase;
-        setPurchaseOrder(p!);
-        console.log(p);
-        // newRows = purchase!.order_items.map((item) => { //!check soon for further changes
-        //   return {
-        //     _id: item._id ? item._id : new ObjectID().toHexString(),
-        //     product_code: item.product_code,
-        //     product_name: item.product_name,
-        //     unit_price: item.unit_price,
-        //     purchased_amount: item.purchased_amount,
-        //     received_amount: item.received_amount,
-        //     lot_number: '',
-        //     container_size: null,
-        //     process_amount: null,
-        //     expiry_date:'',
-        //     notes:'',
-        //     remaining_amount: item.purchased_amount - item.received_amount,
-        //   };
-        // });
+        setPurchase(p!);
         setRows(
           p!.order_items.map((item) => {
             item._id = item._id ? item._id : new ObjectID().toHexString();
@@ -140,7 +237,7 @@ export const PurchaseDetailPage = () => {
 
       const tempPurchase = { ...purchase! }; // gotta find a nicer way around this lol..
       tempPurchase.order_items = rows;
-      setPurchaseOrder(tempPurchase);
+      setPurchase(tempPurchase);
     }
   }, [rows]);
 
@@ -281,10 +378,11 @@ export const PurchaseDetailPage = () => {
       filterable: false,
       renderCell: (row_params: GridRenderCellParams<string>) => (
         <TableAutocomplete
+        initialValue={row_params.row.product_name}
+          readOnly={purchase!.status != 6}
           dbOption="raw-mat"
           handleEditRow={handleEditProductRow}
           rowParams={row_params}
-          initialValue={row_params.row.product_name}
           letterMin={3}
           getOptionLabel={(item: IInventory) =>
             `${item.product_code} | ${item.name}`
@@ -335,7 +433,7 @@ export const PurchaseDetailPage = () => {
       handlePurchaseItem(row, quarantine).then((_purchase) => {
         if (_purchase) {
           savedPurchase = _purchase;
-          setPurchaseOrder(_purchase);
+          setPurchase(_purchase);
           setPurchaseSaved(true);
           const newRows = rows.map((r) => {
             if (r._id === row._id) {
@@ -363,7 +461,7 @@ export const PurchaseDetailPage = () => {
       if (_purchase) {
         // window.location.reload();
         savedPurchase = _purchase;
-        setPurchaseOrder(_purchase);
+        setPurchase(_purchase);
         setPurchaseSaved(true);
       } else {
         console.log("Purchase Not Updated");
@@ -376,7 +474,7 @@ export const PurchaseDetailPage = () => {
       if (_purchase) {
         // window.location.reload();
         savedPurchase = _purchase;
-        setPurchaseOrder(_purchase);
+        setPurchase(_purchase);
         setPurchaseSaved(true);
       } else {
         console.log("Purchase Not Updated");
@@ -389,7 +487,7 @@ export const PurchaseDetailPage = () => {
       console.log("cancel purchase", _purchase, _purchase?.status);
       if (_purchase) {
         savedPurchase = _purchase;
-        setPurchaseOrder(_purchase);
+        setPurchase(_purchase);
         setPurchaseSaved(true);
       } else {
         console.log("Purchase Not Updated");
@@ -446,41 +544,6 @@ export const PurchaseDetailPage = () => {
     console.log(rows);
   };
 
-  const savePurchase = async () => {
-    //send new purchase to server
-    if (id === "new") {
-      await createPurchase(purchase!).then((_purchase) => {
-        if (_purchase) {
-          navigate(`/purchase-orders/${_purchase._id}`, { replace: true });
-          savedPurchase = _purchase;
-          setPurchaseOrder(_purchase);
-          setPurchaseSaved(true);
-        } else {
-          console.log("Purchase Not Saved");
-        }
-      })
-
-    } else {
-      const updated = await updatePurchase(purchase!);
-
-      if (updated === false) {
-        throw Error("Update Purchase Error");
-      }
-    }
-    window.dispatchEvent(
-      new CustomEvent("NotificationEvent", {
-        detail: { text: "Changes Saved" },
-      })
-    );
-    setPurchaseSaved(true);
-  };
-  const cancelSavePurchase = () => {
-    setPurchaseOrder(savedPurchase);
-    let tempPur = { ...savedPurchase! };
-    setRows(tempPur.order_items);
-    setPurchaseSaved(true);
-  };
-
   if (purchase == null) return null;
 
   return (
@@ -519,42 +582,48 @@ export const PurchaseDetailPage = () => {
             <Grid sx={{ maxWidth: "85%" }} container spacing={3}>
               <Grid item xs={3}>
                 <TextField
-                  onChange={(e) =>
-                    setPurchaseOrder({
-                      ...purchase,
-                      order_code: e.target.value,
-                    })
+                  defaultValue={purchase.order_code}
+                  inputRef={(el: any) =>
+                    (inputRefs.current[inputRefMap.order_code] = el)
                   }
+                  error={inputVisuals[inputRefMap.order_code].error}
+                  helperText={inputVisuals[inputRefMap.order_code].helperText}
+                  onBlur={(event) =>
+                    onInputBlur(event, inputMap[inputRefMap.order_code])
+                  }
+                  required={inputMap[inputRefMap.order_code].validation.required}
                   spellCheck="false"
                   InputLabelProps={{ shrink: true }}
                   fullWidth
                   size="small"
                   variant="outlined"
                   label={"Purchase Code"}
-                  value={purchase.order_code}
                 ></TextField>
               </Grid>
               <Grid item xs={3}>
                 <TextField
-                  onChange={(e) =>
-                    setPurchaseOrder({
-                      ...purchase,
-                      date_purchased: e.target.value,
-                    })
+                  defaultValue={purchase.date_purchased}
+                  inputRef={(el: any) =>
+                    (inputRefs.current[inputRefMap.date_purchased] = el)
                   }
+                  error={inputVisuals[inputRefMap.date_purchased].error}
+                  helperText={inputVisuals[inputRefMap.date_purchased].helperText}
+                  onBlur={(event) =>
+                    onInputBlur(event, inputMap[inputRefMap.date_purchased])
+                  }
+                  required={inputMap[inputRefMap.date_purchased].validation.required}
                   fullWidth
                   InputLabelProps={{ shrink: true }}
                   size="small"
                   variant="outlined"
                   label={"Purchase Date"}
                   type={"date"}
-                  value={purchase.date_purchased}
                 ></TextField>
               </Grid>
               <Grid item xs={3}>
                 <TextField
                   onChange={(e) =>
-                    setPurchaseOrder({
+                    setPurchase({
                       ...purchase,
                       date_arrived: e.target.value,
                     })
@@ -593,7 +662,7 @@ export const PurchaseDetailPage = () => {
               <Grid item xs={6}>
                 <TextField
                   onChange={(e) =>
-                    setPurchaseOrder({
+                    setPurchase({
                       ...purchase,
                       shipping_code: e.target.value,
                     })
@@ -612,7 +681,7 @@ export const PurchaseDetailPage = () => {
                 <StandaloneAutocomplete
                   initialValue={purchase.supplier}
                   onChange={(e, value) => {
-                    setPurchaseOrder({ ...purchase, supplier: value });
+                    setPurchase({ ...purchase, supplier: value });
                   }}
                   label={"Supplier"}
                   letterMin={0}
@@ -625,7 +694,7 @@ export const PurchaseDetailPage = () => {
               <Grid item xs={12}>
                 <TextField
                   onChange={(e) =>
-                    setPurchaseOrder({ ...purchase, notes: e.target.value })
+                    setPurchase({ ...purchase, notes: e.target.value })
                   }
                   spellCheck="false"
                   InputLabelProps={{ shrink: true }}

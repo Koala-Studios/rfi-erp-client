@@ -33,6 +33,7 @@ import {
   import { confirmBatching, createBatching, getBatching, IBatching, markBatchingCancelled, updateBatching, finishBatching, IBatchingIngredient, generateBatchingBOM, batchingStatus }  from "../logic/batching.logic";
 import { IProduct } from "../logic/product.logic";
 import { padding } from "@mui/system";
+import { InputInfo, InputVisual, isValid } from "../logic/validation.logic";
   
   let savedBatching: IBatching | null = null;
   
@@ -44,12 +45,82 @@ import { padding } from "@mui/system";
     ["CANCELLED", "error"],
     ["DRAFT", "warning"],
   ];
+
+
+  const addDays = (date:Date, days:number) => {
+    var result = new Date(date);
+    result.setDate(result.getDate() + days);
+    return result;
+  }
+
+
+  const emptyBatching: IBatching = {
+    _id: "",
+    status: 6,
+    batch_code: "",
+    ingredients: [],
+    notes: "",
+    product_code: "",
+    product_name: "",
+    product_id: null,
+    quantity: NaN,
+    date_created: new Date().toISOString().split('T')[0],
+    date_needed: addDays(new Date(),5).toISOString().split('T')[0]
+};
+  const inputRefMap = {
+    batch_code: 0,
+    quantity: 1,
+    notes: 2,
+    date_created:3,
+    // product_code: 2,
+
+  };
+  
+  const inputMap: InputInfo[] = [
+    { label: "batch_code", ref: 0, validation: { required: true, genericVal: "Text" } },
+    {
+      label: "quantity",
+      ref: 1,
+      validation: { required: true, genericVal: "Text" },
+    },
+    {
+      label: "date_created",
+      ref: 3,
+      validation: { required: true, genericVal: "Date" },
+    },
+  ];
   
   export const BatchingDetailPage = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const auth = React.useContext(AuthContext);
+    const inputRefs = React.useRef<any[]>([]);
+    const [inputVisuals, setInputVisuals] = React.useState<InputVisual[]>(
+      Array(inputMap.length).fill({ helperText: "", error: false })
+    );
+
+    const onInputBlur = (
+      event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement, Element>,
+      input: InputInfo
+    ) => {
+      const _input = inputRefs.current[input.ref];
   
+      const inputVal = isValid(_input.value, inputMap[input.ref].validation);
+      inputVisuals[input.ref] = {
+        helperText: inputVal.msg,
+        error: !inputVal.valid,
+      };
+  
+      setInputVisuals({ ...inputVisuals });
+  
+      const label = inputMap[input.ref].label;
+      //@ts-ignore
+      batching[label] = event.target.value;
+  
+      setBatching({ ...batching! });
+      setBatchingSaved(false);
+    };
+
     const handleEditProductRow = (rowid: string, value: IInventory) => {
       let pList = rows!.slice();
       const rowIdx = rows!.findIndex((r: any) => r._id === rowid);
@@ -58,24 +129,7 @@ import { padding } from "@mui/system";
       pList[rowIdx].product_name = value.name;
       setRows(pList);
     };
-    const addDays = (date:Date, days:number) => {
-      var result = new Date(date);
-      result.setDate(result.getDate() + days);
-      return result;
-    }
-    const emptyBatching: IBatching = {
-        _id: "",
-        status: 6,
-        batch_code: "",
-        ingredients: [],
-        notes: "",
-        product_code: "",
-        product_name: "",
-        product_id: null,
-        quantity: 0,
-        date_created: new Date().toISOString().split('T')[0],
-        date_needed: addDays(new Date(),5).toISOString().split('T')[0]
-    };
+
   
     const [batchingSaved, setBatchingSaved] = React.useState<boolean>(true);
     const [batching, setBatching] = React.useState<IBatching | null>(
@@ -296,6 +350,37 @@ import { padding } from "@mui/system";
     // };
   
     const saveBatching = async () => {
+      
+    let allValid = true;
+    //do client side validation
+    for (let i = 0; i < inputRefs.current.length; i++) {
+      const _input = inputRefs.current[i];
+
+      const inputVal = isValid(_input.value, inputMap[i].validation);
+      inputVisuals[i] = {
+        helperText: inputVal.msg,
+        error: !inputVal.valid,
+      };
+
+      if (inputVal.valid === false) {
+        allValid = false;
+      }
+    }
+
+    setInputVisuals({ ...inputVisuals });
+
+    if (allValid === false) {
+      window.dispatchEvent(
+        new CustomEvent("NotificationEvent", {
+          detail: {
+            text: "Changes Not Saved. Some inputs are invalid",
+            color: "error",
+          },
+        })
+      );
+      return;
+    }
+
       //send new batching to server
       if (id === "new") {
         const newBatchingId = await createBatching(auth.token, batching!);
@@ -362,19 +447,25 @@ import { padding } from "@mui/system";
               <Grid sx={{ maxWidth: "85%" }} container spacing={3}>
                 <Grid item xs={3}>
                   <TextField
-                    onChange={(e) =>
-                      setBatching({
-                        ...batching,
-                        batch_code: e.target.value,
-                      })
+                    defaultValue={batching.batch_code}
+                    inputRef={(el: any) =>
+                      (inputRefs.current[inputRefMap.batch_code] = el)
                     }
+                    error={inputVisuals[inputRefMap.batch_code].error}
+                    helperText={inputVisuals[inputRefMap.batch_code].helperText}
+                    onBlur={(event) =>
+                      onInputBlur(event, inputMap[inputRefMap.batch_code])
+                    }
+                    required={
+                      inputMap[inputRefMap.batch_code].validation.required
+                    }
+
                     spellCheck="false"
                     InputLabelProps={{ shrink: true }}
                     fullWidth
                     size="small"
                     variant="outlined"
                     label={"Batching Code"}
-                    value={batching.batch_code}
                   ></TextField>
                 </Grid>
                 <Grid item xs={6}>
@@ -393,11 +484,17 @@ import { padding } from "@mui/system";
                 </Grid>
                 <Grid item xs={1.5}>
                   <TextField
-                    onChange={(e) =>
-                      setBatching({
-                        ...batching,
-                        quantity: parseFloat(e.target.value),
-                      })
+                    defaultValue={batching.quantity}
+                    inputRef={(el: any) =>
+                      (inputRefs.current[inputRefMap.quantity] = el)
+                    }
+                    error={inputVisuals[inputRefMap.quantity].error}
+                    helperText={inputVisuals[inputRefMap.quantity].helperText}
+                    onBlur={(event) =>
+                      onInputBlur(event, inputMap[inputRefMap.quantity])
+                    }
+                    required={
+                      inputMap[inputRefMap.quantity].validation.required
                     }
                     InputProps={{
                       readOnly: batching.status != batchingStatus.DRAFT,
@@ -409,7 +506,6 @@ import { padding } from "@mui/system";
                     variant="outlined"
                     label={"Quantity"}
                     type={"number"}
-                    value={batching.quantity}
                   ></TextField>
                 </Grid>
                 <Grid item xs={3}>

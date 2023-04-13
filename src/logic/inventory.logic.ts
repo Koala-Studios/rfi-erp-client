@@ -25,17 +25,27 @@ interface IRegulatoryContainer {
   organic?: boolean;
   kosher?: boolean;
 }
+
+export interface IInventorySupplierItem {
+  _id: string;
+  name: string;
+}
 export interface IInventory {
   _id: string;
   product_code: string;
   name: string;
+  description:string;
   cost: number;
+  rating: number | null;
+  for_sale: boolean;
+  is_raw: boolean;
   quantity: number;
-  date_created: Date;
+  date_created: string;
   cas_number: string;
   reorder_amount: number;
   aliases:string;
   stock: IStockSummary;
+  suppliers: IInventorySupplierItem[];
   regulatory: IRegulatoryContainer;
   product_type: { name: string; _id: string } | null;
 }
@@ -76,7 +86,54 @@ export const listInventory = async (
   return list;
 };
 
-export const getProduct = async (id: string): Promise<IInventory | null> => {
+
+
+export const createInventory = async (
+  formData: IInventory
+): Promise<IInventory  | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+  };
+
+  let rtn = null;
+
+  await api
+    .post("/create", formData, config)
+    .then((res) => {
+      console.log(res);
+      if (res.status === apiStatus.CREATED) {
+        console.log(res.data);
+        rtn = res.data;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
+};
+export const updateInventory = async (formData: IInventory): Promise<boolean> => {
+  const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+  };
+
+  let rtn = false;
+
+  await api
+    .post("/update", formData, config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        rtn = true;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
+};
+
+export const getInventory = async (id: string): Promise<IInventory | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
@@ -102,9 +159,9 @@ export const getProduct = async (id: string): Promise<IInventory | null> => {
 
 export const lookupInventory = async (
   search_value: string,
-  for_sale: boolean | null,
-  is_raw: boolean | null,
-  approved?: boolean | null
+  for_sale: boolean | undefined,
+  is_raw: boolean | undefined,
+  approved?: boolean | undefined
 ): Promise<IInventory[] | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },

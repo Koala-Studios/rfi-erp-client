@@ -17,13 +17,13 @@ interface Props {
   | "user"
   | "supplier"
   | "product-type"
-  | "product-type-mat",
+  | "product-type-mat"
+  | "product-type-raw";
   handleEditRow: (id: string, newItem: any) => void;
   readOnly?:boolean,
   rowParams: GridRenderCellParams<string>;
   initialValue: string;
   letterMin: number;
-  viewOnly?: boolean;
   getOptionLabel: (option: any) => any;
 }
 
@@ -107,7 +107,7 @@ const TableAutocomplete: React.FC<Props> = ({
           paddingBottom: "10px",
           paddingTop: "10px",
         }}
-        onDoubleClick={() => setEditMode(true)}
+        onDoubleClick={() => setEditMode(!readOnly)}
       >
         <Typography variant="subtitle2" style={{ fontSize: "15px" }}>
           {initialValue}

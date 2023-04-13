@@ -28,7 +28,6 @@ interface IProductCustomers {
   name: string;
 }
 interface IProductContainer {
-  batch_code: string;
   on_hand: number;
   in_transit: number;
   on_order: number;
@@ -43,6 +42,7 @@ export interface IProduct {
   description: string;
   rating: number | null;
   product_code: string;
+  date_created: string;
   is_raw_mat?: boolean;
   for_sale?: boolean;
   cost: number;
@@ -95,20 +95,19 @@ export const listProducts = async (
 
 export const lookupProduct = async (
   search_value: string,
-  for_sale: boolean | null,
-  approved: boolean | null
+  for_sale: boolean | undefined,
+  approved: boolean | undefined
 ): Promise<IProduct[] | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
-      search_value,
-      for_sale,
-      approved,
+      search_value: search_value,
+      for_sale: for_sale,
+      approved: approved
     },
   };
 
   let list: IProduct[] | null = null;
-
   await api
     .get("/lookup", config)
     .then((res) => {

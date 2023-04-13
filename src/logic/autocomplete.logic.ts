@@ -20,7 +20,8 @@ export const lookup = async (
     | "user"
     | "supplier"
     | "product-type"
-    | "product-type-mat",
+    | "product-type-mat"
+    | "product-type-raw",
   letterMin: number
 ) => {
   if (query.length < letterMin) return [];
@@ -34,29 +35,32 @@ export const lookup = async (
   }
   
   else if (dbOption === "inventory") {
-    return await lookupInventory(query, null, null, true);
+    return await lookupInventory(query, undefined, undefined, true);
   } else if (dbOption === "material") {
-    return await lookupInventory(query, false, null, true);
+    return await lookupInventory(query, false, undefined, true);
   } else if (dbOption === "raw-mat") {
-    return await lookupInventory(query, false, true,  null);
+    return await lookupInventory(query, false, true,  undefined);
   } else if (dbOption === "non-raw-mat") {
     return await lookupInventory(query, false, false, true);
   }
   
   else if (dbOption === "product") {
-    return await lookupProduct(query, true, null);
+    return await lookupProduct(query, true, undefined);
   } else if (dbOption === "approved-product") {
     return await lookupProduct(query, true, true);
   } else if (dbOption === "approved-product-all") {
-    return await lookupProduct(query, null, true);
+    return await lookupProduct(query, undefined, true);
   } else if (dbOption === "non-approved-product-all") {
-    return await lookupProduct(query, null, false);
+    return await lookupProduct(query, undefined, false);
   }
   
   else if (dbOption === "product-type") {
-    return await lookupProductType(query, true);
+    return await lookupProductType(query, true, false);
   } else if (dbOption === "product-type-mat") {
-    return await lookupProductType(query, false);
+    return await lookupProductType(query, false, false);
+  }
+  else if (dbOption === "product-type-raw") {
+    return await lookupProductType(query, false, true);
   }
 
   return [];
