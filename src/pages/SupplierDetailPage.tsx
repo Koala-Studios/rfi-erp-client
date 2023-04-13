@@ -232,7 +232,7 @@ export const SupplierDetailPage = () => {
             </Grid>
             <Grid item xs={2}>
               <TextField
-                defaultValue={supplier.created_date ?? }
+                defaultValue={supplier.created_date }
                 inputRef={(el: any) =>
                   (inputRefs.current[inputRefMap.created_date] = el)
                 }
