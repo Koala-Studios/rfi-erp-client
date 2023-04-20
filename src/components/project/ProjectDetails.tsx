@@ -1,4 +1,4 @@
-import { Card, Grid, TextField, Typography } from "@mui/material";
+import { Card, Chip, Grid, TextField, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import { useEffect, useState, useContext, useRef, createRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -34,14 +34,24 @@ import {
 //   ].join("-");
 // };
 
+const ProjectStatus = [
+  ["Pending", "error"],
+  ["In Progress", "warning"],
+  ["Awaiting Approval", "info"],
+  ["Awaiting QC", "warning"],
+  ["Approved", "success"],
+  ["Error", "error"],
+];
+
 const emptyProject: IProject = {
   _id: "",
   name: "",
   project_code: "",
   project_items: [],
-  start_date: "",
+  start_date: new Date().toISOString().split('T')[0],
   customer: null,
   iteration: 0,
+  status: 6
 };
 
 let savedProject: IProject | null = null;
@@ -50,6 +60,7 @@ const inputRefMap = {
   name: 0,
   project_code: 1,
   start_date: 2,
+  notes: 3
 };
 
 const inputMap: InputInfo[] = [
@@ -65,10 +76,10 @@ const inputMap: InputInfo[] = [
     validation: { required: true, genericVal: "Text" },
   },
   {
-    label: "project_code",
-    ref: 1,
-    validation: { required: true, genericVal: "Text" },
-  },
+    label: "notes",
+    ref: 3,
+    validation: { required: false, genericVal: "Text" },
+  }
 ];
 
 export const ProjectDetails = () => {
@@ -210,7 +221,7 @@ export const ProjectDetails = () => {
         </Button>
         <div style={{ display: "flex", gap: 16 }}>
           <Grid container spacing={3}>
-            <Grid item xs={12}>
+            <Grid item xs={10}>
               <TextField
                 defaultValue={project.name}
                 inputRef={(el: any) =>
@@ -229,6 +240,21 @@ export const ProjectDetails = () => {
                 variant="outlined"
                 label={"Project Title"}
               ></TextField>
+            </Grid>
+            <Grid item xs={2}>
+                <Chip
+                //@ts-ignore
+                label={ProjectStatus[project.status][0]}
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  borderRadius: 10,
+                  fontWeight: 600,
+                }}
+                //@ts-ignore
+                color={ProjectStatus[project.status][1]}
+                variant="outlined"
+              />
             </Grid>
             <Grid item xs={6}>
               <TextField
@@ -268,7 +294,7 @@ export const ProjectDetails = () => {
             </Grid>
             <Grid item xs={6}>
               <TextField
-                defaultValue={project.start_date}
+                defaultValue={project.start_date.toString().split('T')[0]}
                 inputRef={(el: any) =>
                   (inputRefs.current[inputRefMap.start_date] = el)
                 }
@@ -305,8 +331,17 @@ export const ProjectDetails = () => {
             </Grid>
             <Grid item xs={12}>
               <TextField
-                onChange={(e) =>
-                  setProject({ ...project, notes: e.target.value })
+                defaultValue={project.notes}
+                inputRef={(el: any) =>
+                  (inputRefs.current[inputRefMap.notes] = el)
+                }
+                error={inputVisuals[inputRefMap.notes].error}
+                helperText={inputVisuals[inputRefMap.notes].helperText}
+                onBlur={(event) =>
+                  onInputBlur(event, inputMap[inputRefMap.notes])
+                }
+                required={
+                  inputMap[inputRefMap.notes].validation.required
                 }
                 spellCheck="false"
                 InputLabelProps={{ shrink: true }}
@@ -316,7 +351,6 @@ export const ProjectDetails = () => {
                 label={"Notes"}
                 multiline
                 rows={6}
-                value={project.notes}
               ></TextField>
             </Grid>
           </Grid>

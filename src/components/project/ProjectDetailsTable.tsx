@@ -17,7 +17,7 @@ import {
 import AddIcon from "@mui/icons-material/Add";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import { useNavigate } from "react-router-dom";
 import IconButton from "@mui/material/IconButton";
 import { IProjectItem } from "../../logic/project.logic";
@@ -28,13 +28,31 @@ import { IInventory } from "../../logic/inventory.logic";
 import { IUser } from "../../logic/user.logic";
 // import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 
-const ProjectStatus = [
+const ItemStatus = [
   ["Pending", "error"],
   ["In Progress", "warning"],
   ["Awaiting Approval", "info"],
+  ["Awaiting QC", "warning"],
   ["Approved", "success"],
   ["Error", "error"],
 ];
+
+const RegulatoryStatus = [
+  ["ART", "error"],
+  ["NAT", "success"],
+  ["NATI", "info"],
+  ["N&A", "warning"],
+];
+
+const DietaryStatus = [
+  ["KOSH", "info"],
+  ["VEGA", "success"],
+  ["ORGA", "warning"],
+  ["NGMO", "error"],
+  ["HALA", "info"],
+  ["VEGE", "success"],
+];
+
 
 function SelectEditInputCell(props: GridRenderCellParams) {
   const { id, value, field } = props;
@@ -46,7 +64,7 @@ function SelectEditInputCell(props: GridRenderCellParams) {
       field,
       value: event.target.value,
     });
-    apiRef.current.stopCellEditMode({ id, field });
+    // apiRef.current.stopCellEditMode({ id, field });
   };
 
   return (
@@ -54,6 +72,7 @@ function SelectEditInputCell(props: GridRenderCellParams) {
       value={value}
       onChange={handleChange}
       size="small"
+      multiple
       sx={{
         height: 1,
         width: "100%",
@@ -106,11 +125,11 @@ export const ProjectDetailsTable: React.FC<Props> = ({
         _id: new ObjectID().toHexString(),
         flavor_name: "",
         product_id: "",
-        status: 1,
-        product_status: 1,
         product_name: "",
         product_code: "",
-        // code:""
+        status: 1,
+        regulatory_status: [1],
+        dietary_status:[1],
       },
     ]);
   };
@@ -135,7 +154,7 @@ export const ProjectDetailsTable: React.FC<Props> = ({
     {
       field: "flavor_name",
       headerName: "Request Flavor Name",
-      width: 300,
+      width: 275,
       editable: true,
     },
     {
@@ -160,7 +179,7 @@ export const ProjectDetailsTable: React.FC<Props> = ({
     {
       field: "assigned_user",
       headerName: "Assignee",
-      width: 200,
+      width: 130,
       sortable: false,
       filterable: false,
       renderCell: (row_params: GridRenderCellParams<string>) => (
@@ -184,23 +203,63 @@ export const ProjectDetailsTable: React.FC<Props> = ({
       ),
     },
     {
-      field: "product_status",
+      field: "regulatory_status",
       headerName: "Regulatory Status",
       editable: true,
-      width: 200,
+      width: 250,
       renderEditCell: renderSelectEditInputCell,
-      renderCell: (params: GridRenderCellParams<number>) => (
-        <Chip
-          label={ProjectStatus[params.value ? params.value - 1 : 4][0]}
-          sx={{
-            fontWeight: 600,
-          }}
-          //@ts-ignore
-
-          color={ProjectStatus[params.value ? params.value - 1 : 4][1]}
-          variant="outlined"
-        />
-      ),
+      renderCell: (params: GridRenderCellParams<number>) => {
+        let chips = [];
+        //@ts-ignore
+          for(let i = 0; i < params?.value!.length ; i++) {
+            console.log(params?.value)
+          chips.push(
+            <Chip
+            //@ts-ignore
+            label={RegulatoryStatus[params.value ? params?.value![i] - 1 : 4][0]}
+            sx={{
+              fontWeight: 600,
+              marginRight:1
+            }}
+            size="small"
+            //@ts-ignore
+            color={RegulatoryStatus[params.value ? params?.value![i] - 1 : 4][1]}
+            variant="outlined"
+          />
+          )
+          }
+          return chips;
+    },
+    },
+    {
+      field: "dietary_status",
+      headerName: "Dietary Status",
+      editable: true,
+      width: 250,
+      renderEditCell: renderSelectEditInputCell,
+      renderCell: (params: GridRenderCellParams<number>) => {
+        let chips = [];
+        //@ts-ignore
+          for(let i = 0; i < params?.value!.length ; i++) {
+            console.log(params?.value)
+          chips.push(
+            <Chip
+            length={50}
+            size="small"
+            //@ts-ignore
+            label={DietaryStatus[params.value ? params?.value![i] - 1 : 4][0]}
+            sx={{
+              fontWeight: 600,
+              marginRight:1
+            }}
+            //@ts-ignore
+            color={DietaryStatus[params.value ? params?.value![i] - 1 : 4][1]}
+            variant="outlined"
+          />
+          )
+          }
+          return chips;
+    },
     },
     {
       field: "status",
@@ -210,12 +269,12 @@ export const ProjectDetailsTable: React.FC<Props> = ({
       width: 200,
       renderCell: (params: GridRenderCellParams<number>) => (
         <Chip
-          label={ProjectStatus[params.value ? params.value - 1 : 4][0]}
+          label={ItemStatus[params.value ? params.value - 1 : 4][0]}
           sx={{
             fontWeight: 600,
           }}
           //@ts-ignore
-          color={ProjectStatus[params.value ? params.value - 1 : 4][1]}
+          color={ItemStatus[params.value ? params.value - 1 : 4][1]}
           variant="outlined"
         />
       ),
@@ -224,7 +283,7 @@ export const ProjectDetailsTable: React.FC<Props> = ({
       field: "product_id",
       headerName: "Actions",
       align: "left",
-      width: 250,
+      width: 170,
       renderCell: (params: GridRenderCellParams<string>) => {
         // const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
         return (
@@ -237,7 +296,7 @@ export const ProjectDetailsTable: React.FC<Props> = ({
                 navigate(`/products/${params.value}`, { replace: false })
               }
             >
-              View Product
+              <VisibilityIcon fontSize="small"/>
             </Button>
             <IconButton
               onClick={() => handleDeleteRow(params.row._id)}
