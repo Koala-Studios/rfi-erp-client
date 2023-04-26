@@ -12,7 +12,7 @@ export interface ICustomer {
   phone?: string;
   email?: string;
   lead_time?: string;
-  createdAt?: string;
+  notes:string;
 }
 
 const api = axios.create({

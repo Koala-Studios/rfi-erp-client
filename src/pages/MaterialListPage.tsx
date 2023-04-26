@@ -24,7 +24,7 @@ const filterArray: FilterElement[] = [
   },
 ];
 
-const InventoryListPage = () => {
+const MaterialListPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -79,7 +79,7 @@ const InventoryListPage = () => {
     },
   ];
 
-  React.useEffect(() => {
+  React.useEffect(() => { //TODO: SET THE LIST HERE TO ONLY RAW MATERIALS, DO THIS WITH FILTERS!
     listInventory(searchParams, filterArray).then((list) => {
       const newRows = list!.docs.map((item) => {
         return {
@@ -125,4 +125,4 @@ const InventoryListPage = () => {
   );
 };
 
-export default InventoryListPage;
+export default MaterialListPage;

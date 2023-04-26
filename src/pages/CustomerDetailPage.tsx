@@ -1,4 +1,4 @@
-import { Card, Button, Grid, TextField, Chip, Typography } from "@mui/material";
+import { Card, Button, Grid, TextField, Chip, Typography, Rating } from "@mui/material";
 import { useEffect, useState, useContext, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../components/navigation/AuthProvider";
@@ -23,6 +23,7 @@ const emptyCustomer: ICustomer = {
   address_two: "",
   code: "",
   phone: "",
+  notes: "",
 };
 
 let savedCustomer: ICustomer | null = null;
@@ -210,7 +211,7 @@ export const CustomerDetailPage = () => {
                 label={"Customer Code"}
               ></TextField>
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={5}>
               <TextField
                 defaultValue={customer.name}
                 inputRef={(el: any) =>
@@ -232,6 +233,8 @@ export const CustomerDetailPage = () => {
               ></TextField>
             </Grid>
             <Grid item xs={2}>
+            </Grid>
+            <Grid item xs={2}>
               <TextField
                 defaultValue={customer.created_date}
                 inputRef={(el: any) =>
@@ -251,9 +254,7 @@ export const CustomerDetailPage = () => {
                 type={"date"}
               ></TextField>
             </Grid>
-            <Grid item xs={3}/>
-            
-            <Grid item xs={3.5}>
+            <Grid item xs={4.5}>
               <TextField
                 onChange={(e) => {
                   setCustomer({ ...customer, contact_name: e.target.value });
@@ -283,7 +284,7 @@ export const CustomerDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
-            <Grid item xs={3}>
+            <Grid item xs={2.5}>
               <TextField
                 onChange={(e) => {
                   setCustomer({ ...customer, phone: e.target.value });
@@ -298,7 +299,7 @@ export const CustomerDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={5.5}>
               <TextField
                 onChange={(e) => {
                   setCustomer({ ...customer, address_one: e.target.value });
@@ -313,7 +314,7 @@ export const CustomerDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={5.5}>
               <TextField
                 onChange={(e) => {
                   setCustomer({ ...customer, address_two: e.target.value });

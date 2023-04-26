@@ -539,7 +539,7 @@ import { InputInfo, InputVisual, isValid } from "../logic/validation.logic";
                     variant="outlined"
                     label={"Deadline Date"}
                     type={"date"}
-                    value={batching.date_needed.split('T')[0]}
+                    value={batching.date_needed ? batching.date_needed.split('T')[0] : null}
                   ></TextField>
                 </Grid>
                 <Grid item xs={2}>
@@ -599,10 +599,7 @@ import { InputInfo, InputVisual, isValid } from "../logic/validation.logic";
               </div>
               <Divider></Divider>
               <Button
-                style={{
-                  display: `${batching.status === 6 ? "box" : "none"}`,
-                }}
-                disabled={id === "new"}
+                disabled={id === "new" || batching.status != 6  }
                 variant="contained"
                 onClick={() => handleConfirmBatching()}
               >

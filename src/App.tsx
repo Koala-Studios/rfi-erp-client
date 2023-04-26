@@ -43,6 +43,7 @@ import { BatchingDetailPage } from "./pages/BatchingDetailPage";
 import { ProductTypeDetailPage } from "./pages/ProductTypeDetailPage";
 import ProductTypeListPage from "./pages/ProductTypeListPage";
 import { InventoryDetailPage } from "./pages/InventoryDetailPage";
+import MaterialListPage from "./pages/MaterialListPage";
 
 const mainTheme = createTheme({
   palette: {
@@ -100,6 +101,17 @@ function App() {
                   </RequireAuth>
                 }
               />
+                            <Route
+              path="/materials"
+                element={
+                  <RequireAuth>
+                    <Navbar title="Materials">
+                      <MaterialListPage />
+                    </Navbar>
+                  </RequireAuth>
+                }
+              />
+
               <Route
                 path="/inventory-stock"
                 element={

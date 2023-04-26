@@ -45,7 +45,7 @@ const emptyInventory: IInventory = {
     reorder_amount:0
   },
   suppliers: [],
-  regulatory: {
+  regulatory: { //TODO: ADD OTHER FIELDS HERE!!
     fda_status: 0,
     cpl_hazard: "",
     fema_number: 0,
@@ -66,8 +66,8 @@ let savedInventory: IInventory | null = null;
 const inputRefMap = {
   name: 0,
   date_created:1,
-  // product_code: 2,
-
+  product_code: 2,
+  //product_type:3
 };
 
 const inputMap: InputInfo[] = [
@@ -77,7 +77,9 @@ const inputMap: InputInfo[] = [
     ref: 1,
     validation: { required: true, genericVal: "Date" },
   },
-  { label: "product_type", ref: 2, validation: { required: true, genericVal: "Text" } },
+  { label: "product_code", ref: 2, validation: { required: false, genericVal: "Text" } },
+  // { label: "product_type", ref: 3, validation: { required: false, genericVal: "Text" } },
+
 ];
 
 
@@ -182,7 +184,7 @@ export const InventoryDetailPage = () => {
       createInventory(inventory!).then((_inventory) => {
         if (_inventory) {
           console.log(_inventory)
-          navigate(`/products/${_inventory._id}`, { replace: true });
+          navigate(`/inventory/${_inventory._id}`, { replace: true });
           savedInventory = _inventory;
           setInventory(_inventory); //THIS IS NOT WORKING ...
           setInventorySaved(true);
@@ -232,12 +234,23 @@ export const InventoryDetailPage = () => {
           <Grid container spacing={3}>
             <Grid item xs={2}>
               <TextField
+                defaultValue={inventory.product_code}
+                inputRef={(el: any) =>
+                  (inputRefs.current[inputRefMap.product_code] = el)
+                }
+                error={inputVisuals[inputRefMap.product_code].error}
+                helperText={inputVisuals[inputRefMap.product_code].helperText}
+                onBlur={(event) =>
+                  onInputBlur(event, inputMap[inputRefMap.product_code])
+                }
+                required={
+                  inputMap[inputRefMap.product_code].validation.required
+                }
                 spellCheck="false"
                 InputLabelProps={{ shrink: true }}
                 fullWidth
                 size="small"
                 variant="outlined"
-                defaultValue={inventory.product_code}
                 InputProps={{
                   readOnly: true,
                 }}
@@ -281,7 +294,7 @@ export const InventoryDetailPage = () => {
               />
             </Grid>
 
-            <Grid item xs={2.5}>
+            <Grid item xs={3}>
               <StandaloneAutocomplete
                 initialValue={inventory.product_type}
                 readOnly={!isNewId}
@@ -313,7 +326,7 @@ export const InventoryDetailPage = () => {
                 rows={2}
               ></TextField>
             </Grid>
-
+            <Grid item xs={4}></Grid>
             <Grid item xs={2}>
               <TextField
                 defaultValue={inventory.date_created}
@@ -335,19 +348,6 @@ export const InventoryDetailPage = () => {
                 label={"Created Date"}
                 InputProps={{
                   readOnly: !isNewId,
-                }}
-                type={"date"}
-              ></TextField>
-            </Grid>
-            <Grid item xs={2}>
-              <TextField
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                size="small"
-                variant="outlined"
-                label={"Approved Date"}
-                InputProps={{
-                  readOnly: true,
                 }}
                 type={"date"}
               ></TextField>

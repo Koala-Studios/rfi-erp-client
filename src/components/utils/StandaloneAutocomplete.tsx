@@ -11,8 +11,11 @@ interface Props {
   readOnly?:boolean;
   placeholder?: string;
   letterMin: number;
+  groupBy?: (option: any) => string;
   dbOption:
   | "customer"
+  | "supplier"
+  | "inventory-stock"
   | "inventory"// all products and materials
   | "material" // not for sale
   | "raw-mat" //is raw, not for sale
@@ -21,7 +24,6 @@ interface Props {
   | "approved-product" //approved and for sale
   | "approved-product-all" //for sale and not for sale, just approved that matters
   | "user"
-  | "supplier"
   | "product-type"
   | "product-type-mat"
   | "product-type-raw";
@@ -34,6 +36,7 @@ const StandaloneAutocomplete: React.FC<Props> = ({
   placeholder,
   label,
   dbOption,
+  groupBy,
   getOptionLabel,
   initialValue,
   readOnly = false
@@ -67,6 +70,7 @@ const StandaloneAutocomplete: React.FC<Props> = ({
       readOnly={readOnly}
       onChange={onChange}
       openOnFocus
+      groupBy={groupBy}
       selectOnFocus
       getOptionLabel={getOptionLabel}
       options={optionList}
@@ -84,7 +88,7 @@ const StandaloneAutocomplete: React.FC<Props> = ({
             // minWidth: "450px",
           }}
         >
-          {children}
+          <b>{children}</b>
         </Paper>
       )}
       onInputChange={handleInputChange}

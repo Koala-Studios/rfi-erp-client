@@ -1,4 +1,4 @@
-import { Card, Chip, Grid, TextField, Typography } from "@mui/material";
+import { Card, Chip, Divider, Grid, TextField, Typography } from "@mui/material";
 import Button from "@mui/material/Button";
 import { useEffect, useState, useContext, useRef, createRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -51,7 +51,7 @@ const emptyProject: IProject = {
   start_date: new Date().toISOString().split('T')[0],
   customer: null,
   iteration: 0,
-  status: 6
+  status: 1
 };
 
 let savedProject: IProject | null = null;
@@ -209,8 +209,18 @@ export const ProjectDetails = () => {
         onCancel={cancelSaveProject}
       ></SaveForm>
       {/* <div style={{ height: 50 }}></div> */}
-      <Card variant="outlined" style={{ padding: 16 }}>
-        <Button
+      <Card variant="outlined" sx={{ padding: 2 }}>
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 100,
+            marginBottom: 10,
+          }}
+        >
+          
+          <div>
+          <Button
           sx={{ mb: 3 }}
           aria-label="go back"
           size="medium"
@@ -219,8 +229,8 @@ export const ProjectDetails = () => {
         >
           <ArrowBackIcon fontSize="small" />
         </Button>
-        <div style={{ display: "flex", gap: 16 }}>
           <Grid container spacing={3}>
+            
             <Grid item xs={10}>
               <TextField
                 defaultValue={project.name}
@@ -244,7 +254,7 @@ export const ProjectDetails = () => {
             <Grid item xs={2}>
                 <Chip
                 //@ts-ignore
-                label={ProjectStatus[project.status][0]}
+                label={ProjectStatus[project ? project!.status - 1: 5][0]}
                 sx={{
                   width: "100%",
                   height: "100%",
@@ -252,7 +262,7 @@ export const ProjectDetails = () => {
                   fontWeight: 600,
                 }}
                 //@ts-ignore
-                color={ProjectStatus[project.status][1]}
+                color={ProjectStatus[project ? project!.status - 1: 5][1]}
                 variant="outlined"
               />
             </Grid>
@@ -354,14 +364,48 @@ export const ProjectDetails = () => {
               ></TextField>
             </Grid>
           </Grid>
+          </div>
 
           <Card
             variant="outlined"
-            style={{ width: "50%", minWidth: "50%", padding: 16 }}
+            style={{
+              width: 260,
+              minWidth: 260,
+              padding: 16,
+              display: "flex",
+
+              flexDirection: "column",
+              gap: 12,
+            }}
           >
             <div>
-              <Typography variant="h6">Overview Stats</Typography>
+              <Typography variant="h6">Action Board</Typography>
             </div>
+            <Divider></Divider>
+            <Button
+              variant="contained"
+              // disabled={id === "new" || stockCount!.status != 1}
+              // onClick={() => handleSubmitStockCount()}
+            >
+              Confirm
+            </Button>
+
+            <Button
+              color="success"
+              variant="contained"
+              // disabled={id === "new" || stockCount!.status != 2}
+              // onClick={() => handleApproveStockCount()}
+            >
+              Finish
+            </Button>
+            <Button
+              color="error"
+              variant="outlined"
+              // disabled={id === "new" || stockCount!.status == 4 ||  stockCount!.status == 3}
+              // onClick={() => handleAbandonStockCount()}
+            >
+              Abandon
+            </Button>
           </Card>
         </div>
       </Card>

@@ -1,4 +1,4 @@
-import { Card, Button, Grid, TextField, Chip, Typography } from "@mui/material";
+import { Card, Button, Grid, TextField, Chip, Typography, Rating } from "@mui/material";
 import { useEffect, useState, useContext, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../components/navigation/AuthProvider";
@@ -15,12 +15,14 @@ import { InputInfo, InputVisual, isValid } from "../logic/validation.logic";
 
 const emptySupplier: ISupplier = {
   _id: "new",
+  code: "",
   name: "",
   contact_name: "",
   email: "",
   address_one: "",
   address_two: "",
-  code: "",
+  trust_factor:null,
+  notes:"",
   phone: "",
   created_date: new Date().toISOString().split('T')[0]
 };
@@ -230,6 +232,18 @@ export const SupplierDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
+            <Grid item xs={2} sx={{ "& > legend": { mt: -0.5 }, }} >
+              <Typography component="legend">Trust Rating</Typography>
+              <Rating
+                onChange={(e, value) => {
+                  console.log(value);
+                  setSupplier({ ...supplier, trust_factor: value });
+                }}
+                name="half-rating"
+                value={supplier.trust_factor}
+                precision={0.5}
+              />
+            </Grid>
             <Grid item xs={2}>
               <TextField
                 defaultValue={supplier.created_date }
@@ -248,10 +262,10 @@ export const SupplierDetailPage = () => {
                 variant="outlined"
                 label={"Created Date"}
                 type={"date"}
-                value={supplier.created_date.split('T')[0]}
+                value={supplier.created_date ? supplier.created_date.split('T')[0] : null}
               ></TextField>
             </Grid>
-            <Grid item xs={4}>
+            <Grid item xs={4.5}>
               <TextField
                 onChange={(e) => {
                   setSupplier({ ...supplier, contact_name: e.target.value });
@@ -266,7 +280,7 @@ export const SupplierDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
-            <Grid item xs={5}>
+            <Grid item xs={4}>
               <TextField
                 onChange={(e) => {
                   setSupplier({ ...supplier, email: e.target.value });
@@ -281,7 +295,7 @@ export const SupplierDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
-            <Grid item xs={5}>
+            <Grid item xs={2.5}>
               <TextField
                 onChange={(e) => {
                   setSupplier({ ...supplier, phone: e.target.value });
@@ -296,7 +310,7 @@ export const SupplierDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
-            <Grid item xs={5}>
+            <Grid item xs={5.5}>
               <TextField
                 onChange={(e) => {
                   setSupplier({ ...supplier, address_one: e.target.value });
@@ -311,7 +325,7 @@ export const SupplierDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
-            <Grid item xs={5}>
+            <Grid item xs={5.5}>
               <TextField
                 onChange={(e) => {
                   setSupplier({ ...supplier, address_two: e.target.value });

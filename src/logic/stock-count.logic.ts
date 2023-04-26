@@ -6,20 +6,27 @@ import {
   IListOptions,
   paramsToObject,
 } from "./utils";
+import { IInventoryStock } from "./inventory-stock.logic";
 
 export interface ICountItem {
-    _id: string;
-    product_id: string;
-    product_code: string;
-    product_name: string;
-    amount: number;
-    amount_proposed: number;
+  _id:string;
+  product_id: string;
+  product_code: string;
+  name: string;
+  lot_number: string;
+  expiry_date: Date;
+  container_id:string;
+  container_size: number;
+  container_amount: number;
+  current_amount: number;
+  proposed_amount: number;
 }
 
 export interface IStockCount {
     _id: string;
-    order_code:string;
-    date_proposed: string;
+    count_code:string;
+    created_date: string;
+    approved_date: string;
     count_items: ICountItem[];
     notes:string;
     status: number;
@@ -59,11 +66,10 @@ export const listStockCounts = async (
   };
 
   export const getStockCount = async (
-    token: string,
     id: string
   ): Promise<IStockCount | null> => {
     const config = {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
       params: {
         id: id,
       },
@@ -75,6 +81,7 @@ export const listStockCounts = async (
       .get("/get", config)
       .then((res) => {
         if (res.status === apiStatus.OK) {
+          console.log(res)
           stockCount = res.data.res;
         }
         window.dispatchEvent(
@@ -91,11 +98,10 @@ export const listStockCounts = async (
   
   
   export const createStockCount = async (
-    token: string,
     formData: IStockCount
-  ): Promise<string | null> => {
+  ): Promise<IStockCount | null> => {
     const config = {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     };
   
     let rtn = null;
@@ -105,8 +111,11 @@ export const listStockCounts = async (
       .then((res) => {
         console.log(res);
         if (res.status === apiStatus.CREATED) {
-          console.log(res.data);
-          rtn = res.data;
+          rtn = res.data.res;
+          console.log(res, 'stock count res!')
+          window.dispatchEvent(
+            new CustomEvent("NotificationEvent", { detail: { text: res.data.message } })
+          );
         }
       })
       .catch((err) => {
@@ -116,11 +125,10 @@ export const listStockCounts = async (
     return rtn;
   };
   export const updateStockCount = async (
-    token: string,
     formData: IStockCount
   ): Promise<boolean> => {
     const config = {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     };
   
     let rtn = false;
@@ -139,18 +147,15 @@ export const listStockCounts = async (
     return rtn;
   };
   
-  export const confirmStockCount = async (
-    token: string,
-    stockCount: IStockCount,
-    stockCount_id: string,
+  export const submitStockCount = async (
+    formData: IStockCount
   ): Promise<IStockCount | null> => {
     const config = {
-      headers: { Authorization: `Bearer ${token}` },
-      // params: {stockCount_id: stockCount_id}
+      headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     };
     let rtn = null;
     await api
-      .post("/confirm-stock-count", stockCount, config)
+      .post("/submit-for-approval",formData, config)
       .then((res) => {
         if (res.status === apiStatus.OK) {
           window.dispatchEvent(
@@ -167,20 +172,19 @@ export const listStockCounts = async (
     return rtn;
   };
   
-  export const markStockCountReceived = async (
-    token: string,
-    stockCount_id: string,
+  export const approveStockCount = async (
+    formData: IStockCount
   ): Promise<IStockCount | null> => {
     const config = {
-      headers: { Authorization: `Bearer ${token}` },
-      params: { stockCount_id: stockCount_id }
+      headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+
     };
   
   
     let rtn = null;
   
     await api
-      .post("/mark-received", stockCount_id, config)
+      .post("/approve", formData, config)
       .then((res) => {
         if (res.status === apiStatus.OK) {
           window.dispatchEvent(
@@ -197,19 +201,46 @@ export const listStockCounts = async (
     return rtn;
   };
   
-  export const markStockCountCancelled = async (
-    token: string,
-    stockCount_id: string,
+  export const disapproveStockCount = async (
+    formData: IStockCount
   ): Promise<IStockCount | null> => {
     const config = {
-      headers: { Authorization: `Bearer ${token}` },
-      params: { stockCount_id: stockCount_id }
+      headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+
     };
   
     let rtn = null;
   
     await api
-      .post("/mark-cancelled", stockCount_id, config)
+      .post("/disapprove", formData, config)
+      .then((res) => {
+        if (res.status === apiStatus.OK) {
+          window.dispatchEvent(
+            new CustomEvent("NotificationEvent", { detail: { text: res.data.message } })
+          );
+          rtn = res.data.res;
+        }
+  
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+  
+    return rtn;
+  };
+
+  export const abandonStockCount = async (
+    formData: IStockCount
+  ): Promise<IStockCount | null> => {
+    const config = {
+      headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+
+    };
+  
+    let rtn = null;
+  
+    await api
+      .post("/abandon", formData, config)
       .then((res) => {
         if (res.status === apiStatus.OK) {
           window.dispatchEvent(

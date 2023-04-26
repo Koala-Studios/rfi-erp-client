@@ -82,8 +82,6 @@ export const listInventory = async (
   return list;
 };
 
-
-
 export const createInventory = async (
   formData: IInventory
 ): Promise<IInventory  | null> => {

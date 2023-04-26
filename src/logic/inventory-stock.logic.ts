@@ -25,7 +25,7 @@ export interface IInventoryStockGrouped {
 }
 
 export interface IInventoryStock {
-  _id: ObjectId;
+  _id: string;
   product_id: string;
   product_code: string;
   name: string;
@@ -109,15 +109,12 @@ export const getStockItem = async (
 
 export const lookupInventoryStock = async (
   //TODO: Not finished
-  token: string,
   search_value: string,
-  for_sale: boolean
 ): Promise<IInventoryStock[] | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
-      search_value,
-      for_sale,
+      search_value
     },
   };
 

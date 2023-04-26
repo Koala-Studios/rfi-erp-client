@@ -17,24 +17,31 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import TableAutocomplete from "../components/utils/TableAutocomplete";
-import { ICountItem } from "../logic/stock-count.logic";
 import { IInventory } from "../logic/inventory.logic";
 import { ObjectID } from "bson";
 import SaveForm from "../components/forms/SaveForm";
 import StandaloneAutocomplete from "../components/utils/StandaloneAutocomplete";
-import { ISupplier } from "../logic/supplier.logic";
-import { confirmStockCount, createStockCount, getStockCount, IStockCount, markStockCountCancelled, markStockCountReceived, updateStockCount } from "../logic/stock-count.logic";
+import {
+  createStockCount,
+  getStockCount,
+  IStockCount,
+  ICountItem,
+  updateStockCount,
+  submitStockCount,
+  approveStockCount,
+  disapproveStockCount,
+  abandonStockCount,
+} from "../logic/stock-count.logic";
+import { IInventoryStock } from "../logic/inventory-stock.logic";
+import { InputInfo, InputVisual, isValid } from "../logic/validation.logic";
 
 let savedStockCount: IStockCount | null = null;
 
 const StockCountStatus = [
-  ["AWAITING SHIPPING", "warning"],
-  ["AWAITING ARRIVAL", "warning"],
-  ["PARTIALLY RECEIVED", "success"],
-  ["RECEIVED", "success"],
-  ["ABANDONED", "error"],
   ["DRAFT", "warning"],
+  ["SUBMITTED", "warning"],
+  ["APPROVED", "success"],
+  ["ABANDONED", "error"],
 ];
 
 export const StockCountDetailPage = () => {
@@ -43,30 +50,87 @@ export const StockCountDetailPage = () => {
   const auth = React.useContext(AuthContext);
 
   const handleEditProductRow = (rowid: string, value: IInventory) => {
+    console.log(rowid, value, "test");
     let pList = rows!.slice();
-    const rowIdx = rows!.findIndex((r: any) => r._id === rowid);
+    const rowIdx = rows!.findIndex((r: any) => r.id === rowid);
     pList[rowIdx].product_code = value.product_code;
     pList[rowIdx].product_id = value._id;
-    pList[rowIdx].product_name = value.name;
+    pList[rowIdx].name = value.name;
     setRows(pList);
   };
 
   const emptyStockCount: IStockCount = {
     _id: "",
-    status: 6,
-    date_proposed:"",
-    order_code: "",
+    status: 1,
+    created_date: new Date().toISOString().split('T')[0],
+    approved_date: "",
+    count_code: "",
     count_items: [],
     notes: "",
   };
 
   const [stockCountSaved, setStockCountSaved] = React.useState<boolean>(true);
-  const [stockCount, setStockCount] = React.useState<IStockCount | null>(
-    null
-  );
+  const [stockCount, setStockCount] = React.useState<IStockCount | null>(null);
+
+  
+const inputRefMap = {
+  count_code: 0,
+  created_date: 1,
+  approved_date: 2,
+  notes:3
+  //TODO: Supplier
+};
+
+const inputMap: InputInfo[] = [
+  { label: "count_code", ref: 0, validation: { required: true, genericVal: "Text" } },
+  {
+    label: "created_date",
+    ref: 1,
+    validation: { required: true, genericVal: "Date" },
+  },
+  {
+    label: "approved_date",
+    ref: 2,
+    validation: { required: false, genericVal: "Date" },
+  },
+  { label: "notes", ref: 3, validation: { required: false, genericVal: "Text" } },
+];
+  
+  const [selectedContainer, setSelectedContainer] = React.useState<IInventoryStock | null>(null);
+  const [weighedAmt, setWeighedAmt] = React.useState<number>(0);
 
   const [rows, setRows] = React.useState<ICountItem[]>([]);
   const [receiveMode, setReceiveMode] = React.useState<boolean>(false);
+  
+  const inputRefs = React.useRef<any[]>([]);
+  const [inputVisuals, setInputVisuals] = React.useState<InputVisual[]>(
+    Array(inputMap.length).fill({ helperText: "", error: false })
+  );
+
+
+  
+  const onInputBlur = (
+    event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement, Element>,
+    input: InputInfo
+  ) => {
+    const _input = inputRefs.current[input.ref];
+
+    const inputVal = isValid(_input.value, inputMap[input.ref].validation);
+    inputVisuals[input.ref] = {
+      helperText: inputVal.msg,
+      error: !inputVal.valid,
+    };
+
+    setInputVisuals({ ...inputVisuals });
+
+    const label = inputMap[input.ref].label;
+    //@ts-ignore
+    stockCount[label] = event.target.value;
+
+    setStockCount({ ...stockCount! });
+    setStockCountSaved(false);
+  };
+
 
   useEffect(() => {
     if (id === "new") {
@@ -74,29 +138,13 @@ export const StockCountDetailPage = () => {
       setStockCount(emptyStockCount);
       setRows([]);
     } else {
-      getStockCount(auth.token, id!).then((p) => {
+      getStockCount(id!).then((p) => {
         const tempStockCount = { ...p! };
         savedStockCount = tempStockCount;
         setStockCount(p!);
         console.log(p);
-        // newRows = stockCount!.count_items.map((item) => { //!check soon for further changes
-        //   return {
-        //     _id: item._id ? item._id : new ObjectID().toHexString(),
-        //     product_code: item.product_code,
-        //     product_name: item.product_name,
-        //     unit_price: item.unit_price,
-        //     stockCountd_amount: item.stockCountd_amount,
-        //     received_amount: item.received_amount,
-        //     lot_number: '',
-        //     container_size: null,
-        //     process_amount: null,
-        //     expiry_date:'',
-        //     notes:'',
-        //     remaining_amount: item.stockCountd_amount - item.received_amount,
-        //   };
-        // });
         setRows(
-          p!.count_items.map((item:ICountItem) => {
+          p!.count_items.map((item: ICountItem) => {
             item._id = item._id ? item._id : new ObjectID().toHexString();
             return item;
           })
@@ -120,8 +168,10 @@ export const StockCountDetailPage = () => {
 
   useEffect(() => {
     //temp maybe
-    if (rows.length != 0 && rows != null && !receiveMode) {
-      if (JSON.stringify(savedStockCount?.count_items) !== JSON.stringify(rows)) {
+    if (rows.length != 0 && rows != null) {
+      if (
+        JSON.stringify(savedStockCount?.count_items) !== JSON.stringify(rows)
+      ) {
         setStockCountSaved(false);
       }
 
@@ -132,85 +182,15 @@ export const StockCountDetailPage = () => {
   }, [rows]);
 
   const receiveColumns: GridColDef[] = [
-    { field: "product_code", headerName: "Product Code", width: 150, editable: false },
-    { field: "product_name", headerName: "Product Name", width: 280, editable: false, renderCell: undefined },
     {
-      field: "stockCountd_amount",
-      headerName: "Container Qty(KG)",
-      type: "number",
-      width: 110,
-      align: "center",
-      editable: false
-    },
-    {
-      field: "received_amount",
-      headerName: "Received Qty",
-      type: "number",
-      width: 100,
-      align: "center",
-      editable: false
-    },
-    {
-      field: "remaining_amount",
-      headerName: "Awaiting Qty",
-      type: "number",
-      width: 100,
-      align: "center",
-      editable: false,
-      valueGetter: (params) =>
-        params.row.stockCountd_amount - params.row.received_amount,
-    },
-    {
-      field: "unit_price",
-      headerName: "Cost($/KG)",
-      type: "number",
-      width: 100,
-      align: "center",
-      editable: false
-    },
-    {
-      field: "lot_number",
-      headerName: "Lot#",
-      type: "string",
-      width: 120,
-      editable: true,
-      align: "right",
-    },
-    {
-      field: "container_size",
-      headerName: "Cont Size(KG)",
-      type: "number",
-      width: 120,
-      editable: true,
-      align: "center",
-    },
-    {
-      field: "process_amount",
-      headerName: "Qty to Process",
-      type: "number",
-      width: 120,
-      editable: true,
-      align: "center",
-    },
-    {
-      field: "expiry_date",
-      headerName: "Exp Date",
-      type: "date",
-      width: 120,
-      editable: true,
-      align: "center",
-    },
-  ];
-  const draftColumns: GridColDef[] = [
-    {
-      field: "id",
+      field: "_id",
       headerName: "Actions",
       align: "left",
       width: 80,
       renderCell: (params: GridRenderCellParams<string>) => (
         <div>
           <IconButton
-            disabled={stockCount!.status !== 6}
+            disabled={stockCount!.status !== 1}
             onClick={() => handleDeleteRow(params.row._id)}
             aria-label="delete"
             color="error"
@@ -220,55 +200,88 @@ export const StockCountDetailPage = () => {
         </div>
       ),
     },
-    { field: "product_code", headerName: "Product Code", width: 150 },
     {
-      field: "product_name",
+      field: "product_code",
+      headerName: "Product Code",
+      width: 150,
+      editable: false,
+    },
+    {
+      field: "name",
       headerName: "Product Name",
-      width: 350,
-      sortable: false,
-      filterable: false,
-      renderCell: (row_params: GridRenderCellParams<string>) => (
-        <TableAutocomplete
-          dbOption="inventory"
-          handleEditRow={handleEditProductRow}
-          rowParams={row_params}
-          initialValue={row_params.row.product_name}
-          letterMin={3}
-          getOptionLabel={(item: IInventory) =>
-            `${item.product_code} | ${item.name}`
-          }
-        />
-      ),
+      width: 280,
+      editable: false,
+      renderCell: undefined,
     },
     {
-      field: "stockCountd_amount",
-      headerName: "Stock Count Qty(KG)",
+      field: "lot_number",
+      headerName: "Lot#",
+      type: "string",
+      width: 130,
+      editable: false,
+      align: "right",
+    },
+    {
+      field: "expiry_date",
+      headerName: "Exp Date",
+      type: "date",
+      width: 120,
+      editable: false,
+      align: "right",
+      valueGetter: (params) => params.row.expiry_date.split('T')[0]
+    },
+    {
+      field: "container_size",
+      headerName: "Qty/Cont",
       type: "number",
-      width: 110,
+      width: 120,
       align: "center",
-      editable: true,
+      editable: false,
     },
     {
-      field: "unit_price",
-      headerName: "Cost($/KG)",
+      field: "container_amount",
+      headerName: "Cont Qty",
       type: "number",
-      width: 100,
+      width: 120,
       align: "center",
-      editable: true,
+      editable: false,
     },
     {
-      field: "received_amount",
-      headerName: "Received Qty",
+      field: "current_amount",
+      headerName: "Curr Qty",
       type: "number",
+      width: 120,
+      align: "center",
+      editable: false,
+    },
+    {
+      field: "proposed_amount",
+      headerName: "Weighed Qty",
+      type: "number",
+      width: 120,
+      editable: stockCount ? stockCount!.status === 1 : true,
+      align: "center",
+    },
 
-      width: 100,
-      align: "center",
-      editable: true,
-    },
   ];
 
-  const handleConfirmStockCount = () => {
-    confirmStockCount(auth.token, stockCount!, stockCount!._id).then((_stockCount) => {
+  const handleSubmitStockCount = () => {
+    submitStockCount(stockCount!).then(
+      (_stockCount) => {
+        if (_stockCount) {
+          // window.location.reload();
+          savedStockCount = _stockCount;
+          setStockCount(_stockCount);
+          setStockCountSaved(true);
+        } else {
+          console.log("Stock Count Not Updated");
+        }
+      }
+    );
+  };
+
+  const handleApproveStockCount = () => {
+    approveStockCount(stockCount!).then((_stockCount) => {
       if (_stockCount) {
         // window.location.reload();
         savedStockCount = _stockCount;
@@ -280,21 +293,8 @@ export const StockCountDetailPage = () => {
     });
   };
 
-  const handleMarkStockCountReceived = () => {
-    markStockCountReceived(auth.token, stockCount!._id).then((_stockCount) => {
-      if (_stockCount) {
-        // window.location.reload();
-        savedStockCount = _stockCount;
-        setStockCount(_stockCount);
-        setStockCountSaved(true);
-      } else {
-        console.log("Stock Count Not Updated");
-      }
-    });
-  };
-
-  const handleMarkStockCountCancelled = () => {
-    markStockCountCancelled(auth.token, stockCount!._id).then((_stockCount) => {
+  const handleDisapproveStockCount = () => {
+    disapproveStockCount(stockCount!).then((_stockCount) => {
       console.log("cancel stockCount", _stockCount, _stockCount?.status);
       if (_stockCount) {
         savedStockCount = _stockCount;
@@ -305,6 +305,20 @@ export const StockCountDetailPage = () => {
       }
     });
   };
+
+  const handleAbandonStockCount = () => {
+    abandonStockCount(stockCount!).then((_stockCount) => {
+      console.log("cancel stockCount", _stockCount, _stockCount?.status);
+      if (_stockCount) {
+        savedStockCount = _stockCount;
+        setStockCount(_stockCount);
+        setStockCountSaved(true);
+      } else {
+        console.log("Stock Count Not Updated");
+      }
+    });
+  };
+
 
   const handleDeleteRow = (row_id: string) => {
     setRows([...rows.filter((m: ICountItem) => m._id !== row_id)]);
@@ -320,6 +334,7 @@ export const StockCountDetailPage = () => {
       },
       ...rows.slice(rowIndex == rows.length ? rowIndex : rowIndex + 1),
     ]);
+    console.log(rows, 'pizzeria mama mia')
   };
 
   // const handleInsertRow = (row_id: string) => { //!not being used atm
@@ -340,40 +355,102 @@ export const StockCountDetailPage = () => {
   // };
 
   const handleAddRow = () => {
-    setRows([
-      {
-        _id: new ObjectID().toHexString(),
-        product_id: "",
-        product_code: "",
-        product_name: "",
-        amount: 0,
-        amount_proposed: 0
-      },
-      ...rows.slice(0),
-    ]);
-    console.log(rows);
+    if(selectedContainer) {
+      if(rows.findIndex(e => e.container_id === selectedContainer._id) != -1) {
+        console.log(rows.findIndex(e => e.container_id === selectedContainer._id), rows, selectedContainer, 'BRUH.')
+        window.dispatchEvent(
+          new CustomEvent("NotificationEvent", {
+            detail: {
+              text: "Container already in rows",
+              color: "error",
+            },
+          })
+        );
+        setSelectedContainer(null);
+        setWeighedAmt(0);
+        return;
+      }
+      const curr_amt = selectedContainer.received_amount - selectedContainer.used_amount;
+      setRows([
+        {
+          _id: new ObjectID().toHexString(),
+          product_id: selectedContainer.product_id,
+          product_code: selectedContainer.product_code,
+          name: selectedContainer.name,
+          expiry_date: selectedContainer.expiry_date,
+          lot_number: selectedContainer.lot_number,
+          container_id:selectedContainer._id,
+          container_size: selectedContainer.container_size,
+          container_amount: Math.ceil(curr_amt / selectedContainer.container_size),
+          current_amount: curr_amt,
+          proposed_amount: weighedAmt,
+        },
+        ...rows.slice(0),
+      ]);
+      setSelectedContainer(null);
+      setWeighedAmt(0);
+    } else {
+      window.dispatchEvent(
+        new CustomEvent("NotificationEvent", {
+          detail: {
+            text: "Row Not Added. No Container Selected",
+            color: "error",
+          },
+        })
+      );
+    }
+
   };
 
   const saveStockCount = async () => {
-    //send new stockCount to server
-    if (id === "new") {
-      const newStockCountId = await createStockCount(auth.token, stockCount!);
-      if (newStockCountId) {
-        navigate(`/stock-counts/${newStockCountId}`, { replace: true });
-        setStockCount({ ...stockCount!, _id: newStockCountId });
-      }
-    } else {
-      const updated = await updateStockCount(auth.token, stockCount!);
+    let allValid = true;
+    //do client side validation
+    for (let i = 0; i < inputRefs.current.length; i++) {
+      const _input = inputRefs.current[i];
 
-      if (updated === false) {
-        throw Error("Update StockCount Error");
+      const inputVal = isValid(_input.value, inputMap[i].validation);
+      inputVisuals[i] = {
+        helperText: inputVal.msg,
+        error: !inputVal.valid,
+      };
+
+      if (inputVal.valid === false) {
+        allValid = false;
       }
     }
-    window.dispatchEvent(
-      new CustomEvent("NotificationEvent", {
-        detail: { text: "Changes Saved" },
-      })
-    );
+
+    setInputVisuals({ ...inputVisuals });
+
+    if (allValid === false) {
+      window.dispatchEvent(
+        new CustomEvent("NotificationEvent", {
+          detail: {
+            text: "Changes Not Saved. Some inputs are invalid",
+            color: "error",
+          },
+        })
+      );
+      return;
+    }
+    //send new stockCount to server
+    if (id === "new") {
+      const _stockCount = await createStockCount(stockCount!);
+      console.log(_stockCount)
+      if (_stockCount) {
+        navigate(`/stock-counts/${_stockCount._id}`, { replace: true });
+        setStockCount({  ..._stockCount });
+        savedStockCount = _stockCount
+        setStockCountSaved(true);
+      } else {
+
+      }
+    } else {
+      const updated = await updateStockCount(stockCount!);
+
+      if (updated === false) {
+        throw Error("Update Stock Count Error");
+      }
+    }
     setStockCountSaved(true);
   };
   const cancelSaveStockCount = () => {
@@ -421,60 +498,69 @@ export const StockCountDetailPage = () => {
             <Grid sx={{ maxWidth: "85%" }} container spacing={3}>
               <Grid item xs={3}>
                 <TextField
-                  onChange={(e) =>
-                    setStockCount({
-                      ...stockCount,
-                      order_code: e.target.value,
-                    })
+                  defaultValue={stockCount.count_code}
+                  inputRef={(el: any) =>
+                    (inputRefs.current[inputRefMap.count_code] = el)
                   }
+                  error={inputVisuals[inputRefMap.count_code].error}
+                  helperText={inputVisuals[inputRefMap.count_code].helperText}
+                  onBlur={(event) =>
+                    onInputBlur(event, inputMap[inputRefMap.count_code])
+                  }
+                  required={inputMap[inputRefMap.count_code].validation.required}
                   spellCheck="false"
                   InputLabelProps={{ shrink: true }}
                   fullWidth
                   size="small"
                   variant="outlined"
                   label={"Stock Count Code"}
-                  value={stockCount.order_code}
                 ></TextField>
               </Grid>
               <Grid item xs={3}>
                 <TextField
-                  onChange={(e) =>
-                    setStockCount({
-                      ...stockCount,
-                      date_proposed: e.target.value,
-                    })
+                  defaultValue={stockCount.created_date.split('T')[0]}
+                  inputRef={(el: any) =>
+                    (inputRefs.current[inputRefMap.created_date] = el)
                   }
+                  error={inputVisuals[inputRefMap.created_date].error}
+                  helperText={inputVisuals[inputRefMap.created_date].helperText}
+                  onBlur={(event) =>
+                    onInputBlur(event, inputMap[inputRefMap.created_date])
+                  }
+                  required={inputMap[inputRefMap.created_date].validation.required}
                   fullWidth
                   InputLabelProps={{ shrink: true }}
                   size="small"
                   variant="outlined"
-                  label={"Stock Count Date"}
+                  label={"Created Date"}
                   type={"date"}
-                  value={stockCount.date_proposed}
                 ></TextField>
               </Grid>
-              {/* <Grid item xs={3}>
+              <Grid item xs={3}>
                 <TextField
-                  onChange={(e) =>
-                    setStockCount({
-                      ...stockCount,
-                      date_arrived: e.target.value,
-                    })
+                  defaultValue={stockCount.approved_date ? stockCount.approved_date.split('T')[0] : null}
+                  inputRef={(el: any) =>
+                    (inputRefs.current[inputRefMap.approved_date] = el)
                   }
+                  error={inputVisuals[inputRefMap.approved_date].error}
+                  helperText={inputVisuals[inputRefMap.approved_date].helperText}
+                  onBlur={(event) =>
+                    onInputBlur(event, inputMap[inputRefMap.approved_date])
+                  }
+                  required={inputMap[inputRefMap.approved_date].validation.required}
                   fullWidth
                   InputLabelProps={{ shrink: true }}
                   size="small"
                   variant="outlined"
-                  label={"Arrival Date"}
+                  label={"Approved Date"}
                   type={"date"}
-                  value={stockCount.date_arrived}
                 ></TextField>
-              </Grid> */}
+              </Grid>
               <Grid item xs={2}>
                 <Chip
                   label={
                     StockCountStatus[
-                    stockCount?.status ? stockCount?.status - 1 : 5
+                      stockCount?.status ? stockCount?.status - 1 : 3
                     ][0]
                   }
                   sx={{
@@ -486,7 +572,7 @@ export const StockCountDetailPage = () => {
                   //@ts-ignore
                   color={
                     StockCountStatus[
-                    stockCount?.status ? stockCount?.status - 1 : 5
+                      stockCount?.status ? stockCount?.status - 1 : 3
                     ][1]
                   }
                   variant="outlined"
@@ -494,9 +580,16 @@ export const StockCountDetailPage = () => {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  onChange={(e) =>
-                    setStockCount({ ...stockCount, notes: e.target.value })
+                  defaultValue={stockCount.notes}
+                  inputRef={(el: any) =>
+                    (inputRefs.current[inputRefMap.notes] = el)
                   }
+                  error={inputVisuals[inputRefMap.notes].error}
+                  helperText={inputVisuals[inputRefMap.notes].helperText}
+                  onBlur={(event) =>
+                    onInputBlur(event, inputMap[inputRefMap.notes])
+                  }
+                  required={inputMap[inputRefMap.notes].validation.required}
                   spellCheck="false"
                   InputLabelProps={{ shrink: true }}
                   fullWidth
@@ -505,7 +598,6 @@ export const StockCountDetailPage = () => {
                   label={"Notes"}
                   multiline
                   rows={6}
-                  value={stockCount.notes}
                 ></TextField>
               </Grid>
             </Grid>
@@ -527,42 +619,95 @@ export const StockCountDetailPage = () => {
             </div>
             <Divider></Divider>
             <Button
-              style={{
-                display: `${stockCount.status === 6 ? "box" : "none"}`,
-              }}
-              disabled={id === "new"}
+              disabled={id === "new" || stockCount!.status != 1}
               variant="contained"
-              onClick={() => handleConfirmStockCount()}
+              onClick={() => handleSubmitStockCount()}
             >
-              Confirm
+              Submit For Approval
             </Button>
 
             <Button
               color="success"
               variant="contained"
-              disabled={id === "new"}
-              onClick={() => handleMarkStockCountReceived()}
+              disabled={id === "new" || stockCount!.status != 2}
+              onClick={() => handleApproveStockCount()}
             >
-              Set as Received
+              Approve
+            </Button>
+            <Button
+              color="warning"
+              variant="contained"
+              disabled={id === "new" || stockCount!.status != 2}
+              onClick={() => handleDisapproveStockCount()}
+            >
+              Disapprove
             </Button>
             <Button
               color="error"
               variant="outlined"
-              disabled={id === "new"}
-              onClick={() => handleMarkStockCountCancelled()}
+              disabled={id === "new" || stockCount!.status == 4 ||  stockCount!.status == 3}
+              onClick={() => handleAbandonStockCount()}
             >
-              Cancel Stock Count
+              Abandon
             </Button>
           </Card>
         </div>
       </Card>
       <Card variant="outlined" sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
-        <div>
+        {/* <div style={{ display: "flex", flexDirection: "row", gap: 10 }}> */}
+          
+        <Grid container spacing={3}>
+          <Grid item xs={7}>
+            
+          <StandaloneAutocomplete
+            initialValue={selectedContainer}
+            onChange={(e, value) => {
+              setSelectedContainer(value)
+              console.log(value)
+            }}
+            groupBy={(option:IInventoryStock) => option.product_code + ' | ' + option.name}
+            label={"Container Lookup"}
+            letterMin={1}
+            dbOption={"inventory-stock"}
+            getOptionLabel={(item: IInventoryStock) => {
+              return (
+                item.product_code +
+                " | " +
+                item.name +
+                " | LOT#: " +
+                item.lot_number +
+                " | CONT SIZE: " +
+                item.container_size +
+                " | CONT AMT: " +
+                Math.floor(item.received_amount / item.container_size) +
+                " | CURR AMT: " +
+                (item.received_amount - item.used_amount)
+              );
+            }}
+          />
+          
+          </Grid>
+          <Grid item xs={2}>
+            
+          <TextField
+            onChange={(e) =>
+              setWeighedAmt(parseFloat(e.target.value))
+            }
+            spellCheck="false"
+            InputLabelProps={{ shrink: true }}
+            size="small"
+            variant="outlined"
+            type="number"
+            label={"Weighed amount"}
+            value={weighedAmt}
+          />
+          </Grid>
+          <Grid item xs={3}>
+            
           <Button
             style={{
               marginBottom: 10,
               marginRight: 10,
-              display: `${stockCount.status === 6 ? "block" : "none"}`,
             }}
             variant="contained"
             onClick={() => {
@@ -571,11 +716,9 @@ export const StockCountDetailPage = () => {
           >
             Add Row
           </Button>
-          {/* <Switch color="primary"
-          disabled={id=== "new"}
-          onChange={() => setReceiveMode(!receiveMode)}/>
-          Receive Mode */}
-        </div>
+          </Grid>
+          </Grid>
+        {/* </div> */}
         <DataGrid
           autoHeight={true}
           rowHeight={46}
@@ -614,15 +757,7 @@ export const StockCountDetailPage = () => {
             //   }
             // }
           }}
-          initialState={{
-            columns: {
-              columnVisibilityModel: {
-                // Hide columns status and traderName, the other columns will remain visible
-                received_amount: stockCount.status != 6,
-              },
-            },
-          }}
-          columns={receiveMode ? receiveColumns : draftColumns}
+          columns={receiveColumns}
           onCellEditCommit={(e, value) => {
             handleEditCell(e.id.toString(), e.field, e.value);
             console.log("test", rows);

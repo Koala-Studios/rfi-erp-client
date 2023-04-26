@@ -5,10 +5,11 @@ import { AuthContext } from "../components/navigation/AuthProvider";
 import { getFormula, submitFormula } from "../logic/formula.logic";
 import { useNavigate, useParams } from "react-router-dom";
 import {
-  Autocomplete,
   Button,
   Card,
   Checkbox,
+  Chip,
+  Divider,
   FormControlLabel,
   Grid,
   Paper,
@@ -16,14 +17,9 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { IInventory, lookupInventory } from "../logic/inventory.logic";
+import { IInventory } from "../logic/inventory.logic";
 import { getProduct } from "../logic/product.logic";
-import { Field } from "formik";
 import { IFormula, IFormulaItem } from "../logic/formula.logic";
-import AddBoxOutlinedIcon from "@mui/icons-material/AddBoxOutlined";
-import RemoveOutlinedIcon from "@mui/icons-material/RemoveOutlined";
-import { apiStatus } from "../logic/utils";
-import { fireEvent } from "@testing-library/react";
 import TableAutocomplete from "../components/utils/TableAutocomplete";
 import { IProduct } from "../logic/product.logic";
 import WarningIcon from "@mui/icons-material/Warning";
@@ -31,9 +27,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { ObjectID } from "bson";
 const FormulaDevPage = () => {
   const navigate = useNavigate();
-  const [invLookupCatalog, setInvLookupCatalog] = React.useState<any>(null);
   const auth = React.useContext(AuthContext);
-  const [rowCount, setRowCount] = React.useState<any>(0);
   const [cost, setCost] = React.useState<number>(0);
   const [multiplier, setMultiplier] = React.useState<number>(1.0);
   const [totalAmt, setTotalAmt] = React.useState<number>(0);
@@ -43,35 +37,48 @@ const FormulaDevPage = () => {
 
   const [base100, setBase100] = React.useState<boolean>(true);
   const [prodYield, setYield] = React.useState<number>(1.0);
+  const [recDose, setRecDose] = React.useState<number>(0.2);
+  const [product, setProduct] = React.useState<IProduct | null>(null);
 
-  const [changedYield, setChangedYield] = React.useState<boolean>(true);
   const [approveonSubmit, setApproveonSubmit] = React.useState<boolean>(false);
 
   const { id } = useParams();
   const { version } = useParams();
+
+  const ProductStatus = [
+    ["Pending", "error"],
+    ["In Progress", "warning"],
+    ["Awaiting Approval", "info"],
+    ["Approved", "success"],
+    ["Error", "error"],
+  ];
+
   React.useEffect(() => {
+    getProduct(id!).then((product) => {
+      setProduct(product);
+    });
     getFormula(id!, version!).then((formula) => {
       if(formula){ 
 
         setYield(formula!.yield ? formula!.yield : 1.0);
         setBase100(formula!.base_hundred ? formula!.base_hundred : true);
+        setRecDose(formula!.rec_dose_rate ? formula!.rec_dose_rate : NaN);
         if (!formula?.formula_items) {
           setRows([
             {
-              id: "row" + rowCount,
+              _id: new ObjectID().toHexString(),
               amount: 0,
               last_amount: 0,
               item_cost: 0,
               cost: 0,
             },
           ]);
-          setRowCount(rowCount + 1);
         } else {
           let count = 0;
           let amount = 0;
           const newRows = formula!.formula_items.map((item, index) => {
             return {
-              id: new ObjectID().toHexString(),
+              _id: new ObjectID().toHexString(),
               material_id: item.material_id,
               material_code: item.material_code,
               material_name: item.material_name,
@@ -84,29 +91,18 @@ const FormulaDevPage = () => {
             };
           });
           setRows(newRows);
-          setRowCount(count);
         }
       } else {
         setYield(1);
         setBase100(true);
-        setRows([{id:new ObjectID().toHexString(), material_id: null, material_code: null, material_name: '', item_cost: 0, amount: 0, last_cost:0,last_amount: null, notes: ''}]);
+        setRows([{_id:new ObjectID().toHexString(), material_id: null, material_code: null, material_name: '', item_cost: 0, amount: 0, last_cost:0,last_amount: null, notes: ''}]);
       }
-    });
-  }, []);
-
-  const [product, setProduct] = React.useState<IProduct | null>(null);
-
-  React.useEffect(() => {
-    getProduct(id!).then((product) => {
-      setProduct(product);
     });
   }, []);
 
   React.useEffect(() => {
     handleSetCost();
-    console.log(totalAmt);
   }, [rows]);
-
   React.useEffect(() => {
     //Temporary method of adjusting carrier amt, other methods would cause infinite recursion atm
     handleCalcCarrier();
@@ -119,7 +115,7 @@ const FormulaDevPage = () => {
   }, [carrier]);
 
   interface IFormulaDevRow extends IFormulaItem {
-    id: string;
+    _id: string;
     last_cost: number | null;
     item_cost: number | null;
     last_amount: number;
@@ -146,7 +142,7 @@ const FormulaDevPage = () => {
               minHeight: "30px",
               marginRight: "12px",
             }}
-            onClick={() => handleDeleteRow(params.row.id)}
+            onClick={() => handleDeleteRow(params.row._id)}
           >
             -
           </Button>
@@ -162,15 +158,15 @@ const FormulaDevPage = () => {
               minWidth: "40px",
               minHeight: "30px",
             }}
-            onClick={() => handleAddRow(params.row.id)}
+            onClick={() => handleAddRow(params.row._id)}
           >
             +
           </Button>
           <Checkbox
-            disabled={carrier != null && carrier != params.row.id}
-            checked={carrier === params.row.id}
+            disabled={carrier != null && carrier != params.row._id}
+            checked={carrier === params.row._id}
             onClick={() => {
-              setCarrier(carrier === null ? params.row.id : null);
+              setCarrier(carrier === null ? params.row._id : null);
             }}
           />
         </strong>
@@ -192,27 +188,19 @@ const FormulaDevPage = () => {
       filterable: false,
       renderCell: (row_params: GridRenderCellParams<string>) => (
         <TableAutocomplete
-          dbOption="raw-mat"
+          dbOption="material"
+          readOnly={row_params.row.last_amount != null}
           // editMode={editMode}
           // setEditMode={setEditMode}
           handleEditRow={handleEditRow}
           rowParams={row_params}
           initialValue={row_params.row.material_name}
-          letterMin={3}
+          letterMin={2}
           getOptionLabel={(item: IInventory) =>
             `${item.product_code} | ${item.name}`
           }
         />
       ),
-    },
-    {
-      field: "item_cost",
-      headerName: "Mat Cost/KG",
-      type: "number",
-      sortable: false,
-      filterable: false,
-      width: 100,
-      align: "left",
     },
     {
       field: "amount",
@@ -226,6 +214,16 @@ const FormulaDevPage = () => {
         params.row.amount === 0 ? null : params.row.amount,
     },
     {
+      field: "last_amount",
+      headerName: "Prev Qty(%)",
+      type: "number",
+      sortable: false,
+      filterable: false,
+      width: 90,
+      align: "right",
+      valueGetter: (params) => params.row.last_amount,
+    },
+    {
       field: "cost",
       headerName: "Cost",
       type: "number",
@@ -237,16 +235,6 @@ const FormulaDevPage = () => {
         params.row.amount === 0
           ? null
           : (params.row.item_cost * params.row.amount) / 100,
-    },
-    {
-      field: "last_amount",
-      headerName: "Prev Qty(%)",
-      type: "number",
-      sortable: false,
-      filterable: false,
-      width: 90,
-      align: "right",
-      valueGetter: (params) => params.row.last_amount,
     },
     {
       field: "last_cost",
@@ -267,31 +255,39 @@ const FormulaDevPage = () => {
       width: 400,
       editable: true,
     },
+    {
+      field: "item_cost",
+      headerName: "Mat Cost/KG",
+      type: "number",
+      sortable: false,
+      filterable: false,
+      width: 100,
+      align: "left",
+    },
   ];
 
   const handleAddRow = (row_id: string) => {
     const index = rows.findIndex(
-      (element: IFormulaDevRow) => element.id === row_id
+      (element: IFormulaDevRow) => element._id === row_id
     );
     setRows([
       ...rows.slice(0, index + 1),
       {
-        id: "row" + rowCount,
+        _id: new ObjectID().toHexString(),
         amount: 0,
-        last_amount: 0,
+        last_amount: null,
         item_cost: 0,
         cost: 0,
       },
       ...rows.slice(index == rows.length - 1 ? index + 2 : index + 1),
     ]);
-    setRowCount(rowCount + 1);
     // setEditMode("row" + rowCount); //onBlur in autocomplete clashes with this, also slows page down
   };
 
   const handleMultiplier = (mult_amount: number) => {
     setRows(
       rows.map((material: IFormulaDevRow, index: number) => {
-        if (material.id != carrier) {
+        if (material._id != carrier) {
           material.amount = material.amount
             ? material.amount * mult_amount
             : material.last_amount * mult_amount;
@@ -300,19 +296,25 @@ const FormulaDevPage = () => {
         return material;
       })
     );
+    
   };
-  const handleEditRow = (row_id: string, newRow: IFormulaDevRow) => {
-    const rowIndex = rows.findIndex((r: IFormulaDevRow) => r.id === row_id);
 
-    setRows([
-      ...rows.slice(0, rowIndex),
-      newRow,
-      ...rows.slice(rowIndex == rows.length ? rowIndex : rowIndex + 1),
-    ]);
+  const handleEditRow = (rowid: string, value: any) => {
+    const rowIndex = rows.findIndex((r: IFormulaDevRow) => r._id === rowid);
+
+    let pList = rows.slice();
+    console.log(rowid, value, rowIndex, pList[rowIndex]);
+    pList[rowIndex].material_code = value.product_code;
+    pList[rowIndex].product_id = value._id;
+    pList[rowIndex].material_name = value.name;
+    pList[rowIndex].item_cost = value.cost;
+
+    setRows(pList);
+
   };
 
   const handleEditCell = (row_id: string, field: string, value: any) => {
-    const rowIndex = rows.findIndex((r: IFormulaDevRow) => r.id === row_id);
+    const rowIndex = rows.findIndex((r: IFormulaDevRow) => r._id === row_id);
     setRows([
       ...rows.slice(0, rowIndex),
       {
@@ -321,13 +323,17 @@ const FormulaDevPage = () => {
       },
       ...rows.slice(rowIndex == rows.length ? rowIndex : rowIndex + 1),
     ]);
+
+    
   };
 
   const handleDeleteRow = (row_id: string) => {
     if (row_id === carrier) {
       setCarrier(null);
     }
-    setRows([...rows.filter((m: IFormulaDevRow) => m.id !== row_id)]);
+    setRows([...rows.filter((m: IFormulaDevRow) => m._id !== row_id)]);
+
+    
   };
 
   const handleSetCost = () => {
@@ -355,15 +361,21 @@ const FormulaDevPage = () => {
     if (rows && carrier != null) {
       let totalMat = 0;
       for (var i = 0; i < rows.length; i++) {
-        if (rows[i].id != carrier) {
+        if (rows[i]._id != carrier) {
           totalMat += rows[i].amount ? rows[i].amount : rows[i].last_amount;
         }
       }
       handleEditCell(carrier, "amount", totalMat < 100 ? 100 - totalMat : NaN);
     }
+
+    
   };
 
-  const handleSubmit = async () => {
+  const handleAdminApprove = async () => {
+    
+    // const new_formula = await submitFormula(approve, newVersion);
+  }
+  const handleSubmit = async (approve:boolean = false) => {
     const newVersion: IFormula = {
       product_code: product!.product_code,
       formula_items: rows.map((material: IFormulaDevRow) => {
@@ -378,12 +390,13 @@ const FormulaDevPage = () => {
       product_id: product!._id,
       yield: prodYield,
       base_hundred: base100,
+      rec_dose_rate: recDose
     };
     //TODO: WHOLE PAGE NEEDS SLIGHT REWORK LOL.
-    const new_formula = await submitFormula(approveonSubmit, newVersion);
+    const _product = await submitFormula(approve, newVersion);
 
-    if (new_formula) {
-      navigate(`/formulas/develop/${new_formula._id}/${version ?? 0 + 1}`, {
+    if (_product) {
+      navigate(`/formulas/develop/${_product._id}/${_product.versions ?? 1}`, {
         replace: true,
       });
     }
@@ -410,6 +423,15 @@ const FormulaDevPage = () => {
   return (
     <>
       <Card variant="outlined" style={{ padding: 16, marginBottom: 10 }}>
+      <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            gap: 100,
+            marginBottom: 10,
+          }}
+      >
+      <div>
       <Button
           sx={{ mb: 3 }}
           aria-label="go back"
@@ -419,71 +441,9 @@ const FormulaDevPage = () => {
         >
           <ArrowBackIcon fontSize="small" />
         </Button>
-        <div style={{ display: "flex", gap: 16 }}>
-          <Grid container spacing={3}>
-            <Grid item xs={2.5}>
-              <TextField
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                size="small"
-                variant="outlined"
-                label={"Created Date"}
-                InputProps={{
-                  readOnly: true,
-                }}
-                type={"date"}
-              ></TextField>
-            </Grid>
-            <Grid item xs={2.5}>
-              {/* <DatePicker
-                label="Basic example"
-                value={undefined}
-                // onChange={(newValue) => {
-                //   setValue(newValue);
-                // }}
-                renderInput={(params) => <TextField {...params} />}
-              /> */}
-              <TextField
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                size="small"
-                variant="outlined"
-                label={"Approved Date"}
-                InputProps={{
-                  readOnly: true,
-                }}
-                type={"date"}
-              ></TextField>
-            </Grid>
-
-            <Grid item xs={3.5}></Grid>
-            <Grid item xs={1.5}>
-              <TextField
-                spellCheck="false"
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-                size="small"
-                variant="outlined"
-                label={"Versions"}
-                InputProps={{
-                  readOnly: true,
-                }}
-              ></TextField>
-            </Grid>
-            <Grid item xs={2}>
-              <TextField
-                spellCheck="false"
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-                size="small"
-                variant="outlined"
-                label={"Status"}
-                InputProps={{
-                  readOnly: true,
-                }}
-              ></TextField>
-            </Grid>
-            <Grid item xs={2}>
+        
+        <Grid sx={{ maxWidth: "85%" }} container spacing={3}>
+          <Grid item xs={2}>
               <TextField
                 spellCheck="false"
                 InputLabelProps={{ shrink: true }}
@@ -494,6 +454,7 @@ const FormulaDevPage = () => {
                   readOnly: true,
                 }}
                 label={"Product Code"}
+                value={product?.product_code}
               ></TextField>
             </Grid>
             <Grid item xs={5}>
@@ -507,6 +468,72 @@ const FormulaDevPage = () => {
                 InputProps={{
                   readOnly: true,
                 }}
+                value={product?.name}
+              ></TextField>
+            </Grid>
+            <Grid item xs={1.5}></Grid>
+            <Grid item xs={1.5}>
+              <TextField
+                spellCheck="false"
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+                size="small"
+                variant="outlined"
+                label={"Versions"}
+                InputProps={{
+                  readOnly: true,
+                }}
+                value={product?.versions}
+              ></TextField>
+            </Grid>
+            <Grid item xs={2}>
+            <Chip
+                  label={
+                    ProductStatus[
+                      product?.status ? product?.status - 1 : 4
+                    ][0]
+                  }
+                  sx={{
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: 10,
+                    fontWeight: 600,
+                  }}
+                  //@ts-ignore
+                  color={
+                    ProductStatus[
+                      product?.status ? product?.status - 1 : 4
+                    ][1]
+                  }
+                  variant="outlined"
+                />
+            </Grid>
+            <Grid item xs={2.5}>
+              <TextField
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                size="small"
+                variant="outlined"
+                label={"Created Date"}
+                InputProps={{
+                  readOnly: true,
+                }}
+                type={"date"}
+                value={product?.date_created}
+              ></TextField>
+            </Grid>
+            <Grid item xs={2.5}>
+              <TextField
+                fullWidth
+                InputLabelProps={{ shrink: true }}
+                size="small"
+                variant="outlined"
+                label={"Approved Date"}
+                InputProps={{
+                  readOnly: true,
+                }}
+                type={"date"}
+                value={product?.date_created}
               ></TextField>
             </Grid>
             <Grid item xs={5}></Grid>
@@ -521,14 +548,64 @@ const FormulaDevPage = () => {
                 label={"Flavor Profile"}
                 multiline
                 rows={6}
+                value={product?.description}
               ></TextField>
             </Grid>
           </Grid>
 
-          <Card variant="outlined" style={{ width: "40%", minWidth: "40%" }}>
+          </div>
+          
+          <Card
+            variant="outlined"
+            style={{
+              width: 260,
+              minWidth: 260,
+              padding: 16,
+              display: "flex",
+
+              flexDirection: "column",
+              gap: 12,
+            }}
+          >
             <div>
-              <Typography variant="h6">Overview Stats</Typography>
+              <Typography variant="h6">Action Board</Typography>
             </div>
+            <Divider></Divider>
+            <Button
+              style={{
+                // display: `${purchase.status === 6 ? "box" : "none"}`,
+              }}
+              disabled={id === "new" || (product!.status != 1 && product!.status != 2)}
+              variant="contained"
+              onClick={() => handleSubmit(false)}
+            >
+              SUBMIT
+            </Button>
+
+            <Button
+              color="info"
+              variant="contained"
+              disabled={id === "new" || product!.status != 2}
+              onClick={() => handleSubmit(true)}
+            >
+              APPROVE & SUBMIT
+            </Button>
+            <Button
+              color="success"
+              variant="contained"
+              disabled={id === "new" || product!.status != 3}
+              onClick={() => handleAdminApprove()}
+            >
+              APPROVE
+            </Button>
+            <Button
+              color="warning"
+              variant="contained"
+              disabled={id === "new" || product!.status != 3}
+              onClick={() => handleAdminApprove()}
+            >
+              DISAPPROVE / REDRAFT
+            </Button>
           </Card>
         </div>
       </Card>
@@ -594,32 +671,29 @@ const FormulaDevPage = () => {
                 variant="outlined"
                 label={"Yield Ratio"}
                 defaultValue={prodYield.toFixed(2)}
-                onChange={(e) => {
+                onBlur={(e) => {
                   setYield(parseFloat(e.target.value));
                 }} //here
               ></TextField>
             </Grid>
             <Grid item xs={1.2}></Grid>
-            <Grid item xs={1.75}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onClick={() => {
-                      setApproveonSubmit(!approveonSubmit);
-                    }}
-                    checked={approveonSubmit}
-                  />
-                }
-                label="Approve?"
-              />
-              <Button
-                variant="contained"
-                size="medium"
-                onClick={() => handleSubmit()}
-              >
-                Submit
-              </Button>
+            <Grid item xs={0.75}>
+              <TextField
+                spellCheck="false"
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+                size="small"
+                variant="outlined"
+                label={"Rec Dose"}
+                defaultValue={recDose.toFixed(2)}
+                type="number"
+                onBlur={(e) => {
+                  console.log(e, 'test dose')
+                  setRecDose(parseFloat(e.target.value));
+                }} //here
+              ></TextField>
             </Grid>
+            <Grid item xs={1.2}></Grid>
             <Grid item xs={0.5}>
               <div hidden={!(prodYield === 1 && totalAmt > 100)}>
                 <Tooltip
@@ -635,6 +709,7 @@ const FormulaDevPage = () => {
         <DataGrid
           rowHeight={39}
           hideFooter
+          getRowId={(row) => row._id}
           onCellKeyDown={(params, event) => {
             if (event.code == "Space") {
               event.stopPropagation();
@@ -662,6 +737,14 @@ const FormulaDevPage = () => {
               //   // console.log(event, params)
               // }
             }
+          }}
+          experimentalFeatures={{ newEditingApi: true }}
+          processRowUpdate={(newRow) => {
+            let pList = rows.slice();
+            const rowIdx = rows.findIndex((r:any) => r._id === newRow._id);
+            pList[rowIdx] = newRow;
+            setRows(pList);
+            return newRow;
           }}
           onCellEditCommit={(e, value) => {
             handleEditCell(e.id.toString(), e.field, e.value);

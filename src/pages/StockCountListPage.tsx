@@ -17,12 +17,35 @@ const StockCountListPage = () => {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
+  
+const StockCountStatus = [
+  ["DRAFT", "warning"],
+  ["SUBMITTED", "warning"],
+  ["APPROVED", "success"],
+  ["ABANDONED", "error"],
+];
   const columns: GridColDef[] = [
-    { field: "order_code", headerName: "SC Code", width: 200 },
-    { field: "customer", headerName: "Customer Name", width: 200 },
-    { field: "date_orderd", headerName: "Purchase Date", width: 200 },
+    { field: "count_code", headerName: "Count Code", width: 200 },
+    { field: "created_date", headerName: "Created Date", width: 200,
+     valueGetter: (params) =>  params.row.created_date.split('T')[0] 
+    },
     { field: "item_count", headerName: "Item Count", width: 200 },
-    { field: "status", headerName: "Status", width: 200 },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 200,
+      renderCell: (params: GridRenderCellParams<number>) => (
+        <Chip
+          label={StockCountStatus[params.value ? params.value - 1 : 0][0]}
+          sx={{
+            fontWeight: 600,
+          }}
+          //@ts-ignore
+          color={StockCountStatus[params.value ? params.value - 1 : 0][1]}
+          variant="outlined"
+        />
+      ),
+    },
     {
       field: "id",
       headerName: "Actions",
@@ -63,12 +86,10 @@ const StockCountListPage = () => {
         const newRows = list!.docs.map((count:IStockCount) => {
           return {
             id: count._id,
-            order_code: count.order_code,
-            date_orderd: count.date_proposed
-              .toString()
-              .replace(/\T.+/, ""),
+            count_code: count.count_code,
+            created_date: count.created_date,
             status: count.status,
-            item_count: count.count_items.length,
+            item_count: count.count_items.length
           };
         });
         setDataOptions({ rows: newRows, listOptions: list! });

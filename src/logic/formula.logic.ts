@@ -18,6 +18,7 @@ export interface IFormula {
   version?: number;
   yield: number;
   base_hundred?: boolean;
+  rec_dose_rate: number;
   date_created?: Date;
   formula_items: IFormulaItem[];
 }

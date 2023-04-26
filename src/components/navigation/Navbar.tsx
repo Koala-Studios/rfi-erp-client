@@ -34,8 +34,10 @@ import InventoryIcon from "@mui/icons-material/Inventory";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import PersonPinCircleIcon from "@mui/icons-material/PersonPinCircle";
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
 import { Link, useLocation } from "react-router-dom";
 import Badge, { BadgeProps } from "@mui/material/Badge";
+import Battery90Icon from '@mui/icons-material/Battery90';
 import Avatar from "@mui/material/Avatar";
 import { AuthContext } from "./AuthProvider";
 import { useEffect } from "react";
@@ -68,12 +70,17 @@ const LinkItems = [
   {
     text: "Inv Containers",
     link: "/inventory-stock",
+    icon: <Battery90Icon></Battery90Icon>,
+  },
+  {
+    text: "Materials",
+    link: "/materials",
     icon: <OilBarrelIcon></OilBarrelIcon>,
   },
   {
     text: "Products",
     link: "/products",
-    icon: <InventoryIcon></InventoryIcon>,
+    icon: <AttachMoneyIcon></AttachMoneyIcon>,
   },
   {
     text: "Development",

@@ -17,6 +17,19 @@ const PurchaseListPage = () => {
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
+
+  
+const PurchaseStatus = [
+  ["AWAITING SHIPPING", "warning"],
+  ["AWAITING ARRIVAL", "warning"],
+  ["PARTIALLY RECEIVED", "success"],
+  ["RECEIVED", "success"],
+  ["ABANDONED", "error"],
+  ["DRAFT", "warning"],
+  ["ERROR", 'error']
+];
+
+
   const filterArray: FilterElement[] = [
     {
       label: "Product Code",
@@ -32,14 +45,29 @@ const PurchaseListPage = () => {
     { field: "supplier", headerName: "Supplier Name", width: 200 },
     { field: "date_purchased", headerName: "Purchase Date", width: 200 },
     { field: "item_count", headerName: "Item Count", width: 200 },
-    { field: "status", headerName: "Status", width: 200 },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 200,
+      renderCell: (params: GridRenderCellParams<number>) => (
+        <Chip
+          label={PurchaseStatus[params.value ? params.value - 1 : 6][0]}
+          sx={{
+            fontWeight: 600,
+          }}
+          //@ts-ignore
+          color={PurchaseStatus[params.value ? params.value - 1 : 6][1]}
+          variant="outlined"
+        />
+      ),
+    },
     {
       field: "id",
       headerName: "Actions",
       align: "left",
       width: 250,
       renderCell: (params: GridRenderCellParams<string>) => (
-        <strong>
+      <strong>
           <Button
             variant="contained"
             color="primary"

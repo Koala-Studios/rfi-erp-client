@@ -86,7 +86,7 @@ export const getBatching = async (
   id: string
 ): Promise<IBatching | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization:  `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       id: id,
     },
@@ -139,7 +139,7 @@ export const createBatching = async (
   formData: IBatching
 ): Promise<string | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization:  `Bearer ${localStorage.getItem("auth_token")}` },
   };
 
   let rtn = null;
@@ -167,7 +167,7 @@ export const confirmBatching = async (
   batching: IBatching,
 ): Promise<IBatching | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization:  `Bearer ${localStorage.getItem("auth_token")}` },
   };
   let rtn = null;
   await api
@@ -192,7 +192,7 @@ export const updateBatching = async (
   formData: IBatching
 ): Promise<boolean> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization:  `Bearer ${localStorage.getItem("auth_token")}` },
   };
 
   let rtn = false;
@@ -216,7 +216,7 @@ export const finishBatching = async (
   batching: IBatching,
 ): Promise<IBatching | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization:  `Bearer ${localStorage.getItem("auth_token")}` },
   };
   let rtn = null;
   await api
@@ -242,7 +242,7 @@ export const markBatchingAbandoned = async (
   batching_id: string,
 ): Promise<IBatching | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization:  `Bearer ${localStorage.getItem("auth_token")}` },
     params: { batching_id: batching_id }
   };
 
@@ -272,7 +272,7 @@ export const markBatchingCancelled = async (
   batching_id: string,
 ): Promise<IBatching | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization:  `Bearer ${localStorage.getItem("auth_token")}` },
     params: { batching_id: batching_id }
   };
 
@@ -302,7 +302,7 @@ export const generateBatchingBOM = async (
   batching_id: string,
 ): Promise<IBatching | null> => {
   const config = {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization:  `Bearer ${localStorage.getItem("auth_token")}` },
     params: { batching_id: batching_id }
   };
 

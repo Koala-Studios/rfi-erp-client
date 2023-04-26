@@ -207,7 +207,7 @@ export const PurchaseDetailPage = () => {
         setPurchase(p!);
         setRows(
           p!.order_items.map((item) => {
-            item._id = item._id ? item._id : new ObjectID().toHexString();
+            item._id = item._id ? item._id : new ObjectID().toHexString(); // can remove this in future after migrations.
             return item;
           })
         );
@@ -314,7 +314,7 @@ export const PurchaseDetailPage = () => {
       align: "center",
     },
     {
-      field: "expiry_date",
+      field: "expiry_date", //TODO: Fix blur not putting value in so clicking button will say "missing fields :-(" (maybe make mini date choosing custom component)
       headerName: "Exp Date",
       type: "date",
       width: 120,

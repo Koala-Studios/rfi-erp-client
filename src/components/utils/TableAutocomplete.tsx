@@ -7,6 +7,8 @@ import { AuthContext } from "../navigation/AuthProvider";
 interface Props {
   dbOption:
   | "customer"
+  | "supplier"
+  | "inventory-stock"
   | "inventory"// all products and materials
   | "material" // not for sale
   | "raw-mat" //is raw, not for sale
@@ -15,7 +17,6 @@ interface Props {
   | "approved-product" //approved and for sale
   | "approved-product-all" //for sale and not for sale, just approved that matters
   | "user"
-  | "supplier"
   | "product-type"
   | "product-type-mat"
   | "product-type-raw";

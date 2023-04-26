@@ -7,9 +7,11 @@ export interface ISupplier {
   code: string;
   email: string;
   contact_name: string;
-  address_one?: string;
-  address_two?: string;
+  address_one: string;
+  address_two: string;
+  notes: string;
   lead_time?: string;
+  trust_factor:number | null;
   phone?: string;
   created_date: string;
 }

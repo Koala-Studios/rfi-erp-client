@@ -1,4 +1,5 @@
 import { lookupCustomer } from "./customer.logic";
+import { lookupInventoryStock } from "./inventory-stock.logic";
 import { lookupInventory } from "./inventory.logic";
 import { lookupProductType } from "./product-type.logic";
 import { lookupProduct } from "./product.logic";
@@ -9,6 +10,8 @@ export const lookup = async (
   query: string,
   dbOption:
     | "customer"
+    | "supplier"
+    | "inventory-stock"
     | "inventory"// all products and materials
     | "material" // not for sale
     | "raw-mat" //is raw, not for sale
@@ -18,25 +21,23 @@ export const lookup = async (
     | "approved-product-all" //for sale and not for sale, just approved that matters
     | "non-approved-product-all" //for sale and not for sale, just not approved that matters
     | "user"
-    | "supplier"
     | "product-type"
     | "product-type-mat"
     | "product-type-raw",
   letterMin: number
 ) => {
   if (query.length < letterMin) return [];
+//TODO: CONVERT TO SWITCH STATEMENT LOL..
 
-  if (dbOption === "customer") {
-    return await lookupCustomer(query);
-  } else if (dbOption === "supplier") {
-    return await lookupSupplier(query);
-  } else if (dbOption === "user") {
-    return await lookupUser(query);
-  }
+if (dbOption === "inventory") {
+  return await lookupInventory(query, undefined, undefined, true);
+}
+if (dbOption === "inventory-stock") {
+  return await lookupInventoryStock(query);
+}
   
-  else if (dbOption === "inventory") {
-    return await lookupInventory(query, undefined, undefined, true);
-  } else if (dbOption === "material") {
+
+ else if (dbOption === "material") {
     return await lookupInventory(query, false, undefined, true);
   } else if (dbOption === "raw-mat") {
     return await lookupInventory(query, false, true,  undefined);
@@ -61,6 +62,13 @@ export const lookup = async (
   }
   else if (dbOption === "product-type-raw") {
     return await lookupProductType(query, false, true);
+  }
+  else if (dbOption === "customer") {
+    return await lookupCustomer(query);
+  } else if (dbOption === "supplier") {
+    return await lookupSupplier(query);
+  } else if (dbOption === "user") {
+    return await lookupUser(query);
   }
 
   return [];
