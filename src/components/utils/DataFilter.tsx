@@ -15,7 +15,7 @@ import { redirect } from "react-router-dom";
 import SimpleSelect from "./SimpleSelect";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import SearchIcon from "@mui/icons-material/Search";
-
+import RemoveIcon from '@mui/icons-material/Remove';
 interface Props {
   filters: FilterElement[];
 }
@@ -122,8 +122,17 @@ const DataFilter: React.FC<Props> = ({ filters }) => {
 
   return (
     <Grid container spacing={2} sx={{ mb: 2 }}>
+      <Grid item xs={0.6}>
+      <Button onClick={handleClearAll} variant="outlined" color="primary"
+          sx={{ mr: 2, pl: 0.8, pr: 0.8 }}>
+          <SearchIcon fontSize="medium" />
+          <RemoveIcon></RemoveIcon>
+        </Button>
+      </Grid>
+
       {createFields()}
       <Grid item xs={12}>
+
         <Button
           onClick={handleSearchClicked}
           variant="contained"
@@ -134,9 +143,7 @@ const DataFilter: React.FC<Props> = ({ filters }) => {
           Search
         </Button>
 
-        <Button onClick={handleClearAll} variant="outlined" color="primary">
-          Clear All
-        </Button>
+
         <Divider sx={{ mt: 2 }} />
       </Grid>
     </Grid>

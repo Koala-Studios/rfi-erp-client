@@ -83,6 +83,7 @@ export const listProducts = async (
     .then((res) => {
       if (res.status === apiStatus.OK) {
         list = res.data.res;
+        console.log(res, 'asdsad')
       }
     })
     .catch((err) => {

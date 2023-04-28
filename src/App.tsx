@@ -14,36 +14,37 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import AuthProvider, {
   RequireAuth,
 } from "./components/navigation/AuthProvider";
-import BatchingListPage from "./pages/BatchingListPage";
+import BatchingListPage from "./pages/batching/BatchingListPage";
 import { Navbar } from "./components/navigation/Navbar";
-import ProductListPage from "./pages/ProductListPage";
-import { ProductDetailPage } from "./pages/ProductDetailPage";
+import ProductListPage from "./pages/product/ProductListPage";
+import { ProductDetailPage } from "./pages/product/ProductDetailPage";
 import { ForecastPage } from "./pages/ForecastPage";
-import InventoryListPage from "./pages/InventoryListPage";
-import SupplierListPage from "./pages/SupplierListPage";
-import { SupplierDetailPage } from "./pages/SupplierDetailPage";
-import { CustomerDetailPage } from "./pages/CustomerDetailPage";
-import { UserDetailPage } from "./pages/UserDetailPage";
-import UserListPage from "./pages/UserListPage";
-import DvpListPage from "./pages/DvpListPage";
-import FormulaPage from "./pages/FormulaPage";
-import PurchaseListPage from "./pages/PurchaseListPage";
-import ProjectListPage from "./pages/ProjectListPage";
-import { PurchaseDetailPage } from "./pages/PurchaseDetailPage";
-import SalesListPage from "./pages/SalesListPage";
-import { SalesDetailPage } from "./pages/SalesDetailPage";
-import FormulaDevPage from "./pages/FormulaDevPage";
+import InventoryListPage from "./pages/inventory/InventoryListPage";
+import SupplierListPage from "./pages/supplier/SupplierListPage";
+import { SupplierDetailPage } from "./pages/supplier/SupplierDetailPage";
+import { CustomerDetailPage } from "./pages/customer/CustomerDetailPage";
+import { UserDetailPage } from "./pages/user/UserDetailPage";
+import UserListPage from "./pages/user/UserListPage";
+import FormulaListPage from "./pages/formula/FormulaListPage";
+import FormulaPage from "./pages/formula/FormulaPage";
+import PurchaseListPage from "./pages/purchasing/PurchaseListPage";
+import ProjectListPage from "./pages/project/ProjectListPage";
+import { PurchaseDetailPage } from "./pages/purchasing/PurchaseDetailPage";
+import SalesListPage from "./pages/sales/SalesListPage";
+import { SalesDetailPage } from "./pages/sales/SalesDetailPage";
+import FormulaDevPage from "./pages/formula/FormulaDevPage";
 import { ProjectDetails } from "./components/project/ProjectDetails";
-import CustomerListPage from "./pages/CustomerListPage";
-import InventoryStockListPage from "./pages/InventoryStockListPage";
+import CustomerListPage from "./pages/customer/CustomerListPage";
+import InventoryStockListPage from "./pages/inventory/InventoryStockListPage";
 import { SnackbarProvider } from "notistack";
-import StockCountListPage from "./pages/StockCountListPage";
-import { StockCountDetailPage } from "./pages/StockCountDetailPage";
-import { BatchingDetailPage } from "./pages/BatchingDetailPage";
-import { ProductTypeDetailPage } from "./pages/ProductTypeDetailPage";
-import ProductTypeListPage from "./pages/ProductTypeListPage";
-import { InventoryDetailPage } from "./pages/InventoryDetailPage";
-import MaterialListPage from "./pages/MaterialListPage";
+import StockCountListPage from "./pages/stock-count/StockCountListPage";
+import { StockCountDetailPage } from "./pages/stock-count/StockCountDetailPage";
+import { BatchingDetailPage } from "./pages/batching/BatchingDetailPage";
+import { ProductTypeDetailPage } from "./pages/product-type/ProductTypeDetailPage";
+import ProductTypeListPage from "./pages/product-type/ProductTypeListPage";
+import { InventoryDetailPage } from "./pages/inventory/InventoryDetailPage";
+import MaterialListPage from "./pages/inventory/MaterialListPage";
+import InventoryMovementPage from "./pages/inventory/InventoryMovementPage";
 
 const mainTheme = createTheme({
   palette: {
@@ -101,6 +102,17 @@ function App() {
                   </RequireAuth>
                 }
               />
+              <Route
+                path="/inventory/:id/movements"
+                element={
+                  <RequireAuth>
+                    <Navbar title="Movements">
+                      <InventoryMovementPage />
+                    </Navbar>
+                  </RequireAuth>
+                }
+              />
+
                             <Route
               path="/materials"
                 element={
@@ -317,7 +329,7 @@ function App() {
                 element={
                   <RequireAuth>
                     <Navbar title="Development">
-                      <DvpListPage />
+                      <FormulaListPage />
                     </Navbar>
                   </RequireAuth>
                 }
