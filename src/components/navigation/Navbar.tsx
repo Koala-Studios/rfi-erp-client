@@ -34,10 +34,10 @@ import InventoryIcon from "@mui/icons-material/Inventory";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import AccountCircle from "@mui/icons-material/AccountCircle";
 import PersonPinCircleIcon from "@mui/icons-material/PersonPinCircle";
-import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import { Link, useLocation } from "react-router-dom";
 import Badge, { BadgeProps } from "@mui/material/Badge";
-import Battery90Icon from '@mui/icons-material/Battery90';
+import Battery90Icon from "@mui/icons-material/Battery90";
 import Avatar from "@mui/material/Avatar";
 import { AuthContext } from "./AuthProvider";
 import { useEffect } from "react";
@@ -47,85 +47,102 @@ import FormHandler from "./FormHandler";
 import OilBarrelIcon from "@mui/icons-material/OilBarrel";
 import AccountMenu from "../menus/AccountMenu";
 import NotificationMenu from "../menus/NotificationMenu";
-import CategoryIcon from '@mui/icons-material/Category';
+import CategoryIcon from "@mui/icons-material/Category";
+import PERMISSIONS from "../../logic/config.permissions";
+import { hasPermission } from "../../logic/user.logic";
 
 const drawerWidth = 190;
 
-const LinkItems = [
+let LinkItems = [
   {
     text: "Projects",
     link: "/projects",
     icon: <AccountTreeIcon></AccountTreeIcon>,
+    permission: PERMISSIONS.project_page,
   },
   {
     text: "Batching",
     link: "/batching",
     icon: <HvacIcon></HvacIcon>,
+    permission: PERMISSIONS.batching_page,
   },
   {
     text: "Inventory",
     link: "/inventory",
     icon: <StorageIcon></StorageIcon>,
+    permission: PERMISSIONS.inventory_page,
   },
   {
     text: "Inv Containers",
     link: "/inventory-stock",
     icon: <Battery90Icon></Battery90Icon>,
+    permission: PERMISSIONS.inventorystock_page,
   },
   {
     text: "Materials",
     link: "/materials",
     icon: <OilBarrelIcon></OilBarrelIcon>,
+    permission: PERMISSIONS.materials_page,
   },
   {
     text: "Products",
     link: "/products",
     icon: <AttachMoneyIcon></AttachMoneyIcon>,
+    permission: PERMISSIONS.products_page,
   },
   {
     text: "Development",
     link: "/development",
     icon: <GroupIcon></GroupIcon>,
+    permission: PERMISSIONS.development_page,
   },
   {
     text: "Forecast",
     link: "/forecast",
     icon: <BiotechIcon></BiotechIcon>,
+    permission: PERMISSIONS.forecast_page,
   },
   {
     text: "Purchase Orders",
     link: "/purchase-orders",
     icon: <ShoppingBasketIcon></ShoppingBasketIcon>,
+    permission: PERMISSIONS.purchaseorder_page,
   },
   {
     text: "Sales Orders",
     link: "/sales-orders",
     icon: <ShoppingBasketIcon></ShoppingBasketIcon>,
+    permission: PERMISSIONS.salesorders_page,
   },
   {
     text: "Stock Count",
     link: "/stock-counts",
     icon: <ContentPasteIcon></ContentPasteIcon>,
+    permission: PERMISSIONS.stockcount_page,
   },
   {
     text: "Users",
     link: "/users",
     icon: <GroupIcon></GroupIcon>,
+    permission: PERMISSIONS.users_page,
   },
   {
     text: "Customers",
     link: "/customers",
     icon: <GroupIcon></GroupIcon>,
+    permission: PERMISSIONS.customers_page,
   },
   {
     text: "Suppliers",
     link: "/suppliers",
     icon: <PersonPinCircleIcon></PersonPinCircleIcon>,
+    permission: PERMISSIONS.suppliers_page,
   },
   {
     text: "Product Types",
     link: "/product-types",
     icon: <CategoryIcon></CategoryIcon>,
+    permission: PERMISSIONS.producttypes_page,
   },
 ];
 
@@ -202,6 +219,10 @@ interface Props {
 export const Navbar: React.FC<Props> = ({ title, children }) => {
   const location = useLocation();
   const auth = React.useContext(AuthContext);
+
+  LinkItems = LinkItems.filter((linkItem) =>
+    hasPermission(auth.user!, linkItem.permission)
+  );
 
   const [accountAnchorEl, setAccountAnchorEl] = React.useState(null);
   const [notificationAnchorEl, setNotificationAnchorEl] = React.useState(null);
