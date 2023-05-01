@@ -113,8 +113,8 @@ function App() {
                 }
               />
 
-                            <Route
-              path="/materials"
+              <Route
+                path="/materials"
                 element={
                   <RequireAuth>
                     <Navbar title="Materials">
@@ -234,7 +234,7 @@ function App() {
                   </RequireAuth>
                 }
               />
-                            <Route
+              <Route
                 path="/product-types"
                 element={
                   <RequireAuth>
@@ -378,7 +378,6 @@ function App() {
                   </RequireAuth>
                 }
               />
-              
             </Routes>
           </AuthProvider>
         </BrowserRouter>

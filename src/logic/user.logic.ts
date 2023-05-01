@@ -16,6 +16,8 @@ export interface IUser {
   user_code?: string;
   created_date?: string;
   notifications?: INotification[];
+  roles?: [];
+
   //TODO:ROLES & DATES
 }
 
@@ -45,7 +47,8 @@ export const getUser = async (id: string): Promise<IUser | null> => {
   return user;
 };
 
-export const listUsers = async (  q: URLSearchParams | undefined,
+export const listUsers = async (
+  q: URLSearchParams | undefined,
   filters: FilterElement[]
 ): Promise<IListOptions | null> => {
   let query = getQuery(q, filters);

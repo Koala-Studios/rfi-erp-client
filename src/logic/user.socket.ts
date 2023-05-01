@@ -52,3 +52,7 @@ export const listenToNotifications = (callback: (n: INotification) => void) => {
 export const deleteUserNotification = (notificationId: string) => {
   socket.emit(send.delete_notification, notificationId);
 };
+
+export const deleteAllUserNotifications = () => {
+  socket.emit(send.delete_all_notifications);
+};

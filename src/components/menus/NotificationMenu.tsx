@@ -12,7 +12,10 @@ import React, { useEffect, useState } from "react";
 import { INotification, IUser } from "../../logic/user.logic";
 import { AuthContext } from "../navigation/AuthProvider";
 import CloseIcon from "@mui/icons-material/Close";
-import { deleteUserNotification } from "../../logic/user.socket";
+import {
+  deleteAllUserNotifications,
+  deleteUserNotification,
+} from "../../logic/user.socket";
 import ClearAllIcon from "@mui/icons-material/ClearAll";
 import InfoIcon from "@mui/icons-material/Info";
 
@@ -25,6 +28,7 @@ const NotificationMenu: React.FC<Props> = ({ anchorEl, setAnchorEl }) => {
   //   const [anchorEl, setAnchorEl] = React.useState(null);
   const open = Boolean(anchorEl);
   const auth = React.useContext(AuthContext);
+  const [notifications, setNotifications] = useState(auth.user?.notifications);
   // const [notifications, setNotifications] = useState<INotification[]>([]);
   const handleClick = (event: any) => {
     setAnchorEl(event.currentTarget);
@@ -36,21 +40,35 @@ const NotificationMenu: React.FC<Props> = ({ anchorEl, setAnchorEl }) => {
   //   }
   // }, [auth.user]);
 
-  const handleCloseNotification = (n: INotification) => {
-    if (n._id) {
-      deleteUserNotification(n._id);
+  const handleCloseNotification = (n_id: string) => {
+    if (n_id) {
+      deleteUserNotification(n_id);
     }
 
-    // const newNotifications = auth.user.filter((n:INotification)=>{if(n._id ==)})
+    auth.user!.notifications = auth.user!.notifications!.filter(
+      (nc: INotification) => nc._id !== n_id
+    );
 
-    // auth.setUser((u:IUser) =>{...u,})
+    let user = auth.user;
+
+    auth.setUser(user);
+    setNotifications(user?.notifications);
   };
 
-  const handleClearAll = () => {};
+  const handleClearAll = () => {
+    deleteAllUserNotifications();
+    auth.user!.notifications = [];
+
+    let user = auth.user;
+    auth.setUser(user);
+    setNotifications(user?.notifications);
+  };
 
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  if (!notifications) return null;
 
   return (
     <Menu
@@ -99,7 +117,7 @@ const NotificationMenu: React.FC<Props> = ({ anchorEl, setAnchorEl }) => {
       </Typography>
       <Divider sx={{ mt: 1, mb: 1 }} />
       <div style={{ maxHeight: 600, overflowY: "scroll" }}>
-        {auth.user?.notifications?.map((n: INotification, idx) => (
+        {notifications.map((n: INotification, idx) => (
           <div key={idx}>
             <MenuItem dense sx={{ justifyContent: "space-between" }}>
               <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
@@ -111,7 +129,7 @@ const NotificationMenu: React.FC<Props> = ({ anchorEl, setAnchorEl }) => {
                   <Typography variant="subtitle2">{n.text}</Typography>
                 </div>
               </div>
-              <IconButton onClick={() => deleteUserNotification(n._id)}>
+              <IconButton onClick={() => handleCloseNotification(n._id)}>
                 <CloseIcon fontSize="small" />
               </IconButton>
             </MenuItem>
