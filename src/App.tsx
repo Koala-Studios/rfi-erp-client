@@ -223,7 +223,7 @@ function App() {
                   </RequireAuth>
                 }
               />
-                            <Route
+              <Route
                 path="/product-types"
                 element={
                   <RequireAuth>
@@ -367,7 +367,6 @@ function App() {
                   </RequireAuth>
                 }
               />
-              
             </Routes>
           </AuthProvider>
         </BrowserRouter>

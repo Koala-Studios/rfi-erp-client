@@ -29,24 +29,24 @@ import InventoryMovementPage from "./InventoryMovementPage";
 const emptyInventory: IInventory = {
   _id: "",
   name: "",
-  aliases:"",
+  aliases: "",
   description: "",
   rating: null,
   is_solid: false,
   product_code: "",
-  date_created: new Date().toISOString().split('T')[0],
+  date_created: new Date().toISOString().split("T")[0],
   for_sale: false,
   is_raw: false,
   cost: 0,
-  quantity:0,
+  quantity: 0,
   stock: {
     on_hand: 0,
     on_order: 0,
     allocated: 0,
     on_hold: 0,
     quarantined: 0,
-    average_price:0,
-    reorder_amount:0
+    average_price: 0,
+    reorder_amount: 0,
   },
   regulatory: { //TODO: ADD OTHER FIELDS HERE!!
     fda_status: 0,
@@ -63,17 +63,15 @@ const emptyInventory: IInventory = {
     vegetarian: false,
   },
   product_type: null,
-  cas_number:'',
-  reorder_amount:0
+  cas_number: "",
+  reorder_amount: 0,
 };
 
 let savedInventory: IInventory | null = null;
 
-
-
 const inputRefMap = {
   name: 0,
-  date_created:1,
+  date_created: 1,
   // product_code: 2,
   //product_type:3
 };
@@ -85,11 +83,9 @@ const inputMap: InputInfo[] = [
     ref: 1,
     validation: { required: true, genericVal: "Date" },
   },
-  // { label: "product_code", ref: 2, validation: { required: false, genericVal: "Text" } }, 
+  // { label: "product_code", ref: 2, validation: { required: false, genericVal: "Text" } },
   // { label: "product_type", ref: 3, validation: { required: false, genericVal: "Text" } },
-
 ];
-
 
 export const InventoryDetailPage = () => {
   const navigate = useNavigate();
@@ -156,7 +152,6 @@ export const InventoryDetailPage = () => {
   }, [inventory]);
 
   const saveInventory = async () => {
-    
     let allValid = true;
     //do client side validation
     for (let i = 0; i < inputRefs.current.length; i++) {
@@ -191,7 +186,7 @@ export const InventoryDetailPage = () => {
     if (id === "new") {
       createInventory(inventory!).then((_inventory) => {
         if (_inventory) {
-          console.log(_inventory)
+          console.log(_inventory);
           navigate(`/inventory/${_inventory._id}`, { replace: true });
           savedInventory = _inventory;
           setInventory(_inventory); //THIS IS NOT WORKING ...
@@ -199,7 +194,7 @@ export const InventoryDetailPage = () => {
         } else {
           console.log("Material Not Saved");
         }
-      })
+      });
     } else {
       const updated = await updateInventory(inventory!);
 
@@ -268,10 +263,7 @@ export const InventoryDetailPage = () => {
                 onBlur={(event) =>
                   onInputBlur(event, inputMap[inputRefMap.name])
                 }
-                required={
-                  inputMap[inputRefMap.name].validation.required
-                }
-                
+                required={inputMap[inputRefMap.name].validation.required}
                 spellCheck="false"
                 InputLabelProps={{ shrink: true }}
                 fullWidth
@@ -281,7 +273,7 @@ export const InventoryDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
-            <Grid item xs={2} sx={{ "& > legend": { mt: -0.5 }, }} >
+            <Grid item xs={2} sx={{ "& > legend": { mt: -0.5 } }}>
               <Typography component="legend">Rating</Typography>
               <Rating
                 onChange={(e, value) => {
@@ -310,8 +302,8 @@ export const InventoryDetailPage = () => {
               />
             </Grid>
 
-            <Grid item xs={6} >
-            <TextField
+            <Grid item xs={6}>
+              <TextField
                 onChange={(e) =>
                   setInventory({ ...inventory, aliases: e.target.value })
                 }

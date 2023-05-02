@@ -7,7 +7,7 @@ import {
 } from "react-router-dom";
 
 import { ISignIn, signIn } from "../../logic/auth.logic";
-import { IUser, loadUser } from "../../logic/user.logic";
+import { IUser, loadUser, setupPermissions } from "../../logic/user.logic";
 import { socketDisconnect, initClientSocket } from "../../logic/user.socket";
 
 interface AuthContextType {
@@ -42,6 +42,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
         loadUser(local_token).then((res: any) => {
           if (res) {
+            console.log("permissions", res);
+            res.permissions = setupPermissions(res);
             setToken(local_token);
             setCurrentUser(res);
             navigate(location.pathname + location.search);
@@ -67,15 +69,16 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     return signIn(user, (data: any) => {
       setToken(data.token);
 
-      console.log(data.user);
-
+      console.log("new user", data);
       let newUser: IUser = {
-        _id: data.user._doc._id,
+        _id: data.user._id,
         notifications: data.user.notifications,
-        email: data.user._doc.email,
-        username: data.user._doc.username,
+        email: data.user.email,
+        username: data.user.username,
+        roles: data.user.roles,
       };
-
+      newUser.permissions = setupPermissions(newUser);
+      console.log("new user", newUser);
       setCurrentUser(newUser);
 
       callback();

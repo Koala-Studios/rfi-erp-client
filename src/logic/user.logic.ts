@@ -1,5 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
+import PERMISSIONS from "./config.permissions";
 
 export interface INotification {
   _id: string;
@@ -16,6 +17,8 @@ export interface IUser {
   user_code?: string;
   created_date?: string;
   notifications?: INotification[];
+  roles?: { name: string; permissions: string[] }[];
+  permissions?: string[];
   //TODO:ROLES & DATES
 }
 
@@ -45,7 +48,8 @@ export const getUser = async (id: string): Promise<IUser | null> => {
   return user;
 };
 
-export const listUsers = async (  q: URLSearchParams | undefined,
+export const listUsers = async (
+  q: URLSearchParams | undefined,
   filters: FilterElement[]
 ): Promise<IListOptions | null> => {
   let query = getQuery(q, filters);
@@ -91,6 +95,28 @@ export const loadUser = async (token: string): Promise<IUser | undefined> => {
       console.log(err);
     });
   return user;
+};
+
+export const setupPermissions = (user: IUser): string[] => {
+  let permissions: string[] = [];
+
+  if (!user.roles) return [];
+
+  for (let i = 0; i < user.roles.length; i++) {
+    const role = user.roles[i];
+
+    if (role.name === "Admin") return [PERMISSIONS.admin];
+
+    for (let j = 0; j < role.permissions.length; j++) {
+      const perm = role.permissions[j];
+
+      if (!permissions.includes(perm)) {
+        permissions.push(perm);
+      }
+    }
+  }
+
+  return permissions;
 };
 
 export const lookupUser = async (
@@ -159,4 +185,10 @@ export const updateUser = async (formData: IUser): Promise<boolean> => {
     });
 
   return rtn;
+};
+
+export const hasPermission = (user: IUser, permission: string) => {
+  if (user.permissions!.includes(PERMISSIONS.admin)) return true;
+
+  return user.permissions!.includes(permission);
 };
