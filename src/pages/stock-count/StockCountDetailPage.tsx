@@ -35,7 +35,7 @@ import {
 } from "../../logic/stock-count.logic";
 import { IInventoryStock } from "../../logic/inventory-stock.logic";
 import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
-
+import Battery0BarTwoToneIcon from '@mui/icons-material/Battery0BarTwoTone';
 let savedStockCount: IStockCount | null = null;
 
 const StockCountStatus = [
@@ -386,7 +386,8 @@ const inputMap: InputInfo[] = [
       setRows([
         {
           _id: new ObjectID().toHexString(),
-          product_id: selectedContainer.product_id,
+          //@ts-ignore //TODO: remove this clearly.
+          product_id: selectedContainer.product_id._id,
           product_code: selectedContainer.product_code,
           name: selectedContainer.name,
           expiry_date: selectedContainer.expiry_date,
@@ -578,6 +579,7 @@ const inputMap: InputInfo[] = [
                   sx={{
                     width: "100%",
                     height: "100%",
+                    maxHeight:40,
                     borderRadius: 10,
                     fontWeight: 600,
                   }}
@@ -668,9 +670,9 @@ const inputMap: InputInfo[] = [
       <Card variant="outlined" sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
         {/* <div style={{ display: "flex", flexDirection: "row", gap: 10 }}> */}
           
-        <Grid container spacing={3}>
-          <Grid item xs={7}>
-            
+        <Grid container spacing={3} sx={{mb:3}}>
+          
+        <Grid item xs={4.5}>
           <StandaloneAutocomplete
             initialValue={selectedContainer}
             readOnly={stockCount.status!= 1}
@@ -678,7 +680,7 @@ const inputMap: InputInfo[] = [
               setSelectedContainer(value)
               console.log(value)
             }}
-            groupBy={(option:IInventoryStock) => option.product_code + ' | ' + option.name}
+            // groupBy={(option:IInventoryStock) => option.product_code + ' | ' + option.name}
             label={"Container Lookup"}
             letterMin={1}
             dbOption={"inventory-stock"}
@@ -688,19 +690,86 @@ const inputMap: InputInfo[] = [
                 " | " +
                 item.name +
                 " | LOT#: " +
-                item.lot_number +
+                item.lot_number + 
                 " | CONT SIZE: " +
-                item.container_size +
-                " | CONT AMT: " +
-                Math.floor(item.received_amount / item.container_size) +
-                " | CURR AMT: " +
-                (item.received_amount - item.used_amount)
+                item.container_size 
+                // +
+                // " | CONT AMT: " +
+                // Math.floor(item.received_amount / item.container_size) +
+                // " | CURR AMT: " +
+                // (item.received_amount - item.used_amount)
               );
             }}
           />
-          
-          </Grid>
-          <Grid item xs={2}>
+        </Grid>
+        <Grid item xs={1}>
+            
+            <TextField
+              disabled={stockCount.status!= 1}
+              spellCheck="false"
+              InputLabelProps={{ shrink: true }}
+              size="small"
+              InputProps={{
+                endAdornment: <InputAdornment position="end">KG</InputAdornment>,
+                readOnly:true
+              }}
+              variant="outlined"
+              label={"Total in Inv"}
+              //@ts-ignore
+              value={selectedContainer ? (selectedContainer?.product_id.stock.on_hand).toFixed(4) : 0}
+            />
+            </Grid>
+        <Grid item xs={1}>
+            
+            <TextField
+              disabled={stockCount.status!= 1}
+              spellCheck="false"
+              InputLabelProps={{ shrink: true }}
+              size="small"
+              InputProps={{
+                endAdornment: <InputAdornment position="end">KG</InputAdornment>,
+                readOnly:true
+              }}
+              variant="outlined"              
+              label={"Cont Size"}
+              value={selectedContainer ? selectedContainer?.container_size : 0}
+            />
+            </Grid>
+            <Grid item xs={1}>
+            
+            <TextField
+              disabled={stockCount.status!= 1}
+              spellCheck="false"
+              InputLabelProps={{ shrink: true }}
+              size="small"
+              InputProps={{
+                endAdornment: <Battery0BarTwoToneIcon/>,
+                readOnly:true
+              }}
+              variant="outlined"
+              label={"Cont Amt"}
+              value={ selectedContainer ? Math.ceil((selectedContainer?.received_amount - selectedContainer?.used_amount) / selectedContainer?.container_size ) : 0 }
+            />
+            </Grid>
+            <Grid item xs={1.5}>
+            
+            <TextField
+              disabled={stockCount.status!= 1}
+              spellCheck="false"
+              InputLabelProps={{ shrink: true }}
+              size="small"
+              InputProps={{
+                endAdornment: <InputAdornment position="end">KG</InputAdornment>,
+                readOnly:true
+              }}
+              variant="outlined"
+              // type="number"
+              
+              label={"Curr Amt"}
+              value={ selectedContainer ? (selectedContainer?.received_amount - selectedContainer?.used_amount).toFixed(4) : 0 }
+            />
+            </Grid>
+          <Grid item xs={1.5}>
             
           <TextField
             onChange={(e) =>
@@ -719,13 +788,9 @@ const inputMap: InputInfo[] = [
             value={weighedAmt}
           />
           </Grid>
-          <Grid item xs={3}>
+          <Grid item xs={1}>
             
           <Button
-            style={{
-              marginBottom: 10,
-              marginRight: 10,
-            }}
             disabled={stockCount.status!= 1}
             variant="contained"
             onClick={() => {

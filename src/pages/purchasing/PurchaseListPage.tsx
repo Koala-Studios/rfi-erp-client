@@ -44,7 +44,7 @@ const PurchaseStatus = [
     { field: "order_code", headerName: "Order Code", width: 200 },
     { field: "supplier", headerName: "Supplier Name", width: 200 },
     { field: "date_purchased", headerName: "Purchase Date", width: 200 },
-    { field: "item_count", headerName: "Item Count", width: 200 },
+    { field: "item_count", headerName: "Item #", width: 80 },
     {
       field: "status",
       headerName: "Status",
@@ -62,6 +62,7 @@ const PurchaseStatus = [
         />
       ),
     },
+    { field: "notes", headerName: "Notes", width: 250 },
     {
       field: "id",
       headerName: "Actions",
@@ -97,6 +98,7 @@ const PurchaseStatus = [
             : "Not Set",
           status: purchase.status,
           item_count: purchase.order_items.length,
+          notes: purchase.notes
         };
       });
       setDataOptions({ rows: newRows, listOptions: list! });

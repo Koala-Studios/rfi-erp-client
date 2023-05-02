@@ -647,6 +647,7 @@ export const PurchaseDetailPage = () => {
                   sx={{
                     width: "100%",
                     height: "100%",
+                    maxHeight:40,
                     borderRadius: 10,
                     fontWeight: 600,
                   }}

@@ -117,7 +117,7 @@ export const ForecastPage = () => {
       headerName: "Required Qty",
       type: "number",
       width: 150,
-      valueGetter: (params) => params.row.required_amount.toFixed(15)
+      valueGetter: (params) => params.row.required_amount ? params.row.required_amount.toFixed(15) : 'error'
     },
     {
       field: "available_amount",

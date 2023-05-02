@@ -51,13 +51,7 @@ export const InventoryMovementPage = () => { //WILL BE USED FOR BOTH MATERIALS A
   if (dataOptions == null) return null;
 
   return <>
-          <NavTab>
-            <LinkTab label="Details" href="./../" />
-            <LinkTab label="Suppliers" href="./../suppliers" />
-            <LinkTab label="Movements" href="." />
-            <LinkTab label="Usage Stats" href="./../stats" />
-          </NavTab>
-    <Card variant="outlined" style={{ paddingLeft:16, paddingRight:16,paddingBottom:16, marginBottom: 10 }}>
+    <Card variant="outlined" style={{ padding:16, marginBottom: 10 }}>
     <DataTable
         rows={dataOptions.rows}
         columns={columns}

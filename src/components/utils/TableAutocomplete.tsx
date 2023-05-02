@@ -53,6 +53,7 @@ const TableAutocomplete: React.FC<Props> = ({
   if (editMode) {
     return (
       <Autocomplete
+        value={initialValue}
         clearOnBlur={true}
         filterOptions={(x) => x}
         openOnFocus
@@ -77,6 +78,7 @@ const TableAutocomplete: React.FC<Props> = ({
         onInputChange={handleInputChange}
         onBlur={() => setEditMode(false)}
         onChange={(event, value) => {
+          console.log(value)
           handleEditRow(rowParams.row._id, value);
           setEditMode(false);
         }}

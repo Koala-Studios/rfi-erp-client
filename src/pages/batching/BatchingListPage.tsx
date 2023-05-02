@@ -35,7 +35,7 @@ const BatchingListPage = () => {
     // { field: "id", headerName: "ID", width: 300 },
     { field: "date", headerName: "Date Created", width: 120 },
     { field: "product_code", headerName: "Product Code", width: 120 },
-    { field: "product_name", headerName: "Product Name", width: 320 },
+    { field: "name", headerName: "Product Name", width: 320 },
     { field: "batch_code", headerName: "Batch Code", width: 120 },
     { field: "quantity", headerName: "Quantity", type: "number", width: 90 },
     {
@@ -71,7 +71,7 @@ const BatchingListPage = () => {
           date: batch.date_created.toString().replace(/\T.+/, ""),
           quantity: batch.quantity,
           product_code: batch.product_code,
-          product_name: batch.product_name,
+          name: batch.name,
         };
       });
       setDataOptions({ rows: newRows, listOptions: list! });

@@ -5,6 +5,7 @@ import {
   Grid,
   IconButton,
   Rating,
+  Tab,
   TextField,
   Typography,
 } from "@mui/material";
@@ -22,6 +23,18 @@ import SaveForm from "../../components/forms/SaveForm";
 import StandaloneAutocomplete from "../../components/utils/StandaloneAutocomplete";
 import { IProductType } from "../../logic/product-type.logic";
 import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
+import LinkTab from "../../components/utils/LinkTab";
+import NavTab from "../../components/utils/NavTab";
+import InventoryMovementPage from "../inventory/InventoryMovementPage";
+
+
+const ProductStatus = [
+  ["PENDING", "error"],
+  ["IN PROGRESS", "warning"],
+  ["AWAITING APPROVAL", "info"],
+  ["APPROVED", "success"],
+  ["DRAFT", "warning"],
+];
 
 const emptyProduct: IProduct = {
   _id: "",
@@ -30,7 +43,8 @@ const emptyProduct: IProduct = {
   description: "",
   rating: null,
   product_code: "",
-  is_raw_mat: false,
+  is_raw: false,
+  is_solid: true,
   date_created: new Date().toISOString().split('T')[0],
   for_sale: true,
   cost: 0,
@@ -42,18 +56,22 @@ const emptyProduct: IProduct = {
     on_hold: 0,
     quarantined: 0,
   },
-  customers: [],
-  regulatory: {
+  regulatory: { //TODO: ADD OTHER FIELDS HERE!!
     fda_status: 0,
     cpl_hazard: "",
     fema_number: 0,
     ttb_status: "",
     eu_status: 0,
+  },
+  dietary: {
+    vegan: false,
     organic: false,
-    kosher: false,
+    kosher: true,
+    halal: false,
+    vegetarian: false,
   },
   versions: 0,
-  status: 0,
+  status: 1,
   approved_version: 0,
   rec_dose_rate: 0,
   product_type: null,
@@ -82,8 +100,9 @@ const inputMap: InputInfo[] = [
 
 
 export const ProductDetailPage = () => {
+  const { id,tab_id } = useParams();
   const navigate = useNavigate();
-  const { id } = useParams();
+  const p_type_var = tab_id === 'material' ? "product-type-mat" : "product-type";
   const auth = React.useContext(AuthContext);
   const [product, setProduct] = React.useState<IProduct | null>(null);
   const isNewId = id === "new";
@@ -115,13 +134,7 @@ export const ProductDetailPage = () => {
     setProduct({ ...product! });
     setProductSaved(false);
   };
-  const ProductStatus = [
-    ["PENDING", "error"],
-    ["IN PROGRESS", "warning"],
-    ["AWAITING APPROVAL", "info"],
-    ["APPROVED", "success"],
-    ["DRAFT", "warning"],
-  ];
+
 
   useEffect(() => {
     if (isNewId) {
@@ -228,7 +241,7 @@ export const ProductDetailPage = () => {
         >
           <ArrowBackIcon fontSize="small" />
         </Button>
-        <div style={{ display: "flex", gap: 16, marginBottom: 10 }}>
+        <div style={{ display: "flex", gap: 16, marginBottom: 10, maxWidth:'80%' }}>
           <Grid container spacing={3}>
             <Grid item xs={2}>
               <TextField
@@ -243,6 +256,7 @@ export const ProductDetailPage = () => {
                 }}
                 label={"Product Code"}
               ></TextField>
+              
             </Grid>
             <Grid item xs={5}>
               <TextField
@@ -282,24 +296,6 @@ export const ProductDetailPage = () => {
                 }}
               ></TextField>
             </Grid>
-            <Grid item xs={2}>
-              <Chip
-                label={
-                  ProductStatus[product?.status ? product.status - 1 : 4][0]
-                }
-                sx={{
-                  width: "80%",
-                  height: "80%",
-                  borderRadius: 10,
-                  fontWeight: 600,
-                }}
-                //@ts-ignore
-                color={
-                  ProductStatus[product?.status ? product.status - 1 : 4][1]
-                }
-                variant="outlined"
-              />
-            </Grid>
             <Grid item xs={2} sx={{ "& > legend": { mt: -0.5 }, }} >
               <Typography component="legend">Rating</Typography>
               <Rating
@@ -312,24 +308,27 @@ export const ProductDetailPage = () => {
                 precision={0.5}
               />
             </Grid>
-
             <Grid item xs={2}>
-              <StandaloneAutocomplete
-                initialValue={product.product_type}
-                readOnly={!isNewId}
-                onChange={(e, value) => {
-                  setProduct({ ...product, product_type: value });
-                }}
-                label={"Product Type"}
-                letterMin={0}
-                dbOption={"product-type"}
-                getOptionLabel={(item: IProductType) =>
-                  item.code + " | " + item.name
+              <Chip
+                label={
+                  ProductStatus[product?.status ? product.status - 1 : 4][0]
                 }
+                sx={{
+                  width: "80%",
+                  height: "80%",
+                  maxHeight:40,
+                  borderRadius: 10,
+                  fontWeight: 600,
+                }}
+                //@ts-ignore
+                color={
+                  ProductStatus[product?.status ? product.status - 1 : 4][1]
+                }
+                variant="outlined"
               />
             </Grid>
 
-            <Grid item xs={6} >
+            <Grid item xs={4} >
             <TextField
                 onChange={(e) =>
                   setProduct({ ...product, aliases: e.target.value })
@@ -346,6 +345,22 @@ export const ProductDetailPage = () => {
               ></TextField>
             </Grid>
 
+            <Grid item xs={2}>
+              <StandaloneAutocomplete
+                initialValue={product.product_type}
+                readOnly={!isNewId}
+                onChange={(e, value) => {
+                  setProduct({ ...product, product_type: value });
+                }}
+                label={"Product Type"}
+                letterMin={0}
+                dbOption={p_type_var}
+                getOptionLabel={(item: IProductType) =>
+                  item.code + " | " + item.name
+                }
+              />
+            </Grid>
+            <Grid item xs={2}/>
             <Grid item xs={2}>
               <TextField
                 defaultValue={product!.date_created ? product.date_created.split('T')[0] : null}
@@ -401,7 +416,7 @@ export const ProductDetailPage = () => {
               ></TextField>
             </Grid>
           </Grid>
-
+{/* 
           <Card
             variant="outlined"
             style={{ width: "40%", minWidth: "40%", padding: 16 }}
@@ -409,10 +424,19 @@ export const ProductDetailPage = () => {
             <div>
               <Typography variant="h6">Overview Stats</Typography>
             </div>
-          </Card>
+          </Card> */}
         </div>
       </Card>
-
+      <NavTab>
+        <LinkTab label="Formula" href= "formula" tab_id={tab_id} disable={id === 'new'}/>
+        <LinkTab label="Customers" href="customers" tab_id={tab_id} disable={id === 'new'} />
+        <LinkTab label="Movements" href= "movements" tab_id={tab_id} disable={id === 'new'}/>
+        <LinkTab label="Usage Stats" href="stats" tab_id={tab_id} disable={id === 'new'} />
+      </NavTab>
+      {
+          (tab_id && tab_id === "movements" && 
+            <InventoryMovementPage/>)
+      }
     </>
   );
 };

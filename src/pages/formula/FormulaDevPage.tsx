@@ -24,7 +24,7 @@ import TableAutocomplete from "../../components/utils/TableAutocomplete";
 import { IProduct } from "../../logic/product.logic";
 import WarningIcon from "@mui/icons-material/Warning";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { ObjectID } from "bson";
+import { ObjectID, ObjectId } from "bson";
 const FormulaDevPage = () => {
   const navigate = useNavigate();
   const auth = React.useContext(AuthContext);
@@ -39,9 +39,6 @@ const FormulaDevPage = () => {
   const [prodYield, setYield] = React.useState<number>(1.0);
   const [recDose, setRecDose] = React.useState<number>(0.2);
   const [product, setProduct] = React.useState<IProduct | null>(null);
-
-  const [approveonSubmit, setApproveonSubmit] = React.useState<boolean>(false);
-
   const { id } = useParams();
   const { version } = useParams();
 
@@ -56,13 +53,14 @@ const FormulaDevPage = () => {
   React.useEffect(() => {
     getProduct(id!).then((product) => {
       setProduct(product);
+      product!.description =  product?.description  ? product?.description : '';
     });
     getFormula(id!, version!).then((formula) => {
       if(formula){ 
 
         setYield(formula!.yield ? formula!.yield : 1.0);
         setBase100(formula!.base_hundred ? formula!.base_hundred : true);
-        setRecDose(formula!.rec_dose_rate ? formula!.rec_dose_rate : NaN);
+        setRecDose(formula!.rec_dose_rate ? formula!.rec_dose_rate : 0.20);
         if (!formula?.formula_items) {
           setRows([
             {
@@ -74,8 +72,6 @@ const FormulaDevPage = () => {
             },
           ]);
         } else {
-          let count = 0;
-          let amount = 0;
           const newRows = formula!.formula_items.map((item, index) => {
             return {
               _id: new ObjectID().toHexString(),
@@ -393,13 +389,22 @@ const FormulaDevPage = () => {
       rec_dose_rate: recDose
     };
     //TODO: WHOLE PAGE NEEDS SLIGHT REWORK LOL.
-    const _product = await submitFormula(approve, newVersion);
-
+    const _product = await submitFormula(approve, newVersion, product!.description);
     if (_product) {
-      navigate(`/formulas/develop/${_product._id}/${_product.versions ?? 1}`, {
+      // setProduct(_formula);
+      navigate(`/formula/develop/${_product._id}/${_product.versions}`, {
         replace: true,
       });
+      navigate(0);
     }
+
+    // if (_formula) {
+    //   // setProduct(_formula);
+    //   navigate(`/formula/develop/${_formula.product_id}/${_formula.versions}`, {
+    //     replace: true,
+    //   });
+    //   setRows(_formula.formula_items.map((item:IFormulaItem) =>{ return {_id: new ObjectId().toHexString(), ...item} }));
+    // }
   };
 
   // function filterChanges(str: string) {
@@ -490,19 +495,20 @@ const FormulaDevPage = () => {
             <Chip
                   label={
                     ProductStatus[
-                      product?.status ? product?.status - 1 : 4
+                      product ? product?.status - 1 : 4
                     ][0]
                   }
                   sx={{
                     width: "100%",
                     height: "100%",
+                    maxHeight:40,
                     borderRadius: 10,
                     fontWeight: 600,
                   }}
                   //@ts-ignore
                   color={
                     ProductStatus[
-                      product?.status ? product?.status - 1 : 4
+                      product ? product?.status - 1 : 4
                     ][1]
                   }
                   variant="outlined"
@@ -540,6 +546,12 @@ const FormulaDevPage = () => {
 
             <Grid item xs={12}>
               <TextField
+                defaultValue={product?.description}
+                onBlur={(event) => {
+                  const new_prod = {...product!, description: event.target.value}
+                  setProduct(new_prod)
+                  console.log("test", new_prod)
+                }}
                 spellCheck="false"
                 InputLabelProps={{ shrink: true }}
                 fullWidth
@@ -548,7 +560,6 @@ const FormulaDevPage = () => {
                 label={"Flavor Profile"}
                 multiline
                 rows={6}
-                value={product?.description}
               ></TextField>
             </Grid>
           </Grid>
@@ -575,7 +586,7 @@ const FormulaDevPage = () => {
               style={{
                 // display: `${purchase.status === 6 ? "box" : "none"}`,
               }}
-              disabled={id === "new" || (product!.status != 1 && product!.status != 2)}
+              disabled={id === "new" || ( product! && product!.status != 1 && product!.status != 2)}
               variant="contained"
               onClick={() => handleSubmit(false)}
             >
@@ -585,7 +596,7 @@ const FormulaDevPage = () => {
             <Button
               color="info"
               variant="contained"
-              disabled={id === "new" || product!.status != 2}
+              disabled={id === "new" || ( product! && product!.status != 2)}
               onClick={() => handleSubmit(true)}
             >
               APPROVE & SUBMIT
@@ -593,7 +604,7 @@ const FormulaDevPage = () => {
             <Button
               color="success"
               variant="contained"
-              disabled={id === "new" || product!.status != 3}
+              disabled={id === "new" || ( product! &&  product!.status != 3)}
               onClick={() => handleAdminApprove()}
             >
               APPROVE
@@ -601,7 +612,7 @@ const FormulaDevPage = () => {
             <Button
               color="warning"
               variant="contained"
-              disabled={id === "new" || product!.status != 3}
+              disabled={id === "new" || ( product! && product!.status != 3)}
               onClick={() => handleAdminApprove()}
             >
               DISAPPROVE / REDRAFT

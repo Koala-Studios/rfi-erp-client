@@ -93,7 +93,7 @@ function App() {
                 }
               />
               <Route
-                path="/inventory/:id"
+                path="/inventory/:id/:tab_id?"
                 element={
                   <RequireAuth>
                     <Navbar title="Inventory Details">
@@ -103,17 +103,6 @@ function App() {
                 }
               />
               <Route
-                path="/inventory/:id/movements"
-                element={
-                  <RequireAuth>
-                    <Navbar title="Movements">
-                      <InventoryMovementPage />
-                    </Navbar>
-                  </RequireAuth>
-                }
-              />
-
-                            <Route
               path="/materials"
                 element={
                   <RequireAuth>
@@ -336,7 +325,7 @@ function App() {
               />
 
               <Route
-                path="/products/:id"
+                path="/products/:id/:tab_id?"
                 element={
                   <RequireAuth>
                     <Navbar title="Product Details">

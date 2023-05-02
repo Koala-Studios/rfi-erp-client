@@ -64,17 +64,6 @@ const ProductListPage = () => {
           >
             View Details
           </Button>
-          <Button
-            variant="outlined"
-            color="primary"
-            size="small"
-            style={{ marginLeft: 16 }}
-            onClick={() =>
-              navigate(`/products/${params.value}`, { replace: false })
-            }
-          >
-            Formula
-          </Button>
         </strong>
       ),
     },
@@ -83,7 +72,7 @@ const ProductListPage = () => {
   const auth = React.useContext(AuthContext);
 
   React.useEffect(() => {
-    listProducts(searchParams ,filterArray, true).then((list) => {
+    listProducts(searchParams ,filterArray, true, true).then((list) => {
       const newRows = list!.docs.map((product) => {
         return {
           id: product._id,

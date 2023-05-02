@@ -63,12 +63,14 @@ export const getFormula = async (
 
 export const submitFormula = async (
   approved: boolean,
-  formula: IFormula
+  formula: IFormula,
+  description: string
 ): Promise<IProduct | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       approved,
+      description,
     },
   };
   // console.log(id, version, 'testing it all')
@@ -79,6 +81,7 @@ export const submitFormula = async (
     .then((res) => {
       if (res.status === apiStatus.OK) {
         product = res.data.res;
+        console.log(product, res, "test");
       }
       // console.log('hello')
       window.dispatchEvent(

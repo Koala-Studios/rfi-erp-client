@@ -62,6 +62,20 @@ const FormulaListPage = () => {
       width: 80,
       align: "right",
     },
+    {
+      field: "created_date",
+      headerName: "Created Date",
+      width: 120,
+      align: "right",
+      valueGetter: (params) => params.row.created_date ? params.row.created_date : ''
+    },
+    {
+      field: "latest_update",
+      headerName: "Latest Update",
+      width: 120,
+      align: "right",
+      valueGetter: (params) => params.row.latest_update ? params.row.latest_update : ''
+    },
     { field: "cost", headerName: "Cost", width: 100, align: "right" },
     {
       field: "id",

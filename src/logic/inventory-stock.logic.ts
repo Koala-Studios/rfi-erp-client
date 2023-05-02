@@ -1,6 +1,7 @@
 import axios from "axios";
 import { ObjectId } from "bson";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
+import { IInventory } from "./inventory.logic";
 
 interface IStockExtension {
   extension_date: Date;
@@ -109,12 +110,12 @@ export const getStockItem = async (
 
 export const lookupInventoryStock = async (
   //TODO: Not finished
-  search_value: string,
+  search_value: string
 ): Promise<IInventoryStock[] | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
-      search_value
+      search_value,
     },
   };
 

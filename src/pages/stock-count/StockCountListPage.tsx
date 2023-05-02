@@ -51,6 +51,7 @@ const StockCountStatus = [
         />
       ),
     },
+    { field: "notes", headerName: "Notes", width: 250 },
     {
       field: "id",
       headerName: "Actions",

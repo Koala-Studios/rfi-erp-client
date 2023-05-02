@@ -8,43 +8,42 @@ import {
 } from "./utils";
 
 export const batchingStatus = {
-  SCHEDULED:1,
-  IN_PROGRESS:2,
-  FINISHED:3, //TODO: update db status of 2 to 3
-  ABANDONED:4,
-  CANCELLED:5,
-  DRAFT:6,
+  SCHEDULED: 1,
+  IN_PROGRESS: 2,
+  FINISHED: 3, //TODO: update db status of 2 to 3
+  ABANDONED: 4,
+  CANCELLED: 5,
+  DRAFT: 6,
 };
 
-
 export interface IBatching {
-  _id: string,
+  _id: string;
   product_id: string | null;
   product_code: string;
-  product_name: string;
+  name: string;
   quantity: number;
   date_created: string;
   date_needed: string;
   ingredients: IBatchingIngredient[];
   batch_code: string;
   status: number;
-  notes: string,
+  notes: string;
 }
 
 export interface IBatchingContainer {
-  container_id: string,
-  lot_number: string,
-  amount_used: string
+  container_id: string;
+  lot_number: string;
+  amount_used: string;
 }
 
 export interface IBatchingIngredient {
-  _id:string,
-  product_id:string;
+  _id: string;
+  product_id: string;
   product_code: string;
-  product_name:string;
+  product_name: string;
   required_amount: number;
   used_containers: IBatchingContainer[];
-  used_amount: number;  
+  used_amount: number;
 }
 
 const api = axios.create({
@@ -80,13 +79,12 @@ export const listBatching = async (
   return list;
 };
 
-
 export const getBatching = async (
   token: string,
   id: string
 ): Promise<IBatching | null> => {
   const config = {
-    headers: { Authorization:  `Bearer ${localStorage.getItem("auth_token")}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       id: id,
     },
@@ -98,11 +96,13 @@ export const getBatching = async (
     .get("/get", config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
-        console.log(res)
+        console.log(res);
         batching = res.data.res;
       }
       window.dispatchEvent(
-        new CustomEvent("NotificationEvent", { detail: { text: res.data.message } })
+        new CustomEvent("NotificationEvent", {
+          detail: { text: res.data.message },
+        })
       );
     })
     .catch((err) => {
@@ -112,7 +112,9 @@ export const getBatching = async (
   return batching;
 };
 
-export const updateBatchingOrder = async (formData: IBatching): Promise<boolean> => {
+export const updateBatchingOrder = async (
+  formData: IBatching
+): Promise<boolean> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
@@ -133,13 +135,12 @@ export const updateBatchingOrder = async (formData: IBatching): Promise<boolean>
   return rtn;
 };
 
-
 export const createBatching = async (
   token: string,
   formData: IBatching
 ): Promise<string | null> => {
   const config = {
-    headers: { Authorization:  `Bearer ${localStorage.getItem("auth_token")}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
 
   let rtn = null;
@@ -160,14 +161,12 @@ export const createBatching = async (
   return rtn;
 };
 
-
-
 export const confirmBatching = async (
   token: string,
-  batching: IBatching,
+  batching: IBatching
 ): Promise<IBatching | null> => {
   const config = {
-    headers: { Authorization:  `Bearer ${localStorage.getItem("auth_token")}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
   let rtn = null;
   await api
@@ -175,11 +174,12 @@ export const confirmBatching = async (
     .then((res) => {
       if (res.status === apiStatus.OK) {
         window.dispatchEvent(
-          new CustomEvent("NotificationEvent", { detail: { text: res.data.message } })
+          new CustomEvent("NotificationEvent", {
+            detail: { text: res.data.message },
+          })
         );
         rtn = res.data.res;
       }
-
     })
     .catch((err) => {
       console.log(err);
@@ -192,7 +192,7 @@ export const updateBatching = async (
   formData: IBatching
 ): Promise<boolean> => {
   const config = {
-    headers: { Authorization:  `Bearer ${localStorage.getItem("auth_token")}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
 
   let rtn = false;
@@ -213,10 +213,10 @@ export const updateBatching = async (
 
 export const finishBatching = async (
   token: string,
-  batching: IBatching,
+  batching: IBatching
 ): Promise<IBatching | null> => {
   const config = {
-    headers: { Authorization:  `Bearer ${localStorage.getItem("auth_token")}` },
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
   let rtn = null;
   await api
@@ -224,11 +224,12 @@ export const finishBatching = async (
     .then((res) => {
       if (res.status === apiStatus.OK) {
         window.dispatchEvent(
-          new CustomEvent("NotificationEvent", { detail: { text: res.data.message } })
+          new CustomEvent("NotificationEvent", {
+            detail: { text: res.data.message },
+          })
         );
         rtn = res.data.res;
       }
-
     })
     .catch((err) => {
       console.log(err);
@@ -239,13 +240,12 @@ export const finishBatching = async (
 
 export const markBatchingAbandoned = async (
   token: string,
-  batching_id: string,
+  batching_id: string
 ): Promise<IBatching | null> => {
   const config = {
-    headers: { Authorization:  `Bearer ${localStorage.getItem("auth_token")}` },
-    params: { batching_id: batching_id }
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+    params: { batching_id: batching_id },
   };
-
 
   let rtn = null;
 
@@ -254,11 +254,12 @@ export const markBatchingAbandoned = async (
     .then((res) => {
       if (res.status === apiStatus.OK) {
         window.dispatchEvent(
-          new CustomEvent("NotificationEvent", { detail: { text: res.data.message } })
+          new CustomEvent("NotificationEvent", {
+            detail: { text: res.data.message },
+          })
         );
         rtn = res.data.res;
       }
-
     })
     .catch((err) => {
       console.log(err);
@@ -269,11 +270,11 @@ export const markBatchingAbandoned = async (
 
 export const markBatchingCancelled = async (
   token: string,
-  batching_id: string,
+  batching_id: string
 ): Promise<IBatching | null> => {
   const config = {
-    headers: { Authorization:  `Bearer ${localStorage.getItem("auth_token")}` },
-    params: { batching_id: batching_id }
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+    params: { batching_id: batching_id },
   };
 
   let rtn = null;
@@ -283,11 +284,12 @@ export const markBatchingCancelled = async (
     .then((res) => {
       if (res.status === apiStatus.OK) {
         window.dispatchEvent(
-          new CustomEvent("NotificationEvent", { detail: { text: res.data.message } })
+          new CustomEvent("NotificationEvent", {
+            detail: { text: res.data.message },
+          })
         );
         rtn = res.data.res;
       }
-
     })
     .catch((err) => {
       console.log(err);
@@ -296,14 +298,13 @@ export const markBatchingCancelled = async (
   return rtn;
 };
 
-
 export const generateBatchingBOM = async (
   token: string,
-  batching_id: string,
+  batching_id: string
 ): Promise<IBatching | null> => {
   const config = {
-    headers: { Authorization:  `Bearer ${localStorage.getItem("auth_token")}` },
-    params: { batching_id: batching_id }
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+    params: { batching_id: batching_id },
   };
 
   let rtn = null;
@@ -313,12 +314,13 @@ export const generateBatchingBOM = async (
     .then((res) => {
       if (res.status === apiStatus.OK) {
         window.dispatchEvent(
-          new CustomEvent("NotificationEvent", { detail: { text: res.data.message } })
+          new CustomEvent("NotificationEvent", {
+            detail: { text: res.data.message },
+          })
         );
         // console.log(res.data, 'BATCH GENERATED BOM')
         rtn = res.data.res;
       }
-
     })
     .catch((err) => {
       console.log(err);

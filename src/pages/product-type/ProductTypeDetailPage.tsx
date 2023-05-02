@@ -157,7 +157,9 @@ export const ProductTypeDetailPage = () => {
                 Is Raw
                 <Checkbox
                   checked={productType.is_raw}
-                  // onChange={}
+                  onClick={(e) => {
+                    setProductType({ ...productType, is_raw: !productType.is_raw });
+                  }}
                   inputProps={{ "aria-label": "controlled" }}
                 />
               </label>
@@ -168,7 +170,9 @@ export const ProductTypeDetailPage = () => {
                 For Sale
                 <Checkbox
                   checked={productType.for_sale}
-                  // onChange={}
+                  onClick={(e) => {
+                    setProductType({ ...productType, for_sale: !productType.for_sale });
+                  }}
                   inputProps={{ "aria-label": "controlled" }}
                 />
               </label>
@@ -182,7 +186,9 @@ export const ProductTypeDetailPage = () => {
                 Avoid Recursion
                 <Checkbox
                   checked={productType.avoid_recur}
-                  // onChange={}
+                  onClick={(e) => {
+                    setProductType({ ...productType, avoid_recur: !productType.avoid_recur });
+                  }}
                   inputProps={{ "aria-label": "controlled" }}
                 />
               </label>

@@ -6,6 +6,7 @@ import {
   MenuItem,
   Select,
   SelectChangeEvent,
+  darkScrollbar,
 } from "@mui/material";
 import React from "react";
 import {
@@ -31,10 +32,12 @@ import { IUser } from "../../logic/user.logic";
 const ItemStatus = [
   ["Pending", "error"],
   ["In Progress", "warning"],
-  ["Awaiting Approval", "info"],
-  ["Awaiting QC", "warning"],
+  ["Waiting QC", "warning"],
+  ["Submitted", "info"],
   ["Approved", "success"],
-  ["Error", "error"],
+  ["Cancelled", "error"],
+  ["Testing", "info"],
+  ["Remake", "warning"],
 ];
 
 const RegulatoryStatus = [
@@ -53,6 +56,14 @@ const DietaryStatus = [
   ["VEGE", "success"],
 ];
 
+const styles = {
+  reg_div: {
+    scroll: {
+      height:'5px',
+      color:'black'
+    }
+  }
+}
 
 function SelectEditInputCell(props: GridRenderCellParams) {
   const { id, value, field } = props;
@@ -72,7 +83,6 @@ function SelectEditInputCell(props: GridRenderCellParams) {
       value={value}
       onChange={handleChange}
       size="small"
-      multiple
       sx={{
         height: 1,
         width: "100%",
@@ -104,9 +114,9 @@ export const ProjectDetailsTable: React.FC<Props> = ({
   const handleEditProductRow = (rowid: string, value: IInventory) => {
     let pList = projectItems.slice();
     const rowIdx = projectItems.findIndex((r) => r._id === rowid);
-    pList[rowIdx].product_code = value.product_code;
-    pList[rowIdx].product_id = value._id;
-    pList[rowIdx].product_name = value.name;
+    pList[rowIdx].product_code = value ? value.product_code : '';
+    pList[rowIdx].product_id = value ? value._id : '';
+    pList[rowIdx].product_name = value ? value.name : '';
 
     setProjectItems(pList);
   };
@@ -127,9 +137,14 @@ export const ProjectDetailsTable: React.FC<Props> = ({
         product_id: "",
         product_name: "",
         product_code: "",
-        status: 1,
         regulatory_status: [1],
+        assigned_user: null,
         dietary_status:[1],
+        notes:"",
+        application:"",
+        priority:0,
+        status: 1,
+
       },
     ]);
   };
@@ -159,8 +174,8 @@ export const ProjectDetailsTable: React.FC<Props> = ({
     },
     {
       field: "product_name",
-      headerName: "Internal Product",
-      width: 300,
+      headerName: "Int Product",
+      width: 250,
       sortable: false,
       filterable: false,
       renderCell: (row_params: GridRenderCellParams<string>) => (
@@ -168,10 +183,11 @@ export const ProjectDetailsTable: React.FC<Props> = ({
           dbOption="product"
           handleEditRow={handleEditProductRow}
           rowParams={row_params}
-          initialValue={row_params.row.product_name}
+          initialValue={row_params.row.product_code + ' | ' + row_params.row.product_name}
           letterMin={3}
-          getOptionLabel={(item: IInventory) =>
-            `${item.product_code} | ${item.name}`
+          getOptionLabel={(item) =>
+            item.product_code ?
+            `${item.product_code} | ${item.name}` : item
           }
         />
       ),
@@ -204,14 +220,16 @@ export const ProjectDetailsTable: React.FC<Props> = ({
     },
     {
       field: "regulatory_status",
-      headerName: "Regulatory Status",
+      headerName: "Reg Status",
       editable: true,
-      width: 250,
+      width:120,
       renderEditCell: renderSelectEditInputCell,
       renderCell: (params: GridRenderCellParams<number>) => {
         let chips = [];
         //@ts-ignore
-          for(let i = 0; i < params?.value!.length ; i++) {
+        // <div>
+          
+          { for(let i = 0; i < params?.value!.length ; i++) {
             console.log(params?.value)
           chips.push(
             <Chip
@@ -228,14 +246,16 @@ export const ProjectDetailsTable: React.FC<Props> = ({
           />
           )
           }
-          return chips;
+          return <div>{chips}</div>; } //TODO: Show overflow..
+          
     },
+
     },
     {
       field: "dietary_status",
-      headerName: "Dietary Status",
+      headerName: "Diet Status",
       editable: true,
-      width: 250,
+      width: 120,
       renderEditCell: renderSelectEditInputCell,
       renderCell: (params: GridRenderCellParams<number>) => {
         let chips = [];
@@ -250,7 +270,8 @@ export const ProjectDetailsTable: React.FC<Props> = ({
             label={DietaryStatus[params.value ? params?.value![i] - 1 : 4][0]}
             sx={{
               fontWeight: 600,
-              marginRight:1
+              marginRight:1,
+              
             }}
             //@ts-ignore
             color={DietaryStatus[params.value ? params?.value![i] - 1 : 4][1]}
@@ -266,7 +287,8 @@ export const ProjectDetailsTable: React.FC<Props> = ({
       headerName: "Status",
       editable: true,
       renderEditCell: renderSelectEditInputCell,
-      width: 200,
+      width: 120,
+      align:'center',
       renderCell: (params: GridRenderCellParams<number>) => (
         <Chip
           label={ItemStatus[params.value ? params.value - 1 : 4][0]}
@@ -292,8 +314,9 @@ export const ProjectDetailsTable: React.FC<Props> = ({
               color="primary"
               variant="contained"
               size="small"
+              disabled={!params.row.product_id || params.row.product_id === "" }
               onClick={() =>
-                navigate(`/products/${params.value}`, { replace: false })
+                navigate(`/products/${params.row.product_id}`, { replace: false })
               }
             >
               <VisibilityIcon fontSize="small"/>
@@ -332,6 +355,7 @@ export const ProjectDetailsTable: React.FC<Props> = ({
         rows={projectItems}
         columns={columns}
         autoHeight={true}
+        
         rowHeight={45}
         editMode="cell"
         getRowId={(row) => row._id}

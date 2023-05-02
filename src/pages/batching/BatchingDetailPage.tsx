@@ -61,7 +61,7 @@ import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
     ingredients: [],
     notes: "",
     product_code: "",
-    product_name: "",
+    name: "",
     product_id: null,
     quantity: NaN,
     date_created: new Date().toISOString().split('T')[0],
@@ -470,10 +470,10 @@ import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
                 </Grid>
                 <Grid item xs={6}>
                 <StandaloneAutocomplete
-                    initialValue={{_id: batching.product_id, product_code: batching.product_code, name: batching.product_name}}
+                    initialValue={{_id: batching.product_id, product_code: batching.product_code, name: batching.name}}
                     onChange={(e, value) => {
                         console.log(e, value, 'TESTER')
-                    setBatching({ ...batching, product_id: value._id, product_code: value.product_code, product_name: value.name});
+                    setBatching({ ...batching, product_id: value._id, product_code: value.product_code, name: value.name});
                     }}
                     readOnly={batching.status != batchingStatus.DRAFT}
                     label={"Product"}

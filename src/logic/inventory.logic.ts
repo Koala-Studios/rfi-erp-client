@@ -16,14 +16,19 @@ interface IStockSummary {
   average_price: number;
   reorder_amount: number;
 }
-interface IRegulatoryContainer {
+interface IRegulatory {
   fda_status?: number;
   cpl_hazard?: string;
   fema_number?: number;
   ttb_status?: string;
   eu_status?: number;
-  organic?: boolean;
-  kosher?: boolean;
+}
+interface IDietary {
+  vegan: boolean;
+  organic: boolean;
+  kosher: boolean;
+  halal: boolean;
+  vegetarian: boolean;
 }
 
 export interface IInventorySupplierItem {
@@ -34,19 +39,20 @@ export interface IInventory {
   _id: string;
   product_code: string;
   name: string;
-  description:string;
+  description: string;
   cost: number;
   rating: number | null;
   for_sale: boolean;
   is_raw: boolean;
+  is_solid: boolean;
   quantity: number;
   date_created: string;
   cas_number: string;
   reorder_amount: number;
-  aliases:string;
+  aliases: string;
   stock: IStockSummary;
-  suppliers: IInventorySupplierItem[];
-  regulatory: IRegulatoryContainer;
+  regulatory: IRegulatory;
+  dietary: IDietary;
   product_type: { name: string; _id: string } | null;
 }
 
@@ -55,7 +61,8 @@ const api = axios.create({
 });
 export const listInventory = async (
   q: URLSearchParams | undefined,
-  filters: FilterElement[]
+  filters: FilterElement[],
+  for_sale: boolean | undefined = undefined
 ): Promise<IListOptions | null> => {
   let query = getQuery(q, filters);
 
@@ -63,6 +70,7 @@ export const listInventory = async (
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       query,
+      for_sale: for_sale,
     },
   };
 
@@ -84,7 +92,7 @@ export const listInventory = async (
 
 export const createInventory = async (
   formData: IInventory
-): Promise<IInventory  | null> => {
+): Promise<IInventory | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
@@ -106,7 +114,9 @@ export const createInventory = async (
 
   return rtn;
 };
-export const updateInventory = async (formData: IInventory): Promise<boolean> => {
+export const updateInventory = async (
+  formData: IInventory
+): Promise<boolean> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
@@ -142,6 +152,11 @@ export const getInventory = async (id: string): Promise<IInventory | null> => {
     .then((res) => {
       if (res.status === apiStatus.OK) {
         inventory_item = res.data;
+        window.dispatchEvent(
+          new CustomEvent("NotificationEvent", {
+            detail: { text: res.data.message },
+          })
+        );
       }
     })
     .catch((err) => {

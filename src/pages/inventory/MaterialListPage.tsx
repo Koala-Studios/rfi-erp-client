@@ -80,7 +80,7 @@ const MaterialListPage = () => {
   ];
 
   React.useEffect(() => { //TODO: SET THE LIST HERE TO ONLY RAW MATERIALS, DO THIS WITH FILTERS!
-    listInventory(searchParams, filterArray).then((list) => {
+    listInventory(searchParams, filterArray, false).then((list) => {
       const newRows = list!.docs.map((item) => {
         return {
           id: item._id,
@@ -98,8 +98,8 @@ const MaterialListPage = () => {
       setDataOptions({ rows: newRows, listOptions: list! });
     });
   }, [currPage, location.key]);
-  const createNewMaterial = () => {
-    navigate(`/inventory/new`, { replace: false });
+  const createNewMaterial = (is_raw:boolean) => {
+    navigate( is_raw ? `/inventory/new` : `/products/new/material` , { replace: false });
   };
 
   if (dataOptions == null) return null;
@@ -112,8 +112,11 @@ const MaterialListPage = () => {
       >
         <DataFilter filters={filterArray}></DataFilter>
 
-        <Button variant="contained" color="primary" onClick={createNewMaterial}>
-          + New Material
+        <Button variant="contained" color="primary" onClick={() => {createNewMaterial(true)}} sx={{mr:2}}>
+          + New Raw Mat
+        </Button>
+        <Button variant="contained" color="primary" onClick={() => {createNewMaterial(false)}}>
+          + New N-Raw Mat
         </Button>
       </Card>
       <DataTable

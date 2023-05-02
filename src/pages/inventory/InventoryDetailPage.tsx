@@ -24,6 +24,7 @@ import { IProductType } from "../../logic/product-type.logic";
 import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
 import NavTab from "../../components/utils/NavTab";
 import LinkTab from "../../components/utils/LinkTab";
+import InventoryMovementPage from "./InventoryMovementPage";
 
 const emptyInventory: IInventory = {
   _id: "",
@@ -31,6 +32,7 @@ const emptyInventory: IInventory = {
   aliases:"",
   description: "",
   rating: null,
+  is_solid: false,
   product_code: "",
   date_created: new Date().toISOString().split('T')[0],
   for_sale: false,
@@ -46,15 +48,19 @@ const emptyInventory: IInventory = {
     average_price:0,
     reorder_amount:0
   },
-  suppliers: [],
   regulatory: { //TODO: ADD OTHER FIELDS HERE!!
     fda_status: 0,
     cpl_hazard: "",
     fema_number: 0,
     ttb_status: "",
     eu_status: 0,
+  },
+  dietary: {
+    vegan: false,
     organic: false,
-    kosher: false,
+    kosher: true,
+    halal: false,
+    vegetarian: false,
   },
   product_type: null,
   cas_number:'',
@@ -87,7 +93,7 @@ const inputMap: InputInfo[] = [
 
 export const InventoryDetailPage = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id, tab_id } = useParams();
   const auth = React.useContext(AuthContext);
   const [inventory, setInventory] = React.useState<IInventory | null>(null);
   const isNewId = id === "new";
@@ -222,27 +228,20 @@ export const InventoryDetailPage = () => {
         onSave={saveInventory}
         onCancel={cancelSaveInventory}
       ></SaveForm>
-          <NavTab>
-            <LinkTab label="Details" href="." />
-            <LinkTab label="Suppliers" href="./suppliers" />
-            <LinkTab label="Movements" href="./movements" />
-            <LinkTab label="Usage Stats" href="./stats" />
-          </NavTab>
-      <Card variant="outlined" style={{ paddingLeft:16, paddingRight:16,paddingBottom:16, marginBottom: 10 }}>
+      <Card variant="outlined" style={{ padding:16, marginBottom: 10 }}>
         <div style={{display:'flex', marginLeft:5, marginBottom:15}}>
           <Button
-              sx={{ mb: 3, mt:2, mr:5 }}
               aria-label="go back"
               size="medium"
               variant="outlined"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('/inventory')}
             >
               <ArrowBackIcon fontSize="small" />
             </Button>
 
         </div>
 
-        <div style={{ display: "flex", gap: 16, marginBottom: 10 }}>
+        <div style={{ display: "flex", gap: 16, marginBottom: 10, maxWidth:'70%' }}>
           <Grid container spacing={3}>
             <Grid item xs={2}>
               <TextField
@@ -371,16 +370,25 @@ export const InventoryDetailPage = () => {
             </Grid>
           </Grid>
 
-          <Card
+          {/* <Card
             variant="outlined"
             style={{ width: "40%", minWidth: "40%", padding: 16 }}
           >
             <div>
               <Typography variant="h6">Overview Stats</Typography>
             </div>
-          </Card>
+          </Card> */}
         </div>
       </Card>
+      <NavTab tab_id={tab_id}>
+        <LinkTab label="Suppliers" href="suppliers" tab_id={tab_id} disable={id === 'new'} />
+        <LinkTab label="Movements" href= "movements" tab_id={tab_id} disable={id === 'new'}/>
+        <LinkTab label="Usage Stats" href="stats" tab_id={tab_id} disable={id === 'new'}/>
+      </NavTab>
+      {
+          (tab_id && tab_id === "movements" && 
+            <InventoryMovementPage/>)
+      }
     </>
   );
 };

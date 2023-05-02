@@ -2,25 +2,19 @@ import axios from "axios";
 import { ObjectId } from "bson";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
 
-// export interface IProduct {
-//   _id: string;
-//   product_code: string;
-//   name: string;
-//   versions: number;
-//   approved_version: number;
-//   cost: number;
-//   date_created?: string;
-//   status: number;
-// }
-
-interface IRegulatoryContainer {
+interface IRegulatory {
   fda_status?: number;
   cpl_hazard?: string;
   fema_number?: number;
   ttb_status?: string;
   eu_status?: number;
-  organic?: boolean;
-  kosher?: boolean;
+}
+interface IDietary {
+  vegan: boolean;
+  organic: boolean;
+  kosher: boolean;
+  halal: boolean;
+  vegetarian: boolean;
 }
 
 interface IProductCustomers {
@@ -43,13 +37,14 @@ export interface IProduct {
   rating: number | null;
   product_code: string;
   date_created: string;
-  is_raw_mat?: boolean;
-  for_sale?: boolean;
+  is_raw: boolean;
+  for_sale: boolean;
+  is_solid: boolean;
   cost: number;
   stock?: IProductContainer;
-  customers: IProductCustomers[];
-  regulatory: IRegulatoryContainer;
-  aliases:string;
+  regulatory: IRegulatory;
+  dietary: IDietary;
+  aliases: string;
   versions: number;
   status: number;
   approved_version: number;
@@ -65,14 +60,15 @@ export const listProducts = async (
   q: URLSearchParams | undefined,
   filters: FilterElement[],
   approved?: boolean,
+  for_sale?: boolean
 ): Promise<IListOptions | null> => {
-  
   let query = getQuery(q, filters);
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       approved,
-      query
+      query,
+      for_sale,
     },
   };
 
@@ -83,7 +79,6 @@ export const listProducts = async (
     .then((res) => {
       if (res.status === apiStatus.OK) {
         list = res.data.res;
-        console.log(res, 'asdsad')
       }
     })
     .catch((err) => {
@@ -92,8 +87,6 @@ export const listProducts = async (
 
   return list;
 };
-
-
 
 export const lookupProduct = async (
   search_value: string,
@@ -105,7 +98,7 @@ export const lookupProduct = async (
     params: {
       search_value: search_value,
       for_sale: for_sale,
-      approved: approved
+      approved: approved,
     },
   };
 
@@ -114,7 +107,6 @@ export const lookupProduct = async (
     .get("/lookup", config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
-        console.log(res, 'test')
         list = res.data.res;
       }
     })
@@ -124,11 +116,13 @@ export const lookupProduct = async (
   return list;
 };
 
-export const lookupProducts = async (code_list:string[]):Promise<IProduct[] | null> => {
+export const lookupProducts = async (
+  code_list: string[]
+): Promise<IProduct[] | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
-      code_list: code_list
+      code_list: code_list,
     },
   };
 
@@ -146,7 +140,7 @@ export const lookupProducts = async (code_list:string[]):Promise<IProduct[] | nu
     });
 
   return products;
-}
+};
 
 export const getProduct = async (id: string): Promise<IProduct | null> => {
   const config = {
@@ -174,7 +168,7 @@ export const getProduct = async (id: string): Promise<IProduct | null> => {
 
 export const createProduct = async (
   formData: IProduct
-): Promise<IProduct  | null> => {
+): Promise<IProduct | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
@@ -186,7 +180,7 @@ export const createProduct = async (
     .then((res) => {
       console.log(res);
       if (res.status === apiStatus.CREATED) {
-        console.log(res.data);
+        // console.log(res.data);
         rtn = res.data;
       }
     })

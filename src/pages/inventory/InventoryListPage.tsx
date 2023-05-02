@@ -65,9 +65,9 @@ const InventoryListPage = () => {
             onClick={() => {
               console.log(params.row)
               if(params.row.is_raw) {
-              navigate(`/inventory/${params.value}`, { replace: false })
+              navigate(`/inventory/${params.value}`)
               } else {
-              navigate(`/products/${params.value}`, { replace: false })
+              navigate(`/products/${params.value}`)
               }
             }
             }
