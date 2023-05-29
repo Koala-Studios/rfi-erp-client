@@ -51,7 +51,7 @@ const emptyProduct: IProduct = {
   stock: {
     on_hand: 0,
     in_transit: 0,
-    on_order: 0,
+    ordered: 0,
     allocated: 0,
     on_hold: 0,
     quarantined: 0,
@@ -416,20 +416,12 @@ export const ProductDetailPage = () => {
               ></TextField>
             </Grid>
           </Grid>
-{/* 
-          <Card
-            variant="outlined"
-            style={{ width: "40%", minWidth: "40%", padding: 16 }}
-          >
-            <div>
-              <Typography variant="h6">Overview Stats</Typography>
-            </div>
-          </Card> */}
         </div>
       </Card>
       <NavTab>
         <LinkTab label="Formula" href= "formula" tab_id={tab_id} disable={id === 'new'}/>
-        <LinkTab label="Customers" href="customers" tab_id={tab_id} disable={id === 'new'} />
+        
+        {(tab_id && product?.for_sale && <LinkTab label="Customers" href="customers" tab_id={tab_id} disable={id === 'new'} />)}
         <LinkTab label="Movements" href= "movements" tab_id={tab_id} disable={id === 'new'}/>
         <LinkTab label="Usage Stats" href="stats" tab_id={tab_id} disable={id === 'new'} />
       </NavTab>
@@ -438,5 +430,5 @@ export const ProductDetailPage = () => {
             <InventoryMovementPage/>)
       }
     </>
-  );
+  ); 
 };

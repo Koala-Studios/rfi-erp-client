@@ -40,7 +40,7 @@ const getClassName = (row: IForecastResults) => {
       : "";
   } else if (
     row.required_amount <=
-    row.available_amount + row.on_order_amount
+    row.available_amount + row.ordered_amount
   ) {
     return "YellowRow";
   } else {
@@ -126,7 +126,7 @@ export const ForecastPage = () => {
       width: 150,
     },
     {
-      field: "on_order_amount",
+      field: "ordered_amount",
       headerName: "Ordered Qty",
       type: "number",
       width: 150,
@@ -319,7 +319,7 @@ export const ForecastPage = () => {
           product_name: item.product_name,
           required_amount: item.required_amount,
           available_amount: item.available_amount,
-          on_order_amount: item.on_order_amount,
+          ordered_amount: item.ordered_amount,
           on_hand_amount: item.on_hand_amount,
           in_transit_amount: item.in_transit_amount,
           reorder_amount: item.reorder_amount,

@@ -2,7 +2,7 @@ import React from "react";
 import { DataTable } from "../../components/utils/DataTable";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { AuthContext } from "../../components/navigation/AuthProvider";
-import { getFormula, submitFormula } from "../../logic/formula.logic";
+import { approveFormula, disapproveFormula, getFormula, submitFormula } from "../../logic/formula.logic";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Button,
@@ -25,22 +25,37 @@ import { IProduct } from "../../logic/product.logic";
 import WarningIcon from "@mui/icons-material/Warning";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { ObjectID, ObjectId } from "bson";
+
+const emptyFormula: IFormula = {
+  product_code: "",
+  product_id: "",
+  yield: 1,
+  rec_dose_rate: 0.02,
+  formula_items: [],
+  approved: false,
+  _id: "new",
+  version: 0,
+  base: 100,
+  date_created: new Date(),
+}
+
+
 const FormulaDevPage = () => {
+
+
+
   const navigate = useNavigate();
   const auth = React.useContext(AuthContext);
   const [cost, setCost] = React.useState<number>(0);
   const [multiplier, setMultiplier] = React.useState<number>(1.0);
   const [totalAmt, setTotalAmt] = React.useState<number>(0);
   const [rows, setRows] = React.useState<any>(null);
-  const [editMode, setEditMode] = React.useState<string | null>(null);
   const [carrier, setCarrier] = React.useState<string | null>(null);
-
-  const [base100, setBase100] = React.useState<boolean>(true);
-  const [prodYield, setYield] = React.useState<number>(1.0);
-  const [recDose, setRecDose] = React.useState<number>(0.2);
-  const [product, setProduct] = React.useState<IProduct | null>(null);
   const { id } = useParams();
   const { version } = useParams();
+  const [formula, setFormula] = React.useState<IFormula | null>(null);
+
+  const [product, setProduct] = React.useState<IProduct | null>(null);
 
   const ProductStatus = [
     ["Pending", "error"],
@@ -50,50 +65,38 @@ const FormulaDevPage = () => {
     ["Error", "error"],
   ];
 
-  React.useEffect(() => {
-    getProduct(id!).then((product) => {
-      setProduct(product);
-      product!.description =  product?.description  ? product?.description : '';
-    });
-    getFormula(id!, version!).then((formula) => {
-      if(formula){ 
 
-        setYield(formula!.yield ? formula!.yield : 1.0);
-        setBase100(formula!.base_hundred ? formula!.base_hundred : true);
-        setRecDose(formula!.rec_dose_rate ? formula!.rec_dose_rate : 0.20);
-        if (!formula?.formula_items) {
-          setRows([
-            {
-              _id: new ObjectID().toHexString(),
-              amount: 0,
-              last_amount: 0,
-              item_cost: 0,
-              cost: 0,
-            },
-          ]);
+  React.useEffect(() => {
+    getProduct(id!).then((_product) => {
+      setProduct(_product);
+      getFormula(id!, parseInt(version!)).then((_formula) => {
+        if(_formula){
+  
+          setFormula(_formula);
+            const newRows = _formula?.formula_items.map((item, index) => {
+              return {
+                _id: new ObjectID().toHexString(),
+                material_id: item.material_id,
+                material_code: item.material_code,
+                material_name: item.material_name,
+                item_cost: item.cost,
+                cost: 0,
+                amount: 0,
+                last_cost: (item.cost * item.amount) / 100,
+                last_amount: item.amount,
+                notes: item.notes,
+              };
+            });
+            setRows(newRows);
         } else {
-          const newRows = formula!.formula_items.map((item, index) => {
-            return {
-              _id: new ObjectID().toHexString(),
-              material_id: item.material_id,
-              material_code: item.material_code,
-              material_name: item.material_name,
-              item_cost: item.cost,
-              cost: 0,
-              amount: 0,
-              last_cost: (item.cost * item.amount) / 100,
-              last_amount: item.amount,
-              notes: item.notes,
-            };
-          });
-          setRows(newRows);
+          setFormula({...emptyFormula, product_code: _product!.product_code, product_id: id!});
+          setRows([{_id:new ObjectID().toHexString(), material_id: null, material_code: null, material_name: '', item_cost: 0, amount: 0, last_cost:0,last_amount: null, notes: ''}]);
         }
-      } else {
-        setYield(1);
-        setBase100(true);
-        setRows([{_id:new ObjectID().toHexString(), material_id: null, material_code: null, material_name: '', item_cost: 0, amount: 0, last_cost:0,last_amount: null, notes: ''}]);
       }
+    )
     });
+    
+
   }, []);
 
   React.useEffect(() => {
@@ -186,14 +189,12 @@ const FormulaDevPage = () => {
         <TableAutocomplete
           dbOption="material"
           readOnly={row_params.row.last_amount != null}
-          // editMode={editMode}
-          // setEditMode={setEditMode}
           handleEditRow={handleEditRow}
           rowParams={row_params}
           initialValue={row_params.row.material_name}
           letterMin={2}
           getOptionLabel={(item: IInventory) =>
-            `${item.product_code} | ${item.name}`
+            item?.product_code ? `${item.product_code} | ${item.name}` : ''
           }
         />
       ),
@@ -277,7 +278,7 @@ const FormulaDevPage = () => {
       },
       ...rows.slice(index == rows.length - 1 ? index + 2 : index + 1),
     ]);
-    // setEditMode("row" + rowCount); //onBlur in autocomplete clashes with this, also slows page down
+  
   };
 
   const handleMultiplier = (mult_amount: number) => {
@@ -301,7 +302,7 @@ const FormulaDevPage = () => {
     let pList = rows.slice();
     console.log(rowid, value, rowIndex, pList[rowIndex]);
     pList[rowIndex].material_code = value.product_code;
-    pList[rowIndex].product_id = value._id;
+    pList[rowIndex].material_id = value._id;
     pList[rowIndex].material_name = value.name;
     pList[rowIndex].item_cost = value.cost;
 
@@ -338,7 +339,7 @@ const FormulaDevPage = () => {
         rows
           // @ts-ignore
           .reduce((a, b) => a + (!b.amount ? b.last_amount : b.amount), 0)
-          .toFixed(2)
+          .toFixed(5)
       );
       setCost(
         rows
@@ -367,61 +368,59 @@ const FormulaDevPage = () => {
     
   };
 
-  const handleAdminApprove = async () => {
-    
-    // const new_formula = await submitFormula(approve, newVersion);
-  }
-  const handleSubmit = async (approve:boolean = false) => {
-    const newVersion: IFormula = {
-      product_code: product!.product_code,
-      formula_items: rows.map((material: IFormulaDevRow) => {
-        return {
-          material_code: material.material_code,
-          amount: material.amount ? material.amount : material.last_amount,
-          notes: material.notes,
-          material_id: material.material_id,
-          material_name: material.material_name,
-        };
-      }),
-      product_id: product!._id,
-      yield: prodYield,
-      base_hundred: base100,
-      rec_dose_rate: recDose
-    };
-    //TODO: WHOLE PAGE NEEDS SLIGHT REWORK LOL.
-    const _product = await submitFormula(approve, newVersion, product!.description);
+  const handleDisapprove = async () => {
+    const _product = await disapproveFormula(product!);
     if (_product) {
-      // setProduct(_formula);
+      setProduct(_product);
+    }
+  }
+
+  const handleAdminApprove = async () => {
+    const _product = await approveFormula(product!);
+    if (_product) {
+      setProduct(_product);
+    }
+  }
+
+
+  const handleSubmit = async (approve:boolean = false) => {
+    const _formula_items = rows.map((material: IFormulaDevRow) => {
+      return {
+        material_code: material.material_code,
+        amount: material.amount ? material.amount : material.last_amount,
+        notes: material.notes,
+        material_id: material.material_id,
+        material_name: material.material_name,
+      };
+    });
+    let newVersion:IFormula = formula!;
+    newVersion.formula_items = _formula_items
+    const res = await submitFormula(approve, newVersion, product!.description);
+
+    if (res) {
+      const _product = res[0];
+      const _formula = res[1];
+      setProduct(_product)
+      setFormula(_formula);
+      setRows(_formula?.formula_items.map((item, index) => {
+        return {
+          _id: new ObjectID().toHexString(),
+          material_id: item.material_id,
+          material_code: item.material_code,
+          material_name: item.material_name,
+          item_cost: item.cost,
+          cost: 0,
+          amount: 0,
+          last_cost: (item.cost * item.amount) / 100,
+          last_amount: item.amount,
+          notes: item.notes,
+        };
+      }));
       navigate(`/formula/develop/${_product._id}/${_product.versions}`, {
         replace: true,
       });
-      navigate(0);
     }
-
-    // if (_formula) {
-    //   // setProduct(_formula);
-    //   navigate(`/formula/develop/${_formula.product_id}/${_formula.versions}`, {
-    //     replace: true,
-    //   });
-    //   setRows(_formula.formula_items.map((item:IFormulaItem) =>{ return {_id: new ObjectId().toHexString(), ...item} }));
-    // }
   };
-
-  // function filterChanges(str: string) {
-  //   lookupInventory(str, false).then((result) => {
-  //     const newCatalog = result?.map((item, key) => {
-  //       return {
-  //         id: key,
-  //         material_id: item._id,
-  //         material_code: item.product_code,
-  //         material_name: item.name,
-  //         label: item.product_code + " |     " + item.name,
-  //         cost: item.cost,
-  //       };
-  //     });
-  //     setInvLookupCatalog(newCatalog);
-  //   });
-  // }
 
   if (rows == null) return null;
 
@@ -607,13 +606,13 @@ const FormulaDevPage = () => {
               disabled={id === "new" || ( product! &&  product!.status != 3)}
               onClick={() => handleAdminApprove()}
             >
-              APPROVE
+              ADMIN APPROVE
             </Button>
             <Button
               color="warning"
               variant="contained"
               disabled={id === "new" || ( product! && product!.status != 3)}
-              onClick={() => handleAdminApprove()}
+              onClick={() => handleDisapprove()}
             >
               DISAPPROVE / REDRAFT
             </Button>
@@ -659,19 +658,18 @@ const FormulaDevPage = () => {
               </Button>
             </Grid>
             <Grid item xs={1}>
-              <FormControlLabel
-                control={
-                  <Checkbox
-                    onClick={() => {
-                      if (base100) {
-                      } /* <-- this portion doesn't work atm because of field below*/
-                      setBase100(!base100);
-                    }}
-                    checked={base100}
-                  />
-                }
-                label="Base100?"
-              />
+              <TextField
+                spellCheck="false"
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+                size="small"
+                variant="outlined"
+                label={"Base"}
+                defaultValue={formula?.base}
+                onBlur={(e) => {
+                  setFormula({...formula! , base: parseFloat(e.target.value)})
+                }} //here
+              ></TextField>
             </Grid>
             <Grid item xs={0.75}>
               <TextField
@@ -681,9 +679,9 @@ const FormulaDevPage = () => {
                 size="small"
                 variant="outlined"
                 label={"Yield Ratio"}
-                defaultValue={prodYield.toFixed(2)}
+                defaultValue={formula?.yield.toFixed(2)}
                 onBlur={(e) => {
-                  setYield(parseFloat(e.target.value));
+                  setFormula({...formula! , yield: parseFloat(e.target.value)})
                 }} //here
               ></TextField>
             </Grid>
@@ -696,22 +694,27 @@ const FormulaDevPage = () => {
                 size="small"
                 variant="outlined"
                 label={"Rec Dose"}
-                defaultValue={recDose.toFixed(2)}
+                defaultValue={formula?.rec_dose_rate.toFixed(2)}
                 type="number"
                 onBlur={(e) => {
-                  console.log(e, 'test dose')
-                  setRecDose(parseFloat(e.target.value));
+                  setFormula({...formula! , rec_dose_rate: parseFloat(e.target.value)})
                 }} //here
               ></TextField>
             </Grid>
-            <Grid item xs={1.2}></Grid>
+            <Grid item xs={1}></Grid>
+            <Grid item xs={1.3}>
+              <h3>Cost/KG: {cost}</h3>
+            </Grid>
+            <Grid item xs={1.3}>
+              <h3>Total: {totalAmt}</h3>
+            </Grid>
             <Grid item xs={0.5}>
-              <div hidden={!(prodYield === 1 && totalAmt > 100)}>
+              <div hidden={!(formula?.yield === 1 && totalAmt != formula.base)}>
                 <Tooltip
                   placement="top"
-                  title="The total surpasses 100 & the yield is set to 1.00"
+                  title={"The total Qty does not match with the base of " + formula?.base}
                 >
-                  <WarningIcon sx={{ color: "orange" }} />
+                  <WarningIcon sx={{ color: "orange" }} style={{fontSize:50}} />
                 </Tooltip>
               </div>
             </Grid>
@@ -724,29 +727,6 @@ const FormulaDevPage = () => {
           onCellKeyDown={(params, event) => {
             if (event.code == "Space") {
               event.stopPropagation();
-            }
-            if (editMode !== null) {
-              switch (event.code) {
-                case "Escape": {
-                  setEditMode(null);
-                  break;
-                }
-                // case("Enter"):
-                // {
-                //   console.log('test', event, params )
-                //   break;
-                // }
-                case "ArrowDown":
-                case "ArrowUp":
-                case "Backspace": {
-                  event.stopPropagation();
-                }
-              }
-            } else {
-              // if( event.code == "Enter")
-              // {
-              //   // console.log(event, params)
-              // }
             }
           }}
           experimentalFeatures={{ newEditingApi: true }}

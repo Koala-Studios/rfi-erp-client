@@ -213,14 +213,14 @@ export const updateBatching = async (
 
 export const finishBatching = async (
   token: string,
-  batching: IBatching
+  batching_id: string
 ): Promise<IBatching | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
   let rtn = null;
   await api
-    .post("/finish-batching", batching, config)
+    .post("/finish-batching", batching_id, config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
         window.dispatchEvent(

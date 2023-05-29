@@ -38,12 +38,12 @@ import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
   let savedBatching: IBatching | null = null;
   
   const BatchingStatus = [
+    ["DRAFT", "warning"],
     ["SCHEDULED", "warning"],
     ["IN PROGRESS", "warning"],
     ["FINISHED", "success"],
     ["ABANDONED", "error"],
     ["CANCELLED", "error"],
-    ["DRAFT", "warning"],
   ];
 
 
@@ -264,7 +264,7 @@ import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
     };
   
     const handleFinishBatching = () => {
-      finishBatching(auth.token, batching!).then((_batching) => {
+      finishBatching(auth.token, batching!._id).then((_batching) => {
         if (_batching) {
           // window.location.reload();
           savedBatching = _batching;
@@ -610,7 +610,7 @@ import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
                 color="success"
                 variant="contained"
                 disabled={id === "new"}
-                onClick={() => handleMarkBatchingCancelled()}//TODO: CHANGE THIS
+                onClick={() => handleFinishBatching()}
               >
                 Finish Batching
               </Button>
@@ -708,8 +708,9 @@ import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
               >
               <TableCell sx={{ p:1, width:150 }}>Product Code</TableCell>
               <TableCell sx={{ p:1, width:300}}>Product Name</TableCell>
-              <TableCell sx={{p:1}} align="right">Total Req Quantity</TableCell>
-              <TableCell sx={{p:1}} align="right" >Used Qty.</TableCell>
+              <TableCell sx={{p:1, width: 120 }} >Total Req Quantity</TableCell>
+              <TableCell sx={{p:1, width: 120 }} >Used Qty.</TableCell>
+              <TableCell></TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -718,13 +719,12 @@ import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
               <TableRow key={'test'}>
                 <TableCell sx={{ p: 1 }} ><Typography variant="subtitle2">{row.product_code} </Typography></TableCell>
                 <TableCell sx={{ p: 1 }} ><Typography variant="subtitle2">{row.product_name} </Typography></TableCell>
-                <TableCell sx={{ p: 1 }} align="right" ><Typography variant="subtitle2">{row.required_amount}</Typography></TableCell>
+                <TableCell sx={{ p: 1 }} ><Typography variant="subtitle2">{row.required_amount}</Typography></TableCell>
                 
-                <TableCell sx={{ p: 1 }} align="right">{0}</TableCell>
+                <TableCell sx={{ p: 1 }}>{0}</TableCell>
               </TableRow>
             <TableRow>
-              <TableCell sx={{ p: 1 }} rowSpan={2} colSpan={2}/>
-              <TableCell sx={{ p: 1 }} align="right">
+              <TableCell sx={{ p: 1 }} rowSpan={2}>
                     
                     <TextField
                         onChange={(e) =>
@@ -742,7 +742,7 @@ import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
                         value={'LOT012TEST'}
                     ></TextField>
                 </TableCell>
-              <TableCell sx={{ p: 1, width:80 }} align="right">
+              <TableCell sx={{ p: 1, width:80 }} >
                 
                 <TextField
                     onChange={(e) =>
@@ -762,7 +762,7 @@ import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
                 </TableCell>
             </TableRow>
             <TableRow>
-              <TableCell sx={{ p: 1 }} align="right">
+              <TableCell sx={{ p: 1 }}>
                     
                     <TextField
                         onChange={(e) =>
@@ -780,7 +780,7 @@ import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
                         value={'LOT013TEST2'}
                     ></TextField>
                 </TableCell>
-              <TableCell sx={{ p: 1, width:80 }} align="right">
+              <TableCell sx={{ p: 1, width:80 }}>
                 
                 <TextField
                     onChange={(e) =>
@@ -799,24 +799,6 @@ import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
                   ></TextField>
                 </TableCell>
             </TableRow>
-            {/* <TableRow>
-            <TableCell sx={{ p: 1, width:120 }} align="right">
-                <TextField
-                    onChange={(e) =>
-                      setBatching({
-                        ...batching,
-                        quantity: parseFloat(e.target.value),
-                      })
-                    }
-                    fullWidth
-                    InputLabelProps={{ shrink: true }}
-                    size="small"
-                    variant="standard"
-                    type={"number"}
-                    value={0}
-                  ></TextField>
-            </TableCell>
-            </TableRow> */}
             </>
             ))}
           </TableBody>

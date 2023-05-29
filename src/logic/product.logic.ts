@@ -24,7 +24,7 @@ interface IProductCustomers {
 interface IProductContainer {
   on_hand: number;
   in_transit: number;
-  on_order: number;
+  ordered: number;
   allocated: number;
   on_hold: number;
   quarantined: number;

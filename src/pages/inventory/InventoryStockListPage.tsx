@@ -176,7 +176,7 @@ const InventoryStockListPage = () => {
       width: 100,
       align: "right",
     },
-    { field: "on_order", headerName: "On Order", width: 100, align: "right" },
+    { field: "ordered", headerName: "Ordered", width: 100, align: "right" },
     {
       field: "quarantined",
       headerName: "Quarantined",

@@ -4,7 +4,7 @@ import { GridColDef, GridRenderCellParams, GridValueGetterParams } from "@mui/x-
 import { listBatching } from "../../logic/batching.logic";
 import { AuthContext } from "../../components/navigation/AuthProvider";
 import { FilterElement, IListData } from "../../logic/utils";
-import { Button, Card, Divider } from "@mui/material";
+import { Button, Card, Chip, Divider } from "@mui/material";
 import {
   useLocation,
   useNavigate,
@@ -25,6 +25,15 @@ const filterArray: FilterElement[] = [
 
 ];
 
+const BatchingStatus = [
+  ["DRAFT", "warning"],
+  ["SCHEDULED", "warning"],
+  ["IN PROGRESS", "warning"],
+  ["FINISHED", "success"],
+  ["ABANDONED", "error"],
+  ["CANCELLED", "error"],
+];
+
 const BatchingListPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -38,6 +47,23 @@ const BatchingListPage = () => {
     { field: "name", headerName: "Product Name", width: 320 },
     { field: "batch_code", headerName: "Batch Code", width: 120 },
     { field: "quantity", headerName: "Quantity", type: "number", width: 90 },
+    {
+      field: "status",
+      headerName: "Status",
+      width: 200,
+      align: 'center',
+      renderCell: (params: GridRenderCellParams<number>) => (
+        <Chip
+          label={BatchingStatus[params.value ? params.value - 1 : 4][0]}
+          sx={{
+            fontWeight: 600,
+          }}
+          //@ts-ignore
+          color={BatchingStatus[params.value ? params.value - 1 : 4][1]}
+          variant="outlined"
+        />
+      ),
+    },
     {
       field: "id",
       headerName: "Actions",
@@ -72,6 +98,7 @@ const BatchingListPage = () => {
           quantity: batch.quantity,
           product_code: batch.product_code,
           name: batch.name,
+          status: batch.status
         };
       });
       setDataOptions({ rows: newRows, listOptions: list! });

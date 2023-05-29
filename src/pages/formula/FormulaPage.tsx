@@ -22,7 +22,7 @@ const FormulaPage = () => {
   const { id, version } = useParams();
   // const { approved_version } = useParams();
   React.useEffect(() => {
-    getFormula(id!, version!).then((formula) => {
+    getFormula(id!, parseInt(version!)).then((formula) => {
       console.log(formula, " TEST");
       if (!formula?.formula_items) {
         setRows({});

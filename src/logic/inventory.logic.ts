@@ -10,7 +10,7 @@ interface IProductTypes {
 interface IStockSummary {
   on_hold: number;
   on_hand: number;
-  on_order: number;
+  ordered: number;
   quarantined: number;
   allocated: number;
   average_price: number;
@@ -151,7 +151,7 @@ export const getInventory = async (id: string): Promise<IInventory | null> => {
     .get("/get", config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
-        inventory_item = res.data;
+        inventory_item = res.data.res;
         window.dispatchEvent(
           new CustomEvent("NotificationEvent", {
             detail: { text: res.data.message },

@@ -41,7 +41,7 @@ const emptyInventory: IInventory = {
   quantity: 0,
   stock: {
     on_hand: 0,
-    on_order: 0,
+    ordered: 0,
     allocated: 0,
     on_hold: 0,
     quarantined: 0,
@@ -136,6 +136,7 @@ export const InventoryDetailPage = () => {
       setInventory(emptyInventory);
     } else {
       getInventory(id!).then((p) => {
+        console.log(p, 'test')
         savedInventory = p;
         setInventory(p!);
         // setInventorySaved(true);

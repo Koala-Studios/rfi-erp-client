@@ -2,6 +2,18 @@ import axios from "axios";
 import { ObjectId } from "bson";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
 
+export interface IMovement {
+  product_id: string;
+  product_code: string;
+  name: string;
+  module_source: string;
+  movement_target_type: string;
+  amount: number;
+  container_id?: string;
+  lot_number?: string;
+  movement_date: Date;
+}
+
 const api = axios.create({
   baseURL: "http://localhost:5000/inventory-movement",
 });

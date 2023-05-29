@@ -43,7 +43,7 @@ const MaterialListPage = () => {
       width: 100,
       align: "right",
     },
-    { field: "on_order", headerName: "On Order", width: 100, align: "right" },
+    { field: "ordered", headerName: "Ordered", width: 100, align: "right" },
     {
       field: "quarantined",
       headerName: "Quarantined",
@@ -89,7 +89,7 @@ const MaterialListPage = () => {
           cost: item.cost,
           reorder_amount: item.reorder_amount ?? 0,
           on_hand: item.on_hand ?? 0,
-          on_order: item.on_order ?? 0,
+          ordered: item.ordered ?? 0,
           quarantined: item.quarantined ?? 0,
           allocated: item.allocated ?? 0,
           is_raw: item.is_raw

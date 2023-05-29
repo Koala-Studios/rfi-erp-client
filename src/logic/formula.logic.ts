@@ -12,15 +12,16 @@ export interface IFormulaItem {
 }
 
 export interface IFormula {
-  _id?: string;
+  _id: string;
   product_code: string;
   product_id: string;
-  version?: number;
+  version: number;
   yield: number;
-  base_hundred?: boolean;
   rec_dose_rate: number;
-  date_created?: Date;
+  date_created: Date;
+  base: number;
   formula_items: IFormulaItem[];
+  approved: boolean;
 }
 
 const api = axios.create({
@@ -29,7 +30,7 @@ const api = axios.create({
 
 export const getFormula = async (
   id: string,
-  version: string
+  version: number
 ): Promise<IFormula | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
@@ -62,22 +63,83 @@ export const getFormula = async (
 };
 
 export const submitFormula = async (
-  approved: boolean,
-  formula: IFormula,
-  description: string
-): Promise<IProduct | null> => {
+  _approved: boolean,
+  _formula: IFormula,
+  _description: string
+): Promise<[IProduct, IFormula] | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
-      approved,
-      description,
+      approved: _approved,
+      description: _description,
     },
   };
   // console.log(id, version, 'testing it all')
   let product: IProduct | null = null;
 
+  console.log(_formula, config, "test");
+
   await api
-    .post("/submit", formula, config)
+    .post("/submit-formula", _formula, config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        product = res.data.res;
+        console.log(product, res, "test");
+      }
+      // console.log('hello')
+      window.dispatchEvent(
+        new CustomEvent("NotificationEvent", {
+          detail: { text: res.data.message },
+        })
+      );
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return product;
+};
+
+export const disapproveFormula = async (
+  _product: IProduct
+): Promise<IProduct | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+  };
+  // console.log(id, version, 'testing it all')
+  let product: IProduct | null = null;
+
+  await api
+    .post("/disapprove-formula", _product, config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        product = res.data.res;
+        console.log(product, res, "test");
+      }
+      // console.log('hello')
+      window.dispatchEvent(
+        new CustomEvent("NotificationEvent", {
+          detail: { text: res.data.message },
+        })
+      );
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return product;
+};
+
+export const approveFormula = async (
+  _product: IProduct
+): Promise<IProduct | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+  };
+  let product: IProduct | null = null;
+
+  await api
+    .post("/approve-formula", _product, config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
         product = res.data.res;

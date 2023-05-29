@@ -21,7 +21,7 @@ export interface IForecastResults {
   product_name: string;
   required_amount: number;
   available_amount: number;
-  on_order_amount: number;
+  ordered_amount: number;
   on_hand_amount: number;
   in_transit_amount: number;
   reorder_amount: number;

@@ -88,16 +88,6 @@ const FormulaListPage = () => {
             variant="contained"
             color="primary"
             size="small"
-            onClick={() =>
-              navigate(`/products/${params.value}`, { replace: false })
-            }
-          >
-            View Details
-          </Button>
-          <Button
-            variant="outlined"
-            color="primary"
-            size="small"
             style={{ marginLeft: 16 }}
             onClick={() =>
               navigate(

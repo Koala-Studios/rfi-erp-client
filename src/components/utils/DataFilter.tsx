@@ -131,7 +131,7 @@ const DataFilter: React.FC<Props> = ({ filters }) => {
       </Grid>
 
       {createFields()}
-      <Grid item xs={12}>
+      <Grid item xs={3}>
 
         <Button
           onClick={handleSearchClicked}
@@ -142,9 +142,6 @@ const DataFilter: React.FC<Props> = ({ filters }) => {
           <SearchIcon fontSize="small" sx={{ mr: 0.5 }} />
           Search
         </Button>
-
-
-        <Divider sx={{ mt: 2 }} />
       </Grid>
     </Grid>
   );

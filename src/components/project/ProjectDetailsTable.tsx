@@ -75,7 +75,7 @@ function SelectEditInputCell(props: GridRenderCellParams) {
       field,
       value: event.target.value,
     });
-    // apiRef.current.stopCellEditMode({ id, field });
+    apiRef.current.stopCellEditMode({ id, field });
   };
 
   return (
