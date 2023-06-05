@@ -149,6 +149,29 @@ export const updateStockCount = async (
   return rtn;
 };
 
+export const fillAllStockCount = async (): Promise<
+  IInventoryStock[] | null
+> => {
+  const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+  };
+
+  let rtn = null;
+
+  await api
+    .get("/fill-all", config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        rtn = res.data.res;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
+};
+
 export const submitStockCount = async (
   formData: IStockCount
 ): Promise<IStockCount | null> => {

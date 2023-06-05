@@ -19,6 +19,8 @@ const PERMISSIONS = {
   customers_page: "customers_page",
   suppliers_page: "suppliers_page",
   producttypes_page: "producttypes_page",
+  development_actions: "development_actions",
+  development_admin: "development_admin",
 };
 
 export default PERMISSIONS;

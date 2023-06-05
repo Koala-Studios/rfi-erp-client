@@ -49,7 +49,7 @@ const emptyInventory: IInventory = {
     reorder_amount: 0,
   },
   regulatory: { //TODO: ADD OTHER FIELDS HERE!!
-    fda_status: 0,
+    fda_status: "",
     cpl_hazard: "",
     fema_number: 0,
     ttb_status: "",

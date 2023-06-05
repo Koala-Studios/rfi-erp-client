@@ -17,7 +17,7 @@ interface IStockSummary {
   reorder_amount: number;
 }
 interface IRegulatory {
-  fda_status?: number;
+  fda_status?: string;
   cpl_hazard?: string;
   fema_number?: number;
   ttb_status?: string;

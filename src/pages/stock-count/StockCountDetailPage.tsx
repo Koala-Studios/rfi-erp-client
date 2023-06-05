@@ -32,6 +32,7 @@ import {
   approveStockCount,
   disapproveStockCount,
   abandonStockCount,
+  fillAllStockCount,
 } from "../../logic/stock-count.logic";
 import { IInventoryStock } from "../../logic/inventory-stock.logic";
 import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
@@ -414,7 +415,14 @@ const inputMap: InputInfo[] = [
     }
 
   };
+  const handlefillAllStockCount = () => {
+    fillAllStockCount().then((containers) => {
 
+      console.log(containers);
+    }
+    );
+   
+  }
   const saveStockCount = async () => {
     let allValid = true;
     //do client side validation
@@ -669,9 +677,14 @@ const inputMap: InputInfo[] = [
       </Card>
       <Card variant="outlined" sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
         {/* <div style={{ display: "flex", flexDirection: "row", gap: 10 }}> */}
-          
         <Grid container spacing={3} sx={{mb:3}}>
-          
+        <Grid item xs={2}>
+        <Button variant="contained">Import Bin</Button>
+        </Grid>  
+        <Grid item xs={2}>
+        <Button color="info" variant="contained" onClick={() => handlefillAllStockCount()}>Import All</Button>
+        </Grid>  
+        <Grid item xs={5}/>
         <Grid item xs={4.5}>
           <StandaloneAutocomplete
             initialValue={selectedContainer}

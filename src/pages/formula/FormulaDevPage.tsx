@@ -25,6 +25,9 @@ import { IProduct } from "../../logic/product.logic";
 import WarningIcon from "@mui/icons-material/Warning";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { ObjectID, ObjectId } from "bson";
+import SpaIcon from '@mui/icons-material/Spa';
+import PERMISSIONS from "../../logic/config.permissions";
+import { hasPermission } from "../../logic/user.logic";
 
 const emptyFormula: IFormula = {
   product_code: "",
@@ -194,7 +197,9 @@ const FormulaDevPage = () => {
           initialValue={row_params.row.material_name}
           letterMin={2}
           getOptionLabel={(item: IInventory) =>
-            item?.product_code ? `${item.product_code} | ${item.name}` : ''
+            { return <> {item?.regulatory.fda_status === "Natural" ? <SpaIcon sx={{ color: 'green' }}/> : ''} {item?.product_code ?  (`${item.product_code} | ${item.name}`) : '' }
+            </> 
+            }
           }
         />
       ),
@@ -595,7 +600,7 @@ const FormulaDevPage = () => {
             <Button
               color="info"
               variant="contained"
-              disabled={id === "new" || ( product! && product!.status != 2)}
+              disabled={id === "new" || ( product! && product!.status != 2) || !hasPermission(auth.user!, PERMISSIONS.development_actions)}
               onClick={() => handleSubmit(true)}
             >
               APPROVE & SUBMIT
@@ -603,7 +608,7 @@ const FormulaDevPage = () => {
             <Button
               color="success"
               variant="contained"
-              disabled={id === "new" || ( product! &&  product!.status != 3)}
+              disabled={id === "new" || ( product! &&  product!.status != 3) || !hasPermission(auth.user!, PERMISSIONS.development_admin)}
               onClick={() => handleAdminApprove()}
             >
               ADMIN APPROVE
@@ -611,7 +616,7 @@ const FormulaDevPage = () => {
             <Button
               color="warning"
               variant="contained"
-              disabled={id === "new" || ( product! && product!.status != 3)}
+              disabled={id === "new" || ( product! && product!.status != 3 )|| !hasPermission(auth.user!, PERMISSIONS.development_actions)}
               onClick={() => handleDisapprove()}
             >
               DISAPPROVE / REDRAFT

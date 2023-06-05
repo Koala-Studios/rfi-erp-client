@@ -37,7 +37,7 @@ const ProductListPage = () => {
       width: 100,
       align: 'center'
     },
-    { field: "cost", headerName: "Cost/KG", width: 100, align: "right" },
+    { field: "cost", headerName: "Cost/KG", width: 100, align: "right"},
     { field: "on_hand", headerName: "On Hand", width: 100, align: "right" },
     { field: "ordered", headerName: "Ordered", width: 100, align: "right" },
     {
@@ -79,7 +79,7 @@ const ProductListPage = () => {
           product_code: product.product_code,
           name: product.name,
           approved_version: product.approved_version,
-          cost: `$${product.cost}`,
+          cost: `$${product.cost.toFixed(2)}`,
           on_hand: product.on_hand ? product.on_hand : 0,
           ordered: product.ordered ? product.ordered : 0,
           quarantined: product.quarantined ? product.quarantined : 0,

@@ -360,7 +360,22 @@ export const ProductDetailPage = () => {
                 }
               />
             </Grid>
-            <Grid item xs={2}/>
+            <Grid item xs={1}/>
+            <Grid item xs={1}>
+              <TextField
+                value={product.cost.toFixed(2)}
+                InputProps={{
+                  readOnly: true,
+                }}
+                spellCheck="false"
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+                size="small"
+                variant="outlined"
+                label={"Cost"}
+                type="number">
+              </TextField>
+            </Grid>
             <Grid item xs={2}>
               <TextField
                 defaultValue={product!.date_created ? product.date_created.split('T')[0] : null}
@@ -421,7 +436,7 @@ export const ProductDetailPage = () => {
       <NavTab>
         <LinkTab label="Formula" href= "formula" tab_id={tab_id} disable={id === 'new'}/>
         
-        {(tab_id && product?.for_sale && <LinkTab label="Customers" href="customers" tab_id={tab_id} disable={id === 'new'} />)}
+        <LinkTab label="Customers" href="customers" tab_id={tab_id} disable={id === 'new'} />
         <LinkTab label="Movements" href= "movements" tab_id={tab_id} disable={id === 'new'}/>
         <LinkTab label="Usage Stats" href="stats" tab_id={tab_id} disable={id === 'new'} />
       </NavTab>
