@@ -4,6 +4,7 @@ const PERMISSIONS = {
 
   //access to list pages
   all_pages: "all_pages",
+
   project_page: "project_page",
   batching_page: "batching_page",
   inventory_page: "inventory_page",

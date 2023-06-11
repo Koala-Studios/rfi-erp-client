@@ -45,6 +45,7 @@ import ProductTypeListPage from "./pages/product-type/ProductTypeListPage";
 import { InventoryDetailPage } from "./pages/inventory/InventoryDetailPage";
 import MaterialListPage from "./pages/inventory/MaterialListPage";
 import InventoryMovementPage from "./pages/inventory/InventoryMovementPage";
+import PERMISSIONS from "./logic/config.permissions";
 
 const mainTheme = createTheme({
   palette: {
@@ -85,7 +86,7 @@ function App() {
               <Route
                 path="/inventory"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.inventory_page}>
                     <Navbar title="Inventory">
                       <InventoryListPage />
                     </Navbar>
@@ -95,7 +96,7 @@ function App() {
               <Route
                 path="/inventory/:id/:tab_id?"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.inventory_page}>
                     <Navbar title="Inventory Details">
                       <InventoryDetailPage />
                     </Navbar>
@@ -103,9 +104,9 @@ function App() {
                 }
               />
               <Route
-              path="/materials"
+                path="/materials"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.materials_page}>
                     <Navbar title="Materials">
                       <MaterialListPage />
                     </Navbar>
@@ -116,7 +117,7 @@ function App() {
               <Route
                 path="/inventory-stock"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.inventorystock_page}>
                     <Navbar title="Inventory Stock">
                       <InventoryStockListPage />
                     </Navbar>
@@ -126,7 +127,7 @@ function App() {
               <Route
                 path="/projects"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.project_page}>
                     <Navbar title="Projects">
                       <ProjectListPage />
                     </Navbar>
@@ -136,7 +137,7 @@ function App() {
               <Route
                 path="/projects/:id"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.project_page}>
                     <Navbar title="Projects Details">
                       <ProjectDetails />
                     </Navbar>
@@ -146,7 +147,7 @@ function App() {
               <Route
                 path="/purchase-orders"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.purchaseorder_page}>
                     <Navbar title="Purchase Orders">
                       <PurchaseListPage />
                     </Navbar>
@@ -156,7 +157,7 @@ function App() {
               <Route
                 path="/purchase-orders/:id"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.purchaseorder_page}>
                     <Navbar title="Purchase Order">
                       <PurchaseDetailPage />
                     </Navbar>
@@ -166,7 +167,7 @@ function App() {
               <Route
                 path="/sales-orders"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.salesorders_page}>
                     <Navbar title="Sales Orders">
                       <SalesListPage />
                     </Navbar>
@@ -176,7 +177,7 @@ function App() {
               <Route
                 path="/sales-orders/:id"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.salesorders_page}>
                     <Navbar title="Sales Order">
                       <SalesDetailPage />
                     </Navbar>
@@ -186,7 +187,7 @@ function App() {
               <Route
                 path="/stock-counts"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.stockcount_page}>
                     <Navbar title="Stock Counts">
                       <StockCountListPage />
                     </Navbar>
@@ -196,7 +197,7 @@ function App() {
               <Route
                 path="/stock-counts/:id"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.stockcount_page}>
                     <Navbar title="Stock Count">
                       <StockCountDetailPage />
                     </Navbar>
@@ -206,7 +207,7 @@ function App() {
               <Route
                 path="/users"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.users_page}>
                     <Navbar title="Users">
                       <UserListPage />
                     </Navbar>
@@ -216,7 +217,7 @@ function App() {
               <Route
                 path="/users/:id"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.users_page}>
                     <Navbar title="User Details">
                       <UserDetailPage />
                     </Navbar>
@@ -226,7 +227,7 @@ function App() {
               <Route
                 path="/product-types"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.producttypes_page}>
                     <Navbar title="Product Types">
                       <ProductTypeListPage />
                     </Navbar>
@@ -236,7 +237,7 @@ function App() {
               <Route
                 path="/product-types/:id"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.producttypes_page}>
                     <Navbar title="Product Type Details">
                       <ProductTypeDetailPage />
                     </Navbar>
@@ -246,7 +247,7 @@ function App() {
               <Route
                 path="/customers"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.customers_page}>
                     <Navbar title="Customers">
                       <CustomerListPage />
                     </Navbar>
@@ -256,7 +257,7 @@ function App() {
               <Route
                 path="/customers/:id"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.customers_page}>
                     <Navbar title="Customer Details">
                       <CustomerDetailPage />
                     </Navbar>
@@ -266,7 +267,7 @@ function App() {
               <Route
                 path="/suppliers"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.suppliers_page}>
                     <Navbar title="Suppliers">
                       <SupplierListPage />
                     </Navbar>
@@ -276,7 +277,7 @@ function App() {
               <Route
                 path="/suppliers/:id"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.suppliers_page}>
                     <Navbar title="Supplier Details">
                       <SupplierDetailPage />
                     </Navbar>
@@ -286,7 +287,7 @@ function App() {
               <Route
                 path="/batching"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.batching_page}>
                     <Navbar title="Batching">
                       <BatchingListPage />
                     </Navbar>
@@ -296,7 +297,7 @@ function App() {
               <Route
                 path="/batching/:id"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.batching_page}>
                     <Navbar title="Batching">
                       <BatchingDetailPage />
                     </Navbar>
@@ -306,7 +307,7 @@ function App() {
               <Route
                 path="/products"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.products_page}>
                     <Navbar title="Products">
                       <ProductListPage />
                     </Navbar>
@@ -316,7 +317,7 @@ function App() {
               <Route
                 path="/development"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.development_page}>
                     <Navbar title="Development">
                       <FormulaListPage />
                     </Navbar>
@@ -327,7 +328,7 @@ function App() {
               <Route
                 path="/products/:id/:tab_id?"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.products_page}>
                     <Navbar title="Product Details">
                       <ProductDetailPage />
                     </Navbar>
@@ -338,7 +339,7 @@ function App() {
               <Route
                 path="/formula/:id/:version"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.development_page}>
                     <Navbar title="Formula Page">
                       <FormulaPage />
                     </Navbar>
@@ -349,7 +350,7 @@ function App() {
               <Route
                 path="/formula/develop/:id/:version"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.development_page}>
                     <Navbar title="Formula Development Page">
                       <FormulaDevPage />
                     </Navbar>
@@ -360,7 +361,7 @@ function App() {
               <Route
                 path="/forecast"
                 element={
-                  <RequireAuth>
+                  <RequireAuth permission={PERMISSIONS.forecast_page}>
                     <Navbar title="Forecast Calculator">
                       <ForecastPage />
                     </Navbar>
