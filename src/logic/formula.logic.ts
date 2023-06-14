@@ -30,7 +30,7 @@ const api = axios.create({
 
 export const getFormula = async (
   id: string,
-  version: number
+  version?: number | null
 ): Promise<IFormula | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },

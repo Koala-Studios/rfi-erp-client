@@ -32,11 +32,11 @@ export const InventoryMovementPage = () => { //WILL BE USED FOR BOTH MATERIALS A
   const columns: GridColDef[] = [
     { field: "product_code", headerName: "Item Code", width: 120 },
     { field: "lot_number", headerName: "Lot Number", width: 300 },
-    { field: "module_source", headerName: "Mvmt Source", width: 120, align: "center" },
-    { field: "movement_target_type", headerName: "Mvmt Type", width: 100, align: "center" },
+    { field: "module_source", headerName: "Source", width: 120, align: "center" },
+    { field: "movement_target_type", headerName: "Type", width: 100, align: "center" },
     { field: "amount", headerName: "Amount", width: 150, align: "right", valueGetter: (params) => params.row.amount.toFixed(5) },
-    { field: "movement_date", headerName: "Movement Date", width: 120, align: "center", valueGetter: (params) => params.row.movement_date.split('T')[0] },
-    { field: "movement_time", headerName: "Movement Time", width: 120, align: "center", valueGetter: (params) => params.row.movement_date.split('T')[1].split('.')[0]},
+    { field: "movement_date", headerName: "Date", width: 120, align: "center", valueGetter: (params) => params.row.movement_date.split('T')[0] },
+    { field: "movement_time", headerName: "Time", width: 120, align: "center", valueGetter: (params) => params.row.movement_date.split('T')[1].split('.')[0]},
     
   ];
 

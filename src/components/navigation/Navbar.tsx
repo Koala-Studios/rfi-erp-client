@@ -50,6 +50,7 @@ import NotificationMenu from "../menus/NotificationMenu";
 import CategoryIcon from "@mui/icons-material/Category";
 import PERMISSIONS from "../../logic/config.permissions";
 import { hasPermission } from "../../logic/user.logic";
+import LocationOnIcon from '@mui/icons-material/LocationOn';
 
 const drawerWidth = 190;
 
@@ -143,6 +144,12 @@ let LinkItems = [
     link: "/product-types",
     icon: <CategoryIcon></CategoryIcon>,
     permission: PERMISSIONS.producttypes_page,
+  },
+  {
+    text: "Stock Locations",
+    link: "/locations",
+    icon: <LocationOnIcon></LocationOnIcon>,
+    permission: PERMISSIONS.inventorystock_page,
   },
 ];
 

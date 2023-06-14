@@ -26,6 +26,7 @@ import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
 import LinkTab from "../../components/utils/LinkTab";
 import NavTab from "../../components/utils/NavTab";
 import InventoryMovementPage from "../inventory/InventoryMovementPage";
+import ProductFormulaPage from "./ProductFormulaPage";
 
 
 const ProductStatus = [
@@ -438,11 +439,14 @@ export const ProductDetailPage = () => {
         
         <LinkTab label="Customers" href="customers" tab_id={tab_id} disable={id === 'new'} />
         <LinkTab label="Movements" href= "movements" tab_id={tab_id} disable={id === 'new'}/>
-        <LinkTab label="Usage Stats" href="stats" tab_id={tab_id} disable={id === 'new'} />
+        <LinkTab label="Usage Stats"  href="stats" tab_id={tab_id} disable={true} />
       </NavTab>
       {
           (tab_id && tab_id === "movements" && 
-            <InventoryMovementPage/>)
+            <InventoryMovementPage/>) ||
+          (tab_id && tab_id === "formula" &&
+          <ProductFormulaPage/>
+          )
       }
     </>
   ); 

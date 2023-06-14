@@ -45,6 +45,8 @@ import ProductTypeListPage from "./pages/product-type/ProductTypeListPage";
 import { InventoryDetailPage } from "./pages/inventory/InventoryDetailPage";
 import MaterialListPage from "./pages/inventory/MaterialListPage";
 import InventoryMovementPage from "./pages/inventory/InventoryMovementPage";
+import LocationListPage from "./pages/location/LocationListPage";
+import { LocationDetailPage } from "./pages/location/LocationDetailPage";
 
 const mainTheme = createTheme({
   palette: {
@@ -219,6 +221,26 @@ function App() {
                   <RequireAuth>
                     <Navbar title="User Details">
                       <UserDetailPage />
+                    </Navbar>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/locations"
+                element={
+                  <RequireAuth>
+                    <Navbar title="Locations">
+                      <LocationListPage />
+                    </Navbar>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/locations/:id"
+                element={
+                  <RequireAuth>
+                    <Navbar title="Location Details">
+                      <LocationDetailPage />
                     </Navbar>
                   </RequireAuth>
                 }
