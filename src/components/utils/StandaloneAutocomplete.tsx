@@ -5,28 +5,32 @@ import { AuthContext } from "../navigation/AuthProvider";
 
 interface Props {
   initialValue: any;
-
+  inputRef?: any;
+  onBlur?: any;
+  error?: boolean;
+  required?: boolean;
+  helperText?: string;
   getOptionLabel: (option: any) => string;
   label: string;
-  readOnly?:boolean;
+  readOnly?: boolean;
   placeholder?: string;
   letterMin: number;
   groupBy?: (option: any) => string;
   dbOption:
-  | "customer"
-  | "supplier"
-  | "inventory-stock"
-  | "inventory"// all products and materials
-  | "material" // not for sale
-  | "raw-mat" //is raw, not for sale
-  | "non-raw-mat" //is not raw, not for sale
-  | "product" //for sale
-  | "approved-product" //approved and for sale
-  | "approved-product-all" //for sale and not for sale, just approved that matters
-  | "user"
-  | "product-type"
-  | "product-type-mat"
-  | "product-type-raw";
+    | "customer"
+    | "supplier"
+    | "inventory-stock"
+    | "inventory" // all products and materials
+    | "material" // not for sale
+    | "raw-mat" //is raw, not for sale
+    | "non-raw-mat" //is not raw, not for sale
+    | "product" //for sale
+    | "approved-product" //approved and for sale
+    | "approved-product-all" //for sale and not for sale, just approved that matters
+    | "user"
+    | "product-type"
+    | "product-type-mat"
+    | "product-type-raw";
   onChange?: (event: React.SyntheticEvent<Element, Event>, value: any) => void;
 }
 
@@ -39,7 +43,12 @@ const StandaloneAutocomplete: React.FC<Props> = ({
   groupBy,
   getOptionLabel,
   initialValue,
-  readOnly = false
+  readOnly = false,
+  inputRef,
+  error,
+  helperText,
+  required,
+  onBlur,
 }) => {
   const [optionList, setOptionList] = React.useState<any>([]);
   const auth = React.useContext(AuthContext);
@@ -64,7 +73,9 @@ const StandaloneAutocomplete: React.FC<Props> = ({
   return (
     <Autocomplete
       value={initialValue}
-      isOptionEqualToValue={(option, value) => option._id === value || option._id === value._id}
+      isOptionEqualToValue={(option, value) =>
+        option._id === value || option._id === value._id
+      }
       clearOnBlur={true}
       blurOnSelect={false}
       readOnly={readOnly}
@@ -95,10 +106,16 @@ const StandaloneAutocomplete: React.FC<Props> = ({
       renderInput={(params) => {
         return (
           <TextField
+            inputRef={inputRef}
+            error={error}
+            onBlur={onBlur}
+            helperText={helperText}
+            required={required}
             label={label}
             variant="outlined"
             placeholder={placeholder}
             {...params}
+            InputLabelProps={{ shrink: true }}
             size="small"
           />
         );

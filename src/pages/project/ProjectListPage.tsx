@@ -13,6 +13,7 @@ import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { formTypes } from "../../logic/form.logic";
 import { FilterElement, IListData } from "../../logic/utils";
 import DataFilter from "../../components/utils/DataFilter";
+import { ExpandableDataTable } from "../../components/utils/ExpandableDataTable";
 
 const ProjectStatus = [
   ["Draft", "error"],
@@ -35,7 +36,6 @@ const ProjectListPage = () => {
     },
     { label: "Batch Code", field: "batch_code", type: "text" },
     { label: "Quantity", field: "quantity", type: "number", regexOption: null },
-  
   ];
   const columns: GridColDef[] = [
     { field: "project_code", headerName: "Code", width: 100 },

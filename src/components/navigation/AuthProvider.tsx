@@ -7,8 +7,14 @@ import {
 } from "react-router-dom";
 
 import { ISignIn, signIn } from "../../logic/auth.logic";
-import { IUser, loadUser, setupPermissions } from "../../logic/user.logic";
+import {
+  IUser,
+  hasPermission,
+  loadUser,
+  setupPermissions,
+} from "../../logic/user.logic";
 import { socketDisconnect, initClientSocket } from "../../logic/user.socket";
+import NoAccessPage from "../../pages/no-access/NoAccessPage";
 
 interface AuthContextType {
   token: any;
@@ -112,7 +118,15 @@ function useAuth() {
   return React.useContext(AuthContext);
 }
 
-export const RequireAuth = ({ children }: { children: JSX.Element }) => {
+interface RequireAuthProps {
+  children: JSX.Element;
+  permission: string;
+}
+
+export const RequireAuth: React.FC<RequireAuthProps> = ({
+  permission,
+  children,
+}) => {
   let auth = useAuth();
   let location = useLocation();
   const navigate = useNavigate();
@@ -127,6 +141,10 @@ export const RequireAuth = ({ children }: { children: JSX.Element }) => {
     // along to that page after they login, which is a nicer user experience
     // than dropping them off on the home page.
     return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  if (!hasPermission(auth.user!, permission)) {
+    return <NoAccessPage />;
   }
 
   return children;

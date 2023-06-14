@@ -1,5 +1,4 @@
 import React from "react";
-import { DataTable } from "../../components/utils/DataTable";
 import {
   GridColDef,
   GridRenderCellParams,
@@ -7,33 +6,15 @@ import {
 } from "@mui/x-data-grid";
 import { listInventoryStock } from "../../logic/inventory-stock.logic";
 import { AuthContext } from "../../components/navigation/AuthProvider";
-import {
-  Box,
-  Button,
-  Card,
-  Collapse,
-  IconButton,
-  Pagination,
-  Paper,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
-  Typography,
-} from "@mui/material";
+import { Button, Card } from "@mui/material";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { setTokenSourceMapRange } from "typescript";
 import { FilterElement, IListData } from "../../logic/utils";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import {
   IInventoryStock,
   IInventoryStockGrouped,
 } from "../../logic/inventory-stock.logic";
 import DataFilter from "../../components/utils/DataFilter";
-import TablePagination from "@mui/material/TablePagination";
+import { ExpandableDataTable } from "../../components/utils/ExpandableDataTable";
 
 const filterArray: FilterElement[] = [
   {
@@ -45,119 +26,6 @@ const filterArray: FilterElement[] = [
   { label: "Product Name", field: "name", type: "text" },
 ];
 
-const ExpandableRow = (props: { row: IInventoryStockGrouped }) => {
-  const row = props.row;
-  const [open, setOpen] = React.useState(false);
-
-  return (
-    //THIS IS FOR TEST OF CONCEPT, WILL BE CHANGED!!!
-    <>
-      <TableRow
-        sx={{
-          "& > *": { borderBottom: "none!important" },
-        }}
-      >
-        <TableCell sx={{ p: 0.7 }} width={50}>
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}
-          >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </TableCell>
-        <TableCell sx={{ p: 1 }} width={120}>
-          <Typography variant="subtitle2">{row.product_code}</Typography>
-        </TableCell>
-        <TableCell sx={{ p: "0px 16px", width: "35%" }}>
-          <Typography variant="subtitle2">{row.name}</Typography>
-        </TableCell>
-        <TableCell sx={{ p: 1 }}>{row.average_cost}</TableCell>
-        <TableCell sx={{ p: 1 }}>{row.received_amount}</TableCell>
-        <TableCell sx={{ p: 1 }}>{row.used_amount}</TableCell>
-        <TableCell sx={{ p: 1 }}>{row.allocated_amount}</TableCell>
-        <TableCell sx={{ p: 1 }}>{row.quarantined_containers}</TableCell>
-      </TableRow>
-      <TableRow>
-        <TableCell
-          sx={{ p: 0 }}
-          // style={{ paddingBottom: 0, paddingTop: 0 }}
-          colSpan={8}
-        >
-          <Collapse
-            in={open}
-            timeout="auto"
-            unmountOnExit
-            sx={{ background: "#ebedf0", pl: 3.5 }}
-          >
-            <Box sx={{ margin: 1, p: "0 16px" }}>
-              <Table size="small" aria-label="purchases">
-                <TableHead>
-                  <TableRow>
-                    <TableCell sx={{ p: 1 }}>Lot#</TableCell>
-                    <TableCell sx={{ p: 1 }}>Supplier</TableCell>
-                    <TableCell sx={{ p: 1 }}>Unit Cost ($/KG)</TableCell>
-                    <TableCell sx={{ p: 1 }}>Received Amt</TableCell>
-                    <TableCell sx={{ p: 1 }}>Container Size</TableCell>
-                    <TableCell sx={{ p: 1 }}>Used Amt</TableCell>
-                    <TableCell sx={{ p: 1 }}>Allocated Amt</TableCell>
-                    <TableCell sx={{ p: 1 }}>Qrntn Amt</TableCell>
-                    <TableCell sx={{ p: 1 }}>Received Date</TableCell>
-                    <TableCell sx={{ p: 1 }}>Expiry Date</TableCell>
-                    <TableCell sx={{ p: 1 }}>Notes</TableCell>
-                    <TableCell sx={{ p: 1 }}>Extensions</TableCell>
-                    <TableCell sx={{ p: 1 }}>Supplier SKU#</TableCell>
-                    {/*//TODO: QC stuff */}
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {row.items.map((item: IInventoryStock) => (
-                    <TableRow key={item._id.toString()}>
-                      <TableCell sx={{ p: 1 }} width={120}>
-                        {item.lot_number}
-                      </TableCell>
-                      <TableCell sx={{ p: 1 }}>
-                        <Typography variant="subtitle2">
-                          {item.supplier_code}
-                        </Typography>
-                      </TableCell>
-                      <TableCell sx={{ p: 1 }}>
-                        {(item.unit_cost + 0).toFixed(2)}
-                      </TableCell>
-                      <TableCell sx={{ p: 1 }}>
-                        {item.received_amount}
-                      </TableCell>
-                      <TableCell sx={{ p: 1 }}>{item.container_size}</TableCell>
-                      <TableCell sx={{ p: 1 }}>{item.used_amount}</TableCell>
-                      <TableCell sx={{ p: 1 }}>
-                        {item.allocated_amount}
-                      </TableCell>
-                      <TableCell sx={{ p: 1 }}>
-                        {item.quarantined_containers}
-                      </TableCell>
-                      <TableCell sx={{ p: 1 }} width={120}>
-                        {item.received_date}
-                      </TableCell>
-                      <TableCell sx={{ p: 1 }} width={120}>
-                        {item.expiry_date}
-                      </TableCell>
-                      <TableCell sx={{ p: 1 }}>{item.notes}</TableCell>
-                      <TableCell sx={{ p: 1 }}>
-                        {item.extensions.length}
-                      </TableCell>
-                      <TableCell sx={{ p: 1 }}>{item.supplier_sku}</TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </Box>
-          </Collapse>
-        </TableCell>
-      </TableRow>
-    </>
-  );
-};
-
 const InventoryStockListPage = () => {
   const navigate = useNavigate();
   const [open, setOpen] = React.useState(false);
@@ -166,43 +34,36 @@ const InventoryStockListPage = () => {
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   const columns: GridColDef[] = [
-    { field: "product_id", headerName: "Item Code", width: 120 },
-    { field: "name", headerName: "Item Name", width: 300 },
-    { field: "cost", headerName: "Cost/KG", width: 100, align: "right" },
-    { field: "on_hand", headerName: "On Hand", width: 100, align: "right" },
+    { field: "product_id", headerName: "Product Code", width: 100 },
+    { field: "name", headerName: "Name", width: 100 },
+    { field: "average_cost", headerName: "Avg Cost ($/KG)", width: 100 },
+    { field: "received_amount", headerName: "Received Amount", width: 100 },
+    { field: "used_amount", headerName: "Used Amount", width: 100 },
+    { field: "allocated_amount", headerName: "Allocated Amount", width: 100 },
     {
-      field: "reorder_amount",
-      headerName: "Reorder Amt",
+      field: "quarantined_containers",
+      headerName: "Quarantined Containers",
       width: 100,
-      align: "right",
     },
-    { field: "ordered", headerName: "Ordered", width: 100, align: "right" },
+  ];
+  const sub_columns: GridColDef[] = [
+    { field: "lot_number", headerName: "Lot#", width: 100 },
+    { field: "supplier_code", headerName: "Supplier", width: 100 },
+    { field: "unit_cost", headerName: "Unit Cost ($/KG)", width: 100 },
+    { field: "received_amount", headerName: "Received Amt", width: 100 },
+    { field: "allocated_amount", headerName: "Container Size", width: 100 },
+    { field: "quarantined_containers", headerName: "Used Amt", width: 100 },
+    { field: "allocated_amount", headerName: "Allocated Amt", width: 100 },
+    { field: "allocated_amount", headerName: "Qrntn Amt", width: 100 },
+    { field: "received_date", headerName: "Received Date", width: 120 },
+    { field: "expiry_date", headerName: "Expiry Date", width: 120 },
+    { field: "allocated_amount", headerName: "Notes", width: 120 },
+    { field: "extensions", headerName: "Extensions", width: 120 },
+    { field: "supplier_sku", headerName: "Supplier SKU#", width: 120 },
     {
-      field: "quarantined",
-      headerName: "Quarantined",
-      width: 100,
-      align: "right",
-    },
-    { field: "allocated", headerName: "Allocated", width: 100, align: "right" },
-    {
-      field: "id",
-      headerName: "Actions",
-      align: "left",
+      field: "quarantined_containers",
+      headerName: "Quarantined Containers",
       width: 120,
-      renderCell: (params: GridRenderCellParams<string>) => (
-        <strong>
-          <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            onClick={() =>
-              navigate(`/products/${params.value}`, { replace: false })
-            }
-          >
-            View Details
-          </Button>
-        </strong>
-      ),
     },
   ];
 
@@ -223,7 +84,7 @@ const InventoryStockListPage = () => {
           used_amount: item.used_amount,
           allocated_amount: item.allocated_amount,
           quarantined_containers: item.quarantined_containers,
-          items: item.items.map((container: IInventoryStock) => {
+          sub_rows: item.items.map((container: IInventoryStock) => {
             return {
               _id: container._id,
               product_id: container.product_id,
@@ -275,74 +136,13 @@ const InventoryStockListPage = () => {
       <div
         style={{ height: "calc(100% - 140px)", maxHeight: "calc(100% - 85px)" }}
       >
-        <TableContainer
-          component={Paper}
-          style={{
-            width: "100%",
-            minHeight: 100,
-            height: "100%",
-            border: "1px solid #c9c9c9",
-            borderRadius: "5px 5px 0 0",
-          }}
-        >
-          <Table
-            aria-label="collapsible table"
-            style={{ position: "relative" }}
-          >
-            <TableHead
-              style={{
-                position: "sticky",
-                top: 0,
-                background: "white",
-                boxShadow: "0 1px 0 0 #e1e1e1",
-                zIndex: 10,
-              }}
-            >
-              <TableRow
-                sx={{
-                  maxHeight: 50,
-                  height: 50,
-                }}
-              >
-                <TableCell sx={{ p: 1 }} />
-                <TableCell sx={{ p: 1 }}>Product Code</TableCell>
-                <TableCell sx={{ p: 1 }}>Name</TableCell>
-                <TableCell sx={{ p: 1 }}>Avg Cost ($/KG)</TableCell>
-                <TableCell sx={{ p: 1 }}>Received Amount</TableCell>
-                <TableCell sx={{ p: 1 }}>Used Amount</TableCell>
-                <TableCell sx={{ p: 1 }}>Allocated Amount</TableCell>
-                <TableCell sx={{ p: 1 }}>Quarantined Containers</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody style={{ overflowY: "scroll" }}>
-              {dataOptions.rows.map((row: IInventoryStockGrouped) => (
-                <ExpandableRow key={row.name} row={row} />
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        <Pagination
-          color="primary"
-          count={15}
-          page={dataOptions.listOptions.page}
-          shape="rounded"
-          variant="outlined"
-          sx={{
-            p: 1,
-            borderRadius: "0 0 5px 5px",
-            background: "white",
-            border: "1px solid #c9c9c9",
-            borderTop: "none",
-            ul: { justifyContent: "end" },
-          }}
-        />
+        <ExpandableDataTable
+          rows={dataOptions.rows}
+          columns={columns}
+          sub_columns={sub_columns}
+          listOptions={dataOptions.listOptions}
+        ></ExpandableDataTable>
       </div>
-      {/* <DataTable
-      rows={dataOptions.rows}
-      columns={columns}
-      listOptions={dataOptions.listOptions}
-    ></DataTable> */}
     </>
   );
 };

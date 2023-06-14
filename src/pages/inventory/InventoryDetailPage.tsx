@@ -48,7 +48,8 @@ const emptyInventory: IInventory = {
     average_price: 0,
     reorder_amount: 0,
   },
-  regulatory: { //TODO: ADD OTHER FIELDS HERE!!
+  regulatory: {
+    //TODO: ADD OTHER FIELDS HERE!!
     fda_status: "",
     cpl_hazard: "",
     fema_number: 0,
@@ -72,6 +73,7 @@ let savedInventory: IInventory | null = null;
 const inputRefMap = {
   name: 0,
   date_created: 1,
+  material_type: 2,
   // product_code: 2,
   //product_type:3
 };
@@ -82,6 +84,11 @@ const inputMap: InputInfo[] = [
     label: "date_created",
     ref: 1,
     validation: { required: true, genericVal: "Date" },
+  },
+  {
+    label: "material_type",
+    ref: 2,
+    validation: { required: true, genericVal: "Text" },
   },
   // { label: "product_code", ref: 2, validation: { required: false, genericVal: "Text" } },
   // { label: "product_type", ref: 3, validation: { required: false, genericVal: "Text" } },
@@ -100,10 +107,7 @@ export const InventoryDetailPage = () => {
     Array(inputMap.length).fill({ helperText: "", error: false })
   );
 
-  const onInputBlur = (
-    event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement, Element>,
-    input: InputInfo
-  ) => {
+  const onInputBlur = (event: any, input: InputInfo) => {
     const _input = inputRefs.current[input.ref];
 
     const inputVal = isValid(_input.value, inputMap[input.ref].validation);
@@ -136,7 +140,7 @@ export const InventoryDetailPage = () => {
       setInventory(emptyInventory);
     } else {
       getInventory(id!).then((p) => {
-        console.log(p, 'test')
+        console.log(p, "test");
         savedInventory = p;
         setInventory(p!);
         // setInventorySaved(true);
@@ -224,20 +228,26 @@ export const InventoryDetailPage = () => {
         onSave={saveInventory}
         onCancel={cancelSaveInventory}
       ></SaveForm>
-      <Card variant="outlined" style={{ padding:16, marginBottom: 10 }}>
-        <div style={{display:'flex', marginLeft:5, marginBottom:15}}>
+      <Card variant="outlined" style={{ padding: 16, marginBottom: 10 }}>
+        <div style={{ display: "flex", marginLeft: 5, marginBottom: 15 }}>
           <Button
-              aria-label="go back"
-              size="medium"
-              variant="outlined"
-              onClick={() => navigate('/inventory')}
-            >
-              <ArrowBackIcon fontSize="small" />
-            </Button>
-
+            aria-label="go back"
+            size="medium"
+            variant="outlined"
+            onClick={() => navigate("/inventory")}
+          >
+            <ArrowBackIcon fontSize="small" />
+          </Button>
         </div>
 
-        <div style={{ display: "flex", gap: 16, marginBottom: 10, maxWidth:'70%' }}>
+        <div
+          style={{
+            display: "flex",
+            gap: 16,
+            marginBottom: 10,
+            maxWidth: "70%",
+          }}
+        >
           <Grid container spacing={3}>
             <Grid item xs={2}>
               <TextField
@@ -290,10 +300,23 @@ export const InventoryDetailPage = () => {
             <Grid item xs={3}>
               <StandaloneAutocomplete
                 initialValue={inventory.product_type}
-                readOnly={!isNewId}
-                onChange={(e, value) => {
+                inputRef={(el: any) =>
+                  (inputRefs.current[inputRefMap.material_type] = el)
+                }
+                error={inputVisuals[inputRefMap.material_type].error}
+                helperText={inputVisuals[inputRefMap.material_type].helperText}
+                onChange={(event, value) => {
                   setInventory({ ...inventory, product_type: value });
+                  // onInputBlur(event, inputMap[inputRefMap.material_type]);
                 }}
+                onBlur={(event: any) =>
+                  onInputBlur(event, inputMap[inputRefMap.material_type])
+                }
+                required={
+                  inputMap[inputRefMap.material_type].validation.required
+                }
+                readOnly={!isNewId}
+                // onChange={(e, value) => {}}
                 label={"Material Type"}
                 letterMin={0}
                 dbOption={"product-type-raw"}
@@ -374,14 +397,26 @@ export const InventoryDetailPage = () => {
         </div>
       </Card>
       <NavTab tab_id={tab_id}>
-        <LinkTab label="Suppliers" href="suppliers" tab_id={tab_id} disable={id === 'new'} />
-        <LinkTab label="Movements" href= "movements" tab_id={tab_id} disable={id === 'new'}/>
-        <LinkTab label="Usage Stats" href="stats" tab_id={tab_id} disable={id === 'new'}/>
+        <LinkTab
+          label="Suppliers"
+          href="suppliers"
+          tab_id={tab_id}
+          disable={id === "new"}
+        />
+        <LinkTab
+          label="Movements"
+          href="movements"
+          tab_id={tab_id}
+          disable={id === "new"}
+        />
+        <LinkTab
+          label="Usage Stats"
+          href="stats"
+          tab_id={tab_id}
+          disable={id === "new"}
+        />
       </NavTab>
-      {
-          (tab_id && tab_id === "movements" && 
-            <InventoryMovementPage/>)
-      }
+      {tab_id && tab_id === "movements" && <InventoryMovementPage />}
     </>
   );
 };
