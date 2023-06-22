@@ -36,6 +36,7 @@ import SaveForm from "../../components/forms/SaveForm";
 import StandaloneAutocomplete from "../../components/utils/StandaloneAutocomplete";
 import { ISupplier } from "../../logic/supplier.logic";
 import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
+import { ILocation } from "../../logic/location.logic";
 
 let savedPurchase: IPurchaseOrder | null = null;
 
@@ -314,6 +315,26 @@ export const PurchaseDetailPage = () => {
       align: "center",
     },
     {
+      field: "location",
+      headerName: "Location",
+      width: 140,
+      sortable: false,
+      filterable: false,
+      renderCell: (row_params: GridRenderCellParams<string>) => (
+        <TableAutocomplete
+        initialValue={row_params.row.location}
+          readOnly={purchase!.status === 6 || purchase!.status === 4}
+          dbOption="location"
+          handleEditRow={handleEditProductRow}
+          rowParams={row_params}
+          letterMin={0}
+          getOptionLabel={(item: ILocation) => item ?
+            `${item.code} | ${item.name}` : ''
+          }
+        />
+      ),
+    },
+    {
       field: "expiry_date", //TODO: Fix blur not putting value in so clicking button will say "missing fields :-(" (maybe make mini date choosing custom component)
       headerName: "Exp Date",
       type: "date",
@@ -384,8 +405,8 @@ export const PurchaseDetailPage = () => {
           handleEditRow={handleEditProductRow}
           rowParams={row_params}
           letterMin={3}
-          getOptionLabel={(item: IInventory) =>
-            `${item.product_code} | ${item.name}`
+          getOptionLabel={(item: IInventory) => item ?
+            `${item.product_code} | ${item.name}` : ''
           }
         />
       ),

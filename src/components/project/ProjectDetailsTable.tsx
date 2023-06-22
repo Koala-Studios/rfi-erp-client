@@ -186,8 +186,8 @@ export const ProjectDetailsTable: React.FC<Props> = ({
           initialValue={row_params.row.product_code + ' | ' + row_params.row.product_name}
           letterMin={3}
           getOptionLabel={(item) =>
-            item.product_code ?
-            `${item.product_code} | ${item.name}` : item
+            item ?
+            `${item.product_code} | ${item.name}` : ''
           }
         />
       ),

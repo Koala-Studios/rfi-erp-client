@@ -34,6 +34,7 @@ import {
 import { IProduct } from "../../logic/product.logic";
 import { padding } from "@mui/system";
 import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
+import { BatchingDataTable } from "./BatchingDataTable";
   
   let savedBatching: IBatching | null = null;
   
@@ -137,6 +138,7 @@ import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
     );
   
     const [rows, setRows] = React.useState<IBatchingIngredient[]>([]);
+    const [expandableRows, setExpandableRows] = React.useState<IBatchingIngredient[]>([]);
     const [receiveMode, setReceiveMode] = React.useState<boolean>(false);
   
     useEffect(() => {
@@ -169,7 +171,16 @@ import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
           setRows(
             p!.ingredients.map((item:IBatchingIngredient) => {
               item._id = item._id ? item._id : new ObjectID().toHexString();
+              
               return item;
+            })
+          );
+          setExpandableRows(
+            p!.ingredients.map((item:IBatchingIngredient) => {
+              return {...item,
+              _id: item._id ? item._id : new ObjectID().toHexString(),
+              sub_rows: [{id:'test1234123',container_id:'11314253241', lot_number:'Test123', amount_used:0},{id:'123123',container_id:'123513', lot_number:'142Test', amount_used:0}],
+            }
             })
           );
           setReceiveMode(p!.status <= 3);
@@ -244,6 +255,117 @@ import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
         headerName: "Remaining Qty",
         type: "number",
         width: 120,
+        align: "right",
+        editable: true,
+      },
+
+    ];
+
+    const expandableColumns: GridColDef[] = [
+      { field: "product_code", headerName: "Product Code", width: 125 },
+      {
+        field: "product_name",
+        headerName: "Product Name",
+        width:350,
+        sortable: false,
+        filterable: false,
+        renderCell: (row_params: GridRenderCellParams<string>) => (
+          <TableAutocomplete
+            dbOption="material"
+            handleEditRow={handleEditProductRow}
+            rowParams={row_params}
+            initialValue={row_params.row.product_name}
+            letterMin={3}
+            getOptionLabel={(item: IInventory) =>
+              `${item.product_code} | ${item.name}`
+            }
+          />
+        ),
+      },
+      {
+        field:'blank'
+      },
+      {
+        field: "required_amount",
+        headerName: "Required Qty",
+        type: "number",
+        width: 160,
+        align: "right",
+        editable: false,
+      },
+      {
+        field: "remaining_amount",
+        headerName: "Remaining Qty",
+        type: "number",
+        width: 160,
+        align: "right",
+        editable: true,
+      },
+      {
+        field: "used_amount",
+        headerName: "Total Used Qty",
+        type: "number",
+        width: 160,
+        align: "right",
+        editable: true,
+      },
+    ];
+    const sub_columns: GridColDef[] = [
+      {
+        field: "id",
+        headerName: "Actions",
+        align: "left",
+        width: 130,
+        renderCell: (params: GridRenderCellParams<string>) => (
+          <strong>
+            <Button
+              variant="outlined"
+              color="error"
+              size="small"
+              style={{
+                backgroundColor: "#ff221115",
+                fontSize: "25px",
+                maxWidth: "40px",
+                maxHeight: "30px",
+                minWidth: "40px",
+                minHeight: "30px",
+                marginRight: "12px",
+              }}
+              onClick={() => handleDeleteRow(params.row._id)}
+            >
+              -
+            </Button>
+            <Button
+              variant="outlined"
+              color="info"
+              size="small"
+              style={{
+                backgroundColor: "#1144ff15",
+                fontSize: "19px",
+                maxWidth: "40px",
+                maxHeight: "30px",
+                minWidth: "40px",
+                minHeight: "30px",
+              }}
+              onClick={() => handleAddRow()}
+            >
+              +
+            </Button>
+          </strong>
+        ),
+      },
+      {
+        field: "lot_number",
+        headerName: "Lot Number",
+        width: 150,
+        align: "right",
+        editable: true,
+      },
+      {
+        field: "amount_used",
+        headerName: "Qty Used",
+        type: "number",
+        width: 150,
         align: "right",
         editable: true,
       },
@@ -334,20 +456,10 @@ import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
     //   ]);
     // };
   
-    // const handleAddRow = () => {
-    //   setRows([
-    //     {
-    //       _id: new ObjectID().toHexString(),
-    //       product_id: "",
-    //       product_code: "",
-    //       product_name: "",
-    //       required_amount: 0,
-    //       used_amount: 0
-    //     },
-    //     ...rows.slice(0),
-    //   ]);
-    //   console.log(rows);
-    // };
+    const handleAddRow = () => {
+      
+      console.log(rows);
+    };
   
     const saveBatching = async () => {
       
@@ -625,7 +737,7 @@ import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
             </Card>
           </div>
         </Card>
-        <Card variant="outlined" sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
+        {/* <Card variant="outlined" sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
           <DataGrid
             autoHeight={true}
             rowHeight={46}
@@ -678,132 +790,15 @@ import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
               console.log("test", rows);
             }}
           ></DataGrid>
-        </Card>
+        </Card> */}
         <Card sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
-        <TableContainer component={Paper}>
-        <Table           style={{
-            width: "100%",
-            minHeight: 100,
-            height: "100%",
-            padding:16,
-            border: "1px solid #c9c9c9",
-            borderRadius: "5px 5px 0 0",
-          }}
-          aria-label="spanning table">
 
-          <TableHead
-              style={{
-                position: "sticky",
-                top: 0,
-                background: "white",
-                boxShadow: "0 1px 0 0 #e1e1e1",
-                zIndex: 10,
-              }}
-            >
-              <TableRow
-                sx={{
-                  maxHeight: 50,
-                  height: 50,
-                }}
-              >
-              <TableCell sx={{ p:1, width:150 }}>Product Code</TableCell>
-              <TableCell sx={{ p:1, width:300}}>Product Name</TableCell>
-              <TableCell sx={{p:1, width: 120 }} >Total Req Quantity</TableCell>
-              <TableCell sx={{p:1, width: 120 }} >Used Qty.</TableCell>
-              <TableCell></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {rows.map((row) => (
-                <>
-              <TableRow key={'test'}>
-                <TableCell sx={{ p: 1 }} ><Typography variant="subtitle2">{row.product_code} </Typography></TableCell>
-                <TableCell sx={{ p: 1 }} ><Typography variant="subtitle2">{row.product_name} </Typography></TableCell>
-                <TableCell sx={{ p: 1 }} ><Typography variant="subtitle2">{row.required_amount}</Typography></TableCell>
-                
-                <TableCell sx={{ p: 1 }}>{0}</TableCell>
-              </TableRow>
-            <TableRow>
-              <TableCell sx={{ p: 1 }} rowSpan={2}>
-                    
-                    <TextField
-                        onChange={(e) =>
-                          setBatching({
-                            ...batching,
-                            quantity: parseFloat(e.target.value),
-                          })
-                        }
-                        fullWidth
-                        sx={{width:120}}
-                        InputLabelProps={{ shrink: true }}
-                        size="small"
-                        variant="standard"
-                        type={"text"}
-                        value={'LOT012TEST'}
-                    ></TextField>
-                </TableCell>
-              <TableCell sx={{ p: 1, width:80 }} >
-                
-                <TextField
-                    onChange={(e) =>
-                      setBatching({
-                        ...batching,
-                        quantity: parseFloat(e.target.value),
-                      })
-                    }
-                    fullWidth
-                    sx={{width:60}}
-                    InputLabelProps={{ shrink: true }}
-                    size="small"
-                    variant="standard"
-                    type={"number"}
-                    value={(Math.random()*10).toPrecision(4)}
-                  ></TextField>
-                </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell sx={{ p: 1 }}>
-                    
-                    <TextField
-                        onChange={(e) =>
-                          setBatching({
-                            ...batching,
-                            quantity: parseFloat(e.target.value),
-                          })
-                        }
-                        fullWidth
-                        sx={{width:120}}
-                        InputLabelProps={{ shrink: true }}
-                        size="small"
-                        variant="standard"
-                        type={"text"}
-                        value={'LOT013TEST2'}
-                    ></TextField>
-                </TableCell>
-              <TableCell sx={{ p: 1, width:80 }}>
-                
-                <TextField
-                    onChange={(e) =>
-                      setBatching({
-                        ...batching,
-                        quantity: parseFloat(e.target.value),
-                      })
-                    }
-                    fullWidth
-                    sx={{width:60}}
-                    InputLabelProps={{ shrink: true }}
-                    size="small"
-                    variant="standard"
-                    type={"number"}
-                    value={(Math.random()*10).toPrecision(4)}
-                  ></TextField>
-                </TableCell>
-            </TableRow>
-            </>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+
+        <BatchingDataTable
+          rows={expandableRows!}
+          columns={expandableColumns}
+          sub_columns={sub_columns}
+        ></BatchingDataTable>
         </Card>
       </>
     );

@@ -37,6 +37,7 @@ import {
 import { IInventoryStock } from "../../logic/inventory-stock.logic";
 import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
 import Battery0BarTwoToneIcon from '@mui/icons-material/Battery0BarTwoTone';
+import { ILocation } from "../../logic/location.logic";
 let savedStockCount: IStockCount | null = null;
 
 const StockCountStatus = [
@@ -679,7 +680,24 @@ const inputMap: InputInfo[] = [
         {/* <div style={{ display: "flex", flexDirection: "row", gap: 10 }}> */}
         <Grid container spacing={3} sx={{mb:3}}>
         <Grid item xs={2}>
-        <Button variant="contained">Import Bin</Button>
+        <StandaloneAutocomplete
+            initialValue={selectedContainer}
+            readOnly={stockCount.status!= 1}
+            onChange={(e, value) => {
+              setSelectedContainer(value)
+            }}
+            label={"Location Lookup"}
+            letterMin={0}
+            dbOption={"location"}
+            getOptionLabel={(item: ILocation) => {
+              return (
+                item.code + ' | ' + item.name + ' | Containers: ' + item.total_containers
+              );
+            }}
+          />
+        </Grid>  
+        <Grid item xs={2}>
+        <Button variant="contained">Import Location</Button>
         </Grid>  
         <Grid item xs={2}>
         <Button color="info" variant="contained" onClick={() => handlefillAllStockCount()}>Import All</Button>
@@ -729,7 +747,7 @@ const inputMap: InputInfo[] = [
               variant="outlined"
               label={"Total in Inv"}
               //@ts-ignore
-              value={selectedContainer ? (selectedContainer?.product_id.stock.on_hand).toFixed(4) : 0}
+              // value={selectedContainer ? (selectedContainer?.product_id.stock.on_hand).toFixed(4) : 0}
             />
             </Grid>
         <Grid item xs={1}>

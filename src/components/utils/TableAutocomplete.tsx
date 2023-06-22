@@ -19,6 +19,7 @@ interface Props {
   | "user"
   | "product-type"
   | "product-type-mat"
+  | "location"
   | "product-type-raw";
   handleEditRow: (id: string, newItem: any) => void;
   readOnly?:boolean,

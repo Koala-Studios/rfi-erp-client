@@ -34,7 +34,7 @@ const InventoryStockListPage = () => {
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
   const columns: GridColDef[] = [
-    { field: "product_id", headerName: "Product Code", width: 100 },
+    { field: "product_code", headerName: "Product Code", width: 100 },
     { field: "name", headerName: "Name", width: 100 },
     { field: "average_cost", headerName: "Avg Cost ($/KG)", width: 100 },
     { field: "received_amount", headerName: "Received Amount", width: 100 },

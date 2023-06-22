@@ -1,6 +1,7 @@
 import { lookupCustomer } from "./customer.logic";
 import { lookupInventoryStock } from "./inventory-stock.logic";
 import { lookupInventory } from "./inventory.logic";
+import { lookupLocation } from "./location.logic";
 import { lookupProductType } from "./product-type.logic";
 import { lookupProduct } from "./product.logic";
 import { lookupSupplier } from "./supplier.logic";
@@ -12,7 +13,7 @@ export const lookup = async (
     | "customer"
     | "supplier"
     | "inventory-stock"
-    | "inventory"// all products and materials
+    | "inventory" // all products and materials
     | "material" // not for sale
     | "raw-mat" //is raw, not for sale
     | "non-raw-mat" //is not raw, not for sale
@@ -23,29 +24,25 @@ export const lookup = async (
     | "user"
     | "product-type"
     | "product-type-mat"
-    | "product-type-raw",
+    | "product-type-raw"
+    | "location",
   letterMin: number
 ) => {
   if (query.length < letterMin) return [];
-//TODO: CONVERT TO SWITCH STATEMENT LOL..
+  //TODO: CONVERT TO SWITCH STATEMENT LOL..
 
-if (dbOption === "inventory") {
-  return await lookupInventory(query, undefined, undefined, true);
-}
-if (dbOption === "inventory-stock") {
-  return await lookupInventoryStock(query);
-}
-  
-
- else if (dbOption === "material") {
+  if (dbOption === "inventory") {
+    return await lookupInventory(query, undefined, undefined, true);
+  }
+  if (dbOption === "inventory-stock") {
+    return await lookupInventoryStock(query);
+  } else if (dbOption === "material") {
     return await lookupInventory(query, false, undefined, true);
   } else if (dbOption === "raw-mat") {
-    return await lookupInventory(query, false, true,  undefined);
+    return await lookupInventory(query, false, true, undefined);
   } else if (dbOption === "non-raw-mat") {
     return await lookupInventory(query, false, false, true);
-  }
-  
-  else if (dbOption === "product") {
+  } else if (dbOption === "product") {
     return await lookupProduct(query, true, undefined);
   } else if (dbOption === "approved-product") {
     return await lookupProduct(query, true, true);
@@ -53,22 +50,20 @@ if (dbOption === "inventory-stock") {
     return await lookupProduct(query, undefined, true);
   } else if (dbOption === "non-approved-product-all") {
     return await lookupProduct(query, undefined, false);
-  }
-  
-  else if (dbOption === "product-type") {
+  } else if (dbOption === "product-type") {
     return await lookupProductType(query, true, false);
   } else if (dbOption === "product-type-mat") {
     return await lookupProductType(query, false, false);
-  }
-  else if (dbOption === "product-type-raw") {
+  } else if (dbOption === "product-type-raw") {
     return await lookupProductType(query, false, true);
-  }
-  else if (dbOption === "customer") {
+  } else if (dbOption === "customer") {
     return await lookupCustomer(query);
   } else if (dbOption === "supplier") {
     return await lookupSupplier(query);
   } else if (dbOption === "user") {
     return await lookupUser(query);
+  } else if (dbOption === "location") {
+    return await lookupLocation(query);
   }
 
   return [];

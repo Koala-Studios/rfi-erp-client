@@ -91,7 +91,8 @@ export const ForecastPage = () => {
           initialValue={row_params.row.product_name}
           letterMin={3}
           getOptionLabel={(item: IInventory) =>
-            `${item.product_code} | ${item.name}`
+            item ? 
+            `${item.product_code} | ${item.name}` : ''
           }
         />
       ),

@@ -30,7 +30,8 @@ interface Props {
     | "user"
     | "product-type"
     | "product-type-mat"
-    | "product-type-raw";
+    | "product-type-raw"
+    | "location";
   onChange?: (event: React.SyntheticEvent<Element, Event>, value: any) => void;
 }
 
@@ -57,6 +58,7 @@ const StandaloneAutocomplete: React.FC<Props> = ({
     if (letterMin === 0) {
       lookup("", dbOption, letterMin).then((result) => {
         setOptionList(result);
+        console.log(result)
       });
     }
   }, []);
@@ -67,6 +69,7 @@ const StandaloneAutocomplete: React.FC<Props> = ({
   ) => {
     lookup(value.toUpperCase(), dbOption, letterMin).then((result) => {
       setOptionList(result);
+      console.log(result)
     });
   };
 
