@@ -79,11 +79,9 @@ export const ExpandableDataTable: React.FC<Props> = ({
             setSearchParams(searchParams);
           }}
         />
-        <Typography variant="subtitle2" sx={{ mr: 2 }}>{`${
-          listOptions.pagingCounter
-        }-${listOptions.pagingCounter + listOptions.limit} of ${
-          listOptions.totalDocs
-        }`}</Typography>
+        <Typography variant="subtitle2" sx={{ mr: 2 }}>{`${listOptions.pagingCounter
+          }-${listOptions.pagingCounter + listOptions.limit} of ${listOptions.totalDocs
+          }`}</Typography>
       </div>
     );
   };
@@ -180,7 +178,7 @@ const ExpandableRow = (props: {
           </IconButton>
         </TableCell>
         {props.columns.map((col) => (
-          <TableCell sx={{ p: 1 }}>{props.row[col.field]}</TableCell>
+          <TableCell sx={{ p: 1, fontWeight: 500 }}>{props.row[col.field]}</TableCell>
         ))}
       </TableRow>
       <TableRow>

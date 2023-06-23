@@ -342,7 +342,21 @@ export const InventoryDetailPage = () => {
                 rows={2}
               ></TextField>
             </Grid>
-            <Grid item xs={4}></Grid>
+            <Grid item xs={2}></Grid>
+            <Grid item xs={2}>
+              <TextField
+                spellCheck="false"
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+                size="small"
+                variant="outlined"
+                label={"Cost"}
+                value={inventory.cost.toFixed(2)}
+                InputProps={{
+                  readOnly: true,
+                }}
+              ></TextField>
+            </Grid>
             <Grid item xs={2}>
               <TextField
                 defaultValue={inventory.date_created}
