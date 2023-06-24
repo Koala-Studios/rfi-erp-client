@@ -11,6 +11,7 @@ import {
 } from "@mui/x-data-grid";
 import {
   Box,
+  Button,
   Card,
   Collapse,
   IconButton,
@@ -177,12 +178,34 @@ const ExpandableRow = (props: {
             aria-label="expand row"
             size="small"
             onClick={() => setOpen(!open)}
+            style={{ display: props.row.sub_rows.length === 0 ? 'none' : 'block' }}
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
-        {props.columns.map((col) => (
-          <TableCell sx={{ p: 1, fontWeight:'500', fontSize:'0.9rem' }}>{props.row[col.field]}</TableCell>
+        {props.columns.map((col, index) => (
+          <TableCell sx={{ p: 1, fontWeight: '500', fontSize: '0.9rem' }}>
+            {index == 5 &&
+              <strong>
+                <Button
+                  variant="outlined"
+                  color="info"
+                  size="small"
+                  style={{
+                    backgroundColor: "#1144ff15",
+                    fontSize: "19px",
+                    maxWidth: "40px",
+                    maxHeight: "30px",
+                    minWidth: "40px",
+                    minHeight: "30px",
+                  }}
+                // onClick={() => handleAddRow()}
+                >
+                  +
+                </Button>
+              </strong>
+            }
+            {props.row[col.field]}</TableCell>
         ))}
       </TableRow>
       <TableRow>
@@ -197,13 +220,21 @@ const ExpandableRow = (props: {
             unmountOnExit
             sx={{ background: "#ebedf0", pl: 3.5 }}
           >
-            <Box sx={{ margin: 0.25, p: "0 0px"
-}}>
-              
+            {/* <Box sx={{
+              marginBottom: 2, p: "0 0px"
+            }}> */}
+
             {console.log(props.sub_columns)}
-              <DataGrid rows={props.row.sub_rows} sx={{width:'450px', float: 'right', height:(40*props.sub_columns.length),maxHeight:'200px'}} headerHeight={40} rowHeight={39} columns={props.sub_columns} hideFooter={true}
-              />
-            </Box>
+            <DataGrid rows={props.row.sub_rows}
+              headerHeight={0}
+              components={{
+                Header: () => null,
+              }}
+              columns={props.sub_columns}
+              getRowId={(row) => row._id}
+              sx={{ width: '775px', float: 'right', height: ((40 * (props.row.sub_rows.length))), maxHeight: '200px' }} rowHeight={39} hideFooter={true}
+            />
+            {/* </Box> */}
           </Collapse>
         </TableCell>
       </TableRow>
