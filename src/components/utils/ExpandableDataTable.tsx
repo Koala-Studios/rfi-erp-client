@@ -118,8 +118,10 @@ export const ExpandableDataTable: React.FC<Props> = ({
               }}
             >
               <TableCell sx={{ p: 1 }}></TableCell>
-              {columns.map((col) => (
-                <TableCell sx={{ p: 1 }}>{col.headerName}</TableCell>
+              {columns.map((col, index) => (
+                
+                <TableCell sx={{ p: 1, width:`${col.width}` }}> 
+                {col.headerName}</TableCell>
               ))}
             </TableRow>
           </TableHead>
@@ -170,7 +172,7 @@ const ExpandableRow = (props: {
           "& > *": { borderBottom: "none!important" },
         }}
       >
-        <TableCell sx={{ p: 0.7 }} width={50}>
+        <TableCell sx={{ p: 0.7 }} width={40}>
           <IconButton
             aria-label="expand row"
             size="small"
@@ -180,7 +182,7 @@ const ExpandableRow = (props: {
           </IconButton>
         </TableCell>
         {props.columns.map((col) => (
-          <TableCell sx={{ p: 1 }}>{props.row[col.field]}</TableCell>
+          <TableCell sx={{ p: 1, fontWeight:'500' }}>{props.row[col.field]}</TableCell>
         ))}
       </TableRow>
       <TableRow>
