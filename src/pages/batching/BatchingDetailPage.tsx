@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   Chip,
+  Collapse,
   Divider,
   Grid,
   IconButton,
@@ -23,6 +24,8 @@ import { AuthContext } from "../../components/navigation/AuthProvider";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import TableAutocomplete from "../../components/utils/TableAutocomplete";
 import { IInventory } from "../../logic/inventory.logic";
@@ -182,7 +185,7 @@ export const BatchingDetailPage = () => {
               _id: item._id ? item._id : new ObjectID().toHexString(),
               container_id: item.used_containers.length > 0 ? item.used_containers[0].container_id : '',
               lot_number: item.used_containers.length > 0 ? item.used_containers[0].lot_number : '',
-              amount_to_use: item.used_containers.length > 0 ? item.used_containers[0].amount_to_use : 0,
+              amount_to_use: item.used_containers.length > 0 ? item.used_containers[0].amount_to_use.toFixed(5) : 0,
               used_amount: 0,
               sub_rows: item.used_containers.length > 1 ? item.used_containers.slice(1, undefined) : [],
               has_enough: item.has_enough
@@ -219,62 +222,12 @@ export const BatchingDetailPage = () => {
     }
   }, [rows]);
 
-  const draftColumns: GridColDef[] = [
-    { field: "product_code", headerName: "Product Code", width: 150 },
-    {
-      field: "product_name",
-      headerName: "Product Name",
-      width: 350,
-      sortable: false,
-      filterable: false,
-      renderCell: (row_params: GridRenderCellParams<string>) => (
-        <TableAutocomplete
-          dbOption="material"
-          handleEditRow={handleEditProductRow}
-          rowParams={row_params}
-          initialValue={row_params.row.product_name}
-          letterMin={3}
-          getOptionLabel={(item: IInventory) =>
-            `${item.product_code} | ${item.name}`
-          }
-        />
-      ),
-    },
-    {
-      field: "required_amount",
-      headerName: "Required Qty",
-      type: "number",
-      width: 120,
-      align: "right",
-      editable: false,
-    },
-    {
-      field: "used_amount",
-      headerName: "Used Qty",
-      type: "number",
-      width: 120,
-      align: "right",
-      editable: true,
-    },
-
-    {
-      field: "remaining_amount",
-      headerName: "Remaining Qty",
-      type: "number",
-      width: 120,
-      align: "right",
-      editable: true,
-    },
-
-
-  ];
-
   const expandableColumns: GridColDef[] = [
     { field: "product_code", headerName: "Product Code", width: 125 },
     {
       field: "product_name",
       headerName: "Product Name",
-      width: 350,
+      // width: 350,
       sortable: false,
       filterable: false,
       renderCell: (row_params: GridRenderCellParams<string>) => (
@@ -294,7 +247,7 @@ export const BatchingDetailPage = () => {
       field: "required_amount",
       headerName: "Required Qty",
       type: "number",
-      width: 160,
+      width: 140,
       align: "right",
       editable: false,
     },
@@ -302,7 +255,7 @@ export const BatchingDetailPage = () => {
       field: "remaining_amount",
       headerName: "Remaining Qty",
       type: "number",
-      width: 160,
+      width: 140,
       align: "right",
       editable: true,
     },
@@ -311,7 +264,7 @@ export const BatchingDetailPage = () => {
       field: "used_amount",
       headerName: "Total Used Qty",
       type: "number",
-      width: 160,
+      width: 140,
       align: "right",
       editable: true,
     },
@@ -322,24 +275,7 @@ export const BatchingDetailPage = () => {
       width: 160,
       renderCell: (params: GridRenderCellParams<string>) => (
         <strong>
-          <Button
-            variant="outlined"
-            color="error"
-            size="small"
-            style={{
-              backgroundColor: "#ff221115",
-              fontSize: "25px",
-              maxWidth: "40px",
-              maxHeight: "30px",
-              minWidth: "40px",
-              minHeight: "30px",
-              marginRight: "12px",
-            }}
-            onClick={() => handleDeleteRow(params.row._id)}
-          >
-            -
-          </Button>
-          <Button
+          <Button //!Can't add render cell right now. will do manually for now..
             variant="outlined"
             color="info"
             size="small"
@@ -351,24 +287,24 @@ export const BatchingDetailPage = () => {
               minWidth: "40px",
               minHeight: "30px",
             }}
-            onClick={() => handleAddRow(params.row.row_id)}
+            onClick={() => handleAddRow(params.row._id)}
           >
             +
-          </Button>
+          </Button>   
         </strong>
       ),
     },
     {
       field: "lot_number",
-      headerName: "Lot #",
-      width: 150,
-      align: "right",
+      headerName: "Lot Number",
+      width: 120,
+      align: "center",
       editable: true,
     },
     {
       field: "confirm_lot_number",
-      headerName: "Confirm Lot #",
-      width: 150,
+      headerName: "Lot Number",
+      width: 120,
       align: "right",
       editable: true,
     },
@@ -376,25 +312,17 @@ export const BatchingDetailPage = () => {
       field: "amount_to_use",
       headerName: "Qty To Use",
       type: "number",
-      width: 130,
-      align: "right",
+      width: 120,
+      align: "left",
       editable: true,
     },
     {
       field: "amount_used",
       headerName: "Qty Used",
       type: "number",
-      width: 130,
-      align: "right",
-      editable: true,
-    },
-    {
-      field: "has_enough",
-      headerName: "Has Enough",
-      type: "boolean",
       width: 120,
-      align: "right",
-      editable: false,
+      align: "left",
+      editable: true,
     },
   ];
   const sub_columns: GridColDef[] = [
@@ -428,14 +356,14 @@ export const BatchingDetailPage = () => {
     {
       field: "lot_number",
       headerName: "Lot Number",
-      width: 150,
+      width: 120,
       align: "center",
       editable: true,
     },
     {
       field: "confirm_lot_number",
       headerName: "Lot Number",
-      width: 125,
+      width: 120,
       align: "right",
       editable: true,
     },
@@ -443,7 +371,7 @@ export const BatchingDetailPage = () => {
       field: "amount_to_use",
       headerName: "Qty To Use",
       type: "number",
-      width: 140,
+      width: 120,
       align: "left",
       editable: true,
     },
@@ -451,17 +379,9 @@ export const BatchingDetailPage = () => {
       field: "amount_used",
       headerName: "Qty Used",
       type: "number",
-      width: 140,
+      width: 120,
       align: "left",
       editable: true,
-    },
-    {
-      field: "has_enough",
-      headerName: "Has Enough",
-      type: "boolean",
-      width: 20,
-      align: "right",
-      editable: false,
     },
   ];
 
@@ -509,28 +429,27 @@ export const BatchingDetailPage = () => {
         savedBatching = _batching;
         setBatching(_batching);
         setBatchingSaved(true);
-        setRows(_batching.ingredients)
+        setExpandableRows(
+          _batching!.ingredients.map((item: IBatchingIngredient) => {
+            return {
+              ...item,
+              _id: item._id ? item._id : new ObjectID().toHexString(),
+              container_id: item.used_containers.length > 0 ? item.used_containers[0].container_id : '',
+              lot_number: item.used_containers.length > 0 ? item.used_containers[0].lot_number : '',
+              amount_to_use: item.used_containers.length > 0 ? item.used_containers[0].amount_to_use : 0,
+              used_amount: 0,
+              sub_rows: item.used_containers.length > 1 ? item.used_containers.slice(1, undefined) : [],
+              has_enough: item.has_enough
+            }
+          })
+        );
       } else {
         console.log("Batching Not Updated");
       }
     });
   };
 
-  const handleDeleteRow = (row_id: string) => {
-    setRows([...rows.filter((m: IBatchingIngredient) => m._id !== row_id)]);
-  };
 
-  const handleEditCell = (row_id: string, field: string, value: any) => {
-    const rowIndex = rows.findIndex((r: any) => r._id === row_id);
-    setRows([
-      ...rows.slice(0, rowIndex),
-      {
-        ...rows[rowIndex],
-        [field]: value,
-      },
-      ...rows.slice(rowIndex == rows.length ? rowIndex : rowIndex + 1),
-    ]);
-  };
 
   // const handleInsertRow = (row_id: string) => { //!not being used atm
   //   const index = rows.findIndex(
@@ -550,17 +469,44 @@ export const BatchingDetailPage = () => {
   // };
 
   const handleAddRow = (row_id: string) => {
-    const index = rows.findIndex(
+    const index = expandableRows.findIndex(
       (element) => element._id === row_id
     );
-    const tempRows = rows[index].sub_rows.push({ id: 'test1234123', container_id: '11314253241', lot_number: 'A' + parseFloat((Math.random() * 1304).toFixed(6)) * 1000000, confirm_lot_number: '', amount_used: 0 })
-    console.log(rows[index])
-    setRows([
-      tempRows
-    ]);
-
+    setExpandableRows(expandableRows.map((row:IBatchingIngredient, r_index) => {
+      if(r_index != index) {
+        return row;
+      } else {
+        row.sub_rows = [...row.sub_rows, {_id: new ObjectID().toHexString(),
+          container_id:'',
+          lot_number: '',
+          amount_to_use: 0,
+          used_amount: 0}]
+        return row;
+      }
+      }));
     console.log(rows);
   };
+
+  const handleDeleteRow = (row_id: string) => {
+    console.log('test', row_id)
+    setExpandableRows(expandableRows.map((row:IBatchingIngredient) => {
+        const new_row = {...row, sub_rows: row.sub_rows.filter((r:any) => r._id != row_id)}
+        return new_row;
+      }));
+  };
+
+  const handleEditCell = (row_id: string, field: string, value: any) => {
+    const rowIndex = rows.findIndex((r: any) => r._id === row_id);
+    setRows([
+      ...rows.slice(0, rowIndex),
+      {
+        ...rows[rowIndex],
+        [field]: value,
+      },
+      ...rows.slice(rowIndex == rows.length ? rowIndex : rowIndex + 1),
+    ]);
+  };
+
 
   const saveBatching = async () => {
 
@@ -838,60 +784,6 @@ export const BatchingDetailPage = () => {
           </Card>
         </div>
       </Card>
-      {/* <Card variant="outlined" sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
-          <DataGrid
-            autoHeight={true}
-            rowHeight={46}
-            rows={rows!}
-            getRowId={(row) => row._id}
-            processRowUpdate={(newRow) => {
-              console.log(newRow);
-              let pList = rows.slice();
-              const rowIdx = rows.findIndex(
-                (r: IBatchingIngredient) => r._id === newRow._id
-              );
-              pList[rowIdx] = newRow;
-              setRows(pList);
-              return newRow;
-            }}
-            onCellKeyDown={(params, event) => {
-              if (event.code == "Space") {
-                event.stopPropagation();
-              }
-              // if (receiveMode !== null) {
-              //   switch (event.code) {
-              //     case "Escape": {
-              //       setReceiveMode(null);
-              //       break;
-              //     }
-              //     // case("Enter"):
-              //     // {
-              //     //   console.log('test', event, params )
-              //     //   break;
-              //     // }
-              //     case "ArrowDown":
-              //     case "ArrowUp":
-              //     case "Backspace": {
-              //       event.stopPropagation();
-              //     }
-              //   }
-              // }
-            }}
-            initialState={{
-              columns: {
-                columnVisibilityModel: {
-                  // Hide columns status and traderName, the other columns will remain visible
-                  received_amount: batching.status != 6,
-                },
-              },
-            }}
-            columns={draftColumns}
-            onCellEditCommit={(e, value) => {
-              handleEditCell(e.id.toString(), e.field, e.value);
-              console.log("test", rows);
-            }}
-          ></DataGrid>
-        </Card> */}
       <Card sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
 
 
@@ -901,6 +793,144 @@ export const BatchingDetailPage = () => {
           sub_columns={sub_columns}
         ></BatchingDataTable>
       </Card>
+      <Card sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
+      <TableContainer
+        component={Paper}
+        style={{
+          width: "100%",
+          minHeight: 100,
+          height: "100%",
+          border: "1px solid #c9c9c9",
+          borderBottom: "none",
+          borderRadius: "5px 5px 0 0",
+        }}
+      >
+        <Table aria-label="collapsible table" style={{ position: "relative" }}>
+          <TableHead
+            style={{
+              position: "sticky",
+              top: 0,
+              background: "white",
+              boxShadow: "0 1px 0 0 #e1e1e1",
+              zIndex: 10,
+            }}
+          >
+            <TableRow
+              sx={{
+                maxHeight: 50,
+                height: 50,
+              }}
+            >
+              <TableCell sx={{ p: 1 }}></TableCell>
+              {expandableColumns.map((col) => (
+                <TableCell sx={{ p: 1 }} align={col.align} contentEditable={col.editable} width={col.width}>{col.headerName}</TableCell>
+              ))}
+            </TableRow>
+          </TableHead>
+          <TableBody style={{ overflowY: "scroll", height: "400px!important" }}>
+            {/* {dataOptions.rows.map((row: IInventoryStockGrouped) => (
+                    <ExpandableRow key={row.name} row={row} />
+                  ))} */}
+            {expandableRows.map((row_item) => (
+              <ExpandableRow
+                key={row_item.product_id}
+                columns={expandableColumns}
+                sub_columns={sub_columns}
+                handleAddRow={handleAddRow}
+                row={row_item}
+              ></ExpandableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      </Card>
+
+    </>
+  );
+};
+
+
+
+const ExpandableRow = (props: {
+  columns: GridColDef[];
+  sub_columns: GridColDef[];
+  handleAddRow:(row_id:string) => void;
+  row: any;
+}) => {
+
+  const [open, setOpen] = React.useState(false);
+  return (
+    <>
+      <TableRow
+        sx={{
+          "& > *": { borderBottom: "none!important" },
+        }}
+      >
+        <TableCell sx={{ p: 0.7 }} width={50}>
+          <IconButton
+            aria-label="expand row"
+            size="small"
+            onClick={() => setOpen(!open)}
+            style={{ display: props.row.sub_rows.length === 0 ? 'none' : 'block' }}
+          >
+            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+          </IconButton>
+        </TableCell>
+        {props.columns.map((col, index) => (
+          <TableCell sx={{ p: 1, fontWeight: '500', fontSize: '0.9rem' }}>
+            {index == 5 &&
+              <strong>
+                <Button
+                  variant="outlined"
+                  color="info"
+                  size="small"
+                  style={{
+                    backgroundColor: "#1144ff15",
+                    fontSize: "19px",
+                    maxWidth: "40px",
+                    maxHeight: "30px",
+                    minWidth: "40px",
+                    minHeight: "30px",
+                  }}  
+                onClick={() => props.handleAddRow(props.row._id)}
+                >
+                  +
+                </Button>
+              </strong>
+            }
+            {props.row[col.field]}</TableCell>
+        ))}
+      </TableRow>
+      <TableRow>
+        <TableCell
+          sx={{ p: 0 }}
+          // style={{ paddingBottom: 0, paddingTop: 0 }}
+          colSpan={12}
+        >
+          <Collapse
+            in={open}
+            timeout="auto"
+            unmountOnExit
+            sx={{ background: "#ebedf0", pl: 3.5 }}
+          >
+            {/* <Box sx={{
+              marginBottom: 2, p: "0 0px"
+            }}> */}
+
+            {console.log(props.sub_columns)}
+            <DataGrid rows={props.row.sub_rows}
+              headerHeight={0}
+              components={{
+                Header: () => null,
+              }}
+              columns={props.sub_columns}
+              getRowId={(row) => row._id}
+              sx={{ width:'620px', float: 'right', height: ((40 * (props.row.sub_rows.length))), maxHeight: '200px' }} rowHeight={39} hideFooter={true}
+            />
+            {/* </Box> */}
+          </Collapse>
+        </TableCell>
+      </TableRow>
     </>
   );
 };
