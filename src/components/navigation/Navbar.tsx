@@ -67,16 +67,18 @@ let LinkItems = [
     icon: <HvacIcon></HvacIcon>,
     permission: PERMISSIONS.batching_page,
   },
+  // {
+  //   text: "Inventory",
+  //   link: "/inventory",
+  //   icon: <StorageIcon></StorageIcon>,
+  //   permission: PERMISSIONS.inventory_page,
+  // },
   {
+    // text: "Inv Containers",
     text: "Inventory",
-    link: "/inventory",
-    icon: <StorageIcon></StorageIcon>,
-    permission: PERMISSIONS.inventory_page,
-  },
-  {
-    text: "Inv Containers",
     link: "/inventory-stock",
-    icon: <Battery90Icon></Battery90Icon>,
+    // icon: <Battery90Icon></Battery90Icon>,
+    icon: <StorageIcon></StorageIcon>,
     permission: PERMISSIONS.inventorystock_page,
   },
   {
