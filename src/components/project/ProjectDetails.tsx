@@ -60,7 +60,8 @@ const inputRefMap = {
   name: 0,
   project_code: 1,
   start_date: 2,
-  notes: 3
+  notes: 3,
+  customer: 4
 };
 
 const inputMap: InputInfo[] = [
@@ -79,7 +80,13 @@ const inputMap: InputInfo[] = [
     label: "notes",
     ref: 3,
     validation: { required: false, genericVal: "Text" },
-  }
+  },
+  {
+    label: "customer",
+    ref: 4,
+    validation: { required: true, genericVal: "Text" },
+  },
+  
 ];
 
 export const ProjectDetails = () => {
@@ -230,44 +237,7 @@ export const ProjectDetails = () => {
           <ArrowBackIcon fontSize="small" />
         </Button>
           <Grid container spacing={3}>
-            
-            <Grid item xs={10}>
-              <TextField
-                defaultValue={project.name}
-                inputRef={(el: any) =>
-                  (inputRefs.current[inputRefMap.name] = el)
-                }
-                error={inputVisuals[inputRefMap.name].error}
-                helperText={inputVisuals[inputRefMap.name].helperText}
-                onBlur={(event) =>
-                  onInputBlur(event, inputMap[inputRefMap.name])
-                }
-                required={inputMap[inputRefMap.name].validation.required}
-                spellCheck="false"
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-                size="small"
-                variant="outlined"
-                label={"Project Title"}
-              ></TextField>
-            </Grid>
-            <Grid item xs={2}>
-                <Chip
-                //@ts-ignore
-                label={ProjectStatus[project ? project!.status - 1: 5][0]}
-                sx={{
-                  width: "100%",
-                  height: "100%",
-                  maxHeight:"40px",
-                  borderRadius: 10,
-                  fontWeight: 600,
-                }}
-                //@ts-ignore
-                color={ProjectStatus[project ? project!.status - 1: 5][1]}
-                variant="outlined"
-              />
-            </Grid>
-            <Grid item xs={6}>
+          <Grid item xs={2}>
               <TextField
                 defaultValue={project.project_code}
                 inputRef={(el: any) =>
@@ -289,21 +259,70 @@ export const ProjectDetails = () => {
                 label={"Project Code"}
               ></TextField>
             </Grid>
-
-            <Grid item xs={6}>
-              <StandaloneAutocomplete
+            <Grid item xs={4}>
+              <TextField
+                defaultValue={project.name}
+                inputRef={(el: any) =>
+                  (inputRefs.current[inputRefMap.name] = el)
+                }
+                error={inputVisuals[inputRefMap.name].error}
+                helperText={inputVisuals[inputRefMap.name].helperText}
+                onBlur={(event) =>
+                  onInputBlur(event, inputMap[inputRefMap.name])
+                }
+                required={inputMap[inputRefMap.name].validation.required}
+                spellCheck="false"
+                InputLabelProps={{ shrink: true }}
+                fullWidth
+                size="small"
+                variant="outlined"
+                label={"Project Title"}
+              ></TextField>
+            </Grid>
+            <Grid item xs={2}>
+            <StandaloneAutocomplete
                 initialValue={project.customer}
-                onChange={(e, value) => {
+                inputRef={(el: any) =>
+                  (inputRefs.current[inputRefMap.customer] = el)
+                }
+                error={inputVisuals[inputRefMap.customer].error}
+                helperText={inputVisuals[inputRefMap.customer].helperText}
+                onChange={(event, value) => {
                   setProject({ ...project, customer: value });
+                  // onInputBlur(event, inputMap[inputRefMap.material_type]);
                 }}
+                onBlur={(event: any) =>
+                  onInputBlur(event, inputMap[inputRefMap.customer])
+                }
+                required={
+                  inputMap[inputRefMap.customer].validation.required
+                }
                 label={"Customer"}
                 letterMin={0}
                 dbOption={"customer"}
                 // getOptionLabel={(item: ICustomer) => item.code + ' | ' + item.name}
-                getOptionLabel={(item: ICustomer) => item.name}
+                getOptionLabel={(item: ICustomer) => item ? item.name : ''}
               />
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={2}></Grid>
+            <Grid item xs={2}>
+                <Chip
+                //@ts-ignore
+                label={ProjectStatus[project ? project!.status - 1: 5][0]}
+                sx={{
+                  width: "100%",
+                  height: "100%",
+                  maxHeight:"40px",
+                  borderRadius: 10,
+                  fontWeight: 600,
+                }}
+                //@ts-ignore
+                color={ProjectStatus[project ? project!.status - 1: 5][1]}
+                variant="outlined"
+              />
+            </Grid>
+            <Grid item xs={8}></Grid>
+            <Grid item xs={2}>
               <TextField
                 defaultValue={project.start_date.toString().split('T')[0]}
                 inputRef={(el: any) =>
@@ -326,7 +345,7 @@ export const ProjectDetails = () => {
                 type={"date"}
               ></TextField>
             </Grid>
-            <Grid item xs={6}>
+            <Grid item xs={2}>
               <TextField
                 fullWidth
                 InputLabelProps={{ shrink: true }}
@@ -361,7 +380,7 @@ export const ProjectDetails = () => {
                 variant="outlined"
                 label={"Notes"}
                 multiline
-                rows={6}
+                rows={8}
               ></TextField>
             </Grid>
           </Grid>

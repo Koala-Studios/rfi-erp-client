@@ -73,7 +73,8 @@ const inputRefMap = {
   quantity: 1,
   notes: 2,
   date_created: 3,
-  // product_code: 2,
+  product_code: 4,
+  test:5
 
 };
 
@@ -89,6 +90,12 @@ const inputMap: InputInfo[] = [
     ref: 3,
     validation: { required: true, genericVal: "Date" },
   },
+  {
+    label: "product_code",
+    ref: 4,
+    validation: { required: true, genericVal: "Text" },
+  },
+  
 ];
 
 export const BatchingDetailPage = () => {
@@ -684,6 +691,17 @@ export const BatchingDetailPage = () => {
               <Grid item xs={6}>
                 <StandaloneAutocomplete
                   initialValue={{ _id: batching.product_id, product_code: batching.product_code, name: batching.name }}
+                  inputRef={(el: any) =>
+                    (inputRefs.current[inputRefMap.product_code] = el)
+                  }
+                  error={inputVisuals[inputRefMap.product_code].error}
+                  helperText={inputVisuals[inputRefMap.product_code].helperText}
+                  onBlur={(event: any) =>
+                    onInputBlur(event, inputMap[inputRefMap.product_code])
+                  }
+                  required={
+                    inputMap[inputRefMap.batch_code].validation.required
+                  }
                   onChange={(e, value) => {
                     console.log(e, value, 'TESTER')
                     setBatching({ ...batching, product_id: value._id, product_code: value.product_code, name: value.name });

@@ -234,7 +234,7 @@ export const InventoryDetailPage = () => {
             aria-label="go back"
             size="medium"
             variant="outlined"
-            onClick={() => navigate("/inventory")}
+            onClick={() => navigate("/inventory-stock")}
           >
             <ArrowBackIcon fontSize="small" />
           </Button>
