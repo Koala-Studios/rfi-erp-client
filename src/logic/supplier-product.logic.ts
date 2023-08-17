@@ -1,28 +1,36 @@
 import axios from "axios";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
 
-export interface ISupplier {
+interface ISupplierItem {
   _id: string;
   name: string;
   code: string;
-  email: string;
-  contact_name: string;
-  address_one: string;
-  address_two: string;
-  notes: string;
-  lead_time?: string;
-  trust_factor: number | null;
-  phone?: string;
-  created_date: string;
+}
+interface IDiscountRate {
+  min_amount: number;
+  disc_percent: number;
+}
+
+export interface ISupplierProduct {
+  _id: string;
+  product_id: string;
+  supplier: ISupplierItem;
+  supplier_sku: string;
+  product_code: string;
+  name: string;
+  cost: number;
+  discount_rates: IDiscountRate[];
+  description: string;
+  cas_number?: string;
 }
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/suppliers",
+  baseURL: "http://localhost:5000/supplier-products",
 });
 
-export const lookupSupplier = async (
+export const lookupSupplierProduct = async (
   search_value: string
-): Promise<ISupplier[] | null> => {
+): Promise<ISupplierProduct[] | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
@@ -30,7 +38,7 @@ export const lookupSupplier = async (
     },
   };
 
-  let list: ISupplier[] | null = null;
+  let list: ISupplierProduct[] | null = null;
 
   await api
     .get("/lookup", config)
@@ -45,7 +53,7 @@ export const lookupSupplier = async (
   return list;
 };
 
-export const listSuppliers = async (
+export const listSupplierProducts = async (
   q: URLSearchParams | undefined,
   filters: FilterElement[]
 ): Promise<IListOptions | null> => {
@@ -74,7 +82,9 @@ export const listSuppliers = async (
   return list;
 };
 
-export const getSupplier = async (id: string): Promise<ISupplier | null> => {
+export const getSupplierProduct = async (
+  id: string
+): Promise<ISupplierProduct | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
@@ -82,7 +92,7 @@ export const getSupplier = async (id: string): Promise<ISupplier | null> => {
     },
   };
 
-  let supplier: ISupplier | null = null;
+  let supplier: ISupplierProduct | null = null;
 
   await api
     .get("/get", config)
@@ -98,8 +108,8 @@ export const getSupplier = async (id: string): Promise<ISupplier | null> => {
   return supplier;
 };
 
-export const createSupplier = async (
-  formData: ISupplier
+export const createSupplierProduct = async (
+  formData: ISupplierProduct
 ): Promise<string | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
@@ -121,7 +131,10 @@ export const createSupplier = async (
 
   return rtn;
 };
-export const updateSupplier = async (formData: ISupplier): Promise<boolean> => {
+
+export const updateSupplier = async (
+  formData: ISupplierProduct
+): Promise<boolean> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
@@ -133,30 +146,6 @@ export const updateSupplier = async (formData: ISupplier): Promise<boolean> => {
     .then((res) => {
       if (res.status === apiStatus.OK) {
         rtn = true;
-      }
-    })
-    .catch((err) => {
-      console.log(err);
-    });
-
-  return rtn;
-};
-
-export const createSupplierProduct = async (
-  formData: ISupplier
-): Promise<string | null> => {
-  const config = {
-    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
-  };
-
-  let rtn = null;
-  await api
-    .post("/product/create", formData, config)
-    .then((res) => {
-      console.log(res);
-      if (res.status === apiStatus.CREATED) {
-        console.log(res.data);
-        rtn = res.data;
       }
     })
     .catch((err) => {
