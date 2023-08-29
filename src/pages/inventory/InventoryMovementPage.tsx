@@ -25,7 +25,6 @@ export const InventoryMovementPage = () => { //WILL BE USED FOR BOTH MATERIALS A
   const location = useLocation();
   const { id } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
-  const auth = React.useContext(AuthContext);
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
   const [currPage, setCurrPage] = React.useState<number>(1);
 

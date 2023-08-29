@@ -1,27 +1,39 @@
 import axios from "axios";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
 
+interface IProductItem {
+  _id: string;
+  product_code: string;
+  name: string;
+}
 interface ICustomerItem {
   _id: string;
   name: string;
   code: string;
+}
+
+interface ICustomerProduct {
+  product: IProductItem;
+  customer: ICustomerItem;
+  customer_sku: string;
+  customer_prod_name: string;
+  cost: number;
+  discount_rates: IDiscountRate[];
+  description: string;
+  aliases: string;
 }
 interface IDiscountRate {
   min_amount: number;
   disc_percent: number;
 }
 
-export interface IcustomerProduct {
-  _id: string;
-}
-
 const api = axios.create({
   baseURL: "http://localhost:5000/customer-products",
 });
 
-export const lookupcustomerProduct = async (
+export const lookupCustomerProduct = async (
   search_value: string
-): Promise<IcustomerProduct[] | null> => {
+): Promise<ICustomerProduct[] | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
@@ -29,7 +41,7 @@ export const lookupcustomerProduct = async (
     },
   };
 
-  let list: IcustomerProduct[] | null = null;
+  let list: ICustomerProduct[] | null = null;
 
   await api
     .get("/lookup", config)
@@ -44,7 +56,7 @@ export const lookupcustomerProduct = async (
   return list;
 };
 
-export const listcustomerProducts = async (
+export const listCustomerProducts = async (
   q: URLSearchParams | undefined,
   filters: FilterElement[]
 ): Promise<IListOptions | null> => {
@@ -75,7 +87,7 @@ export const listcustomerProducts = async (
 
 export const getcustomerProduct = async (
   id: string
-): Promise<IcustomerProduct | null> => {
+): Promise<ICustomerProduct | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
@@ -83,7 +95,7 @@ export const getcustomerProduct = async (
     },
   };
 
-  let customer: IcustomerProduct | null = null;
+  let customer: ICustomerProduct | null = null;
 
   await api
     .get("/get", config)
@@ -100,7 +112,7 @@ export const getcustomerProduct = async (
 };
 
 export const createcustomerProduct = async (
-  formData: IcustomerProduct
+  formData: ICustomerProduct
 ): Promise<string | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
@@ -124,7 +136,7 @@ export const createcustomerProduct = async (
 };
 
 export const updateSupplier = async (
-  formData: IcustomerProduct
+  formData: ICustomerProduct
 ): Promise<boolean> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },

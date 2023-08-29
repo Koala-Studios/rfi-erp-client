@@ -44,7 +44,6 @@ import { ProductTypeDetailPage } from "./pages/product-type/ProductTypeDetailPag
 import ProductTypeListPage from "./pages/product-type/ProductTypeListPage";
 import { InventoryDetailPage } from "./pages/inventory/InventoryDetailPage";
 import MaterialListPage from "./pages/inventory/MaterialListPage";
-import InventoryMovementPage from "./pages/inventory/InventoryMovementPage";
 import LocationListPage from "./pages/location/LocationListPage";
 import { LocationDetailPage } from "./pages/location/LocationDetailPage";
 import PERMISSIONS from "./logic/config.permissions";
@@ -297,7 +296,7 @@ function App() {
                 }
               />
               <Route
-                path="/suppliers/:id"
+                path="/suppliers/:id/:tab_id?"
                 element={
                   <RequireAuth permission={PERMISSIONS.suppliers_page}>
                     <Navbar title="Supplier Details">

@@ -12,6 +12,9 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SaveForm from "../../components/forms/SaveForm";
 import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
+import SupplierProductPage from "./SupplierProductPage";
+import LinkTab from "../../components/utils/LinkTab";
+import NavTab from "../../components/utils/NavTab";
 
 const emptySupplier: ISupplier = {
   _id: "new",
@@ -53,7 +56,7 @@ const inputMap: InputInfo[] = [
 
 export const SupplierDetailPage = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id,tab_id } = useParams();
   const auth = useContext(AuthContext);
   const [supplier, setSupplier] = useState<ISupplier | null>(null);
   const [supplierSaved, setSupplierSaved] = useState<boolean>(true);
@@ -353,6 +356,15 @@ export const SupplierDetailPage = () => {
           </Card>
         </div>
       </Card>
+      <NavTab>
+
+        <LinkTab label="Products" href= "products" tab_id={tab_id} disable={id === 'new'}/>
+        <LinkTab label="Order History" href= "order-history" tab_id={tab_id} disable={true}/>
+      </NavTab>
+      {
+          (tab_id && tab_id === "products" && 
+        <SupplierProductPage></SupplierProductPage>)
+      }
     </>
   );
 };

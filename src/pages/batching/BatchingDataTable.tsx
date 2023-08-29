@@ -185,7 +185,7 @@ const ExpandableRow = (props: {
         </TableCell>
         {props.columns.map((col, index) => (
           <TableCell sx={{ p: 1, fontWeight: '500', fontSize: '0.9rem' }}>
-            {index == 5 &&
+            {index == 9 &&
               <strong>
                 <Button
                   variant="outlined"
@@ -218,7 +218,7 @@ const ExpandableRow = (props: {
             in={open}
             timeout="auto"
             unmountOnExit
-            sx={{ background: "#ebedf0", pl: 3.5 }}
+            sx={{ background: "#ebedf0" ,float: 'right' }}
           >
             {/* <Box sx={{
               marginBottom: 2, p: "0 0px"
@@ -232,7 +232,7 @@ const ExpandableRow = (props: {
               }}
               columns={props.sub_columns}
               getRowId={(row) => row._id}
-              sx={{ width: '775px', float: 'right', height: ((40 * (props.row.sub_rows.length))), maxHeight: '200px' }} rowHeight={39} hideFooter={true}
+              sx={{ width: '655px', float: 'right', height: ((40.5 * (props.row.sub_rows.length))), maxHeight: '200px' }} rowHeight={39} hideFooter={true}
             />
             {/* </Box> */}
           </Collapse>

@@ -2,19 +2,17 @@ import React from "react";
 import { DataTable } from "../../components/utils/DataTable";
 import {
   GridColDef,
-  GridRenderCellParams,
-  GridValueGetterParams,
 } from "@mui/x-data-grid";
-import { listSuppliers } from "../../logic/supplier.logic";
-import { AuthContext } from "../../components/navigation/AuthProvider";
 import { Button, Card, Rating } from "@mui/material";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { FilterElement, IListData } from "../../logic/utils";
 import DataFilter from "../../components/utils/DataFilter";
+import { listSupplierProducts } from "../../logic/supplier-product.logic";
 
 const SupplierProductPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { id } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
   const filterArray: FilterElement[] = [
@@ -42,22 +40,21 @@ const SupplierProductPage = () => {
   
   ];
   const columns: GridColDef[] = [
-    { field: "product_code", headerName: "Product Code", width: 80 },
-    { field: "supplier_sku", headerName: "Supplier SKU", width: 80 },
-    { field: "name", headerName: "Product Name", width: 250 },
+    { field: "product_code", headerName: "Product Code", width: 120 },
+    { field: "name", headerName: "Product Name", width:350 },
     {
       field: "cost",
       headerName: "Cost/KG",
-      width: 200,
+      width: 120,
     },
-    { field: "description", headerName: "Description", width: 200 },
-    { field: "cas_number", headerName: "Cas Number", width: 200 },
+    { field: "description", headerName: "Description", width: 350 },
+    { field: "supplier_sku", headerName: "Supplier SKU", width: 120 },
+    { field: "cas_number", headerName: "Cas Number", width: 140 },
   ];
 
-  const auth = React.useContext(AuthContext);
 
   React.useEffect(() => {
-    listSuppliers(searchParams, filterArray).then((list) => {
+    listSupplierProducts(searchParams, filterArray).then((list) => {
       const newRows = list!.docs.map((supplier) => {
         return {
           ...supplier,
@@ -88,6 +85,7 @@ const SupplierProductPage = () => {
       <DataTable
         rows={dataOptions.rows}
         columns={columns}
+        auto_height
         listOptions={dataOptions.listOptions}
       ></DataTable>
     </>

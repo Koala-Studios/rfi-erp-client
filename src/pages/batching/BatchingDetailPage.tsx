@@ -221,62 +221,12 @@ export const BatchingDetailPage = () => {
     }
   }, [rows]);
 
-  const draftColumns: GridColDef[] = [
-    { field: "product_code", headerName: "Product Code", width: 150 },
-    {
-      field: "product_name",
-      headerName: "Product Name",
-      width: 350,
-      sortable: false,
-      filterable: false,
-      renderCell: (row_params: GridRenderCellParams<string>) => (
-        <TableAutocomplete
-          dbOption="material"
-          handleEditRow={handleEditProductRow}
-          rowParams={row_params}
-          initialValue={row_params.row.product_name}
-          letterMin={3}
-          getOptionLabel={(item: IInventory) =>
-            `${item.product_code} | ${item.name}`
-          }
-        />
-      ),
-    },
-    {
-      field: "required_amount",
-      headerName: "Required Qty",
-      type: "number",
-      width: 120,
-      align: "right",
-      editable: false,
-    },
-    {
-      field: "used_amount",
-      headerName: "Used Qty",
-      type: "number",
-      width: 120,
-      align: "right",
-      editable: true,
-    },
-
-    {
-      field: "remaining_amount",
-      headerName: "Remaining Qty",
-      type: "number",
-      width: 120,
-      align: "right",
-      editable: true,
-    },
-
-
-  ];
-
   const expandableColumns: GridColDef[] = [
     { field: "product_code", headerName: "Product Code", width: 125 },
     {
       field: "product_name",
       headerName: "Product Name",
-      width: 350,
+      // width: 350,
       sortable: false,
       filterable: false,
       renderCell: (row_params: GridRenderCellParams<string>) => (
@@ -318,49 +268,6 @@ export const BatchingDetailPage = () => {
       editable: true,
     },
     {
-      field: "id",
-      headerName: "Actions",
-      align: "left",
-      width: 160,
-      renderCell: (params: GridRenderCellParams<string>) => (
-        <strong>
-          <Button
-            variant="outlined"
-            color="error"
-            size="small"
-            style={{
-              backgroundColor: "#ff221115",
-              fontSize: "25px",
-              maxWidth: "40px",
-              maxHeight: "30px",
-              minWidth: "40px",
-              minHeight: "30px",
-              marginRight: "12px",
-            }}
-            onClick={() => handleDeleteRow(params.row._id)}
-          >
-            -
-          </Button>
-          <Button
-            variant="outlined"
-            color="info"
-            size="small"
-            style={{
-              backgroundColor: "#1144ff15",
-              fontSize: "19px",
-              maxWidth: "40px",
-              maxHeight: "30px",
-              minWidth: "40px",
-              minHeight: "30px",
-            }}
-            onClick={() => handleAddRow(params.row.row_id)}
-          >
-            +
-          </Button>
-        </strong>
-      ),
-    },
-    {
       field: "lot_number",
       headerName: "Lot #",
       width: 150,
@@ -391,20 +298,51 @@ export const BatchingDetailPage = () => {
       editable: true,
     },
     {
-      field: "has_enough",
-      headerName: "Has Enough",
+      field: "actions",
+      headerName: "Actions",
       type: "boolean",
-      width: 120,
+      width: 50,
       align: "right",
       editable: false,
     },
+    
   ];
   const sub_columns: GridColDef[] = [
     {
+      field: "lot_number",
+      headerName: "Lot Number",
+      width: 155,
+      align: "left",
+      editable: true,
+    },
+    {
+      field: "confirm_lot_number",
+      headerName: "Lot Number",
+      width: 150,
+      align: "left",
+      editable: true,
+    },
+    {
+      field: "amount_to_use",
+      headerName: "Qty To Use",
+      type: "number",
+      width: 140,
+      align: "left",
+      editable: true,
+    },
+    {
+      field: "amount_used",
+      headerName: "Qty Used",
+      type: "number",
+      width: 140,
+      align: "left",
+      editable: true,
+    },
+    {
       field: "id",
       headerName: "Actions",
-      align: "left",
-      width: 120,
+      align:'left',
+      width: 50,
       renderCell: (params: GridRenderCellParams<string>) => (
         <strong>
           <Button
@@ -426,44 +364,6 @@ export const BatchingDetailPage = () => {
           </Button>
         </strong>
       ),
-    },
-    {
-      field: "lot_number",
-      headerName: "Lot Number",
-      width: 150,
-      align: "center",
-      editable: true,
-    },
-    {
-      field: "confirm_lot_number",
-      headerName: "Lot Number",
-      width: 125,
-      align: "right",
-      editable: true,
-    },
-    {
-      field: "amount_to_use",
-      headerName: "Qty To Use",
-      type: "number",
-      width: 140,
-      align: "left",
-      editable: true,
-    },
-    {
-      field: "amount_used",
-      headerName: "Qty Used",
-      type: "number",
-      width: 140,
-      align: "left",
-      editable: true,
-    },
-    {
-      field: "has_enough",
-      headerName: "Has Enough",
-      type: "boolean",
-      width: 20,
-      align: "right",
-      editable: false,
     },
   ];
 
@@ -875,60 +775,7 @@ export const BatchingDetailPage = () => {
           </Card>
         </div>
       </Card>
-      {/* <Card variant="outlined" sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
-          <DataGrid
-            autoHeight={true}
-            rowHeight={46}
-            rows={rows!}
-            getRowId={(row) => row._id}
-            processRowUpdate={(newRow) => {
-              console.log(newRow);
-              let pList = rows.slice();
-              const rowIdx = rows.findIndex(
-                (r: IBatchingIngredient) => r._id === newRow._id
-              );
-              pList[rowIdx] = newRow;
-              setRows(pList);
-              return newRow;
-            }}
-            onCellKeyDown={(params, event) => {
-              if (event.code == "Space") {
-                event.stopPropagation();
-              }
-              // if (receiveMode !== null) {
-              //   switch (event.code) {
-              //     case "Escape": {
-              //       setReceiveMode(null);
-              //       break;
-              //     }
-              //     // case("Enter"):
-              //     // {
-              //     //   console.log('test', event, params )
-              //     //   break;
-              //     // }
-              //     case "ArrowDown":
-              //     case "ArrowUp":
-              //     case "Backspace": {
-              //       event.stopPropagation();
-              //     }
-              //   }
-              // }
-            }}
-            initialState={{
-              columns: {
-                columnVisibilityModel: {
-                  // Hide columns status and traderName, the other columns will remain visible
-                  received_amount: batching.status != 6,
-                },
-              },
-            }}
-            columns={draftColumns}
-            onCellEditCommit={(e, value) => {
-              handleEditCell(e.id.toString(), e.field, e.value);
-              console.log("test", rows);
-            }}
-          ></DataGrid>
-        </Card> */}
+
       <Card sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
 
 
