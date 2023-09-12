@@ -30,13 +30,23 @@ import { ObjectID } from "bson";
 import SaveForm from "../../components/forms/SaveForm";
 import StandaloneAutocomplete from "../../components/utils/StandaloneAutocomplete";
 import { ISupplier } from "../../logic/supplier.logic";
-import { confirmBatching, createBatching, getBatching, IBatching, markBatchingCancelled, updateBatching, finishBatching, IBatchingIngredient, generateBatchingBOM, batchingStatus } from "../../logic/batching.logic";
+import { confirmBatching, createBatching, getBatching, IBatching, markBatchingCancelled, updateBatching, finishBatching, IBatchingIngredient, generateBatchingBOM, batchingStatus, IBatchingContainer } from "../../logic/batching.logic";
 import { IProduct } from "../../logic/product.logic";
 import { padding } from "@mui/system";
 import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
 import { BatchingDataTable } from "./BatchingDataTable";
 
 let savedBatching: IBatching | null = null;
+
+interface expBatchIngr extends IBatchingIngredient {
+  _id: string;
+  container_id: string;
+  lot_number: string;
+  amount_to_use: number;
+  used_amount: number;
+  sub_rows: IBatchingContainer[];
+  has_enough: boolean
+}
 
 const BatchingStatus = [
   ["DRAFT", "warning"],
@@ -140,7 +150,7 @@ export const BatchingDetailPage = () => {
   );
 
   const [rows, setRows] = React.useState<IBatchingIngredient[]>([]);
-  const [expandableRows, setExpandableRows] = React.useState<IBatchingIngredient[]>([]);
+  const [expandableRows, setExpandableRows] = React.useState<expBatchIngr[]>([]);
   const [receiveMode, setReceiveMode] = React.useState<boolean>(false);
 
   useEffect(() => {
@@ -153,7 +163,6 @@ export const BatchingDetailPage = () => {
         const tempBatching = { ...p! };
         savedBatching = tempBatching;
         setBatching(p!);
-        console.log(p);
         // newRows = batching!.ingredients.map((item) => { //!check soon for further changes
         //   return {
         //     _id: item._id ? item._id : new ObjectID().toHexString(),
@@ -178,7 +187,7 @@ export const BatchingDetailPage = () => {
           })
         );
         setExpandableRows(
-          p!.ingredients.map((item: IBatchingIngredient) => {
+          p!.ingredients.map((item) => {
             return {
               ...item,
               _id: item._id ? item._id : new ObjectID().toHexString(),
@@ -187,7 +196,7 @@ export const BatchingDetailPage = () => {
               amount_to_use: item.used_containers.length > 0 ? item.used_containers[0].amount_to_use : 0,
               used_amount: 0,
               sub_rows: item.used_containers.length > 1 ? item.used_containers.slice(1, undefined) : [],
-              has_enough: item.has_enough
+              has_enough: true
             }
           })
         );
@@ -386,7 +395,7 @@ export const BatchingDetailPage = () => {
         savedBatching = _batching;
         setBatching(_batching);
         setBatchingSaved(true);
-        setExpandableRows(_batching.ingredients.map((item: IBatchingIngredient) => {
+        setExpandableRows(_batching.ingredients.map((item) => {
           return {
             ...item,
             _id: item._id ? item._id : new ObjectID().toHexString(),
@@ -395,7 +404,7 @@ export const BatchingDetailPage = () => {
             amount_to_use: item.used_containers.length > 0 ? item.used_containers[0].amount_to_use : 0,
             used_amount: 0,
             sub_rows: item.used_containers.length > 1 ? item.used_containers.slice(1, undefined) : [],
-            has_enough: item.has_enough
+            has_enough: true
           }
         })
       );
@@ -432,7 +441,10 @@ export const BatchingDetailPage = () => {
 
 
   const handleDeleteRow = (row_id: string) => {
-    setRows([...rows.filter((m: IBatchingIngredient) => m._id !== row_id)]);
+    setExpandableRows(
+      expandableRows.map((row:expBatchIngr) => {
+          return {...row, sub_rows: row.sub_rows.filter((sub_row) => sub_row._id !== row_id  )};
+      }))
   };
 
   const handleEditCell = (row_id: string, field: string, value: any) => {
@@ -468,13 +480,16 @@ export const BatchingDetailPage = () => {
     const index = rows.findIndex(
       (element) => element._id === row_id
     );
-    const tempRows = rows[index].sub_rows.push({ id: 'test1234123', container_id: '11314253241', lot_number: 'A' + parseFloat((Math.random() * 1304).toFixed(6)) * 1000000, confirm_lot_number: '', amount_used: 0 })
-    console.log(rows[index])
-    setRows([
-      tempRows
-    ]);
+    const targetRow:IBatchingIngredient = expandableRows[index];
+     setExpandableRows(
+      expandableRows.map((row:expBatchIngr) => {
+        if(row === targetRow) {
+          return {...row, sub_rows: [...targetRow.sub_rows, { _id: new ObjectID().toHexString(), container_id: '', lot_number: '', confirm_lot_number: '', amount_used: null }]};
+        }
+        return row;
+      })
+    );
 
-    console.log(rows);
   };
 
   const saveBatching = async () => {
@@ -782,6 +797,7 @@ export const BatchingDetailPage = () => {
         <BatchingDataTable
           rows={expandableRows!}
           columns={expandableColumns}
+          handleAddRow={ handleAddRow}
           sub_columns={sub_columns}
         ></BatchingDataTable>
       </Card>

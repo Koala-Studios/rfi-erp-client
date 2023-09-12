@@ -38,6 +38,7 @@ interface Props {
   sub_columns: GridColDef[];
   auto_height?: boolean;
   listOptions?: IListOptions;
+  handleAddRow: (row_id:string) => void;
   handleDBClick?: GridEventListener<"rowClick">;
 }
 
@@ -45,6 +46,7 @@ export const BatchingDataTable: React.FC<Props> = ({
   rows,
   columns,
   sub_columns,
+  handleAddRow,
   auto_height = false,
   listOptions = null,
   handleDBClick,
@@ -135,8 +137,7 @@ export const BatchingDataTable: React.FC<Props> = ({
                 key={row_item.name}
                 columns={columns}
                 sub_columns={sub_columns}
-                row={row_item}
-              ></ExpandableRow>
+                row={row_item} handleAddRow={handleAddRow}></ExpandableRow>
             ))}
           </TableBody>
         </Table>
@@ -163,6 +164,7 @@ const ExpandableRow = (props: {
   columns: GridColDef[];
   sub_columns: GridColDef[];
   row: any;
+  handleAddRow: (row_id:string) => void;
 }) => {
   const [open, setOpen] = React.useState(false);
 
@@ -178,7 +180,7 @@ const ExpandableRow = (props: {
             aria-label="expand row"
             size="small"
             onClick={() => setOpen(!open)}
-            style={{ display: props.row.sub_rows.length === 0 ? 'none' : 'block' }}
+            style={{ display: /*!props.row.sub_rows || props.row.sub_rows.length === 0 ? 'none' : */'block' }}
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
@@ -199,7 +201,7 @@ const ExpandableRow = (props: {
                     minWidth: "40px",
                     minHeight: "30px",
                   }}
-                // onClick={() => handleAddRow()}
+                onClick={() => { props.handleAddRow(props.row['_id'])}}
                 >
                   +
                 </Button>
@@ -223,8 +225,6 @@ const ExpandableRow = (props: {
             {/* <Box sx={{
               marginBottom: 2, p: "0 0px"
             }}> */}
-
-            {console.log(props.sub_columns)}
             <DataGrid rows={props.row.sub_rows}
               headerHeight={0}
               components={{

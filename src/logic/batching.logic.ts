@@ -31,6 +31,7 @@ export interface IBatching {
 }
 
 export interface IBatchingContainer {
+  _id: string;
   container_id: string;
   lot_number: string;
   amount_to_use: number;
@@ -46,7 +47,7 @@ export interface IBatchingIngredient {
   required_amount: number;
   used_containers: IBatchingContainer[];
   used_amount: number;
-  has_enough?: boolean;
+  has_enough: boolean;
 }
 
 const api = axios.create({
