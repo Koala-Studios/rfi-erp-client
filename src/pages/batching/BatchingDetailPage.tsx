@@ -235,21 +235,9 @@ export const BatchingDetailPage = () => {
     {
       field: "product_name",
       headerName: "Product Name",
-      // width: 350,
+      width: 350,
       sortable: false,
       filterable: false,
-      renderCell: (row_params: GridRenderCellParams<string>) => (
-        <TableAutocomplete
-          dbOption="material"
-          handleEditRow={handleEditProductRow}
-          rowParams={row_params}
-          initialValue={row_params.row.product_name}
-          letterMin={3}
-          getOptionLabel={(item: IInventory) =>
-            `${item.product_code} | ${item.name}`
-          }
-        />
-      ),
     },
     {
       field: "required_amount",
@@ -276,12 +264,32 @@ export const BatchingDetailPage = () => {
       align: "right",
       editable: true,
     },
+    // {
+    //   field: "lot_number",
+    //   headerName: "Lot #",
+    //   width: 150,
+    //   align: "right",
+    //   editable: true,
+    // },
     {
       field: "lot_number",
       headerName: "Lot #",
       width: 150,
-      align: "right",
-      editable: true,
+      sortable: false,
+      filterable: false,
+      renderCell: (row_params: GridRenderCellParams<string>) => (
+        <TableAutocomplete
+        initialValue={row_params.row.sub_rows.lot_number}
+          // readOnly={batching!.status === 6 || purchase!.status === 4}
+          dbOption="container"
+          handleEditRow={handleEditProductRow}
+          rowParams={row_params}
+          letterMin={0}
+          getOptionLabel={(item: IBatchingContainer) => item ?
+            `${item.lot_number} ` : ''
+          }
+        />
+      ),
     },
     {
       field: "confirm_lot_number",
@@ -319,10 +327,24 @@ export const BatchingDetailPage = () => {
   const sub_columns: GridColDef[] = [
     {
       field: "lot_number",
-      headerName: "Lot Number",
+      headerName: "Lot #",
       width: 155,
-      align: "left",
-      editable: true,
+      align:'left',
+      sortable: false,
+      filterable: false,
+      renderCell: (row_params: GridRenderCellParams<string>) => (
+        <TableAutocomplete
+        initialValue={''}
+          // readOnly={batching!.status === 6 || purchase!.status === 4}
+          dbOption="container"
+          handleEditRow={handleEditProductRow}
+          rowParams={row_params}
+          letterMin={0}
+          getOptionLabel={(item: IBatchingContainer) => item ?
+            `${item.lot_number} ` : ''
+          }
+        />
+      ),
     },
     {
       field: "confirm_lot_number",
@@ -449,6 +471,7 @@ export const BatchingDetailPage = () => {
 
   const handleEditCell = (row_id: string, field: string, value: any) => {
     const rowIndex = rows.findIndex((r: any) => r._id === row_id);
+    console.log(row_id, field, value)
     setRows([
       ...rows.slice(0, rowIndex),
       {
@@ -798,6 +821,7 @@ export const BatchingDetailPage = () => {
           rows={expandableRows!}
           columns={expandableColumns}
           handleAddRow={ handleAddRow}
+          handleEditCell={handleEditCell}
           sub_columns={sub_columns}
         ></BatchingDataTable>
       </Card>

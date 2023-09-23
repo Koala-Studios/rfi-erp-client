@@ -15,6 +15,7 @@ import {
   Card,
   Collapse,
   IconButton,
+  Input,
   Pagination,
   Paper,
   Table,
@@ -39,6 +40,7 @@ interface Props {
   auto_height?: boolean;
   listOptions?: IListOptions;
   handleAddRow: (row_id:string) => void;
+  handleEditCell: (row_id: string, field: string, value: any) => void;
   handleDBClick?: GridEventListener<"rowClick">;
 }
 
@@ -47,6 +49,7 @@ export const BatchingDataTable: React.FC<Props> = ({
   columns,
   sub_columns,
   handleAddRow,
+  handleEditCell,
   auto_height = false,
   listOptions = null,
   handleDBClick,
@@ -137,7 +140,7 @@ export const BatchingDataTable: React.FC<Props> = ({
                 key={row_item.name}
                 columns={columns}
                 sub_columns={sub_columns}
-                row={row_item} handleAddRow={handleAddRow}></ExpandableRow>
+                row={row_item} handleAddRow={handleAddRow} handleEditCell={handleEditCell}></ExpandableRow>
             ))}
           </TableBody>
         </Table>
@@ -164,6 +167,7 @@ const ExpandableRow = (props: {
   columns: GridColDef[];
   sub_columns: GridColDef[];
   row: any;
+  handleEditCell:(row_id: string, field: string, value: any) => void;
   handleAddRow: (row_id:string) => void;
 }) => {
   const [open, setOpen] = React.useState(false);
@@ -172,7 +176,7 @@ const ExpandableRow = (props: {
     <>
       <TableRow
         sx={{
-          "& > *": { borderBottom: "none!important" },
+          "& > *": { borderBottom: "none!important" }
         }}
       >
         <TableCell sx={{ p: 0.7 }} width={50}>
@@ -180,14 +184,16 @@ const ExpandableRow = (props: {
             aria-label="expand row"
             size="small"
             onClick={() => setOpen(!open)}
-            style={{ display: /*!props.row.sub_rows || props.row.sub_rows.length === 0 ? 'none' : */'block' }}
+            // style={{ display: /*!props.row.sub_rows || props.row.sub_rows.length === 0 ? 'none' : */'block' }}
+            style={{ display: !props.row.sub_rows || props.row.sub_rows.length === 0 ? 'none' : 'block' }}
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
-        </TableCell>
-        {props.columns.map((col, index) => (
-          <TableCell sx={{ p: 1, fontWeight: '500', fontSize: '0.9rem' }}>
+        </TableCell >
+        {props.columns.map((col:GridColDef, index) => (
+          <>
             {index == 9 &&
+            <TableCell  sx={{ p: 1, fontWeight: '500',fontSize: '0.9rem' }}>
               <strong>
                 <Button
                   variant="outlined"
@@ -201,13 +207,15 @@ const ExpandableRow = (props: {
                     minWidth: "40px",
                     minHeight: "30px",
                   }}
-                onClick={() => { props.handleAddRow(props.row['_id'])}}
+                onClick={() => { props.handleAddRow(props.row['_id']); setOpen(true) }}
                 >
                   +
                 </Button>
               </strong>
+              </TableCell>
             }
-            {props.row[col.field]}</TableCell>
+            <CustomTableCell handleEditCell={props.handleEditCell} row={props.row} name={col.field} index={index} column={col} value={props.row[col.field]} ></CustomTableCell>
+            </>
         ))}
       </TableRow>
       <TableRow>
@@ -240,4 +248,25 @@ const ExpandableRow = (props: {
       </TableRow>
     </>
   );
+};
+const CustomTableCell = ( props:any) => {
+  const [isEditMode, setEditMode ] = React.useState<boolean>(false);
+  if(!props.row.renderCell){ return (
+    <TableCell align="left" onDoubleClick={()=> {setEditMode(true); }} onAbort={()=>{setEditMode(false)}}>
+      { isEditMode && props.column.editable ? (
+              <Input
+                defaultValue={props.row[props.column.field]}
+                style={{height:19, margin:0, padding:0}}
+                name={props.name ?? ''}
+                onChange={(e) => props.handleEditCell(props.row._id,props.column.field, e.target.value)}
+              />
+              ) : (
+                props.row[props.column.field]
+              )}  
+      </TableCell>
+  )} else {
+    return (
+      props.row.renderCell
+    );
+  };
 };

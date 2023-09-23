@@ -25,7 +25,8 @@ export const lookup = async (
     | "product-type"
     | "product-type-mat"
     | "product-type-raw"
-    | "location",
+    | "location"
+    | "container",
   letterMin: number
 ) => {
   if (query.length < letterMin) return [];
@@ -64,6 +65,8 @@ export const lookup = async (
     return await lookupUser(query);
   } else if (dbOption === "location") {
     return await lookupLocation(query);
+  } else if (dbOption === "container") {
+    return await lookupInventoryStock(query);
   }
 
   return [];

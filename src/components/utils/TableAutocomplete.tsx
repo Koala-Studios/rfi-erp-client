@@ -20,7 +20,8 @@ interface Props {
   | "product-type"
   | "product-type-mat"
   | "location"
-  | "product-type-raw";
+  | "product-type-raw"
+  | "container";
   handleEditRow: (id: string, newItem: any) => void;
   readOnly?:boolean,
   rowParams: GridRenderCellParams<string>;
