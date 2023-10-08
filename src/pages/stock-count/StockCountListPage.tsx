@@ -77,13 +77,10 @@ const StockCountStatus = [
   const auth = React.useContext(AuthContext);
 
   const filterArray: FilterElement[] = [
-    { label: "Item Name", field: "name", type: "text" },
-    {
-      label: "Item Code",
-      field: "product_code",
-      type: "text",
-      regexOption: null,
-    },
+    { label: "Count Code", field: "count_code", type: "text" },
+    { label: "Created Date", field: "create_date", type: "date" },
+    { label: "Approved Date", field: "approved_date", type: "date" },
+    { label: "Status", field: "status", type: "dropdown", options: [{value: 1, text: "Ok"}, {value: 2, text: "\!Ok"}] },
   ];
   
   React.useEffect(() => {

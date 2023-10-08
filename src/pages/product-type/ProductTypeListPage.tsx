@@ -18,14 +18,8 @@ const ProductTypeListPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
   const filterArray: FilterElement[] = [
-    {
-      label: "Product Code",
-      field: "product_code",
-      type: "text",
-    },
-    { label: "Batch Code", field: "batch_code", type: "text" },
-    { label: "Quantity", field: "quantity", type: "number", regexOption: null },
-  
+    { label: "Code", field: "code", type: "text" },
+    { label: "Name", field: "name", type: "text" },
   ];
   const columns: GridColDef[] = [
     // { field: "id", headerName: "ID", width: 300 },

@@ -31,14 +31,12 @@ const PurchaseStatus = [
 
 
   const filterArray: FilterElement[] = [
-    {
-      label: "Product Code",
-      field: "product_code",
-      type: "text",
-    },
-    { label: "Batch Code", field: "batch_code", type: "text" },
-    { label: "Quantity", field: "quantity", type: "number", regexOption: null },
-  
+    { label: "Order Code", field: "order_code", type: "text" },
+    { label: "Date Purchased", field: "date_purchased", type: "date" },
+    { label: "Date Arrived", field: "date_arrived", type: "date" },
+    { label: "Shipping Code", field: "shipping_code", type: "text" },
+    { label: "Supplier", field: "supplier", type: "dropdown", options: [{value: "sup", text: "Sup_1"}, {value: "Rolling", text: "Sup_2"}] },
+    { label: "Status", field: "status", type: "dropdown", options: [{value: 1, text: "Ok"}, {value: 2, text: "\!Ok"}] },
   ];
   const columns: GridColDef[] = [
     { field: "order_code", headerName: "Order Code", width: 200 },

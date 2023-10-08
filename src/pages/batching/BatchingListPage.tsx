@@ -20,7 +20,11 @@ const filterArray: FilterElement[] = [
     field: "product_code",
     type: "text",
   },
+  { label: "Product Name", field: "name", type: "text"},
   { label: "Batch Code", field: "batch_code", type: "text" },
+  { label: "Status", field: "status", type: "dropdown", options: [{value: 1, text: "Ok"}, {value: 2, text: "\!Ok"}] },
+  { label: "Date Created", field: "date_created", type: "date" },
+  { label: "Date Due", field: "date_needed", type: "date" },
   { label: "Quantity", field: "quantity", type: "number", regexOption: null },
 
 ];

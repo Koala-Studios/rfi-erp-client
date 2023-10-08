@@ -29,6 +29,7 @@ const DataFilter: React.FC<Props> = ({ filters }) => {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
+    console.log(filters)
     if (open === false) {
       filterEls.current = [];
 
@@ -37,6 +38,7 @@ const DataFilter: React.FC<Props> = ({ filters }) => {
 
     for (let i = 0; i < filters.length; i++) {
       const val = searchParams.get(filters[i].field);
+      console.log(val)
       if (val) {
         filterEls.current[i].value = val;
       }
@@ -46,6 +48,7 @@ const DataFilter: React.FC<Props> = ({ filters }) => {
   const handleSearchClicked = () => {
     for (let i = 0; i < filters.length; i++) {
       const filterVal = filterEls.current[i].value;
+
       if (filterVal && filterVal !== "") {
         if (searchParams.has(filters[i].field)) {
           searchParams.set(filters[i].field, filterVal);
@@ -70,15 +73,27 @@ const DataFilter: React.FC<Props> = ({ filters }) => {
     setOpen(false);
   };
 
+  const filterPush = (element: any, dropdown: boolean) => {
+    if(filterEls.current.length < filters.length) {
+      if(dropdown){
+        filterEls.current.push(element.node)
+
+        return
+      }
+
+      filterEls.current.push(element)
+    }
+  }
+
   const createFields = () => {
     return filters.map((item, idx) => {
-      if (item.type === "dropdown") {
+      if (item.type === "dropdown") { 
         return (
           <Grid key={idx} item xs={2}>
             <SimpleSelect
               label={item.label}
               options={item.options!}
-              inputRef={(element: any) => filterEls.current.push(element)}
+              inputRef={(element: any) => filterPush(element, true)}
             />
           </Grid>
         );
@@ -87,7 +102,7 @@ const DataFilter: React.FC<Props> = ({ filters }) => {
       return (
         <Grid key={idx} item xs={2}>
           <TextField
-            inputRef={(element: any) => filterEls.current.push(element)}
+            inputRef={(element: any) => filterPush(element, false)}
             spellCheck="false"
             InputLabelProps={{ shrink: true }}
             fullWidth

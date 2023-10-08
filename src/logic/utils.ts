@@ -35,7 +35,7 @@ export interface FilterElement {
 }
 
 export interface OptionItem {
-  value: number;
+  value: number | string;
   text: string;
 }
 
@@ -50,7 +50,6 @@ export function paramsToObject(entries: any) {
 }
 export function paramsToObjectRegex(entries: any, filters: FilterElement[]) {
   const result: any = {};
-
   for (const [key, value] of entries) {
     if (key === "page" || key === "count") {
       result[key] = value;

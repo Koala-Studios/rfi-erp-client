@@ -18,14 +18,9 @@ const UserListPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
   const filterArray: FilterElement[] = [
-    {
-      label: "Product Code",
-      field: "product_code",
-      type: "text",
-    },
-    { label: "Batch Code", field: "batch_code", type: "text" },
-    { label: "Quantity", field: "quantity", type: "number", regexOption: null },
-  
+    { label: "Email", field: "email", type: "text" },
+    { label: "Username", field: "username", type: "text" },
+    { label: "Roles", field: "roles", type: "dropdown", options: [{value: "idk", text: "Role_1"}, {value: "Rolling", text: "Role_2"}] },
   ];
   const columns: GridColDef[] = [
     // { field: "id", headerName: "ID", width: 300 },

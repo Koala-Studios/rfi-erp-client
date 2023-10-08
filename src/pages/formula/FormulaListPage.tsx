@@ -26,7 +26,13 @@ const filterArray: FilterElement[] = [
     field: "product_code",
     type: "text",
   },
-  { label: "Batch Code", field: "batch_code", type: "text" },
+  { label: "Product Name", field: "name", type: "text"},
+  { label: "Product Alias", field: "aliases", type: "text"},
+  { label: "Regulatory", field: "regulatory", type: "text"}, // Look at regulatory obj
+  { label: "Dietary", field: "dietary", type: "text"},
+  { label: "Product Type", field: "product_type", type: "text"},
+  { label: "Date Created", field: "date_created", type: "date"},
+  { label: "Solid", field: "is_solid", type: "text"},
   { label: "Quantity", field: "quantity", type: "number", regexOption: null },
 
 ];

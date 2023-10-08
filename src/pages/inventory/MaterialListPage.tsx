@@ -22,6 +22,13 @@ const filterArray: FilterElement[] = [
     type: "text",
     regexOption: null,
   },
+  { label: "Product Alias", field: "aliases", type: "text"},
+  { label: "Cas number", field: "cas_number", type: "text"},
+  { label: "Regulatory", field: "regulatory", type: "text"}, // Look at regulatory obj
+  { label: "Dietary", field: "dietary", type: "text"},
+  { label: "Product Type", field: "product_type", type: "text"},
+  { label: "Date Created", field: "date_created", type: "date"},
+  { label: "Solid", field: "is_solid", type: "text"},
 ];
 
 const MaterialListPage = () => {

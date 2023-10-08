@@ -18,13 +18,12 @@ const SupplierListPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
   const filterArray: FilterElement[] = [
-    {
-      label: "Product Code",
-      field: "product_code",
-      type: "text",
-    },
-    { label: "Batch Code", field: "batch_code", type: "text" },
-    { label: "Quantity", field: "quantity", type: "number", regexOption: null },
+    { label: "Name", field: "name", type: "text" },
+    { label: "Code", field: "code", type: "text" },
+    { label: "Created Date", field: "created_date", type: "date" },
+    { label: "Contact Name", field: "contact_name", type: "text" },
+    { label: "Email", field: "email", type: "text" },
+    { label: "Phone", field: "phone", type: "text" },
   
   ];
   const columns: GridColDef[] = [

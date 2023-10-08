@@ -17,13 +17,12 @@ import DataFilter from "../../components/utils/DataFilter";
 import { ExpandableDataTable } from "../../components/utils/ExpandableDataTable";
 
 const filterArray: FilterElement[] = [
-  {
-    label: "Product Code",
-    field: "product_code",
-    type: "text",
-    regexOption: null,
-  },
-  { label: "Product Name", field: "name", type: "text" },
+  { label: "Product Code", field: "product_code", type: "text"},
+  { label: "Product Name", field: "name", type: "text"},
+  { label: "Lot Number", field: "lot_number", type: "text"},
+  { label: "Expirey Date", field: "expiry_date", type: "date"},
+  { label: "Supplier Sku", field: "supplier_sku", type: "text"},
+  { label: "Container Size", field: "container_size", type: "number"},
 ];
 
 const InventoryStockListPage = () => {
