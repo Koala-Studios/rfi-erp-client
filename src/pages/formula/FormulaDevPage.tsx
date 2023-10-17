@@ -691,7 +691,7 @@ const FormulaDevPage = () => {
               ></TextField>
             </Grid>
             <Grid item xs={1.2}></Grid>
-            <Grid item xs={0.75}>
+            <Grid item xs={1}>
               <TextField
                 spellCheck="false"
                 InputLabelProps={{ shrink: true }}

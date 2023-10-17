@@ -39,9 +39,9 @@ const PurchaseStatus = [
     { label: "Status", field: "status", type: "dropdown", options: [{value: 1, text: "Ok"}, {value: 2, text: "\!Ok"}] },
   ];
   const columns: GridColDef[] = [
-    { field: "order_code", headerName: "Order Code", width: 200 },
-    { field: "supplier", headerName: "Supplier Name", width: 200 },
-    { field: "date_purchased", headerName: "Purchase Date", width: 200 },
+    { field: "order_code", headerName: "Order Code", width: 150 },
+    { field: "supplier", headerName: "Supplier", width: 130 },
+    { field: "date_purchased", headerName: "Purchase Date", width: 130 },
     { field: "item_count", headerName: "Item #", width: 80 },
     {
       field: "status",

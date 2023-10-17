@@ -25,7 +25,7 @@ import {
   updatePurchase,
 } from "../../logic/purchase-order.logic";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import TableAutocomplete from "../../components/utils/TableAutocomplete";
@@ -65,6 +65,7 @@ const emptyPurchase: IPurchaseOrder = {
 const inputRefMap = {
   order_code: 0,
   date_purchased: 1,
+  supplier:2
   //TODO: Supplier
 };
 
@@ -75,8 +76,12 @@ const inputMap: InputInfo[] = [
     ref: 1,
     validation: { required: true, genericVal: "Date" },
   },
+  {
+    label: "supplier",
+    ref: 2,
+    validation: { required: true, genericVal: "Text" },
+  },
 ];
-
 
 export const PurchaseDetailPage = () => {
   const navigate = useNavigate();
@@ -163,7 +168,7 @@ export const PurchaseDetailPage = () => {
         }
       })
 
-    } else {
+    } else { //TODO: Ensure user can't save PO with empty rows
       const updated = await updatePurchase(purchase!);
 
       if (updated === false) {
@@ -291,6 +296,14 @@ export const PurchaseDetailPage = () => {
       editable: false,
     },
     {
+      field: "sample",
+      headerName: "Sample",
+      type: "boolean",
+      width: 80,
+      editable: true,
+      align: "center",
+    },
+    {
       field: "lot_number",
       headerName: "Lot#",
       type: "string",
@@ -314,26 +327,26 @@ export const PurchaseDetailPage = () => {
       editable: true,
       align: "center",
     },
-    {
-      field: "location",
-      headerName: "Location",
-      width: 140,
-      sortable: false,
-      filterable: false,
-      renderCell: (row_params: GridRenderCellParams<string>) => (
-        <TableAutocomplete
-        initialValue={row_params.row.location}
-          readOnly={purchase!.status === 6 || purchase!.status === 4}
-          dbOption="location"
-          handleEditRow={handleEditProductRow}
-          rowParams={row_params}
-          letterMin={0}
-          getOptionLabel={(item: ILocation) => item ?
-            `${item.code} | ${item.name}` : ''
-          }
-        />
-      ),
-    },
+    // {
+    //   field: "location",
+    //   headerName: "Location",
+    //   width: 140,
+    //   sortable: false,
+    //   filterable: false,
+    //   renderCell: (row_params: GridRenderCellParams<string>) => (
+    //     <TableAutocomplete
+    //     initialValue={row_params.row.location}
+    //       readOnly={purchase!.status === 6 || purchase!.status === 4}
+    //       dbOption="location"
+    //       handleEditRow={handleEditProductRow}
+    //       rowParams={row_params}
+    //       letterMin={0}
+    //       getOptionLabel={(item: ILocation) => item ?
+    //         `${item.code} | ${item.name}` : ''
+    //       }
+    //     />
+    //   ),
+    // },
     {
       field: "expiry_date", //TODO: Fix blur not putting value in so clicking button will say "missing fields :-(" (maybe make mini date choosing custom component)
       headerName: "Exp Date",
@@ -426,6 +439,14 @@ export const PurchaseDetailPage = () => {
       width: 100,
       align: "center",
       editable: true,
+    },
+    {
+      field: "sample",
+      headerName: "Sample",
+      type: "boolean",
+      width: 80,
+      editable: true,
+      align: "center",
     },
     {
       field: "received_amount",
@@ -559,6 +580,7 @@ export const PurchaseDetailPage = () => {
         purchased_amount: 0,
         received_amount: 0,
         unit_price: 0,
+        sample:false
       },
       ...rows.slice(0),
     ]);
@@ -702,14 +724,27 @@ export const PurchaseDetailPage = () => {
               <Grid item xs={3}>
                 <StandaloneAutocomplete
                   initialValue={purchase.supplier}
-                  onChange={(e, value) => {
-                    setPurchase({ ...purchase, supplier: value });
+                  inputRef={(el: any) =>
+                    (inputRefs.current[inputRefMap.supplier] = el)
+                  }
+                  error={inputVisuals[inputRefMap.supplier].error}
+                  helperText={inputVisuals[inputRefMap.supplier].helperText}
+                  onChange={(event, value) => {
+                    console.log(value, 'testing ')
+                    setPurchase({ ...purchase, supplier: {name: value.name, supplier_id: value._id} });
+                    // onInputBlur(event, inputMap[inputRefMap.material_type]);
                   }}
+                  // onBlur={(event: any) =>
+                  //   onInputBlur(event, inputMap[inputRefMap.supplier])
+                  // }
+                  required={
+                    inputMap[inputRefMap.supplier].validation.required
+                  }
                   label={"Supplier"}
                   letterMin={0}
                   readOnly={purchase.status != 6}
                   dbOption={"supplier"}
-                  getOptionLabel={(item: ISupplier) => item.name}
+                  getOptionLabel={(item: ISupplier) => item ? item.name : ''}
                 />
               </Grid>
 
@@ -802,6 +837,20 @@ export const PurchaseDetailPage = () => {
           rowHeight={46}
           rows={rows!}
           getRowId={(row) => row._id}
+          getCellClassName={(params: GridCellParams<number>) => {
+            if (params.field === 'unit_price') {
+              return params.row.unit_price > 0 ? '' : 'YellowRow';
+            } else if (params.field === 'expiry_date') {
+              return params.row.expiry_date != null ? '' : 'YellowRow';
+            } else if (params.field === 'lot_number') {
+              return params.row.lot_number != null ? '' : 'YellowRow';
+            } else if (params.field === 'container_size') {
+              return params.row.container_size > 0 ? '' : 'YellowRow';
+            } else if (params.field === 'process_amount') {
+              return params.row.process_amount > 0 ? '' : 'YellowRow';
+            }
+            return '';
+          }}
           processRowUpdate={(newRow) => {
             console.log(newRow);
             let pList = rows.slice();

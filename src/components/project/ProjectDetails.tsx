@@ -291,9 +291,9 @@ export const ProjectDetails = () => {
                   setProject({ ...project, customer: value });
                   // onInputBlur(event, inputMap[inputRefMap.material_type]);
                 }}
-                onBlur={(event: any) =>
-                  onInputBlur(event, inputMap[inputRefMap.customer])
-                }
+                // onBlur={(event: any) =>
+                //   onInputBlur(event, inputMap[inputRefMap.customer])
+                // }
                 required={
                   inputMap[inputRefMap.customer].validation.required
                 }

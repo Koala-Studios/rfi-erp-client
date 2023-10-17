@@ -3,9 +3,10 @@ import { useEffect, useState, useContext } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../components/navigation/AuthProvider";
 import { getProduct } from "../../logic/product.logic";
-import { createUser, getUser, IUser, updateUser } from "../../logic/user.logic";
+import { createUser, getUser, IUser, IUserRole, updateUser } from "../../logic/user.logic";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SaveForm from "../../components/forms/SaveForm";
+import StandaloneAutocomplete from "../../components/utils/StandaloneAutocomplete";
 
 const emptyUser: IUser = {
   _id: "",
@@ -134,7 +135,24 @@ export const UserDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
-            <Grid item xs={6}></Grid>
+            
+          <Grid item xs={6}>
+          <StandaloneAutocomplete //TODO: Make this work properly, for testing purposes rn
+            initialValue={user.roles}
+            readOnly={false}
+            onChange={(e:any, value:any) => {
+              setUser({...user!, roles: [value] })
+            }}
+            label={"Roles"}
+            letterMin={0}
+            dbOption={"roles"}
+            getOptionLabel={(item: IUserRole) => {
+              return (
+                item.name
+              );
+            }}
+          />
+          </Grid>
 
             <Grid item xs={3}>
               <TextField
@@ -165,7 +183,6 @@ export const UserDetailPage = () => {
               ></TextField>
             </Grid>
           </Grid>
-
           <Card
             variant="outlined"
             style={{ width: "40%", minWidth: "40%", padding: 16 }}

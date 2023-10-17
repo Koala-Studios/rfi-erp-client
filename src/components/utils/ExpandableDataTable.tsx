@@ -64,7 +64,7 @@ export const ExpandableDataTable: React.FC<Props> = ({
       >
         <Pagination
           color="primary"
-          count={listOptions!.totalPages - 1}
+          count={listOptions!.totalPages}
           page={currPage}
           shape="rounded"
           variant="outlined"

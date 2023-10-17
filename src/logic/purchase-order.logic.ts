@@ -9,6 +9,7 @@ export interface IOrderItem {
   purchased_amount: number;
   received_amount: number;
   unit_price: number;
+  sample: boolean;
 }
 
 export interface IOrderItemProcess extends IOrderItem {
@@ -167,7 +168,7 @@ export const confirmPurchase = async (
     .catch((err) => {
       console.log(err);
     });
-    
+
   return rtn;
 };
 

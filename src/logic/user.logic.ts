@@ -22,6 +22,11 @@ export interface IUser {
   //TODO:ROLES & DATES
 }
 
+export interface IUserRole {
+  _id: string;
+  name: string;
+}
+
 const api = axios.create({
   baseURL: "http://localhost:5000/user",
 });
@@ -133,6 +138,31 @@ export const lookupUser = async (
 
   await api
     .get("/lookup", config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        list = res.data.res;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  return list;
+};
+
+export const lookupRoles = async (
+  search_value: string
+): Promise<IUser[] | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+    params: {
+      search_value,
+    },
+  };
+
+  let list: IUser[] | null = null;
+
+  await api
+    .get("/role-lookup", config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
         list = res.data.res;

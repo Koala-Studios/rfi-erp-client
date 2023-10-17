@@ -7,6 +7,7 @@ import {
   paramsToObject,
 } from "./utils";
 import { IInventoryStock } from "./inventory-stock.logic";
+import { ILocation } from "./location.logic";
 
 export interface ICountItem {
   _id: string;
@@ -160,6 +161,32 @@ export const fillAllStockCount = async (): Promise<
 
   await api
     .get("/fill-all", config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        rtn = res.data.res;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
+};
+
+export const fillAllLocation = async (
+  location_id: string
+): Promise<IInventoryStock[] | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+    params: {
+      location_id: location_id,
+    },
+  };
+
+  let rtn = null;
+
+  await api
+    .get("/fill-location", config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
         rtn = res.data.res;

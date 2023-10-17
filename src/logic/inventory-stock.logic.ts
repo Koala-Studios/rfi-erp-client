@@ -18,8 +18,9 @@ export interface IInventoryStockGrouped {
   product_code: string;
   name: string;
   average_cost: number;
+  sample: boolean;
   received_amount: number;
-  used_amount: number;
+  remaining_amount: number;
   allocated_amount: number;
   quarantined_containers: number;
   items: [IInventoryStock];
@@ -32,8 +33,9 @@ export interface IInventoryStock {
   name: string;
   unit_cost: number;
   container_size: number;
+  sample: boolean;
   received_amount: number;
-  used_amount: number;
+  remaining_amount: number;
   allocated_amount: number;
   quarantined_containers: number;
 

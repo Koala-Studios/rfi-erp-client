@@ -33,6 +33,7 @@ import {
   disapproveStockCount,
   abandonStockCount,
   fillAllStockCount,
+  fillAllLocation,
 } from "../../logic/stock-count.logic";
 import { IInventoryStock } from "../../logic/inventory-stock.logic";
 import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
@@ -99,7 +100,8 @@ const inputMap: InputInfo[] = [
   { label: "notes", ref: 3, validation: { required: false, genericVal: "Text" } },
 ];
   
-  const [selectedContainer, setSelectedContainer] = React.useState<IInventoryStock | null>(null);
+const [selectedContainer, setSelectedContainer] = React.useState<IInventoryStock | null>(null);
+const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>(null);
   const [weighedAmt, setWeighedAmt] = React.useState<number>(NaN);
 
   const [rows, setRows] = React.useState<ICountItem[]>([]);
@@ -231,7 +233,7 @@ const inputMap: InputInfo[] = [
       width: 120,
       editable: false,
       align: "right",
-      valueGetter: (params) => params.row.expiry_date.split('T')[0]
+      valueGetter: (params) => params.row.expiry_date ? params.row.expiry_date.split('T')[0] : ''
     },
     {
       field: "container_size",
@@ -384,7 +386,6 @@ const inputMap: InputInfo[] = [
         setWeighedAmt(NaN);
         return;
       }
-      const curr_amt = selectedContainer.received_amount - selectedContainer.used_amount;
       setRows([
         {
           _id: new ObjectID().toHexString(),
@@ -396,8 +397,8 @@ const inputMap: InputInfo[] = [
           lot_number: selectedContainer.lot_number,
           container_id:selectedContainer._id,
           container_size: selectedContainer.container_size,
-          container_amount: Math.ceil(curr_amt / selectedContainer.container_size),
-          current_amount: curr_amt,
+          container_amount: Math.ceil(selectedContainer.remaining_amount / selectedContainer.container_size),
+          current_amount: selectedContainer.remaining_amount,
           proposed_amount: weighedAmt,
         },
         ...rows.slice(0),
@@ -418,12 +419,56 @@ const inputMap: InputInfo[] = [
   };
   const handlefillAllStockCount = () => {
     fillAllStockCount().then((containers) => {
-
-      console.log(containers);
+      containers?.map((container:IInventoryStock) => {
+        setRows([
+          {
+            _id: new ObjectID().toHexString(),
+            //@ts-ignore //TODO: remove this clearly.
+            product_id: container.product_id._id,
+            product_code: container.product_code,
+            name: container.name,
+            expiry_date: container.expiry_date,
+            lot_number: container.lot_number,
+            container_id:container._id,
+            container_size: container.container_size ?? 0,
+            container_amount: (container.remaining_amount && container.container_size) ? Math.ceil(container.remaining_amount / container.container_size) : 0,
+            current_amount: container.remaining_amount ?? 0,
+            proposed_amount: 0,
+          },
+          ...rows.slice(0),
+        ]);
+      })
     }
     );
    
   }
+  const handlefillLocation = () => {
+    if(selectedLocation) {
+      console.log(selectedLocation)
+      fillAllLocation(selectedLocation!._id).then((containers) => {
+        containers?.map((container:IInventoryStock) => {
+          setRows([
+            {
+              _id: new ObjectID().toHexString(),
+              //@ts-ignore //TODO: remove this clearly.
+              product_id: container.product_id._id,
+              product_code: container.product_code,
+              name: container.name,
+              expiry_date: container.expiry_date,
+              lot_number: container.lot_number,
+              container_id:container._id,
+              container_size: container.container_size ?? 0,
+              container_amount: (container.remaining_amount && container.container_size) ? Math.ceil(container.remaining_amount / container.container_size) : 0,
+              current_amount: container.remaining_amount ?? 0,
+              proposed_amount: 0,
+            },
+            ...rows.slice(0),
+          ]);
+        })
+      })
+    }
+  }
+
   const saveStockCount = async () => {
     let allValid = true;
     //do client side validation
@@ -679,12 +724,12 @@ const inputMap: InputInfo[] = [
       <Card variant="outlined" sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
         {/* <div style={{ display: "flex", flexDirection: "row", gap: 10 }}> */}
         <Grid container spacing={3} sx={{mb:3}}>
-        <Grid item xs={2}>
+        <Grid item xs={3}>
         <StandaloneAutocomplete
-            initialValue={selectedContainer}
+            initialValue={selectedLocation}
             readOnly={stockCount.status!= 1}
             onChange={(e, value) => {
-              setSelectedContainer(value)
+              setSelectedLocation(value)
             }}
             label={"Location Lookup"}
             letterMin={0}
@@ -697,7 +742,7 @@ const inputMap: InputInfo[] = [
           />
         </Grid>  
         <Grid item xs={2}>
-        <Button variant="contained">Import Location</Button>
+        <Button variant="contained" onClick={() => handlefillLocation()}>Import Location</Button>
         </Grid>  
         <Grid item xs={2}>
         <Button color="info" variant="contained" onClick={() => handlefillAllStockCount()}>Import All</Button>
@@ -778,8 +823,8 @@ const inputMap: InputInfo[] = [
                 readOnly:true
               }}
               variant="outlined"
-              label={"Cont Amt"}
-              value={ selectedContainer ? Math.ceil((selectedContainer?.received_amount - selectedContainer?.used_amount) / selectedContainer?.container_size ) : 0 }
+              label={"Cont Qty"}
+              value={ selectedContainer ? Math.ceil((selectedContainer?.remaining_amount) / selectedContainer?.container_size ) : 0 }
             />
             </Grid>
             <Grid item xs={1.5}>
@@ -797,7 +842,7 @@ const inputMap: InputInfo[] = [
               // type="number"
               
               label={"Curr Amt"}
-              value={ selectedContainer ? (selectedContainer?.received_amount - selectedContainer?.used_amount).toFixed(4) : 0 }
+              value={ selectedContainer ? (selectedContainer?.remaining_amount).toFixed(4) : 0 }
             />
             </Grid>
           <Grid item xs={1.5}>
@@ -828,7 +873,7 @@ const inputMap: InputInfo[] = [
               handleAddRow();
             }}
           >
-            Add Row
+            Add
           </Button>
           </Grid>
           </Grid>

@@ -15,13 +15,13 @@ import DataFilter from "../../components/utils/DataFilter";
 
 //label,field,type
 const filterArray: FilterElement[] = [
-  { label: "Item Name", field: "name", type: "text" },
   {
     label: "Item Code",
     field: "product_code",
     type: "text",
     regexOption: null,
   },
+  { label: "Item Name", field: "name", type: "text" },
   { label: "Product Alias", field: "aliases", type: "text"},
   { label: "Cas number", field: "cas_number", type: "text"},
   { label: "Regulatory", field: "regulatory", type: "text"}, // Look at regulatory obj

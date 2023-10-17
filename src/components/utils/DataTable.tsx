@@ -55,7 +55,7 @@ export const DataTable: React.FC<Props> = ({
       <div style={{ display: "flex", alignItems: "center" }}>
         <Pagination
           color="primary"
-          count={listOptions!.totalPages - 1}
+          count={listOptions!.totalPages }
           page={currPage}
           shape="rounded"
           variant="outlined"
@@ -72,7 +72,7 @@ export const DataTable: React.FC<Props> = ({
         />
         <Typography variant="subtitle2" sx={{ mr: 2 }}>{`${
           listOptions.pagingCounter
-        }-${listOptions.pagingCounter + listOptions.limit} of ${
+        }-${ listOptions.totalDocs > (listOptions.pagingCounter + listOptions.limit) ? (listOptions.pagingCounter + listOptions.limit) : listOptions.totalDocs} of ${
           listOptions.totalDocs
         }`}</Typography>
       </div>

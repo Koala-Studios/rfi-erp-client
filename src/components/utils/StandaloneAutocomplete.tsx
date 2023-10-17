@@ -31,7 +31,8 @@ interface Props {
     | "product-type"
     | "product-type-mat"
     | "product-type-raw"
-    | "location";
+    | "location"
+    | "roles";
   onChange?: (event: React.SyntheticEvent<Element, Event>, value: any) => void;
 }
 

@@ -5,7 +5,7 @@ import { lookupLocation } from "./location.logic";
 import { lookupProductType } from "./product-type.logic";
 import { lookupProduct } from "./product.logic";
 import { lookupSupplier } from "./supplier.logic";
-import { lookupUser } from "./user.logic";
+import { lookupRoles, lookupUser } from "./user.logic";
 
 export const lookup = async (
   query: string,
@@ -26,7 +26,8 @@ export const lookup = async (
     | "product-type-mat"
     | "product-type-raw"
     | "location"
-    | "container",
+    | "container"
+    | "roles",
   letterMin: number
 ) => {
   if (query.length < letterMin) return [];
@@ -67,6 +68,8 @@ export const lookup = async (
     return await lookupLocation(query);
   } else if (dbOption === "container") {
     return await lookupInventoryStock(query);
+  } else if (dbOption === "roles") {
+    return await lookupRoles(query);
   }
 
   return [];

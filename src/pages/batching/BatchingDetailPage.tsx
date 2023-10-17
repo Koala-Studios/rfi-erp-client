@@ -334,7 +334,7 @@ export const BatchingDetailPage = () => {
       filterable: false,
       renderCell: (row_params: GridRenderCellParams<string>) => (
         <TableAutocomplete
-        initialValue={''}
+        initialValue={row_params.row.lot_number}
           // readOnly={batching!.status === 6 || purchase!.status === 4}
           dbOption="container"
           handleEditRow={handleEditProductRow}
