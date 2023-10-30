@@ -25,6 +25,7 @@ import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
 import NavTab from "../../components/utils/NavTab";
 import LinkTab from "../../components/utils/LinkTab";
 import InventoryMovementPage from "./InventoryMovementPage";
+import InventoryContainerPage from "./InventoryContainerPage";
 
 const emptyInventory: IInventory = {
   _id: "",
@@ -234,7 +235,7 @@ export const InventoryDetailPage = () => {
             aria-label="go back"
             size="medium"
             variant="outlined"
-            onClick={() => navigate("/inventory-stock")}
+            onClick={() => navigate("/materials")}
           >
             <ArrowBackIcon fontSize="small" />
           </Button>
@@ -424,6 +425,12 @@ export const InventoryDetailPage = () => {
           disable={id === "new"}
         />
         <LinkTab
+          label="Containers"
+          href="containers"
+          tab_id={tab_id}
+          disable={id === "new"}
+        />
+        <LinkTab
           label="Usage Stats"
           href="stats"
           tab_id={tab_id}
@@ -431,6 +438,7 @@ export const InventoryDetailPage = () => {
         />
       </NavTab>
       {tab_id && tab_id === "movements" && <InventoryMovementPage />}
+      {tab_id && tab_id === "containers" && <InventoryContainerPage />}
     </>
   );
 };

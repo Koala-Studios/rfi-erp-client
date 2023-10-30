@@ -22,6 +22,7 @@ const PERMISSIONS = {
   producttypes_page: "producttypes_page",
   development_actions: "development_actions",
   development_admin: "development_admin",
+  qc_page: "qc_page",
 };
 
 export default PERMISSIONS;

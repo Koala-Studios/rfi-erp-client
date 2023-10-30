@@ -25,6 +25,7 @@ import LinkTab from "../../components/utils/LinkTab";
 import NavTab from "../../components/utils/NavTab";
 import InventoryMovementPage from "../inventory/InventoryMovementPage";
 import ProductFormulaPage from "./ProductFormulaPage";
+import InventoryContainerPage from "../inventory/InventoryContainerPage";
 
 
 const ProductStatus = [
@@ -437,6 +438,7 @@ export const ProductDetailPage = () => {
         
         <LinkTab label="Customers" href="customers" tab_id={tab_id} disable={id === 'new'} />
         <LinkTab label="Movements" href= "movements" tab_id={tab_id} disable={id === 'new'}/>
+        <LinkTab label="Containers"  href="containers" tab_id={tab_id} disable={true} />
         <LinkTab label="Usage Stats"  href="stats" tab_id={tab_id} disable={true} />
       </NavTab>
       {
@@ -444,7 +446,8 @@ export const ProductDetailPage = () => {
             <InventoryMovementPage/>) ||
           (tab_id && tab_id === "formula" &&
           <ProductFormulaPage/>
-          )
+          ) ||
+      (tab_id && tab_id === "containers" && <InventoryContainerPage />)
       }
     </>
   ); 

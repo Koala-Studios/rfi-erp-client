@@ -61,6 +61,12 @@ a {
 .RedRow:hover {
   background: #d69a9a!important
 }
+.GreenRow {
+  background: #a3d69a!important
+}
+.GreenRow:hover {
+  background: #aac9a5!important
+}
 
 
 

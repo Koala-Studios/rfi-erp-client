@@ -84,6 +84,37 @@ export const listInventoryStock = async (
   return list;
 };
 
+export const listInventoryContainers = async (
+  q: URLSearchParams | undefined,
+  filters: FilterElement[],
+  id: string | undefined
+): Promise<IListOptions | null> => {
+  let query = getQuery(q, filters);
+
+  const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+    params: {
+      query,
+      product_id: id,
+    },
+  };
+
+  let list: IListOptions | null = null;
+
+  await api
+    .get("/list-containers", config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        list = res.data.res;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return list;
+};
+
 export const getStockItem = async (
   id: string
 ): Promise<IInventoryStock | null> => {

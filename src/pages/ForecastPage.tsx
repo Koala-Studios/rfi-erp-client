@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import { DataGrid, GridColDef, GridFooter, GridFooterContainer, GridRenderCellParams, GridToolbar } from "@mui/x-data-grid";
+import { DataGrid, GridCellParams, GridColDef, GridFooter, GridFooterContainer, GridRenderCellParams, GridToolbar } from "@mui/x-data-grid";
 import React from "react";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { DataTable } from "../components/utils/DataTable";
@@ -403,6 +403,12 @@ export const ForecastPage = () => {
           autoHeight={true}
           pagination
           density={'compact'}
+          getCellClassName={(params: GridCellParams<number>) => {
+            if (params.field === 'amount') {
+              return params.row.amount > 0 ? '' : 'RedRow';
+            }
+            return '';  
+          }}
           // rowHeight={45}
           onCellKeyDown={(params, event) => {
             if (event.code == "Space") {

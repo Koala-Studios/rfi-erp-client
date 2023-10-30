@@ -67,6 +67,37 @@ export const listPOs = async (
   return list;
 };
 
+export const listSupplierOrders = async (
+  q: URLSearchParams | undefined,
+  filters: FilterElement[],
+  id: string | undefined
+): Promise<IListOptions | null> => {
+  let query = getQuery(q, filters);
+
+  const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+    params: {
+      query,
+      supplier_id: id,
+    },
+  };
+
+  let list: IListOptions | null = null;
+
+  await api
+    .get("/list-supplier-orders", config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        list = res.data.res;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return list;
+};
+
 export const getPurchase = async (
   id: string
 ): Promise<IPurchaseOrder | null> => {

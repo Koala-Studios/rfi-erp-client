@@ -26,8 +26,8 @@ const CustomerListPage = () => {
     { label: "Phone", field: "phone", type: "text" },
   ];
   const columns: GridColDef[] = [
-    { field: "name", headerName: "Customer Name", width: 250 },
-    { field: "code", headerName: "Customer Code", width: 200 },
+    { field: "name", headerName: "Customer Name", width: 150 },
+    { field: "code", headerName: "Code", width: 80 },
     {
       field: "contact_name",
       headerName: "Contact Name",

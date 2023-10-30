@@ -15,6 +15,7 @@ import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
 import SupplierProductPage from "./SupplierProductPage";
 import LinkTab from "../../components/utils/LinkTab";
 import NavTab from "../../components/utils/NavTab";
+import SupplierOrdersPage from "./SupplierOrdersPage";
 
 const emptySupplier: ISupplier = {
   _id: "new",
@@ -359,11 +360,13 @@ export const SupplierDetailPage = () => {
       <NavTab>
 
         <LinkTab label="Products" href= "products" tab_id={tab_id} disable={id === 'new'}/>
-        <LinkTab label="Order History" href= "order-history" tab_id={tab_id} disable={true}/>
+        <LinkTab label="Order History" href= "order-history" tab_id={tab_id} disable={id === 'new'}/>
       </NavTab>
       {
           (tab_id && tab_id === "products" && 
-        <SupplierProductPage></SupplierProductPage>)
+          <SupplierProductPage></SupplierProductPage>) ||
+          (tab_id && tab_id === "order-history" && 
+          <SupplierOrdersPage></SupplierOrdersPage>)
       }
     </>
   );

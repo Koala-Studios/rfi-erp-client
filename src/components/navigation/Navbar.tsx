@@ -51,7 +51,9 @@ import CategoryIcon from "@mui/icons-material/Category";
 import PERMISSIONS from "../../logic/config.permissions";
 import { hasPermission } from "../../logic/user.logic";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-
+import { FactCheck, ManageAccounts } from "@mui/icons-material";
+import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
+import ScienceIcon from '@mui/icons-material/Science';
 const drawerWidth = 190;
 
 let LinkItems = [
@@ -96,8 +98,14 @@ let LinkItems = [
   {
     text: "Development",
     link: "/development",
-    icon: <GroupIcon></GroupIcon>,
+    icon: <ScienceIcon></ScienceIcon>,
     permission: PERMISSIONS.development_page,
+  },
+  {
+    text: "Quality Control",
+    link: "/qc",
+    icon: <FactCheck></FactCheck>,
+    permission: PERMISSIONS.qc_page,
   },
   {
     text: "Forecast",
@@ -108,7 +116,7 @@ let LinkItems = [
   {
     text: "Purchase Orders",
     link: "/purchase-orders",
-    icon: <ShoppingBasketIcon></ShoppingBasketIcon>,
+    icon: <AddShoppingCartIcon></AddShoppingCartIcon>,
     permission: PERMISSIONS.purchaseorder_page,
   },
   {
@@ -126,7 +134,7 @@ let LinkItems = [
   {
     text: "Users",
     link: "/users",
-    icon: <GroupIcon></GroupIcon>,
+    icon: <ManageAccounts></ManageAccounts>,
     permission: PERMISSIONS.users_page,
   },
   {

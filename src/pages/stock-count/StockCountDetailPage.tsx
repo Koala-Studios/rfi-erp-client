@@ -390,7 +390,7 @@ const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>
         {
           _id: new ObjectID().toHexString(),
           //@ts-ignore //TODO: remove this clearly.
-          product_id: selectedContainer.product_id._id,
+          product_id: selectedContainer.product_id,
           product_code: selectedContainer.product_code,
           name: selectedContainer.name,
           expiry_date: selectedContainer.expiry_date,
@@ -424,7 +424,7 @@ const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>
           {
             _id: new ObjectID().toHexString(),
             //@ts-ignore //TODO: remove this clearly.
-            product_id: container.product_id._id,
+            product_id: container.product_id,
             product_code: container.product_code,
             name: container.name,
             expiry_date: container.expiry_date,
@@ -451,7 +451,7 @@ const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>
             {
               _id: new ObjectID().toHexString(),
               //@ts-ignore //TODO: remove this clearly.
-              product_id: container.product_id._id,
+              product_id: container.product_id,
               product_code: container.product_code,
               name: container.name,
               expiry_date: container.expiry_date,

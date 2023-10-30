@@ -247,16 +247,6 @@ const FormulaDevPage = () => {
       width: 100,
       valueGetter: (params) => params.row.last_cost,
     },
-
-    {
-      field: "notes",
-      headerName: "Notes",
-      type: "string",
-      sortable: false,
-      filterable: false,
-      width: 400,
-      editable: true,
-    },
     {
       field: "item_cost",
       headerName: "Mat Cost/KG",
@@ -266,6 +256,15 @@ const FormulaDevPage = () => {
       width: 100,
       align: "left",
     },
+    {
+      field: "notes",
+      headerName: "Notes",
+      type: "string",
+      sortable: false,
+      filterable: false,
+      width: 400,
+      editable: true,
+    }
   ];
 
   const handleAddRow = (row_id: string) => {

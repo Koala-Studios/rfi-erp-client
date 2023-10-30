@@ -19,6 +19,7 @@ interface Props {
   auto_height?: boolean;
   listOptions: IListOptions;
   handleDBClick?: GridEventListener<"rowClick">;
+  GetCellClassName?: (row: any) => string;
 }
 
 export const DataTable: React.FC<Props> = ({
@@ -27,6 +28,7 @@ export const DataTable: React.FC<Props> = ({
   columns,
   auto_height = false,
   listOptions,
+  GetCellClassName,
   handleDBClick,
 }) => {
   const CustomToolbar: React.FC = () => {
@@ -87,6 +89,7 @@ export const DataTable: React.FC<Props> = ({
         style={{
           border: "1px solid #c9c9c9",
         }}
+        getCellClassName={GetCellClassName}
         rows={rows}
         columns={columns}
         autoHeight={auto_height}
