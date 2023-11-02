@@ -75,7 +75,7 @@ const filterArray: FilterElement[] = [
   }, [location.key]);
 
   const createNewSalesOrder = () => {
-    navigate(`/sales/new`, { replace: false });
+    navigate(`/sales-orders/new`, { replace: false });
   };
 
   if (dataOptions == null) return null;

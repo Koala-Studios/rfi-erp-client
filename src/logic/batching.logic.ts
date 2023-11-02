@@ -32,6 +32,7 @@ export interface IBatching {
 
 export interface IBatchingContainer {
   _id: string;
+  is_open: string;
   container_id: string;
   lot_number: string;
   amount_to_use: number;

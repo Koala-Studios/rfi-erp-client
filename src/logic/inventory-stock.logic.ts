@@ -34,6 +34,8 @@ export interface IInventoryStock {
   unit_cost: number;
   container_size: number;
   sample: boolean;
+  is_solid: boolean;
+  is_open: boolean;
   received_amount: number;
   remaining_amount: number;
   allocated_amount: number;

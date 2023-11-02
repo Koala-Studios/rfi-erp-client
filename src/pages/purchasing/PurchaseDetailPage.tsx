@@ -865,24 +865,6 @@ export const PurchaseDetailPage = () => {
             if (event.code == "Space") {
               event.stopPropagation();
             }
-            // if (receiveMode !== null) {
-            //   switch (event.code) {
-            //     case "Escape": {
-            //       setReceiveMode(null);
-            //       break;
-            //     }
-            //     // case("Enter"):
-            //     // {
-            //     //   console.log('test', event, params )
-            //     //   break;
-            //     // }
-            //     case "ArrowDown":
-            //     case "ArrowUp":
-            //     case "Backspace": {
-            //       event.stopPropagation();
-            //     }
-            //   }
-            // }
           }}
           initialState={{
             columns: {

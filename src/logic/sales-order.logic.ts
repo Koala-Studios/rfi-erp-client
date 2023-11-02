@@ -1,25 +1,37 @@
 import axios from "axios";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
 
-interface IOrderItem {
+export interface IOrderItem {
+  _id: string;
+  product_id: string;
   product_code: string;
-  material_name: string;
+  product_name: string;
+  sold_amount: number;
+  shipped_amount: number;
+  unit_price: number;
+}
+
+export interface IOrderItemProcess extends IOrderItem {
   lot_number: string;
-  amount: number;
-  price: number;
-  status: number;
-  material_id: string;
+  process_amount: number;
+  container_size: number;
+  expiry_date: Date;
+}
+
+interface ISalesCustomer {
+  _id: string;
+  code: string;
 }
 export interface ISalesOrder {
   _id: string;
-  supplier_code: string;
-  supplier: string;
-  date_arrived: Date;
-  date_purchased: Date;
-  status: Number;
+  customer: ISalesCustomer;
+  date_shipped: string;
+  shipping_code: string;
+  date_sold: string;
+  status: number;
+  notes: string;
   order_code: string;
-
-  order_items: [IOrderItem];
+  order_items: IOrderItem[];
 }
 
 const api = axios.create({
@@ -84,4 +96,164 @@ export const getSalesOrder = async (
     });
 
   return sales_order;
+};
+
+export const createSales = async (
+  formData: ISalesOrder
+): Promise<ISalesOrder | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+  };
+
+  let rtn = null;
+
+  await api
+    .post("/create", formData, config)
+    .then((res) => {
+      console.log(res);
+      if (res.status === apiStatus.CREATED) {
+        console.log(res.data);
+        rtn = res.data;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
+};
+export const updateSales = async (formData: ISalesOrder): Promise<boolean> => {
+  const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+  };
+
+  let rtn = false;
+
+  await api
+    .post("/update", formData, config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        rtn = true;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
+};
+
+export const confirmSales = async (
+  sales: ISalesOrder,
+  sales_id: string
+): Promise<ISalesOrder | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+  };
+  let rtn = null;
+  await api
+    .post("/confirm-sales", sales, config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        window.dispatchEvent(
+          new CustomEvent("NotificationEvent", {
+            detail: { text: res.data.message },
+          })
+        );
+        rtn = res.data.res;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
+};
+
+export const markSalesReceived = async (
+  sales_id: string
+): Promise<ISalesOrder | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+    params: { sales_id: sales_id },
+  };
+
+  let rtn = null;
+
+  await api
+    .post("/mark-received", sales_id, config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        window.dispatchEvent(
+          new CustomEvent("NotificationEvent", {
+            detail: { text: res.data.message },
+          })
+        );
+        rtn = res.data.res;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
+};
+
+export const markSalesCancelled = async (
+  sales_id: string
+): Promise<ISalesOrder | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+    params: { sales_id: sales_id },
+  };
+
+  let rtn = null;
+
+  await api
+    .post("/mark-cancelled", sales_id, config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        window.dispatchEvent(
+          new CustomEvent("NotificationEvent", {
+            detail: { text: res.data.message },
+          })
+        );
+        rtn = res.data.res;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
+};
+
+export const handleSalesItem = async (
+  salesItem: IOrderItemProcess,
+  quarantine: boolean
+): Promise<ISalesOrder | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+    params: { quarantine: quarantine },
+  };
+
+  let rtn = null;
+
+  await api
+    .post("/receive-item", salesItem, config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        window.dispatchEvent(
+          new CustomEvent("NotificationEvent", {
+            detail: { text: res.data.message },
+          })
+        );
+        rtn = res.data.res;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return rtn;
 };
