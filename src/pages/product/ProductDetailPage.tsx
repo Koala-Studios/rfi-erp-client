@@ -21,12 +21,11 @@ import SaveForm from "../../components/forms/SaveForm";
 import StandaloneAutocomplete from "../../components/utils/StandaloneAutocomplete";
 import { IProductType } from "../../logic/product-type.logic";
 import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
-import LinkTab from "../../components/utils/LinkTab";
-import NavTab from "../../components/utils/NavTab";
 import InventoryMovementPage from "../inventory/InventoryMovementPage";
 import ProductFormulaPage from "./ProductFormulaPage";
 import InventoryContainerPage from "../inventory/InventoryContainerPage";
-
+import LinkTab from "../../components/utils/LinkTab";
+import NavTab from "../../components/utils/NavTab";
 
 const ProductStatus = [
   ["PENDING", "error"],
@@ -360,8 +359,7 @@ export const ProductDetailPage = () => {
                 }
               />
             </Grid>
-            <Grid item xs={1}/>
-            <Grid item xs={1}>
+            <Grid item xs={2}>
               <TextField
                 value={product.cost.toFixed(2)}
                 InputProps={{
@@ -372,7 +370,7 @@ export const ProductDetailPage = () => {
                 fullWidth
                 size="small"
                 variant="outlined"
-                label={"Cost"}
+                label={"Cost/KG"}
                 type="number">
               </TextField>
             </Grid>
@@ -435,10 +433,9 @@ export const ProductDetailPage = () => {
       </Card>
       <NavTab>
         <LinkTab label="Formula" href= "formula" tab_id={tab_id} disable={id === 'new'}/>
-        
         <LinkTab label="Customers" href="customers" tab_id={tab_id} disable={id === 'new'} />
         <LinkTab label="Movements" href= "movements" tab_id={tab_id} disable={id === 'new'}/>
-        <LinkTab label="Containers"  href="containers" tab_id={tab_id} disable={true} />
+        <LinkTab label="Containers"  href="containers" tab_id={tab_id} disable={id === 'new'} />
         <LinkTab label="Usage Stats"  href="stats" tab_id={tab_id} disable={true} />
       </NavTab>
       {

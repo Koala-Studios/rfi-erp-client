@@ -23,8 +23,8 @@ export interface IPurchaseOrder {
   _id: string;
   notes: string;
   supplier: {
-    name: string;
-    supplier_id: string;
+    _id: string;
+    code: string;
   };
   date_arrived: string;
   date_purchased: string;

@@ -431,6 +431,12 @@ export const InventoryDetailPage = () => {
           disable={id === "new"}
         />
         <LinkTab
+          label="Found In"
+          href="foundin"
+          tab_id={tab_id}
+          disable={id === "new"}
+        />
+        <LinkTab
           label="Usage Stats"
           href="stats"
           tab_id={tab_id}

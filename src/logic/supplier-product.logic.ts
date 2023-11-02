@@ -55,7 +55,9 @@ export const lookupSupplierProduct = async (
 
 export const listSupplierProducts = async (
   q: URLSearchParams | undefined,
-  filters: FilterElement[]
+  filters: FilterElement[],
+  supplier_id?: string,
+  product_id?: string
 ): Promise<IListOptions | null> => {
   let query = getQuery(q, filters);
 
@@ -63,6 +65,8 @@ export const listSupplierProducts = async (
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       query,
+      supplier_id,
+      product_id,
     },
   };
 

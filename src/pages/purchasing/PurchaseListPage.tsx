@@ -90,7 +90,7 @@ const PurchaseStatus = [
         return {
           id: purchase._id,
           order_code: purchase.order_code,
-          supplier: purchase.supplier.name,
+          supplier: purchase.supplier ? purchase.supplier.code : 'error',
           date_purchased: purchase.date_purchased
             ? purchase.date_purchased.toString().replace(/\T.+/, "")
             : "Not Set",

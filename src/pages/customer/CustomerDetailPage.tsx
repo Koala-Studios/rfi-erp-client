@@ -12,6 +12,8 @@ import {
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SaveForm from "../../components/forms/SaveForm";
 import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
+import NavTab from "../../components/utils/NavTab";
+import LinkTab from "../../components/utils/LinkTab";
 
 const emptyCustomer: ICustomer = {
   _id: "new",
@@ -52,7 +54,7 @@ const inputMap: InputInfo[] = [
 
 export const CustomerDetailPage = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id, tab_id } = useParams();
   const auth = useContext(AuthContext);
   const [customer, setCustomer] = useState<ICustomer | null>(null);
   const [customerSaved, setCustomerSaved] = useState<boolean>(true);
@@ -191,7 +193,7 @@ export const CustomerDetailPage = () => {
         </Button>
         <div style={{ display: "flex", gap: 16, marginBottom: 10 }}>
           <Grid container spacing={3}>
-            <Grid item xs={2}>
+            <Grid item xs={2.5}>
               <TextField
                 defaultValue={customer.code}
                 inputRef={(el: any) =>
@@ -232,9 +234,9 @@ export const CustomerDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
-            <Grid item xs={2}>
+            <Grid item xs={1}>
             </Grid>
-            <Grid item xs={2}>
+            <Grid item xs={2.5}>
               <TextField
                 defaultValue={customer.created_date}
                 inputRef={(el: any) =>
@@ -342,6 +344,17 @@ export const CustomerDetailPage = () => {
           </Card>
         </div>
       </Card>
+      <NavTab>
+
+<LinkTab label="Products" href= "products" tab_id={tab_id} disable={id === 'new'}/>
+<LinkTab label="Order History" href= "order-history" tab_id={tab_id} disable={id === 'new'}/>
+</NavTab>
+{
+  (tab_id && tab_id === "products" && 
+  <div></div>) || 
+  (tab_id && tab_id === "order-history" && 
+  <div></div>)
+}
     </>
   );
 };

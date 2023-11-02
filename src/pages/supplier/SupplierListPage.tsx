@@ -32,11 +32,11 @@ const SupplierListPage = () => {
     {
       field: "contact_name",
       headerName: "Contact Name",
-      width: 200,
+      width: 150,
     },
     { field: "address_one", headerName: "Address Line One", width: 200 },
     { field: "address_two", headerName: "Address Line Two", width: 200 },
-    { field: "phone", headerName: "Phone Number", width: 200 },
+    { field: "phone", headerName: "Phone Number", width: 170 },
     { field: "trust_factor", headerName: "Trust Rating", width: 120, align:'center',
     renderCell: (params: GridRenderCellParams<number>) => (
       <Rating

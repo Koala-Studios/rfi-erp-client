@@ -80,7 +80,7 @@ const SupplierProductPage = () => {
 
 
   React.useEffect(() => {
-    listSupplierProducts(searchParams, filterArray).then((list) => {
+    listSupplierProducts(searchParams, filterArray, id).then((list) => {
       const newRows = list!.docs.map((product:ISupplierProduct) => {
         return {
           ...product,
@@ -92,7 +92,7 @@ const SupplierProductPage = () => {
     });
   }, [location.key]);
   const createNewSupplierProduct = () => {
-    setRows([...rows.slice(0),  {
+    setRows([{
       _id: new ObjectID().toHexString(),
       product_id: '',
       supplier: {_id: '', code:'', name: ''},
@@ -103,7 +103,7 @@ const SupplierProductPage = () => {
       discount_rates: [],
       description: '',
       cas_number: '',
-    }])
+    }, ...rows.slice(0)])
   };
 
   const handleEditProductRow = (rowid: string, value: IInventory) => {

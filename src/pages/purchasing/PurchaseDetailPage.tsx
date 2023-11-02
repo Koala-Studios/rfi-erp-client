@@ -52,7 +52,7 @@ const PurchaseStatus = [
 
 const emptyPurchase: IPurchaseOrder = {
   _id: "",
-  supplier: { supplier_id: "", name: "" },
+  supplier: { _id: "", code: "" },
   date_purchased: new Date().toISOString().split('T')[0],
   date_arrived: "",
   shipping_code: "",
@@ -418,7 +418,7 @@ export const PurchaseDetailPage = () => {
           handleEditRow={handleEditProductRow}
           rowParams={row_params}
           letterMin={3}
-          getOptionLabel={(item: IInventory) => item ?
+          getOptionLabel={(item: IInventory) => item.name ?
             `${item.product_code} | ${item.name}` : ''
           }
         />
@@ -731,7 +731,7 @@ export const PurchaseDetailPage = () => {
                   helperText={inputVisuals[inputRefMap.supplier].helperText}
                   onChange={(event, value) => {
                     console.log(value, 'testing ')
-                    setPurchase({ ...purchase, supplier: {name: value.name, supplier_id: value._id} });
+                    setPurchase({ ...purchase, supplier: {_id: value._id, code: value.code} });
                     // onInputBlur(event, inputMap[inputRefMap.material_type]);
                   }}
                   // onBlur={(event: any) =>
@@ -744,7 +744,7 @@ export const PurchaseDetailPage = () => {
                   letterMin={0}
                   readOnly={purchase.status != 6}
                   dbOption={"supplier"}
-                  getOptionLabel={(item: ISupplier) => item ? item.name : ''}
+                  getOptionLabel={(item: ISupplier) => item ? item.code : ''}
                 />
               </Grid>
 
