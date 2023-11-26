@@ -21,6 +21,7 @@ export interface IOrderItemProcess extends IOrderItem {
 interface ISalesCustomer {
   _id: string;
   code: string;
+  name: string;
 }
 export interface ISalesOrder {
   _id: string;

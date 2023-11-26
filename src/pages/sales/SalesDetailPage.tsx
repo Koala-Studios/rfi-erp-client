@@ -41,10 +41,10 @@ import { ILocation } from "../../logic/location.logic";
 let savedSales: ISalesOrder | null = null;
 
 const SalesStatus = [
+  ["AWAITING PRODUCTION", "warning"],
   ["AWAITING SHIPPING", "warning"],
-  ["AWAITING ARRIVAL", "warning"],
-  ["PARTIALLY RECEIVED", "success"],
-  ["RECEIVED", "success"],
+  ["PARTIALLY FINISHED", "success"],
+  ["FINISHED", "success"],
   ["ABANDONED", "error"],
   ["DRAFT", "warning"],
 ];
@@ -52,7 +52,7 @@ const SalesStatus = [
 
 const emptySales: ISalesOrder = {
   _id: "",
-  customer: { _id: "", code: "" },
+  customer: { _id: "", code: "", name: "" },
   date_sold: new Date().toISOString().split('T')[0],
   date_shipped: "",
   shipping_code: "",
@@ -414,7 +414,7 @@ export const SalesDetailPage = () => {
         <TableAutocomplete
         initialValue={row_params.row.product_name}
           readOnly={sales!.status != 6}
-          dbOption="raw-mat"
+          dbOption="approved-product"
           handleEditRow={handleEditProductRow}
           rowParams={row_params}
           letterMin={3}
@@ -425,7 +425,7 @@ export const SalesDetailPage = () => {
       ),
     },
     {
-      field: "salesd_amount",
+      field: "sold_amount",
       headerName: "Order Qty(KG)",
       type: "number",
       width: 110,
@@ -434,7 +434,7 @@ export const SalesDetailPage = () => {
     },
     {
       field: "unit_price",
-      headerName: "Cost($/KG)",
+      headerName: "Price($/KG)",
       type: "number",
       width: 100,
       align: "center",
@@ -731,7 +731,7 @@ export const SalesDetailPage = () => {
                   helperText={inputVisuals[inputRefMap.customer].helperText}
                   onChange={(event, value) => {
                     console.log(value, 'testing ')
-                    setSales({ ...sales, customer: {_id: value._id, code: value.code} });
+                    setSales({ ...sales, customer: {_id: value._id, code: value.code, name: value.name} });
                     // onInputBlur(event, inputMap[inputRefMap.material_type]);
                   }}
                   // onBlur={(event: any) =>

@@ -64,8 +64,8 @@ const filterArray: FilterElement[] = [
         return {
           id: order._id,
           order_code: order.order_code,
-          customer: order.customer,
-          date_orderd: order.date_orderd.toString().replace(/\T.+/, ""),
+          customer: order.customer.name,
+          date_orderd: order.date_orderd ? order.date_orderd.toString().replace(/\T.+/, "") : '',
           status: order.status,
           item_count: order.order_items.length,
         };
