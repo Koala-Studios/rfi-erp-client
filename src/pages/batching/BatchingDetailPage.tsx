@@ -35,7 +35,9 @@ import { IProduct } from "../../logic/product.logic";
 import { padding } from "@mui/system";
 import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
 import { BatchingDataTable } from "./BatchingDataTable";
-
+import Battery4BarIcon from '@mui/icons-material/Battery4Bar';
+import BatteryFullIcon from '@mui/icons-material/BatteryFull';
+import { IInventoryStock } from "../../logic/inventory-stock.logic";
 let savedBatching: IBatching | null = null;
 
 interface expBatchIngr extends IBatchingIngredient {
@@ -279,17 +281,18 @@ export const BatchingDetailPage = () => {
       filterable: false,
       renderCell: (row_params: GridRenderCellParams<string>) => (
         <TableAutocomplete
-        initialValue={row_params.row.sub_rows.lot_number}
+        initialValue={row_params.row.lot_number}
           // readOnly={batching!.status === 6 || purchase!.status === 4}
           dbOption="container"
           handleEditRow={handleEditProductRow}
           rowParams={row_params}
           letterMin={0}
-          getOptionLabel={(item: IBatchingContainer) => item ?
-            `${item.lot_number} ` : ''
+          getOptionLabel={(item: IBatchingContainer) =>
+            { return <> {item?.is_open ? <Battery4BarIcon sx={{ color: 'green' }}/> : ''} {item?.lot_number ?  (`${item.lot_number}`) : '' }
+            </> 
+            }
           }
-        />
-      ),
+          />),
     },
     {
       field: "confirm_lot_number",
@@ -340,11 +343,12 @@ export const BatchingDetailPage = () => {
           handleEditRow={handleEditProductRow}
           rowParams={row_params}
           letterMin={0}
-          getOptionLabel={(item: IBatchingContainer) => item ?
-            `${item.lot_number} ` : ''
+          getOptionLabel={(item: IInventoryStock) =>
+            { return <> {item?.is_open ? <Battery4BarIcon sx={{ color: 'green' }}/> : <BatteryFullIcon sx={{ color: 'warning'  }}/>} {item?.lot_number ?  (item.lot_number + ' | Rem#:' + item.remaining_amount) : '' } {item.sample ? <h4>. [S]</h4>  : ''}  
+            </> 
+            }
           }
-        />
-      ),
+          />),
     },
     {
       field: "confirm_lot_number",
