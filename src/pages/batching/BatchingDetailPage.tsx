@@ -69,7 +69,7 @@ const addDays = (date: Date, days: number) => {
 
 const emptyBatching: IBatching = {
   _id: "",
-  status: 6,
+  status: 1,
   sales_id:undefined,
   batch_code: "",
   ingredients: [],
