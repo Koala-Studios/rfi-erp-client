@@ -32,6 +32,9 @@ import { useSearchParams } from "react-router-dom";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import { DataGrid } from "@mui/x-data-grid";
+import TableAutocomplete from "../../components/utils/TableAutocomplete";
+import { IBatchingContainer } from "../../logic/batching.logic";
+import { IInventoryStock } from "../../logic/inventory-stock.logic";
 
 interface Props {
   rows: any[];
@@ -39,6 +42,7 @@ interface Props {
   sub_columns: GridColDef[];
   auto_height?: boolean;
   listOptions?: IListOptions;
+  handleChooseContainer:  (row_id: string, value: any) => void;
   handleAddRow: (row_id:string) => void;
   handleEditCell: (row_id: string, field: string, value: any) => void;
   handleDBClick?: GridEventListener<"rowClick">;
@@ -50,10 +54,12 @@ export const BatchingDataTable: React.FC<Props> = ({
   sub_columns,
   handleAddRow,
   handleEditCell,
+  handleChooseContainer,
   auto_height = false,
   listOptions = null,
   handleDBClick,
 }) => {
+  
   const CustomPagination = () => {
     const [searchParams, setSearchParams] = useSearchParams();
 
@@ -140,7 +146,7 @@ export const BatchingDataTable: React.FC<Props> = ({
                 key={row_item.name}
                 columns={columns}
                 sub_columns={sub_columns}
-                row={row_item} handleAddRow={handleAddRow} handleEditCell={handleEditCell}></ExpandableRow>
+                row={row_item} handleAddRow={handleAddRow} handleChooseContainer={handleChooseContainer} handleEditCell={handleEditCell}></ExpandableRow>
             ))}
           </TableBody>
         </Table>
@@ -167,11 +173,23 @@ const ExpandableRow = (props: {
   columns: GridColDef[];
   sub_columns: GridColDef[];
   row: any;
+  handleChooseContainer:(row_id: string, value: any) => void;
   handleEditCell:(row_id: string, field: string, value: any) => void;
   handleAddRow: (row_id:string) => void;
 }) => {
   const [open, setOpen] = React.useState(false);
-
+  const getClassName = (row:IBatchingContainer) => {
+  
+    if(row.amount_to_use < row.available_amount || row.confirm_lot_number === '') {
+      return "YellowRow";
+    } else if (
+      row.lot_number != row.confirm_lot_number
+    ) {
+      return "RedRow";
+    } else {
+      return '';
+    }
+  };
   return (
     <>
       <TableRow
@@ -192,6 +210,24 @@ const ExpandableRow = (props: {
         </TableCell >
         {props.columns.map((col:GridColDef, index) => (
           <>
+            {index == 5 &&
+            <div style={{width:155,maxWidth:155, height:35, maxHeight:35}}>
+              <TableAutocomplete
+              initialValue={props.row.lot_number}
+                // readOnly={batching!.status === 6 || purchase!.status === 4}
+                width={155}
+                
+                dbOption="container"
+                handleEditRow={props.handleChooseContainer}
+                rowParams={{...props.row.row_params, row:{_id: props.row._id}}}
+                letterMin={-1}
+                getOptionLabel={(item: IInventoryStock) => item._id ?
+                  `${item.lot_number} | AV#: ${item.remaining_amount - item.allocated_amount}`: ''
+                }
+              />
+            </div>
+
+            }
             {index == 9 &&
             <TableCell  sx={{ p: 1, fontWeight: '500',fontSize: '0.9rem' }}>
               <strong>
@@ -211,11 +247,14 @@ const ExpandableRow = (props: {
                 >
                   +
                 </Button>
-              </strong>
+              </strong> 
               </TableCell>
             }
-            <CustomTableCell handleEditCell={props.handleEditCell} row={props.row} name={col.field} index={index} column={col} value={props.row[col.field]} ></CustomTableCell>
-            </>
+            {index != 9 && index != 5 &&
+              <CustomTableCell handleEditCell={props.handleEditCell} row={props.row} name={col.field} index={index} column={col} value={props.row[col.field]} ></CustomTableCell>
+              
+            }
+          </>
         ))}
       </TableRow>
       <TableRow>
@@ -233,11 +272,15 @@ const ExpandableRow = (props: {
             {/* <Box sx={{
               marginBottom: 2, p: "0 0px"
             }}> */}
-            <DataGrid rows={props.row.sub_rows}
+            <DataGrid 
+              rows={props.row.sub_rows}
               headerHeight={0}
+              
+              getRowClassName={(params) => getClassName(params.row)}
               components={{
                 Header: () => null,
               }}
+              // onCellEditCommit={}
               columns={props.sub_columns}
               getRowId={(row) => row._id}
               sx={{ width: '655px', float: 'right', height: ((40.5 * (props.row.sub_rows.length))), maxHeight: '200px' }} rowHeight={39} hideFooter={true}
