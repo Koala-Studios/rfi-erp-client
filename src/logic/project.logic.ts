@@ -28,6 +28,10 @@ export interface IProjectItem {
   product_status: number;
   product_code: string;
   assigned_user: IUser;
+  notes?:string;
+  external_code?:string;
+  regulatory_status?:[Number];
+  dietary_status?:[Number];
 }
 
 const api = axios.create({

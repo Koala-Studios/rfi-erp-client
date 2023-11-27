@@ -54,6 +54,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { FactCheck, ManageAccounts } from "@mui/icons-material";
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import ScienceIcon from '@mui/icons-material/Science';
+import ValidateForm from "../utils/ValidateForm";
 const drawerWidth = 190;
 
 let LinkItems = [
@@ -440,6 +441,7 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
       <Main open={open}>{children}</Main>
       <NotificationHandler></NotificationHandler>
       <FormHandler></FormHandler>
+      <ValidateForm></ValidateForm>
     </Box>
   );
 };

@@ -3,12 +3,14 @@ import {
   Box,
   Button,
   Chip,
+  Link,
   MenuItem,
   Select,
+  Menu,
   SelectChangeEvent,
   darkScrollbar,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import {
   DataGrid,
   GridColDef,
@@ -27,33 +29,38 @@ import { ObjectID } from "bson";
 import { IFormulaItem } from "../../logic/formula.logic";
 import { IInventory } from "../../logic/inventory.logic";
 import { IUser } from "../../logic/user.logic";
+import { MoreHoriz } from "@mui/icons-material";
 // import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
+import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
+import { SingleDropdownCell } from "../utils/TableComponents";
 
 const ItemStatus = [
-  ["Pending", "error"],
-  ["In Progress", "warning"],
-  ["Waiting QC", "warning"],
-  ["Submitted", "info"],
-  ["Approved", "success"],
-  ["Cancelled", "error"],
-  ["Testing", "info"],
-  ["Remake", "warning"],
+  [1,"Pending", "error"],
+  [2,"In Progress", "warning"],
+  [3,"Waiting QC", "warning"],
+  [4,"Submitted", "info"],
+  [5,"Approved", "success"],
+  [6,"Cancelled", "error"],
+  [7,"Testing", "info"],
+  [8,"Remake", "warning"],
 ];
 
 const RegulatoryStatus = [
-  ["ART", "error"],
-  ["NAT", "success"],
-  ["NATI", "info"],
-  ["N&A", "warning"],
+  [1,"ART", "error"],
+  [2,"NAT", "success"],
+  [3,"NATI", "info"],
+  [4,"N&A", "warning"],
 ];
 
 const DietaryStatus = [
-  ["KOSH", "info"],
-  ["VEGA", "success"],
-  ["ORGA", "warning"],
-  ["NGMO", "error"],
-  ["HALA", "info"],
-  ["VEGE", "success"],
+  [1,"KOSH", "info"],
+  [2,"VEGA", "success"],
+  [3,"ORGA", "warning"],
+  [4,"NGMO", "error"],
+  [5,"HALA", "info"],
+  [6,"VEGE", "success"],
 ];
 
 const styles = {
@@ -65,45 +72,122 @@ const styles = {
   }
 }
 
-function SelectEditInputCell(props: GridRenderCellParams) {
-  const { id, value, field } = props;
-  const apiRef = useGridApiContext();
+  interface ActionProps {
+    tableParams: GridRenderCellParams<string>;
+    handleDeleteRow: (id:string) => void;
+  }
 
-  const handleChange = async (event: SelectChangeEvent) => {
-    await apiRef.current.setEditCellValue({
-      id,
-      field,
-      value: event.target.value,
-    });
-    apiRef.current.stopCellEditMode({ id, field });
+ const TableActions: React.FC<ActionProps> = ({tableParams, handleDeleteRow}) => {
+  // const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  const handleApprove = () => {
+    window.dispatchEvent(
+      new CustomEvent("ValidateForm", {
+        detail: {
+          formType: "approve",
+          onSubmit: () => {
+            console.log("OBJECT APPROVED")
+          },
+        },
+      })
+    );
+
+    handleClose();
+  };
+  const handleDelete = () => {
+    window.dispatchEvent(
+      new CustomEvent("ValidateForm", {
+        detail: {
+          formType: "delete",
+          onSubmit: () => {
+            console.log("OBJECT DELETED")
+            handleDeleteRow(tableParams.id.toString());
+          },
+        },
+      })
+    );
+
+    handleClose();
   };
 
   return (
-    <Select
-      value={value}
-      onChange={handleChange}
-      size="small"
-      sx={{
-        height: 1,
-        width: "100%",
+    <div>
+      <IconButton
+        color="primary"
+        size="small"
+        // disabled={!tableParams.row.product_id || tableParams.row.product_id === "" }
+        onClick={() =>{}
+          // navigate(`/products/${tableParams.row.product_id}`, { replace: false })
+        }
+      >
+        <VisibilityIcon fontSize="small"/>
+      </IconButton>
+      <IconButton
+        onClick={handleClick}
+        color="primary"
+      >
+        <MoreHoriz />
+      </IconButton>
+      <Menu
+      anchorEl={anchorEl}
+      open={open}
+      onClose={handleClose}
+      onClick={handleClose}
+      sx={{border:"1px solid #00000015"}}
+      PaperProps={{
+        elevation: 0,
+        sx: {
+          width: 150,
+          overflow: "visible",
+          filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+          mt: 0.5,
+          "& .MuiAvatar-root": {
+            width: 32,
+            height: 32,
+            ml: -0.5,
+            mr: 1,
+          },
+          "&:before": {
+            content: '""',
+            display: "block",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: 10,
+            height: 10,
+            bgcolor: "background.paper",
+            transform: "translateX(15px) translateY(-50%) rotate(45deg)",
+            zIndex: 0,
+          },
+        },
       }}
-    >
-      <MenuItem value={1}>Pending</MenuItem>
-      <MenuItem value={2}>In Progress</MenuItem>
-      <MenuItem value={3}>Awaiting Approval</MenuItem>
-      <MenuItem value={4}>Approved</MenuItem>
-    </Select>
+      >
+          <MenuItem sx={{background: "#00806015", color:"#008060", p:2}} onClick={handleApprove}>
+            <CheckCircleOutlineIcon sx={{mr:2}}/> Approve
+          </MenuItem>
+          <MenuItem sx={{p:2}} onClick={handleClose}>
+            <HelpOutlineIcon sx={{mr:2}}/> Details
+          </MenuItem>
+          <MenuItem sx={{background: "#ff221115", color:"#ff2211", p:2}} onClick={handleDelete}>
+            <DeleteOutlineIcon sx={{mr:2}}/> Delete
+          </MenuItem>
+      </Menu>
+    </div>
   );
 }
-
-const renderSelectEditInputCell: GridColDef["renderCell"] = (params) => {
-  return <SelectEditInputCell {...params} />;
-};
 
 interface Props {
   projectItems: IProjectItem[];
   setProjectItems: any;
 }
+
 
 export const ProjectDetailsTable: React.FC<Props> = ({
   projectItems,
@@ -124,6 +208,33 @@ export const ProjectDetailsTable: React.FC<Props> = ({
     let pList = projectItems.slice();
     const rowIdx = projectItems.findIndex((r) => r._id === rowid);
     pList[rowIdx].assigned_user = value;
+
+    setProjectItems(pList);
+  };
+  const handleEditStatus = (rowid:string, value: number | string) => {
+    let pList = projectItems.slice();
+    const rowIdx = projectItems.findIndex((r) => r._id === rowid);
+    
+    //@ts-ignore
+    pList[rowIdx].status = value;
+
+    setProjectItems(pList);
+  };
+  const handleEditRegStatus = (rowid:string, value: number | string) => {
+    let pList = projectItems.slice();
+    const rowIdx = projectItems.findIndex((r) => r._id === rowid);
+    
+    //@ts-ignore
+    pList[rowIdx].regulatory_status = value;
+
+    setProjectItems(pList);
+  };
+  const handleEditDietStatus = (rowid:string, value: number | string) => {
+    let pList = projectItems.slice();
+    const rowIdx = projectItems.findIndex((r) => r._id === rowid);
+    
+    //@ts-ignore
+    pList[rowIdx].dietary_status = value;
 
     setProjectItems(pList);
   };
@@ -157,40 +268,43 @@ export const ProjectDetailsTable: React.FC<Props> = ({
     setProjectItems(pList);
   };
 
-  // React.useEffect(() => {
-  //   //user came out of edit mode
-  //   console.log(rows);
-  //   if (editMode == null) {
-  //     setProjectItems(rows);
-  //   }
-  // }, [editMode]);
-
   const columns: GridColDef[] = [
+    {
+      field: "product_id",
+      headerName: "Actions",
+      align: "left",
+      width: 90,
+      renderCell: (params: GridRenderCellParams<string>) => {
+        // const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
+       
+        return <TableActions tableParams={params} handleDeleteRow={handleDeleteRow}/>
+      },
+    },
     {
       field: "flavor_name",
       headerName: "Request Flavor Name",
-      width: 275,
+      width: 170,
       editable: true,
     },
     {
-      field: "product_name",
-      headerName: "Int Product",
-      width: 250,
-      sortable: false,
-      filterable: false,
-      renderCell: (row_params: GridRenderCellParams<string>) => (
-        <TableAutocomplete
-          dbOption="product"
-          handleEditRow={handleEditProductRow}
-          rowParams={row_params}
-          initialValue={row_params.row.product_code + ' | ' + row_params.row.product_name}
-          letterMin={3}
-          getOptionLabel={(item) =>
-            item ?
-            `${item.product_code} | ${item.name}` : ''
-          }
-        />
+      field: "status",
+      headerName: "Status",
+      editable: false,
+      width: 120,
+      align:'center',
+      renderCell: (params: GridRenderCellParams<number>) => (
+         <SingleDropdownCell 
+          handleEditRow={handleEditStatus}
+          id={params.id} 
+          value={params.value}
+          field={params.field} options={ItemStatus}/>
       ),
+    },
+    {
+      field: "notes",
+      headerName: "Notes",
+      width: 350,
+      editable: true,
     },
     {
       field: "assigned_user",
@@ -221,117 +335,52 @@ export const ProjectDetailsTable: React.FC<Props> = ({
     {
       field: "regulatory_status",
       headerName: "Reg Status",
-      editable: true,
-      width:120,
-      renderEditCell: renderSelectEditInputCell,
-      renderCell: (params: GridRenderCellParams<number>) => {
-        let chips = [];
-        //@ts-ignore
-        // <div>
-          
-          { for(let i = 0; i < params?.value!.length ; i++) {
-            console.log(params?.value)
-          chips.push(
-            <Chip
-            //@ts-ignore
-            label={RegulatoryStatus[params.value ? params?.value![i] - 1 : 4][0]}
-            sx={{
-              fontWeight: 600,
-              marginRight:1
-            }}
-            size="small"
-            //@ts-ignore
-            color={RegulatoryStatus[params.value ? params?.value![i] - 1 : 4][1]}
-            variant="outlined"
-          />
-          )
-          }
-          return <div>{chips}</div>; } //TODO: Show overflow..
-          
-    },
+      editable: false,
+      width:90,
+      renderCell: (params: GridRenderCellParams<number>) => (
+        <SingleDropdownCell 
+         handleEditRow={handleEditRegStatus}
+         id={params.id} 
+         value={params.value}
+         field={params.field} options={RegulatoryStatus}/>
+     )
 
     },
     {
       field: "dietary_status",
       headerName: "Diet Status",
-      editable: true,
-      width: 120,
-      renderEditCell: renderSelectEditInputCell,
-      renderCell: (params: GridRenderCellParams<number>) => {
-        let chips = [];
-        //@ts-ignore
-          for(let i = 0; i < params?.value!.length ; i++) {
-            console.log(params?.value)
-          chips.push(
-            <Chip
-            length={50}
-            size="small"
-            //@ts-ignore
-            label={DietaryStatus[params.value ? params?.value![i] - 1 : 4][0]}
-            sx={{
-              fontWeight: 600,
-              marginRight:1,
-              
-            }}
-            //@ts-ignore
-            color={DietaryStatus[params.value ? params?.value![i] - 1 : 4][1]}
-            variant="outlined"
-          />
-          )
-          }
-          return chips;
-    },
+      editable: false,
+      width: 90,
+      renderCell: (params: GridRenderCellParams<number>) => (
+        <SingleDropdownCell 
+         handleEditRow={handleEditDietStatus}
+         id={params.id} 
+         value={params.value}
+         field={params.field} options={DietaryStatus}/>
+     )
     },
     {
-      field: "status",
-      headerName: "Status",
-      editable: true,
-      renderEditCell: renderSelectEditInputCell,
-      width: 120,
-      align:'center',
-      renderCell: (params: GridRenderCellParams<number>) => (
-        <Chip
-          label={ItemStatus[params.value ? params.value - 1 : 4][0]}
-          sx={{
-            fontWeight: 600,
-          }}
-          //@ts-ignore
-          color={ItemStatus[params.value ? params.value - 1 : 4][1]}
-          variant="outlined"
+      field: "product_name",
+      headerName: "Internal Product",
+      width: 200,
+      sortable: false,
+      filterable: false,
+      renderCell: (row_params: GridRenderCellParams<string>) => (
+        <TableAutocomplete
+          dbOption="product"
+          handleEditRow={handleEditProductRow}
+          rowParams={row_params}
+          initialValue={row_params.row.product_code + ' | ' + row_params.row.product_name}
+          letterMin={3}
+          getOptionLabel={(item) =>
+            item ?
+            `${item.product_code} | ${item.name}` : ''
+          }
         />
       ),
     },
-    {
-      field: "product_id",
-      headerName: "Actions",
-      align: "left",
-      width: 170,
-      renderCell: (params: GridRenderCellParams<string>) => {
-        // const isInEditMode = rowModesModel[id]?.mode === GridRowModes.Edit;
-        return (
-          <div>
-            <Button
-              color="primary"
-              variant="contained"
-              size="small"
-              disabled={!params.row.product_id || params.row.product_id === "" }
-              onClick={() =>
-                navigate(`/products/${params.row.product_id}`, { replace: false })
-              }
-            >
-              <VisibilityIcon fontSize="small"/>
-            </Button>
-            <IconButton
-              onClick={() => handleDeleteRow(params.row._id)}
-              aria-label="delete"
-              color="error"
-            >
-              <DeleteIcon />
-            </IconButton>
-          </div>
-        );
-      },
-    },
+    
+   
   ];
 
   // if (rows == null) return null;
@@ -355,8 +404,8 @@ export const ProjectDetailsTable: React.FC<Props> = ({
         rows={projectItems}
         columns={columns}
         autoHeight={true}
-        
-        rowHeight={45}
+        getRowHeight={() => 'auto'}
+        // rowHeight={70}
         editMode="cell"
         getRowId={(row) => row._id}
         experimentalFeatures={{ newEditingApi: true }}

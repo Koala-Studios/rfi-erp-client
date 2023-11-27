@@ -430,13 +430,14 @@ export const ProjectDetails = () => {
         </div>
       </Card>
       <Card variant="outlined" style={{ marginTop: 16, padding: 16 }}>
-        <ProjectDetailsTable
+         <ProjectDetailsTable
           projectItems={project.project_items}
           setProjectItems={(pItems: IProjectItem[]) => {
             setProject({ ...project, project_items: pItems });
             setProjectSaved(false);
           }}
         />
+        
       </Card>
     </>
   );
