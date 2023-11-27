@@ -6,15 +6,27 @@ export interface IOrderItem {
   product_id: string;
   product_code: string;
   product_name: string;
+  batch_id: string;
   sold_amount: number;
+  sample: boolean;
   shipped_amount: number;
   unit_price: number;
+  status: number;
 }
+
+export const itemStatus = {
+  PENDING: 0,
+  SCHEDULED: 1,
+  IN_PROGRESS: 2,
+  WAITING_QC: 3,
+  WAITING_SHIPPING: 4,
+  SHIPPED: 5,
+};
 
 export interface IOrderItemProcess extends IOrderItem {
   process_amount: number;
   order_id: string;
-  required_date: string;
+  date_needed: string;
   product_id: string;
 }
 
@@ -230,16 +242,18 @@ export const markSalesCancelled = async (
 };
 
 export const handleSalesItem = async (
-  salesItem: IOrderItemProcess
+  salesItem: IOrderItemProcess,
+  order_id: string
 ): Promise<ISalesOrder | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+    params: { order_id },
   };
 
   let rtn = null;
 
   await api
-    .post("/receive-item", salesItem, config)
+    .post("/handle-item", salesItem, config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
         window.dispatchEvent(

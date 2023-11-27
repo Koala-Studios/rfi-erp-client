@@ -70,6 +70,7 @@ const addDays = (date: Date, days: number) => {
 const emptyBatching: IBatching = {
   _id: "",
   status: 6,
+  sales_id:undefined,
   batch_code: "",
   ingredients: [],
   notes: "",
@@ -344,7 +345,7 @@ export const BatchingDetailPage = () => {
           rowParams={row_params}
           letterMin={0}
           getOptionLabel={(item: IInventoryStock) =>
-            { return <> {item?.is_open ? <Battery4BarIcon sx={{ color: 'green' }}/> : <BatteryFullIcon sx={{ color: 'warning'  }}/>} {item?.lot_number ?  (item.lot_number + ' | Rem#:' + item.remaining_amount) : '' } {item.sample ? <h4>. [S]</h4>  : ''}  
+            { return <> {item.sample ? <h4> [S]</h4>  : ''}{item?.is_open ? <Battery4BarIcon sx={{ color: 'green' }}/> : <BatteryFullIcon sx={{ color: 'warning'  }}/>} {item?.lot_number ?  (item.lot_number + ' | Qty:' + item.remaining_amount.toFixed(5)) : '' }  
             </> 
             }
           }
@@ -408,11 +409,14 @@ export const BatchingDetailPage = () => {
         savedBatching = _batching;
         setBatching(_batching);
         setBatchingSaved(true);
-        handleGenerateBatchingBOM();
+        // handleGenerateBatchingBOM();
       } else {
         console.log("Batching Not Updated");
       }
     });
+  };
+  const handleBOMBatching = () => {
+    handleGenerateBatchingBOM();
   };
 
   const handleGenerateBatchingBOM = () => {
@@ -726,7 +730,7 @@ export const BatchingDetailPage = () => {
                   value={batching.date_needed ? batching.date_needed.split('T')[0] : null}
                 ></TextField>
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={2.5}>
                 <Chip
                   label={
                     BatchingStatus[
@@ -748,6 +752,20 @@ export const BatchingDetailPage = () => {
                   variant="outlined"
                 />
               </Grid>
+              {
+                batching.sales_id != undefined &&
+                <Grid item xs={2}>
+              <Button
+              aria-label="go back"
+              size="medium"
+              variant="outlined"
+              onClick={() => navigate('/sales-orders/'+ batching!.sales_id)}
+            >
+              View Source
+            </Button>
+              </Grid>
+              }
+              
               <Grid item xs={12}>
                 <TextField
                   defaultValue={batching.notes}
@@ -791,13 +809,19 @@ export const BatchingDetailPage = () => {
             </div>
             <Divider></Divider>
             <Button
-              disabled={id === "new" || batching.status != 6}
+              disabled={id === "new" || batching.status != 1}
               variant="contained"
               onClick={() => handleConfirmBatching()}
             >
-              Confirm
+              Schedule
             </Button>
-
+            <Button
+              disabled={id === "new" || batching.status != 2}
+              variant="contained"
+              onClick={() => handleBOMBatching()}
+            >
+              Generate BOM
+            </Button>
             <Button
               color="success"
               variant="contained"
@@ -818,7 +842,7 @@ export const BatchingDetailPage = () => {
         </div>
       </Card>
 
-      <Card sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
+      {batching!.status >= 2 && <Card sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
 
 
         <BatchingDataTable
@@ -828,7 +852,7 @@ export const BatchingDetailPage = () => {
           handleEditCell={handleEditCell}
           sub_columns={sub_columns}
         ></BatchingDataTable>
-      </Card>
+      </Card> }
     </>
   );
 };

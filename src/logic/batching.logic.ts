@@ -8,12 +8,12 @@ import {
 } from "./utils";
 
 export const batchingStatus = {
-  SCHEDULED: 1,
-  IN_PROGRESS: 2,
-  FINISHED: 3, //TODO: update db status of 2 to 3
-  ABANDONED: 4,
-  CANCELLED: 5,
-  DRAFT: 6,
+  DRAFT: 1,
+  SCHEDULED: 2,
+  IN_PROGRESS: 3,
+  FINISHED: 4, //TODO: update db status of 2 to 3
+  ABANDONED: 5,
+  CANCELLED: 6,
 };
 
 export interface IBatching {
@@ -21,6 +21,7 @@ export interface IBatching {
   product_id: string | null;
   product_code: string;
   name: string;
+  sales_id: string | undefined;
   quantity: number;
   date_created: string;
   date_needed: string;
