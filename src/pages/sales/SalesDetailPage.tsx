@@ -41,18 +41,26 @@ import { ILocation } from "../../logic/location.logic";
 let savedSales: ISalesOrder | null = null;
 
 const SalesStatus = [
+  ["AWAITING PRODUCTION", "warning"],
   ["AWAITING SHIPPING", "warning"],
-  ["AWAITING ARRIVAL", "warning"],
-  ["PARTIALLY RECEIVED", "success"],
-  ["RECEIVED", "success"],
+  ["PARTIALLY FINISHED", "success"],
+  ["FINISHED", "success"],
   ["ABANDONED", "error"],
   ["DRAFT", "warning"],
 ];
 
+const ItemStatus = [
+  ["PENDING", "error"],
+  ["SCHEDULED", "warning"],
+  ["IN PROGRESS", "warning"],
+  ["WAITING QC", "info"],
+  ["WAITING SHIPPING", "info"],
+  ["SHIPPED", "success"],
+];
 
 const emptySales: ISalesOrder = {
   _id: "",
-  customer: { _id: "", code: "" },
+  customer: { _id: "", code: "", name: "" },
   date_sold: new Date().toISOString().split('T')[0],
   date_shipped: "",
   shipping_code: "",
@@ -64,7 +72,7 @@ const emptySales: ISalesOrder = {
 
 const inputRefMap = {
   order_code: 0,
-  date_salesd: 1,
+  date_sold: 1,
   customer:2
   //TODO: Customer
 };
@@ -72,7 +80,7 @@ const inputRefMap = {
 const inputMap: InputInfo[] = [
   { label: "order_code", ref: 0, validation: { required: true, genericVal: "Text" } },
   {
-    label: "date_salesd",
+    label: "date_sold",
     ref: 1,
     validation: { required: true, genericVal: "Date" },
   },
@@ -262,31 +270,31 @@ export const SalesDetailPage = () => {
       renderCell: undefined,
     },
     {
-      field: "salesd_amount",
+      field: "sold_amount",
       headerName: "Order Qty(KG)",
       type: "number",
       width: 110,
       align: "center",
       editable: false,
     },
-    {
-      field: "received_amount",
-      headerName: "Received Qty",
-      type: "number",
-      width: 100,
-      align: "center",
-      editable: false,
-    },
-    {
-      field: "remaining_amount",
-      headerName: "Awaiting Qty",
-      type: "number",
-      width: 100,
-      align: "center",
-      editable: false,
-      valueGetter: (params) =>
-        params.row.salesd_amount - params.row.received_amount,
-    },
+    // {
+    //   field: "received_amount",
+    //   headerName: "Received Qty",
+    //   type: "number",
+    //   width: 100,
+    //   align: "center",
+    //   editable: false,
+    // },
+    // {
+    //   field: "remaining_amount",
+    //   headerName: "Awaiting Qty",
+    //   type: "number",
+    //   width: 100,
+    //   align: "center",
+    //   editable: false,
+    //   valueGetter: (params) =>
+    //     params.row.salesd_amount - params.row.received_amount,
+    // },
     {
       field: "unit_price",
       headerName: "Cost($/KG)",
@@ -296,20 +304,21 @@ export const SalesDetailPage = () => {
       editable: false,
     },
     {
-      field: "sample",
-      headerName: "Sample",
-      type: "boolean",
-      width: 80,
-      editable: true,
-      align: "center",
-    },
-    {
-      field: "lot_number",
-      headerName: "Lot#",
-      type: "string",
-      width: 120,
-      editable: true,
-      align: "right",
+      field: "status",
+      headerName: "Status",
+      width: 200,
+      align: 'center',
+      renderCell: (params: GridRenderCellParams<number>) => (
+        <Chip
+          label={ItemStatus[params.value ? params.value - 1 : 4][0]}
+          sx={{
+            fontWeight: 600,
+          }}
+          //@ts-ignore
+          color={ItemStatus[params.value ? params.value - 1 : 4][1]}
+          variant="outlined"
+        />
+      ),
     },
     {
       field: "container_size",
@@ -323,6 +332,14 @@ export const SalesDetailPage = () => {
       field: "process_amount",
       headerName: "Qty to Process",
       type: "number",
+      width: 120,
+      editable: true,
+      align: "center",
+    },
+    {
+      field: "date_needed", //TODO: Fix blur not putting value in so clicking button will say "missing fields :-(" (maybe make mini date choosing custom component)
+      headerName: "Needed Date",
+      type: "date",
       width: 120,
       editable: true,
       align: "center",
@@ -348,40 +365,47 @@ export const SalesDetailPage = () => {
     //   ),
     // },
     {
-      field: "expiry_date", //TODO: Fix blur not putting value in so clicking button will say "missing fields :-(" (maybe make mini date choosing custom component)
-      headerName: "Exp Date",
-      type: "date",
-      width: 120,
-      editable: true,
-      align: "center",
-    },
-    {
       field: "id",
       headerName: "Actions",
       align: "left",
-      width: 240,
+      width: 250,
       renderCell: (params: GridRenderCellParams<string>) => (
         <strong>
-          <Button
+          { params.row.batch_id === "" && <Button
             variant="contained"
             color="primary"
             size="small"
-            onClick={() => handleReceiveRow(params.row, false)}
+            onClick={() => handleRow(params.row)}
           >
-            Send to Qc
-          </Button>
-
-          <Button
+            Schedule Batching
+          </Button> }
+          { params.row.batch_id != "" && <Button
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={() => navigate("/batching/" + params.row.batch_id)}
+          >
+            See Batching
+          </Button> }
+          {/* <Button
             variant="outlined"
             color="warning"
             size="small"
             style={{ marginLeft: 16 }}
             onClick={() => handleReceiveRow(params.row, true)}
           >
-            Quarantine
-          </Button>
+            
+          </Button> */}
         </strong>
       ),
+    },
+    {
+      field: "sample",
+      headerName: "Sample",
+      type: "boolean",
+      width: 80,
+      editable: true,
+      align: "center",
     },
   ];
   const draftColumns: GridColDef[] = [
@@ -414,7 +438,7 @@ export const SalesDetailPage = () => {
         <TableAutocomplete
         initialValue={row_params.row.product_name}
           readOnly={sales!.status != 6}
-          dbOption="raw-mat"
+          dbOption="approved-product"
           handleEditRow={handleEditProductRow}
           rowParams={row_params}
           letterMin={3}
@@ -425,7 +449,7 @@ export const SalesDetailPage = () => {
       ),
     },
     {
-      field: "salesd_amount",
+      field: "sold_amount",
       headerName: "Order Qty(KG)",
       type: "number",
       width: 110,
@@ -434,7 +458,7 @@ export const SalesDetailPage = () => {
     },
     {
       field: "unit_price",
-      headerName: "Cost($/KG)",
+      headerName: "Price($/KG)",
       type: "number",
       width: 100,
       align: "center",
@@ -459,11 +483,8 @@ export const SalesDetailPage = () => {
     },
   ];
 
-  const handleReceiveRow = (row: IOrderItemProcess, quarantine: boolean) => {
+  const handleRow = (row: IOrderItemProcess) => {
     if (
-      !row.container_size ||
-      !row.expiry_date ||
-      !row.lot_number ||
       !row.process_amount
     ) {
       window.dispatchEvent(
@@ -472,25 +493,12 @@ export const SalesDetailPage = () => {
         })
       );
     } else {
-      handleSalesItem(row, quarantine).then((_sales) => {
+      handleSalesItem(row, sales!._id).then((_sales) => {
         if (_sales) {
           savedSales = _sales;
           setSales(_sales);
+          setRows(_sales.order_items)
           setSalesSaved(true);
-          const newRows = rows.map((r) => {
-            if (r._id === row._id) {
-              return {
-                ...r,
-                // received_amount: r.received_amount + row.process_amount,
-                lot_number: "",
-                process_amount: null,
-                container_size: null,
-                expiry_date: null,
-              };
-            }
-            return r;
-          });
-          setRows(newRows);
         } else {
           console.log("Sales Not Updated");
         }
@@ -579,8 +587,10 @@ export const SalesDetailPage = () => {
         product_name: "",
         sold_amount: 0,
         shipped_amount: 0,
-        unit_price: 0
-        // sample:false
+        unit_price: 0,
+        batch_id: "",
+        sample:false,
+        status: 1
       },
       ...rows.slice(0),
     ]);
@@ -640,26 +650,26 @@ export const SalesDetailPage = () => {
                   fullWidth
                   size="small"
                   variant="outlined"
-                  label={"Sales Code"}
+                  label={"Sale Code"}
                 ></TextField>
               </Grid>
               <Grid item xs={3}>
                 <TextField
-                  defaultValue={sales.date_sold}
+                  defaultValue={sales.date_sold ? sales.date_sold.split('T')[0] : ''}
                   inputRef={(el: any) =>
-                    (inputRefs.current[inputRefMap.date_salesd] = el)
+                    (inputRefs.current[inputRefMap.date_sold] = el)
                   }
-                  error={inputVisuals[inputRefMap.date_salesd].error}
-                  helperText={inputVisuals[inputRefMap.date_salesd].helperText}
+                  error={inputVisuals[inputRefMap.date_sold].error}
+                  helperText={inputVisuals[inputRefMap.date_sold].helperText}
                   onBlur={(event) =>
-                    onInputBlur(event, inputMap[inputRefMap.date_salesd])
+                    onInputBlur(event, inputMap[inputRefMap.date_sold])
                   }
-                  required={inputMap[inputRefMap.date_salesd].validation.required}
+                  required={inputMap[inputRefMap.date_sold].validation.required}
                   fullWidth
                   InputLabelProps={{ shrink: true }}
                   size="small"
                   variant="outlined"
-                  label={"Sales Date"}
+                  label={"Sale Date"}
                   type={"date"}
                 ></TextField>
               </Grid>
@@ -675,7 +685,7 @@ export const SalesDetailPage = () => {
                   InputLabelProps={{ shrink: true }}
                   size="small"
                   variant="outlined"
-                  label={"Arrival Date"}
+                  label={"Fulfillment Date"}
                   type={"date"}
                   value={sales.date_shipped}
                 ></TextField>
@@ -731,7 +741,7 @@ export const SalesDetailPage = () => {
                   helperText={inputVisuals[inputRefMap.customer].helperText}
                   onChange={(event, value) => {
                     console.log(value, 'testing ')
-                    setSales({ ...sales, customer: {_id: value._id, code: value.code} });
+                    setSales({ ...sales, customer: {_id: value._id, code: value.code, name: value.name} });
                     // onInputBlur(event, inputMap[inputRefMap.material_type]);
                   }}
                   // onBlur={(event: any) =>
@@ -744,8 +754,8 @@ export const SalesDetailPage = () => {
                   letterMin={0}
                   readOnly={sales.status != 6}
                   dbOption={"customer"}
-                  getOptionLabel={(item: ICustomer) => item ?
-                    `${item.code}` : ''
+                  getOptionLabel={(item: ICustomer) => item.code ?
+                    `${item.code}`+ ' | ' + `${item.name}`  : ''
                   }
                 />
               </Grid>

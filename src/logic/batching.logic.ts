@@ -8,12 +8,12 @@ import {
 } from "./utils";
 
 export const batchingStatus = {
-  SCHEDULED: 1,
-  IN_PROGRESS: 2,
-  FINISHED: 3, //TODO: update db status of 2 to 3
-  ABANDONED: 4,
-  CANCELLED: 5,
-  DRAFT: 6,
+  DRAFT: 1,
+  SCHEDULED: 2,
+  IN_PROGRESS: 3,
+  FINISHED: 4, //TODO: update db status of 2 to 3
+  ABANDONED: 5,
+  CANCELLED: 6,
 };
 
 export interface IBatching {
@@ -21,6 +21,7 @@ export interface IBatching {
   product_id: string | null;
   product_code: string;
   name: string;
+  sales_id: string | undefined;
   quantity: number;
   date_created: string;
   date_needed: string;
@@ -35,7 +36,9 @@ export interface IBatchingContainer {
   is_open: string;
   container_id: string;
   lot_number: string;
+  confirm_lot_number: string;
   amount_to_use: number;
+  available_amount: number; //TODO: maybe live update somehow? we have sockets setup right?
   used_amount: number;
 }
 
@@ -48,6 +51,7 @@ export interface IBatchingIngredient {
   required_amount: number;
   used_containers: IBatchingContainer[];
   used_amount: number;
+  total_used_amount: number;
   has_enough: boolean;
 }
 

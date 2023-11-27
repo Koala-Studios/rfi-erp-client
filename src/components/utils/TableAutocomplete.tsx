@@ -28,6 +28,7 @@ interface Props {
   initialValue: string;
   letterMin: number;
   getOptionLabel: (option: any) => any;
+  width?:number
 }
 
 const TableAutocomplete: React.FC<Props> = ({
@@ -36,6 +37,7 @@ const TableAutocomplete: React.FC<Props> = ({
   initialValue,
   letterMin,
   dbOption,
+  width = 340,
   getOptionLabel,
   readOnly = false
 }) => {
@@ -56,7 +58,7 @@ const TableAutocomplete: React.FC<Props> = ({
     return (
       <Autocomplete
         value={initialValue}
-        clearOnBlur={true}
+        clearOnBlur={false}
         filterOptions={(x) => x}
         openOnFocus
         selectOnFocus
@@ -76,7 +78,7 @@ const TableAutocomplete: React.FC<Props> = ({
             {children}
           </Paper>
         )}
-        sx={{ width: 340, height: "39px" }}
+        sx={{ width: width, height: "39px" }}
         onInputChange={handleInputChange}
         onBlur={() => setEditMode(false)}
         onChange={(event, value) => {

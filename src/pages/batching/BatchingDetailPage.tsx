@@ -70,6 +70,7 @@ const addDays = (date: Date, days: number) => {
 const emptyBatching: IBatching = {
   _id: "",
   status: 6,
+  sales_id:undefined,
   batch_code: "",
   ingredients: [],
   notes: "",
@@ -97,7 +98,7 @@ const inputMap: InputInfo[] = [
   {
     label: "notes",
     ref: 2,
-    validation: { required: true, genericVal: "Text" },
+    validation: { required: false, genericVal: "Text" },
   },
 
   { label: "product_id", ref: 3, validation: { required: true, genericVal: "Text" } },
@@ -125,7 +126,6 @@ export const BatchingDetailPage = () => {
       helperText: inputVal.msg,
       error: !inputVal.valid,
     };
-
     setInputVisuals({ ...inputVisuals });
 
     const label = inputMap[input.ref].label;
@@ -136,15 +136,25 @@ export const BatchingDetailPage = () => {
     setBatchingSaved(false);
   };
 
-  const handleEditProductRow = (rowid: string, value: IInventory) => {
-    let pList = rows!.slice();
-    const rowIdx = rows!.findIndex((r: any) => r._id === rowid);
-    pList[rowIdx].product_code = value.product_code;
-    pList[rowIdx].product_id = value._id;
-    pList[rowIdx].product_name = value.name;
-    setRows(pList);
-  };
+  const handleEditProductRow = (rowid: string, value: IInventoryStock) => { //not using right now here
+    const index = expandableRows.findIndex(
+      (element) => element.sub_rows.some(e => e._id === rowid)
+    );
+    const targetRow:IBatchingIngredient = expandableRows[index];
+    setExpandableRows(expandableRows.map((row)=> {
+      if(row === targetRow) {
+        // targetRow.sub_rows.splice(index, 1, 
+        //   {_id:rowid, container_id: value._id, lot_number: value.lot_number,required_amount: targetRow.required_amount - targetRow.used_amount, used_amount: 0, has_enough: ((value.remaining_amount - (targetRow.required_amount - targetRow.used_amount)) >= 0)}
+        // )
+        const req_amt = (targetRow.required_amount - targetRow.total_used_amount)
+        return {...row, sub_rows: targetRow.sub_rows.toSpliced(index, 1, 
+          {_id:rowid, container_id: value._id, confirm_lot_number:'', lot_number: value.lot_number,amount_to_use: value.remaining_amount  > req_amt ? req_amt : value.remaining_amount, amount_used: 0 ,has_enough: ((value.remaining_amount - req_amt) >= 0)}
+          )}
+      }
+        return row;
+    }))
 
+  };
 
   const [batchingSaved, setBatchingSaved] = React.useState<boolean>(true);
   const [batching, setBatching] = React.useState<IBatching | null>(
@@ -159,7 +169,6 @@ export const BatchingDetailPage = () => {
     if (id === "new") {
       savedBatching = emptyBatching;
       setBatching(emptyBatching);
-      setRows([]);
     } else {
       getBatching(auth.token, id!).then((p) => {
         const tempBatching = { ...p! };
@@ -196,7 +205,7 @@ export const BatchingDetailPage = () => {
               container_id: item.used_containers.length > 0 ? item.used_containers[0].container_id : '',
               lot_number: item.used_containers.length > 0 ? item.used_containers[0].lot_number : '',
               amount_to_use: item.used_containers.length > 0 ? item.used_containers[0].amount_to_use : 0,
-              used_amount: 0,
+              total_used_amount: 0,
               sub_rows: item.used_containers.length > 1 ? item.used_containers.slice(1, undefined) : [],
               has_enough: true
             }
@@ -255,7 +264,7 @@ export const BatchingDetailPage = () => {
       type: "number",
       width: 160,
       align: "right",
-      editable: true,
+      editable: false,
     },
 
     {
@@ -264,7 +273,7 @@ export const BatchingDetailPage = () => {
       type: "number",
       width: 160,
       align: "right",
-      editable: true,
+      editable: false,
     },
     // {
     //   field: "lot_number",
@@ -305,7 +314,7 @@ export const BatchingDetailPage = () => {
       field: "amount_to_use",
       headerName: "Qty To Use",
       type: "number",
-      width: 130,
+      width: 90,
       align: "right",
       editable: true,
     },
@@ -313,7 +322,7 @@ export const BatchingDetailPage = () => {
       field: "amount_used",
       headerName: "Qty Used",
       type: "number",
-      width: 130,
+      width: 110,
       align: "right",
       editable: true,
     },
@@ -344,7 +353,7 @@ export const BatchingDetailPage = () => {
           rowParams={row_params}
           letterMin={0}
           getOptionLabel={(item: IInventoryStock) =>
-            { return <> {item?.is_open ? <Battery4BarIcon sx={{ color: 'green' }}/> : <BatteryFullIcon sx={{ color: 'warning'  }}/>} {item?.lot_number ?  (item.lot_number + ' | Rem#:' + item.remaining_amount) : '' } {item.sample ? <h4>. [S]</h4>  : ''}  
+            { return <> {item.sample ? <h4> [S]</h4>  : ''}{item?.is_open ? <Battery4BarIcon sx={{ color: 'green' }}/> : <BatteryFullIcon sx={{ color: 'warning'  }}/>} {item?.lot_number ?  (item.lot_number + ' | Qty:' + item.remaining_amount.toFixed(5)) : '' }  
             </> 
             }
           }
@@ -361,7 +370,7 @@ export const BatchingDetailPage = () => {
       field: "amount_to_use",
       headerName: "Qty To Use",
       type: "number",
-      width: 140,
+      width: 90,
       align: "left",
       editable: true,
     },
@@ -369,7 +378,7 @@ export const BatchingDetailPage = () => {
       field: "amount_used",
       headerName: "Qty Used",
       type: "number",
-      width: 140,
+      width: 110,
       align: "left",
       editable: true,
     },
@@ -408,11 +417,14 @@ export const BatchingDetailPage = () => {
         savedBatching = _batching;
         setBatching(_batching);
         setBatchingSaved(true);
-        handleGenerateBatchingBOM();
+        // handleGenerateBatchingBOM();
       } else {
         console.log("Batching Not Updated");
       }
     });
+  };
+  const handleBOMBatching = () => {
+    handleGenerateBatchingBOM();
   };
 
   const handleGenerateBatchingBOM = () => {
@@ -481,30 +493,29 @@ export const BatchingDetailPage = () => {
       {
         ...rows[rowIndex],
         [field]: value,
+        total_used_amount: field === 'amount_used' ? rows[rowIndex].used_amount - (rows[rowIndex].used_amount - value) : rows[rowIndex].total_used_amount
       },
       ...rows.slice(rowIndex == rows.length ? rowIndex : rowIndex + 1),
     ]);
   };
 
-  // const handleInsertRow = (row_id: string) => { //!not being used atm
-  //   const index = rows.findIndex(
-  //     (element: { id: string }) => element.id === row_id
-  //   );
-  //   setRows([
-  //     ...rows.slice(0, index + 1),
-  //     {
-  //       _id: new ObjectID().toHexString(),
-  //       amount: 0,
-  //       last_amount: 0,
-  //       item_cost: 0,
-  //       cost: 0,
-  //     },
-  //     ...rows.slice(index == rows.length - 1 ? index + 2 : index + 1),
-  //   ]);
-  // };
-
+  const handleChooseContainer = (row_id:string,value:IBatchingContainer) => {
+    const index = expandableRows.findIndex(
+      (element) => element._id === row_id
+    );
+    const targetRow:IBatchingIngredient = expandableRows[index];
+     setExpandableRows(
+      expandableRows.map((row:expBatchIngr) => {
+        if(row === targetRow) {
+          return {...row, lot_number: value.lot_number, container_id: value._id};
+        }
+        return row;
+      })
+    );
+  }
+ 
   const handleAddRow = (row_id: string) => {
-    const index = rows.findIndex(
+    const index = expandableRows.findIndex(
       (element) => element._id === row_id
     );
     const targetRow:IBatchingIngredient = expandableRows[index];
@@ -559,6 +570,7 @@ export const BatchingDetailPage = () => {
         setBatching({ ...batching!, _id: newBatchingId });
       }
     } else {
+      //Recompile with proper format to save
       const updated = await updateBatching(auth.token, batching!);
 
       if (updated === false) {
@@ -575,7 +587,7 @@ export const BatchingDetailPage = () => {
   const cancelSaveBatching = () => {
     setBatching(savedBatching);
     let tempPur = { ...savedBatching! };
-    setRows(tempPur.ingredients);
+    setRows(tempPur.ingredients); //TODO: change to expRow
     setBatchingSaved(true);
   };
 
@@ -726,7 +738,7 @@ export const BatchingDetailPage = () => {
                   value={batching.date_needed ? batching.date_needed.split('T')[0] : null}
                 ></TextField>
               </Grid>
-              <Grid item xs={2}>
+              <Grid item xs={2.5}>
                 <Chip
                   label={
                     BatchingStatus[
@@ -748,6 +760,20 @@ export const BatchingDetailPage = () => {
                   variant="outlined"
                 />
               </Grid>
+              {
+                batching.sales_id != undefined &&
+                <Grid item xs={2}>
+              <Button
+              aria-label="go back"
+              size="medium"
+              variant="outlined"
+              onClick={() => navigate('/sales-orders/'+ batching!.sales_id)}
+            >
+              View Source
+            </Button>
+              </Grid>
+              }
+              
               <Grid item xs={12}>
                 <TextField
                   defaultValue={batching.notes}
@@ -791,13 +817,19 @@ export const BatchingDetailPage = () => {
             </div>
             <Divider></Divider>
             <Button
-              disabled={id === "new" || batching.status != 6}
+              disabled={id === "new" || batching.status != 1}
               variant="contained"
               onClick={() => handleConfirmBatching()}
             >
-              Confirm
+              Schedule
             </Button>
-
+            <Button
+              disabled={id === "new" || batching.status != 2}
+              variant="contained"
+              onClick={() => handleBOMBatching()}
+            >
+              Generate BOM
+            </Button>
             <Button
               color="success"
               variant="contained"
@@ -818,17 +850,18 @@ export const BatchingDetailPage = () => {
         </div>
       </Card>
 
-      <Card sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
+      {batching!.status >= 2 && <Card sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
 
 
         <BatchingDataTable
           rows={expandableRows!}
           columns={expandableColumns}
+          handleChooseContainer={handleChooseContainer}
           handleAddRow={ handleAddRow}
           handleEditCell={handleEditCell}
           sub_columns={sub_columns}
         ></BatchingDataTable>
-      </Card>
+      </Card> }
     </>
   );
 };

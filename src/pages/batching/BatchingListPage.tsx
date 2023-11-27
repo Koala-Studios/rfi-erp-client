@@ -29,6 +29,7 @@ const filterArray: FilterElement[] = [
 
 ];
 
+
 const BatchingStatus = [
   ["DRAFT", "warning"],
   ["SCHEDULED", "warning"],
@@ -37,6 +38,7 @@ const BatchingStatus = [
   ["ABANDONED", "error"],
   ["CANCELLED", "error"],
 ];
+
 
 const BatchingListPage = () => {
   const navigate = useNavigate();
@@ -47,6 +49,7 @@ const BatchingListPage = () => {
   const columns: GridColDef[] = [
     // { field: "id", headerName: "ID", width: 300 },
     { field: "date", headerName: "Date Created", width: 120 },
+    { field: "date_needed",  headerName: "Date Due", type: "date" },
     { field: "product_code", headerName: "Product Code", width: 120 },
     { field: "name", headerName: "Product Name", width: 320 },
     { field: "batch_code", headerName: "Batch Code", width: 120 },
@@ -58,12 +61,12 @@ const BatchingListPage = () => {
       align: 'center',
       renderCell: (params: GridRenderCellParams<number>) => (
         <Chip
-          label={BatchingStatus[params.value ? params.value - 1 : 4][0]}
+          label={BatchingStatus[params.value ? params.value - 1 : 5][0]}
           sx={{
             fontWeight: 600,
           }}
           //@ts-ignore
-          color={BatchingStatus[params.value ? params.value - 1 : 4][1]}
+          color={BatchingStatus[params.value ? params.value - 1 : 5][1]}
           variant="outlined"
         />
       ),
@@ -99,6 +102,7 @@ const BatchingListPage = () => {
           id: batch._id,
           batch_code: batch.batch_code,
           date: batch.date_created.toString().replace(/\T.+/, ""),
+          date_needed: batch.date_needed ? batch.date_needed.toString().replace(/\T.+/, "") : '',
           quantity: batch.quantity,
           product_code: batch.product_code,
           name: batch.name,
