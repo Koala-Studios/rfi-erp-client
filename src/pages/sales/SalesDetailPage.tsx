@@ -262,7 +262,7 @@ export const SalesDetailPage = () => {
       renderCell: undefined,
     },
     {
-      field: "salesd_amount",
+      field: "sold_amount",
       headerName: "Order Qty(KG)",
       type: "number",
       width: 110,
@@ -348,38 +348,30 @@ export const SalesDetailPage = () => {
     //   ),
     // },
     {
-      field: "expiry_date", //TODO: Fix blur not putting value in so clicking button will say "missing fields :-(" (maybe make mini date choosing custom component)
-      headerName: "Exp Date",
-      type: "date",
-      width: 120,
-      editable: true,
-      align: "center",
-    },
-    {
       field: "id",
       headerName: "Actions",
       align: "left",
-      width: 240,
+      width: 250,
       renderCell: (params: GridRenderCellParams<string>) => (
         <strong>
           <Button
             variant="contained"
             color="primary"
             size="small"
-            onClick={() => handleReceiveRow(params.row, false)}
+            onClick={() => handleRow(params.row)}
           >
-            Send to Qc
+            Schedule Batch
           </Button>
 
-          <Button
+          {/* <Button
             variant="outlined"
             color="warning"
             size="small"
             style={{ marginLeft: 16 }}
             onClick={() => handleReceiveRow(params.row, true)}
           >
-            Quarantine
-          </Button>
+            
+          </Button> */}
         </strong>
       ),
     },
@@ -459,7 +451,7 @@ export const SalesDetailPage = () => {
     },
   ];
 
-  const handleReceiveRow = (row: IOrderItemProcess, quarantine: boolean) => {
+  const handleRow = (row: IOrderItemProcess) => {
     if (
       !row.container_size ||
       !row.expiry_date ||
@@ -472,7 +464,7 @@ export const SalesDetailPage = () => {
         })
       );
     } else {
-      handleSalesItem(row, quarantine).then((_sales) => {
+      handleSalesItem(row).then((_sales) => {
         if (_sales) {
           savedSales = _sales;
           setSales(_sales);

@@ -12,10 +12,10 @@ export interface IOrderItem {
 }
 
 export interface IOrderItemProcess extends IOrderItem {
-  lot_number: string;
   process_amount: number;
-  container_size: number;
-  expiry_date: Date;
+  order_id: string;
+  required_date: string;
+  product_id: string;
 }
 
 interface ISalesCustomer {
@@ -230,12 +230,10 @@ export const markSalesCancelled = async (
 };
 
 export const handleSalesItem = async (
-  salesItem: IOrderItemProcess,
-  quarantine: boolean
+  salesItem: IOrderItemProcess
 ): Promise<ISalesOrder | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
-    params: { quarantine: quarantine },
   };
 
   let rtn = null;
