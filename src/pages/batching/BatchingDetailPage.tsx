@@ -50,6 +50,7 @@ import { BatchingDataTable } from "./BatchingDataTable";
 import Battery4BarIcon from "@mui/icons-material/Battery4Bar";
 import BatteryFullIcon from "@mui/icons-material/BatteryFull";
 import { IInventoryStock } from "../../logic/inventory-stock.logic";
+import { TableGridColDef } from "../../components/batching/BatchingTable";
 let savedBatching: IBatching | null = null;
 
 interface expBatchIngr extends IBatchingIngredient {
@@ -62,9 +63,7 @@ interface expBatchIngr extends IBatchingIngredient {
   has_enough: boolean;
 }
 
-export interface TableGridColDef extends GridColDef {
-  customRender?: any;
-}
+
 
 const BatchingStatus = [
   ["DRAFT", "warning"],
@@ -326,11 +325,11 @@ export const BatchingDetailPage = () => {
     {
       field: "lot_number",
       headerName: "Lot #",
-      width: 120,
+      width: 200,
       sortable: false,
       filterable: false,
       customRender: (row: any) => (
-        <TableCell sx={{ pl: "16px" }}>
+        <TableCell sx={{width: 200, pl: "16px" }}>
           <TableAutocomplete
             width={100}
             initialValue={row.lot_number}
@@ -391,10 +390,11 @@ export const BatchingDetailPage = () => {
           <TableCell
             sx={{
               p: 1,
-              pl: "16px",
-              pr: "16px",
+              pl: "10px",
+              pr: "10px",
               fontWeight: "500",
               fontSize: "0.9rem",
+              width:65
             }}
           >
             <Button
@@ -422,37 +422,40 @@ export const BatchingDetailPage = () => {
     {
       field: "lot_number",
       headerName: "Lot #",
-      width: 150,
+      width: 200,
       align: "left",
       sortable: false,
       filterable: false,
-      renderCell: (row_params: GridRenderCellParams<string>) => (
-        <TableAutocomplete
-          initialValue={row_params.row.lot_number}
-          // readOnly={batching!.status === 6 || purchase!.status === 4}
-          dbOption="container"
-          handleEditRow={handleEditProductRow}
-          rowParams={row_params}
-          letterMin={0}
-          getOptionLabel={(item: IInventoryStock) => {
-            return (
-              <>
-                {" "}
-                {item.sample ? <h4> [S]</h4> : ""}
-                {item?.is_open ? (
-                  <Battery4BarIcon sx={{ color: "green" }} />
-                ) : (
-                  <BatteryFullIcon sx={{ color: "warning" }} />
-                )}{" "}
-                {item?.lot_number
-                  ? item.lot_number +
-                    " | Qty:" +
-                    item.remaining_amount.toFixed(5)
-                  : ""}
-              </>
-            );
-          }}
-        />
+      customRender: (row: any) => (
+        <TableCell sx={{width: 200,  pl: "16px" }}>
+          <TableAutocomplete
+            width={100}
+            initialValue={row.lot_number}
+            // readOnly={batching!.status === 6 || purchase!.status === 4}
+            dbOption="container"
+            handleEditRow={handleEditProductRow}
+            rowParams={{ row: row }}
+            letterMin={0}
+            getOptionLabel={(item: IInventoryStock) => {
+              return (
+                <>
+                  {" "}
+                  {item.sample ? <h4> [S]</h4> : ""}
+                  {item?.is_open ? (
+                    <Battery4BarIcon sx={{ color: "green" }} />
+                  ) : (
+                    <BatteryFullIcon sx={{ color: "warning" }} />
+                  )}{" "}
+                  {item?.lot_number
+                    ? item.lot_number +
+                      " | Qty:" +
+                      item.remaining_amount.toFixed(5)
+                    : ""}
+                </>
+              );
+            }}
+          />
+        </TableCell>
       ),
     },
     {
@@ -488,8 +491,8 @@ export const BatchingDetailPage = () => {
           <TableCell
             sx={{
               p: 1,
-              pl: "16px",
-              pr: "16px",
+              pl: "10px",
+              pr: "10px",
               fontWeight: "500",
               fontSize: "0.9rem",
             }}
@@ -499,6 +502,8 @@ export const BatchingDetailPage = () => {
               color="info"
               size="small"
               style={{
+                borderColor: "#bb221155",
+                color: "#bb221155",
                 backgroundColor: "#ff221115",
                 fontSize: "19px",
                 maxWidth: "40px",
@@ -513,25 +518,6 @@ export const BatchingDetailPage = () => {
           </TableCell>
         );
       },
-      renderCell: (params: GridRenderCellParams<string>) => (
-        <Button
-          variant="outlined"
-          color="error"
-          size="small"
-          style={{
-            backgroundColor: "#ff221115",
-            fontSize: "25px",
-            maxWidth: "40px",
-            maxHeight: "30px",
-            minWidth: "40px",
-            minHeight: "30px",
-            marginRight: "12px",
-          }}
-          onClick={() => handleDeleteRow(params.row._id)}
-        >
-          -
-        </Button>
-      ),
     },
   ];
 

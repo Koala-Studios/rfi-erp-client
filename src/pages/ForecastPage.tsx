@@ -296,7 +296,23 @@ export const ForecastPage = () => {
   };
 
   const handleCalculate = () => {
-    if (rows.length === 0) return;
+    if (rows.length === 0) {
+      window.dispatchEvent(
+        new CustomEvent("NotificationEvent", {
+          detail: { color: "error", text: "Rows Are Empty!"},
+        })
+      );
+      return;
+    }
+    const zero_amt = rows.find((x)=> x.amount <= 0 || x.product_id === "")
+    if(zero_amt != undefined) {
+      window.dispatchEvent(
+        new CustomEvent("NotificationEvent", {
+          detail: { color: "error", text: zero_amt.product_id === "" ? "Empty Row!"  : zero_amt.product_code + " Has an Invalid Qty!"},
+        })
+      );
+      return;
+    }
     setLoading(true);
 
     //TODO:Remove elements that are not filled in

@@ -70,7 +70,7 @@ const StandaloneAutocomplete: React.FC<Props> = ({
   ) => {
     lookup(value.toUpperCase(), dbOption, letterMin).then((result) => {
       setOptionList(result);
-      console.log(result)
+      // console.log(result)
     });
   };
 

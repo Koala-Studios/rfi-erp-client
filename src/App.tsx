@@ -47,6 +47,7 @@ import MaterialListPage from "./pages/inventory/MaterialListPage";
 import LocationListPage from "./pages/location/LocationListPage";
 import { LocationDetailPage } from "./pages/location/LocationDetailPage";
 import PERMISSIONS from "./logic/config.permissions";
+import QualityControlListPage from "./pages/quality-control/QualityControlListPage";
 
 const mainTheme = createTheme({
   palette: {
@@ -385,6 +386,16 @@ function App() {
                   <RequireAuth permission={PERMISSIONS.forecast_page}>
                     <Navbar title="Forecast Calculator">
                       <ForecastPage />
+                    </Navbar>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/qc"
+                element={
+                  <RequireAuth permission={PERMISSIONS.batching_page}>
+                    <Navbar title="Quality Control Dashboard">
+                      <QualityControlListPage />
                     </Navbar>
                   </RequireAuth>
                 }

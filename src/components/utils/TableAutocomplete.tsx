@@ -37,7 +37,7 @@ const TableAutocomplete: React.FC<Props> = ({
   initialValue,
   letterMin,
   dbOption,
-  width = 340,
+  width = 240,
   getOptionLabel,
   readOnly = false
 }) => {
