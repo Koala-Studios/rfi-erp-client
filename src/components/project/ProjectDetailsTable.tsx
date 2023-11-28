@@ -34,7 +34,7 @@ import { MoreHoriz } from "@mui/icons-material";
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import HelpOutlineIcon from '@mui/icons-material/HelpOutline';
-import { SingleDropdownCell } from "../utils/TableComponents";
+import { MultiDropdownCell, SingleDropdownCell } from "../utils/TableComponents";
 
 const ItemStatus = [
   [1,"Pending", "error"],
@@ -232,9 +232,9 @@ export const ProjectDetailsTable: React.FC<Props> = ({
   const handleEditDietStatus = (rowid:string, value: number | string) => {
     let pList = projectItems.slice();
     const rowIdx = projectItems.findIndex((r) => r._id === rowid);
-    
     //@ts-ignore
-    pList[rowIdx].dietary_status = value;
+    pList[rowIdx].dietary_status.push(value);
+    // pList[rowIdx].dietary_status = pList[rowIdx].dietary_status.push(value);
 
     setProjectItems(pList);
   };
@@ -350,9 +350,9 @@ export const ProjectDetailsTable: React.FC<Props> = ({
       field: "dietary_status",
       headerName: "Diet Status",
       editable: false,
-      width: 90,
+      width: 150,
       renderCell: (params: GridRenderCellParams<number>) => (
-        <SingleDropdownCell 
+        <MultiDropdownCell 
          handleEditRow={handleEditDietStatus}
          id={params.id} 
          value={params.value}
