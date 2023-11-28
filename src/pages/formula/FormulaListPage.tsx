@@ -87,9 +87,8 @@ const FormulaListPage = () => {
       field: "id",
       headerName: "Actions",
       align: "left",
-      width: 150,
+      width: 100,
       renderCell: (params: GridRenderCellParams<string>) => (
-        <strong>
           <Button
             variant="contained"
             color="primary"
@@ -108,7 +107,6 @@ const FormulaListPage = () => {
           >
             Formula
           </Button>
-        </strong>
       ),
     },
   ];

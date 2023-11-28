@@ -24,7 +24,7 @@ interface Props {
   | "container";
   handleEditRow: (id: string, newItem: any) => void;
   readOnly?:boolean,
-  rowParams: GridRenderCellParams<string>;
+  rowParams: any;
   initialValue: string;
   letterMin: number;
   getOptionLabel: (option: any) => any;
@@ -71,8 +71,8 @@ const TableAutocomplete: React.FC<Props> = ({
             style={{
               background: "#e4e6ee",
               fontSize: "16px",
-              maxWidth: "450px",
-              minWidth: "450px",
+              maxWidth: width,
+              minWidth: width,
             }}
           >
             {children}
@@ -109,7 +109,7 @@ const TableAutocomplete: React.FC<Props> = ({
     return (
       <div
         style={{
-          minWidth: "340px",
+          minWidth: width,
           minHeight: "39px",
           paddingBottom: "10px",
           paddingTop: "10px",
@@ -125,41 +125,3 @@ const TableAutocomplete: React.FC<Props> = ({
 };
 
 export default TableAutocomplete;
-
-//onchange old stuff
-
-//Works great if you use arrow keys and Enter key to select, otherwise it doesn't work :-()
-// const valueObj = value as IFormulaDevRow;
-// if (value_obj) {
-//   let newRow: IFormulaDevRow = {
-//     id: rowParams.row._id,
-//     material_id: value_obj.material_id,
-//     material_code: value_obj.material_code,
-//     material_name: value_obj.material_name,
-//     cost: value_obj.cost,
-//     amount: 0,
-//     last_amount: 0,
-//     item_cost: value_obj.cost,
-//     last_cost: 0,
-//     notes: "",
-//   };
-
-// } else {
-//   console.log("dud");
-// }
-
-// function filterChanges(string: string) {
-//   lookupInventory(string, false).then((result) => {
-//     const newCatalog = result?.map((item, key) => {
-//       return {
-//         id: key,
-//         material_id: item._id,
-//         material_code: item.product_code,
-//         material_name: item.name,
-//         label: item.product_code + " |     " + item.name,
-//         cost: item.cost,
-//       };
-//     });
-//     setOptionList(newCatalog);
-//   });
-// }

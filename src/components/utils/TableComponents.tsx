@@ -1,4 +1,4 @@
-import { Chip, Menu, MenuItem, Select, SelectChangeEvent } from "@mui/material";
+import { Chip, Menu, MenuItem, Select, SelectChangeEvent, TextField, Typography } from "@mui/material";
 import { GridColDef, useGridApiContext } from "@mui/x-data-grid";
 import React, { useState } from "react";
 
@@ -95,6 +95,61 @@ export const SingleDropdownCell: React.FC<SingleDropdownCellProps> = ({id, value
     );
   }
 
-//   export const renderSingleDropdownCell: GridColDef["renderCell"] = (params) => {
-//     return <SingleDropdownCell id={params.id} value={params.value} field={params.field} options={[]}/>;
-//   };
+interface TableTexfieldProps {
+    handleEditRow: (value:string) => void;
+    width?: number;
+    readOnly?:boolean;
+    initialValue:string;
+    type?: string;
+}
+
+export const TableTexfield: React.FC<TableTexfieldProps> = ({
+    handleEditRow,
+    initialValue,
+    width = 150,
+    type,
+    readOnly = false
+  }) => {
+    const [editMode, setEditMode] = React.useState(false);
+    
+    if (readOnly == false && editMode) {
+        return (
+            <TextField
+              variant="outlined"
+              autoFocus
+              type={type ? type : "text"}
+              onBlur={(event)=> {
+                handleEditRow(event.target.value);
+                setEditMode(false)
+              }}
+              InputProps={{ sx: { borderRadius: 0 } }}
+              sx={{
+                width:width,
+                maxWidth:width,
+                // marginLeft: "-5%",
+                // minWidth: "110%",
+                // minHeight: "39px",
+                margin:"0!important",
+              }}
+              placeholder={initialValue}
+            //   {...params}
+            />
+          )
+    } else {
+      return (
+        <div
+          style={{
+            width:width,
+            maxWidth:width,
+            padding: "16px",
+          }}
+          onDoubleClick={() => setEditMode(!readOnly)}
+        >
+          <Typography variant="subtitle2" style={{ fontSize: "15px" }}>
+            {initialValue}
+          </Typography>
+        </div>
+      );
+    }
+  };
+  

@@ -30,13 +30,25 @@ import { ObjectID } from "bson";
 import SaveForm from "../../components/forms/SaveForm";
 import StandaloneAutocomplete from "../../components/utils/StandaloneAutocomplete";
 import { ISupplier } from "../../logic/supplier.logic";
-import { confirmBatching, createBatching, getBatching, IBatching, markBatchingCancelled, updateBatching, finishBatching, IBatchingIngredient, generateBatchingBOM, batchingStatus, IBatchingContainer } from "../../logic/batching.logic";
+import {
+  confirmBatching,
+  createBatching,
+  getBatching,
+  IBatching,
+  markBatchingCancelled,
+  updateBatching,
+  finishBatching,
+  IBatchingIngredient,
+  generateBatchingBOM,
+  batchingStatus,
+  IBatchingContainer,
+} from "../../logic/batching.logic";
 import { IProduct } from "../../logic/product.logic";
 import { padding } from "@mui/system";
 import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
 import { BatchingDataTable } from "./BatchingDataTable";
-import Battery4BarIcon from '@mui/icons-material/Battery4Bar';
-import BatteryFullIcon from '@mui/icons-material/BatteryFull';
+import Battery4BarIcon from "@mui/icons-material/Battery4Bar";
+import BatteryFullIcon from "@mui/icons-material/BatteryFull";
 import { IInventoryStock } from "../../logic/inventory-stock.logic";
 let savedBatching: IBatching | null = null;
 
@@ -47,7 +59,11 @@ interface expBatchIngr extends IBatchingIngredient {
   amount_to_use: number;
   used_amount: number;
   sub_rows: IBatchingContainer[];
-  has_enough: boolean
+  has_enough: boolean;
+}
+
+export interface TableGridColDef extends GridColDef {
+  customRender?: any;
 }
 
 const BatchingStatus = [
@@ -59,18 +75,16 @@ const BatchingStatus = [
   ["CANCELLED", "error"],
 ];
 
-
 const addDays = (date: Date, days: number) => {
   var result = new Date(date);
   result.setDate(result.getDate() + days);
   return result;
-}
-
+};
 
 const emptyBatching: IBatching = {
   _id: "",
   status: 1,
-  sales_id:undefined,
+  sales_id: undefined,
   batch_code: "",
   ingredients: [],
   notes: "",
@@ -78,8 +92,8 @@ const emptyBatching: IBatching = {
   name: "",
   product_id: "",
   quantity: NaN,
-  date_created: new Date().toISOString().split('T')[0],
-  date_needed: addDays(new Date(), 5).toISOString().split('T')[0]
+  date_created: new Date().toISOString().split("T")[0],
+  date_needed: addDays(new Date(), 5).toISOString().split("T")[0],
 };
 const inputRefMap = {
   batch_code: 0,
@@ -89,7 +103,11 @@ const inputRefMap = {
 };
 
 const inputMap: InputInfo[] = [
-  { label: "batch_code", ref: 0, validation: { required: true, genericVal: "Text" } },
+  {
+    label: "batch_code",
+    ref: 0,
+    validation: { required: true, genericVal: "Text" },
+  },
   {
     label: "quantity",
     ref: 1,
@@ -101,8 +119,11 @@ const inputMap: InputInfo[] = [
     validation: { required: false, genericVal: "Text" },
   },
 
-  { label: "product_id", ref: 3, validation: { required: true, genericVal: "Text" } },
-  
+  {
+    label: "product_id",
+    ref: 3,
+    validation: { required: true, genericVal: "Text" },
+  },
 ];
 
 export const BatchingDetailPage = () => {
@@ -136,33 +157,48 @@ export const BatchingDetailPage = () => {
     setBatchingSaved(false);
   };
 
-  const handleEditProductRow = (rowid: string, value: IInventoryStock) => { //not using right now here
-    const index = expandableRows.findIndex(
-      (element) => element.sub_rows.some(e => e._id === rowid)
+  const handleEditProductRow = (rowid: string, value: IInventoryStock) => {
+    //not using right now here
+    const index = expandableRows.findIndex((element) =>
+      element.sub_rows.some((e) => e._id === rowid)
     );
-    const targetRow:IBatchingIngredient = expandableRows[index];
-    setExpandableRows(expandableRows.map((row)=> {
-      if(row === targetRow) {
-        // targetRow.sub_rows.splice(index, 1, 
-        //   {_id:rowid, container_id: value._id, lot_number: value.lot_number,required_amount: targetRow.required_amount - targetRow.used_amount, used_amount: 0, has_enough: ((value.remaining_amount - (targetRow.required_amount - targetRow.used_amount)) >= 0)}
-        // )
-        const req_amt = (targetRow.required_amount - targetRow.total_used_amount)
-        return {...row, sub_rows: targetRow.sub_rows.toSpliced(index, 1, 
-          {_id:rowid, container_id: value._id, confirm_lot_number:'', lot_number: value.lot_number,amount_to_use: value.remaining_amount  > req_amt ? req_amt : value.remaining_amount, amount_used: 0 ,has_enough: ((value.remaining_amount - req_amt) >= 0)}
-          )}
-      }
+    const targetRow: IBatchingIngredient = expandableRows[index];
+    setExpandableRows(
+      expandableRows.map((row) => {
+        if (row === targetRow) {
+          // targetRow.sub_rows.splice(index, 1,
+          //   {_id:rowid, container_id: value._id, lot_number: value.lot_number,required_amount: targetRow.required_amount - targetRow.used_amount, used_amount: 0, has_enough: ((value.remaining_amount - (targetRow.required_amount - targetRow.used_amount)) >= 0)}
+          // )
+          const req_amt =
+            targetRow.required_amount - targetRow.total_used_amount;
+          return {
+            ...row,
+            sub_rows: targetRow.sub_rows.toSpliced(index, 1, {
+              _id: rowid,
+              container_id: value._id,
+              confirm_lot_number: "",
+              lot_number: value.lot_number,
+              amount_to_use:
+                value.remaining_amount > req_amt
+                  ? req_amt
+                  : value.remaining_amount,
+              amount_used: 0,
+              has_enough: value.remaining_amount - req_amt >= 0,
+            }),
+          };
+        }
         return row;
-    }))
-
+      })
+    );
   };
 
   const [batchingSaved, setBatchingSaved] = React.useState<boolean>(true);
-  const [batching, setBatching] = React.useState<IBatching | null>(
-    null
-  );
+  const [batching, setBatching] = React.useState<IBatching | null>(null);
 
   const [rows, setRows] = React.useState<IBatchingIngredient[]>([]);
-  const [expandableRows, setExpandableRows] = React.useState<expBatchIngr[]>([]);
+  const [expandableRows, setExpandableRows] = React.useState<expBatchIngr[]>(
+    []
+  );
   const [receiveMode, setReceiveMode] = React.useState<boolean>(false);
 
   useEffect(() => {
@@ -202,13 +238,25 @@ export const BatchingDetailPage = () => {
             return {
               ...item,
               _id: item._id ? item._id : new ObjectID().toHexString(),
-              container_id: item.used_containers.length > 0 ? item.used_containers[0].container_id : '',
-              lot_number: item.used_containers.length > 0 ? item.used_containers[0].lot_number : '',
-              amount_to_use: item.used_containers.length > 0 ? item.used_containers[0].amount_to_use : 0,
+              container_id:
+                item.used_containers.length > 0
+                  ? item.used_containers[0].container_id
+                  : "",
+              lot_number:
+                item.used_containers.length > 0
+                  ? item.used_containers[0].lot_number
+                  : "",
+              amount_to_use:
+                item.used_containers.length > 0
+                  ? item.used_containers[0].amount_to_use
+                  : 0,
               total_used_amount: 0,
-              sub_rows: item.used_containers.length > 1 ? item.used_containers.slice(1, undefined) : [],
-              has_enough: true
-            }
+              sub_rows:
+                item.used_containers.length > 1
+                  ? item.used_containers.slice(1, undefined)
+                  : [],
+              has_enough: true,
+            };
           })
         );
         setReceiveMode(p!.status <= 3);
@@ -241,7 +289,7 @@ export const BatchingDetailPage = () => {
     }
   }, [rows]);
 
-  const expandableColumns: GridColDef[] = [
+  const expandableColumns: TableGridColDef[] = [
     { field: "product_code", headerName: "Product Code", width: 125 },
     {
       field: "product_name",
@@ -275,38 +323,43 @@ export const BatchingDetailPage = () => {
       align: "right",
       editable: false,
     },
-    // {
-    //   field: "lot_number",
-    //   headerName: "Lot #",
-    //   width: 150,
-    //   align: "right",
-    //   editable: true,
-    // },
     {
       field: "lot_number",
       headerName: "Lot #",
-      width: 150,
+      width: 120,
       sortable: false,
       filterable: false,
-      renderCell: (row_params: GridRenderCellParams<string>) => (
-        <TableAutocomplete
-        initialValue={row_params.row.lot_number}
-          // readOnly={batching!.status === 6 || purchase!.status === 4}
-          dbOption="container"
-          handleEditRow={handleEditProductRow}
-          rowParams={row_params}
-          letterMin={0}
-          getOptionLabel={(item: IBatchingContainer) =>
-            { return <> {item?.is_open ? <Battery4BarIcon sx={{ color: 'green' }}/> : ''} {item?.lot_number ?  (`${item.lot_number}`) : '' }
-            </> 
-            }
-          }
-          />),
+      customRender: (row: any) => (
+        <TableCell sx={{ pl: "16px" }}>
+          <TableAutocomplete
+            width={100}
+            initialValue={row.lot_number}
+            // readOnly={batching!.status === 6 || purchase!.status === 4}
+            dbOption="container"
+            handleEditRow={handleEditProductRow}
+            rowParams={{ row: row }}
+            letterMin={0}
+            getOptionLabel={(item: IBatchingContainer) => {
+              return (
+                <>
+                  {" "}
+                  {item?.is_open ? (
+                    <Battery4BarIcon sx={{ color: "green" }} />
+                  ) : (
+                    ""
+                  )}{" "}
+                  {item?.lot_number ? `${item.lot_number}` : ""}
+                </>
+              );
+            }}
+          />
+        </TableCell>
+      ),
     },
     {
       field: "confirm_lot_number",
       headerName: "Confirm Lot #",
-      width: 150,
+      width: 120,
       align: "right",
       editable: true,
     },
@@ -319,7 +372,7 @@ export const BatchingDetailPage = () => {
       editable: true,
     },
     {
-      field: "amount_used",
+      field: "used_amount",
       headerName: "Qty Used",
       type: "number",
       width: 110,
@@ -327,42 +380,85 @@ export const BatchingDetailPage = () => {
       editable: true,
     },
     {
-      field: "actions",
+      field: "product_id",
       headerName: "Actions",
       type: "boolean",
-      width: 50,
+      width: 65,
       align: "right",
       editable: false,
+      customRender: (row: any) => {
+        return (
+          <TableCell
+            sx={{
+              p: 1,
+              pl: "16px",
+              pr: "16px",
+              fontWeight: "500",
+              fontSize: "0.9rem",
+            }}
+          >
+            <Button
+              variant="outlined"
+              color="info"
+              size="small"
+              style={{
+                backgroundColor: "#1144ff15",
+                fontSize: "19px",
+                maxWidth: "40px",
+                maxHeight: "30px",
+                minWidth: "40px",
+                minHeight: "30px",
+              }}
+              onClick={() => handleAddRow(row["_id"])}
+            >
+              +
+            </Button>
+          </TableCell>
+        );
+      },
     },
-    
   ];
-  const sub_columns: GridColDef[] = [
+  const sub_columns: TableGridColDef[] = [
     {
       field: "lot_number",
       headerName: "Lot #",
-      width: 155,
-      align:'left',
+      width: 150,
+      align: "left",
       sortable: false,
       filterable: false,
       renderCell: (row_params: GridRenderCellParams<string>) => (
         <TableAutocomplete
-        initialValue={row_params.row.lot_number}
+          initialValue={row_params.row.lot_number}
           // readOnly={batching!.status === 6 || purchase!.status === 4}
           dbOption="container"
           handleEditRow={handleEditProductRow}
           rowParams={row_params}
           letterMin={0}
-          getOptionLabel={(item: IInventoryStock) =>
-            { return <> {item.sample ? <h4> [S]</h4>  : ''}{item?.is_open ? <Battery4BarIcon sx={{ color: 'green' }}/> : <BatteryFullIcon sx={{ color: 'warning'  }}/>} {item?.lot_number ?  (item.lot_number + ' | Qty:' + item.remaining_amount.toFixed(5)) : '' }  
-            </> 
-            }
-          }
-          />),
+          getOptionLabel={(item: IInventoryStock) => {
+            return (
+              <>
+                {" "}
+                {item.sample ? <h4> [S]</h4> : ""}
+                {item?.is_open ? (
+                  <Battery4BarIcon sx={{ color: "green" }} />
+                ) : (
+                  <BatteryFullIcon sx={{ color: "warning" }} />
+                )}{" "}
+                {item?.lot_number
+                  ? item.lot_number +
+                    " | Qty:" +
+                    item.remaining_amount.toFixed(5)
+                  : ""}
+              </>
+            );
+          }}
+        />
+      ),
     },
     {
       field: "confirm_lot_number",
       headerName: "Lot Number",
-      width: 150,
+      width: 120,
       align: "left",
       editable: true,
     },
@@ -385,43 +481,73 @@ export const BatchingDetailPage = () => {
     {
       field: "id",
       headerName: "Actions",
-      align:'left',
-      width: 50,
-      renderCell: (params: GridRenderCellParams<string>) => (
-        <strong>
-          <Button
-            variant="outlined"
-            color="error"
-            size="small"
-            style={{
-              backgroundColor: "#ff221115",
-              fontSize: "25px",
-              maxWidth: "40px",
-              maxHeight: "30px",
-              minWidth: "40px",
-              minHeight: "30px",
-              marginRight: "12px",
+      align: "left",
+      width: 65,
+      customRender: (row: any) => {
+        return (
+          <TableCell
+            sx={{
+              p: 1,
+              pl: "16px",
+              pr: "16px",
+              fontWeight: "500",
+              fontSize: "0.9rem",
             }}
-            onClick={() => handleDeleteRow(params.row._id)}
           >
-            -
-          </Button>
-        </strong>
+            <Button
+              variant="outlined"
+              color="info"
+              size="small"
+              style={{
+                backgroundColor: "#ff221115",
+                fontSize: "19px",
+                maxWidth: "40px",
+                maxHeight: "30px",
+                minWidth: "40px",
+                minHeight: "30px",
+              }}
+              onClick={() => handleDeleteRow(row["_id"])}
+            >
+              -
+            </Button>
+          </TableCell>
+        );
+      },
+      renderCell: (params: GridRenderCellParams<string>) => (
+        <Button
+          variant="outlined"
+          color="error"
+          size="small"
+          style={{
+            backgroundColor: "#ff221115",
+            fontSize: "25px",
+            maxWidth: "40px",
+            maxHeight: "30px",
+            minWidth: "40px",
+            minHeight: "30px",
+            marginRight: "12px",
+          }}
+          onClick={() => handleDeleteRow(params.row._id)}
+        >
+          -
+        </Button>
       ),
     },
   ];
 
   const handleConfirmBatching = () => {
-    confirmBatching(auth.token, batching!).then((_batching: IBatching | null) => {
-      if (_batching) {
-        savedBatching = _batching;
-        setBatching(_batching);
-        setBatchingSaved(true);
-        // handleGenerateBatchingBOM();
-      } else {
-        console.log("Batching Not Updated");
+    confirmBatching(auth.token, batching!).then(
+      (_batching: IBatching | null) => {
+        if (_batching) {
+          savedBatching = _batching;
+          setBatching(_batching);
+          setBatchingSaved(true);
+          // handleGenerateBatchingBOM();
+        } else {
+          console.log("Batching Not Updated");
+        }
       }
-    });
+    );
   };
   const handleBOMBatching = () => {
     handleGenerateBatchingBOM();
@@ -433,19 +559,32 @@ export const BatchingDetailPage = () => {
         savedBatching = _batching;
         setBatching(_batching);
         setBatchingSaved(true);
-        setExpandableRows(_batching.ingredients.map((item) => {
-          return {
-            ...item,
-            _id: item._id ? item._id : new ObjectID().toHexString(),
-            container_id: item.used_containers.length > 0 ? item.used_containers[0].container_id : '',
-            lot_number: item.used_containers.length > 0 ? item.used_containers[0].lot_number : '',
-            amount_to_use: item.used_containers.length > 0 ? item.used_containers[0].amount_to_use : 0,
-            used_amount: 0,
-            sub_rows: item.used_containers.length > 1 ? item.used_containers.slice(1, undefined) : [],
-            has_enough: true
-          }
-        })
-      );
+        setExpandableRows(
+          _batching.ingredients.map((item) => {
+            return {
+              ...item,
+              _id: item._id ? item._id : new ObjectID().toHexString(),
+              container_id:
+                item.used_containers.length > 0
+                  ? item.used_containers[0].container_id
+                  : "",
+              lot_number:
+                item.used_containers.length > 0
+                  ? item.used_containers[0].lot_number
+                  : "",
+              amount_to_use:
+                item.used_containers.length > 0
+                  ? item.used_containers[0].amount_to_use
+                  : 0,
+              used_amount: 0,
+              sub_rows:
+                item.used_containers.length > 1
+                  ? item.used_containers.slice(1, undefined)
+                  : [],
+              has_enough: true,
+            };
+          })
+        );
       } else {
         console.log("Batching Not Updated");
       }
@@ -477,61 +616,80 @@ export const BatchingDetailPage = () => {
     });
   };
 
-
   const handleDeleteRow = (row_id: string) => {
     setExpandableRows(
-      expandableRows.map((row:expBatchIngr) => {
-          return {...row, sub_rows: row.sub_rows.filter((sub_row) => sub_row._id !== row_id  )};
-      }))
+      expandableRows.map((row: expBatchIngr) => {
+        return {
+          ...row,
+          sub_rows: row.sub_rows.filter((sub_row) => sub_row._id !== row_id),
+        };
+      })
+    );
   };
 
   const handleEditCell = (row_id: string, field: string, value: any) => {
+    //TODO: DANIEL THIS NNEEDS FIX
+
     const rowIndex = rows.findIndex((r: any) => r._id === row_id);
-    console.log(row_id, field, value)
+    console.log(row_id, field, value);
     setRows([
       ...rows.slice(0, rowIndex),
       {
         ...rows[rowIndex],
         [field]: value,
-        total_used_amount: field === 'amount_used' ? rows[rowIndex].used_amount - (rows[rowIndex].used_amount - value) : rows[rowIndex].total_used_amount
+        total_used_amount:
+          field === "amount_used"
+            ? rows[rowIndex].used_amount - (rows[rowIndex].used_amount - value)
+            : rows[rowIndex].total_used_amount,
       },
       ...rows.slice(rowIndex == rows.length ? rowIndex : rowIndex + 1),
     ]);
+    console.log(rows);
   };
 
-  const handleChooseContainer = (row_id:string,value:IBatchingContainer) => {
-    const index = expandableRows.findIndex(
-      (element) => element._id === row_id
-    );
-    const targetRow:IBatchingIngredient = expandableRows[index];
-     setExpandableRows(
-      expandableRows.map((row:expBatchIngr) => {
-        if(row === targetRow) {
-          return {...row, lot_number: value.lot_number, container_id: value._id};
+  const handleChooseContainer = (row_id: string, value: IBatchingContainer) => {
+    const index = expandableRows.findIndex((element) => element._id === row_id);
+    const targetRow: IBatchingIngredient = expandableRows[index];
+    setExpandableRows(
+      expandableRows.map((row: expBatchIngr) => {
+        if (row === targetRow) {
+          return {
+            ...row,
+            lot_number: value.lot_number,
+            container_id: value._id,
+          };
         }
         return row;
       })
     );
-  }
- 
-  const handleAddRow = (row_id: string) => {
-    const index = expandableRows.findIndex(
-      (element) => element._id === row_id
-    );
-    const targetRow:IBatchingIngredient = expandableRows[index];
-     setExpandableRows(
-      expandableRows.map((row:expBatchIngr) => {
-        if(row === targetRow) {
-          return {...row, sub_rows: [...targetRow.sub_rows, { _id: new ObjectID().toHexString(), container_id: '', lot_number: '', confirm_lot_number: '', amount_used: null }]};
-        }
-        return row;
-      })
-    );
+  };
 
+  const handleAddRow = (row_id: string) => {
+    const index = expandableRows.findIndex((element) => element._id === row_id);
+    const targetRow: IBatchingIngredient = expandableRows[index];
+    setExpandableRows(
+      expandableRows.map((row: expBatchIngr) => {
+        if (row === targetRow) {
+          return {
+            ...row,
+            sub_rows: [
+              ...targetRow.sub_rows,
+              {
+                _id: new ObjectID().toHexString(),
+                container_id: "",
+                lot_number: "",
+                confirm_lot_number: "",
+                amount_used: null,
+              },
+            ],
+          };
+        }
+        return row;
+      })
+    );
   };
 
   const saveBatching = async () => {
-
     let allValid = true;
     //do client side validation
     for (let i = 0; i < inputRefs.current.length; i++) {
@@ -641,7 +799,6 @@ export const BatchingDetailPage = () => {
                   required={
                     inputMap[inputRefMap.batch_code].validation.required
                   }
-
                   spellCheck="false"
                   InputLabelProps={{ shrink: true }}
                   fullWidth
@@ -652,12 +809,16 @@ export const BatchingDetailPage = () => {
               </Grid>
               <Grid item xs={6}>
                 <StandaloneAutocomplete
-                  initialValue={{ _id: batching.product_id, product_code: batching.product_code, name: batching.name }}
+                  initialValue={{
+                    _id: batching.product_id,
+                    product_code: batching.product_code,
+                    name: batching.name,
+                  }}
                   inputRef={(el: any) =>
                     (inputRefs.current[inputRefMap.product_id] = el)
                   }
                   error={inputVisuals[inputRefMap.product_id].error}
-                  onBlur={(event:any) =>
+                  onBlur={(event: any) =>
                     onInputBlur(event, inputMap[inputRefMap.product_id])
                   }
                   helperText={inputVisuals[inputRefMap.product_id].helperText}
@@ -665,17 +826,31 @@ export const BatchingDetailPage = () => {
                     inputMap[inputRefMap.product_id].validation.required
                   }
                   onChange={(e, value) => {
-                    if(value) {
-                      setBatching({ ...batching, product_id: value._id, product_code: value.product_code, name: value.name});
+                    if (value) {
+                      setBatching({
+                        ...batching,
+                        product_id: value._id,
+                        product_code: value.product_code,
+                        name: value.name,
+                      });
                     } else {
-                      setBatching({...batching, product_id: null, product_code: '', name: '' })
+                      setBatching({
+                        ...batching,
+                        product_id: null,
+                        product_code: "",
+                        name: "",
+                      });
                     }
-                    }}
+                  }}
                   readOnly={batching.status != batchingStatus.DRAFT}
                   label={"Product"}
                   letterMin={0}
                   dbOption={"approved-product"}
-                  getOptionLabel={(item: IProduct) => item.product_code ? item.product_code + ' | ' + item.name : ''}
+                  getOptionLabel={(item: IProduct) =>
+                    item.product_code
+                      ? item.product_code + " | " + item.name
+                      : ""
+                  }
                 />
               </Grid>
               <Grid item xs={1.5}>
@@ -689,13 +864,10 @@ export const BatchingDetailPage = () => {
                   onBlur={(event) =>
                     onInputBlur(event, inputMap[inputRefMap.quantity])
                   }
-                  required={
-                    inputMap[inputRefMap.quantity].validation.required
-                  }
+                  required={inputMap[inputRefMap.quantity].validation.required}
                   InputProps={{
                     readOnly: batching.status != batchingStatus.DRAFT,
                   }}
-
                   fullWidth
                   InputLabelProps={{ shrink: true }}
                   size="small"
@@ -718,7 +890,7 @@ export const BatchingDetailPage = () => {
                   variant="outlined"
                   label={"Batching Date"}
                   type={"date"}
-                  value={batching.date_created.split('T')[0]}
+                  value={batching.date_created.split("T")[0]}
                 ></TextField>
               </Grid>
               <Grid item xs={3}>
@@ -735,14 +907,18 @@ export const BatchingDetailPage = () => {
                   variant="outlined"
                   label={"Deadline Date"}
                   type={"date"}
-                  value={batching.date_needed ? batching.date_needed.split('T')[0] : null}
+                  value={
+                    batching.date_needed
+                      ? batching.date_needed.split("T")[0]
+                      : null
+                  }
                 ></TextField>
               </Grid>
               <Grid item xs={2.5}>
                 <Chip
                   label={
                     BatchingStatus[
-                    batching?.status ? batching?.status - 1 : 5
+                      batching?.status ? batching?.status - 1 : 5
                     ][0]
                   }
                   sx={{
@@ -754,26 +930,27 @@ export const BatchingDetailPage = () => {
                   //@ts-ignore
                   color={
                     BatchingStatus[
-                    batching?.status ? batching?.status - 1 : 5
+                      batching?.status ? batching?.status - 1 : 5
                     ][1]
                   }
                   variant="outlined"
                 />
               </Grid>
-              {
-                batching.sales_id != undefined &&
+              {batching.sales_id != undefined && (
                 <Grid item xs={2}>
-              <Button
-              aria-label="go back"
-              size="medium"
-              variant="outlined"
-              onClick={() => navigate('/sales-orders/'+ batching!.sales_id)}
-            >
-              View Source
-            </Button>
-              </Grid>
-              }
-              
+                  <Button
+                    aria-label="go back"
+                    size="medium"
+                    variant="outlined"
+                    onClick={() =>
+                      navigate("/sales-orders/" + batching!.sales_id)
+                    }
+                  >
+                    View Source
+                  </Button>
+                </Grid>
+              )}
+
               <Grid item xs={12}>
                 <TextField
                   defaultValue={batching.notes}
@@ -785,9 +962,7 @@ export const BatchingDetailPage = () => {
                   onBlur={(event) =>
                     onInputBlur(event, inputMap[inputRefMap.notes])
                   }
-                  required={
-                    inputMap[inputRefMap.notes].validation.required
-                  }
+                  required={inputMap[inputRefMap.notes].validation.required}
                   spellCheck="false"
                   InputLabelProps={{ shrink: true }}
                   fullWidth
@@ -850,18 +1025,43 @@ export const BatchingDetailPage = () => {
         </div>
       </Card>
 
-      {batching!.status >= 2 && <Card sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
-
-
-        <BatchingDataTable
-          rows={expandableRows!}
-          columns={expandableColumns}
-          handleChooseContainer={handleChooseContainer}
-          handleAddRow={ handleAddRow}
-          handleEditCell={handleEditCell}
-          sub_columns={sub_columns}
-        ></BatchingDataTable>
-      </Card> }
+      {batching!.status >= 2 && (
+        <Card sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
+          <BatchingDataTable
+            rows={expandableRows!}
+            columns={expandableColumns}
+            handleChooseContainer={handleChooseContainer}
+            handleAddRow={handleAddRow}
+            handleEditCell={handleEditCell}
+            sub_columns={sub_columns}
+          ></BatchingDataTable>
+        </Card>
+      )}
     </>
+  );
+};
+
+const CustomTableAdd = (handleAddRow: any, row_id: string) => {
+  return (
+    <TableCell sx={{ p: 1, fontWeight: "500", fontSize: "0.9rem" }}>
+      <strong>
+        <Button
+          variant="outlined"
+          color="info"
+          size="small"
+          style={{
+            backgroundColor: "#1144ff15",
+            fontSize: "19px",
+            maxWidth: "40px",
+            maxHeight: "30px",
+            minWidth: "40px",
+            minHeight: "30px",
+          }}
+          onClick={() => handleAddRow(row_id)}
+        >
+          +
+        </Button>
+      </strong>
+    </TableCell>
   );
 };

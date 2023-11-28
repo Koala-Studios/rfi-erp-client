@@ -35,6 +35,8 @@ import { DataGrid } from "@mui/x-data-grid";
 import TableAutocomplete from "../../components/utils/TableAutocomplete";
 import { IBatchingContainer } from "../../logic/batching.logic";
 import { IInventoryStock } from "../../logic/inventory-stock.logic";
+import { TableGridColDef } from "./BatchingDetailPage";
+import { TableTexfield } from "../../components/utils/TableComponents";
 
 interface Props {
   rows: any[];
@@ -42,8 +44,8 @@ interface Props {
   sub_columns: GridColDef[];
   auto_height?: boolean;
   listOptions?: IListOptions;
-  handleChooseContainer:  (row_id: string, value: any) => void;
-  handleAddRow: (row_id:string) => void;
+  handleChooseContainer: (row_id: string, value: any) => void;
+  handleAddRow: (row_id: string) => void;
   handleEditCell: (row_id: string, field: string, value: any) => void;
   handleDBClick?: GridEventListener<"rowClick">;
 }
@@ -59,7 +61,6 @@ export const BatchingDataTable: React.FC<Props> = ({
   listOptions = null,
   handleDBClick,
 }) => {
-  
   const CustomPagination = () => {
     const [searchParams, setSearchParams] = useSearchParams();
 
@@ -75,29 +76,7 @@ export const BatchingDataTable: React.FC<Props> = ({
           display: "flex",
           alignItems: "center",
         }}
-      >
-        {/* (listOptions && <Pagination
-          color="primary"
-          count={listOptions!.totalPages - 1}
-          page={currPage}
-          shape="rounded"
-          variant="outlined"
-          sx={{ mr: 2 }}
-          onChange={(event, value) => {
-            if (searchParams.has("page")) {
-              searchParams.set("page", value.toString());
-            } else {
-              searchParams.append("page", value.toString());
-            }
-
-            setSearchParams(searchParams);
-          }}
-        />)
-        (listOptions && <Typography variant="subtitle2" sx={{ mr: 2 }}>{`${
-          listOptions!.pagingCounter
-        }-${listOptions!.pagingCounter + listOptions!.limit} of ${
-          listOptions!.totalDocs
-        }`}</Typography>) */}
+      >         
       </div>
     );
   };
@@ -133,7 +112,9 @@ export const BatchingDataTable: React.FC<Props> = ({
             >
               <TableCell sx={{ p: 1 }}></TableCell>
               {columns.map((col) => (
-                <TableCell sx={{ p: 1 }} width={col.width}>{col.headerName}</TableCell>
+                <TableCell sx={{ p: 1 }} width={col.width}>
+                  {col.headerName}
+                </TableCell>
               ))}
             </TableRow>
           </TableHead>
@@ -146,7 +127,11 @@ export const BatchingDataTable: React.FC<Props> = ({
                 key={row_item.name}
                 columns={columns}
                 sub_columns={sub_columns}
-                row={row_item} handleAddRow={handleAddRow} handleChooseContainer={handleChooseContainer} handleEditCell={handleEditCell}></ExpandableRow>
+                row={row_item}
+                handleAddRow={handleAddRow}
+                handleChooseContainer={handleChooseContainer}
+                handleEditCell={handleEditCell}
+              ></ExpandableRow>
             ))}
           </TableBody>
         </Table>
@@ -173,28 +158,28 @@ const ExpandableRow = (props: {
   columns: GridColDef[];
   sub_columns: GridColDef[];
   row: any;
-  handleChooseContainer:(row_id: string, value: any) => void;
-  handleEditCell:(row_id: string, field: string, value: any) => void;
-  handleAddRow: (row_id:string) => void;
+  handleChooseContainer: (row_id: string, value: any) => void;
+  handleEditCell: (row_id: string, field: string, value: any) => void;
+  handleAddRow: (row_id: string) => void;
 }) => {
   const [open, setOpen] = React.useState(false);
-  const getClassName = (row:IBatchingContainer) => {
-  
-    if(row.amount_to_use < row.available_amount || row.confirm_lot_number === '') {
-      return "YellowRow";
-    } else if (
-      row.lot_number != row.confirm_lot_number
+  const getClassName = (row: IBatchingContainer) => {
+    if (
+      row.amount_to_use < row.available_amount ||
+      row.confirm_lot_number === ""
     ) {
+      return "YellowRow";
+    } else if (row.lot_number != row.confirm_lot_number) {
       return "RedRow";
     } else {
-      return '';
+      return "";
     }
   };
   return (
     <>
       <TableRow
         sx={{
-          "& > *": { borderBottom: "none!important" }
+          "& > *": { borderBottom: "none!important" },
         }}
       >
         <TableCell sx={{ p: 0.7 }} width={50}>
@@ -203,113 +188,157 @@ const ExpandableRow = (props: {
             size="small"
             onClick={() => setOpen(!open)}
             // style={{ display: /*!props.row.sub_rows || props.row.sub_rows.length === 0 ? 'none' : */'block' }}
-            style={{ display: !props.row.sub_rows || props.row.sub_rows.length === 0 ? 'none' : 'block' }}
+            style={{
+              display:
+                !props.row.sub_rows || props.row.sub_rows.length === 0
+                  ? "none"
+                  : "block",
+            }}
           >
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
-        </TableCell >
-        {props.columns.map((col:GridColDef, index) => (
-          <>
-            {index == 5 &&
-            <div style={{width:155,maxWidth:155, height:35, maxHeight:35}}>
-              <TableAutocomplete
-              initialValue={props.row.lot_number}
-                // readOnly={batching!.status === 6 || purchase!.status === 4}
-                width={155}
-                
-                dbOption="container"
-                handleEditRow={props.handleChooseContainer}
-                rowParams={{...props.row.row_params, row:{_id: props.row._id}}}
-                letterMin={-1}
-                getOptionLabel={(item: IInventoryStock) => item._id ?
-                  `${item.lot_number} | AV#: ${item.remaining_amount - item.allocated_amount}`: ''
-                }
-              />
-            </div>
-
-            }
-            {index == 9 &&
-            <TableCell  sx={{ p: 1, fontWeight: '500',fontSize: '0.9rem' }}>
-              <strong>
-                <Button
-                  variant="outlined"
-                  color="info"
-                  size="small"
-                  style={{
-                    backgroundColor: "#1144ff15",
-                    fontSize: "19px",
-                    maxWidth: "40px",
-                    maxHeight: "30px",
-                    minWidth: "40px",
-                    minHeight: "30px",
+        </TableCell>
+        {props.columns.map((col: TableGridColDef, index) => {
+          if (col.customRender) {
+            return <>{col.customRender(props.row)}</>;
+          }
+          if (col.editable) {
+            return (
+              <TableCell sx={{ minWidth: col.width, p: 0 }}>
+                <TableTexfield
+                  type={col.type}
+                  width={col.width}
+                  initialValue={
+                    props.row[col.field] ? props.row[col.field] : "-"
+                  }
+                  handleEditRow={(value: string) => {
+                    props.handleEditCell(props.row["_id"], col.field, value);
                   }}
-                onClick={() => { props.handleAddRow(props.row['_id']); setOpen(true) }}
-                >
-                  +
-                </Button>
-              </strong> 
+                />
               </TableCell>
-            }
-            {index != 9 && index != 5 &&
-              <CustomTableCell handleEditCell={props.handleEditCell} row={props.row} name={col.field} index={index} column={col} value={props.row[col.field]} ></CustomTableCell>
-              
-            }
-          </>
-        ))}
+            );
+          }
+
+          return <TableCell>{props.row[col.field]}</TableCell>;
+        })}
       </TableRow>
       <TableRow>
+        <TableCell colSpan={6}></TableCell>
         <TableCell
           sx={{ p: 0 }}
           // style={{ paddingBottom: 0, paddingTop: 0 }}
-          colSpan={12}
+          colSpan={6}
         >
           <Collapse
             in={open}
             timeout="auto"
             unmountOnExit
-            sx={{ background: "#ebedf0" ,float: 'right' }}
+            sx={{ background: "#2ff", width: "100%" }}
           >
-            {/* <Box sx={{
-              marginBottom: 2, p: "0 0px"
-            }}> */}
-            <DataGrid 
+            <Table
+              aria-label="collapsible table"
+              style={{ position: "relative" }}
+            >
+              <TableBody>
+                <TableRow
+                  sx={{
+                    background: "red",
+                    minWidth: "100%",
+                    height: 40.5 * props.row.sub_rows.length,
+                    "& > *": { borderBottom: "none!important" },
+                  }}
+                >
+                  {props.row.sub_rows.map((col: TableGridColDef) => {
+                    if (col.customRender) {
+                      return <>{col.customRender(props.row)}</>;
+                    }
+                    if (col.editable) {
+                      return (
+                        <TableCell sx={{ width: 100, p: 0 }}>
+                          <TableTexfield
+                            type={col.type}
+                            width={col.width}
+                            initialValue={
+                              props.row[col.field] ? props.row[col.field] : "-"
+                            }
+                            handleEditRow={(value: string) => {
+                              props.handleEditCell(
+                                props.row["_id"],
+                                col.field,
+                                value
+                              );
+                            }}
+                          />
+                        </TableCell>
+                      );
+                    }
+
+                    return (
+                      <TableCell sx={{ width: col.width }}>
+                        {props.row[col.field]}
+                      </TableCell>
+                    );
+                  })}
+                </TableRow>
+              </TableBody>
+            </Table>
+            {/* <DataGrid 
               rows={props.row.sub_rows}
               headerHeight={0}
               
               getRowClassName={(params) => getClassName(params.row)}
-              components={{
-                Header: () => null,
-              }}
+              // components={{
+              //   Header: () => null,
+              // }}
               // onCellEditCommit={}
               columns={props.sub_columns}
               getRowId={(row) => row._id}
-              sx={{ width: '655px', float: 'right', height: ((40.5 * (props.row.sub_rows.length))), maxHeight: '200px' }} rowHeight={39} hideFooter={true}
-            />
-            {/* </Box> */}
+              sx={{ 
+                '& .MuiDataGrid-cell': {
+                  paddingLeft: "16px",
+                  paddingRight: "16px",
+                },
+                                
+                height: ((40.5 * (props.row.sub_rows.length)))}} rowHeight={40} hideFooter={true}
+            /> */}
           </Collapse>
         </TableCell>
       </TableRow>
     </>
   );
 };
-const CustomTableCell = ( props:any) => {
-  const [isEditMode, setEditMode ] = React.useState<boolean>(false);
-  if(!props.row.renderCell){ return (
-    <TableCell align="left" onDoubleClick={()=> {setEditMode(true); }} onAbort={()=>{setEditMode(false)}}>
-      { isEditMode && props.column.editable ? (
-              <Input
-                defaultValue={props.row[props.column.field]}
-                style={{height:19, margin:0, padding:0}}
-                name={props.name ?? ''}
-                onChange={(e) => props.handleEditCell(props.row._id,props.column.field, e.target.value)}
-              />
-              ) : (
-                props.row[props.column.field]
-              )}  
-      </TableCell>
-  )} else {
+const CustomTableCell = (props: any) => {
+  const [isEditMode, setEditMode] = React.useState<boolean>(false);
+  if (!props.row.renderCell) {
     return (
-      props.row.renderCell
+      <TableCell
+        align="left"
+        onDoubleClick={() => {
+          setEditMode(true);
+        }}
+        onAbort={() => {
+          setEditMode(false);
+        }}
+      >
+        {isEditMode && props.column.editable ? (
+          <Input
+            defaultValue={props.row[props.column.field]}
+            style={{ height: 19, margin: 0, padding: 0 }}
+            name={props.name ?? ""}
+            onChange={(e) =>
+              props.handleEditCell(
+                props.row._id,
+                props.column.field,
+                e.target.value
+              )
+            }
+          />
+        ) : (
+          props.row[props.column.field]
+        )}
+      </TableCell>
     );
-  };
+  } else {
+    return props.row.renderCell;
+  }
 };
