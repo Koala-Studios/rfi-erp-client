@@ -36,7 +36,7 @@ interface Props {
   onChange?: (event: React.SyntheticEvent<Element, Event>, value: any) => void;
 }
 
-const StandaloneAutocomplete: React.FC<Props> = ({
+const MultiAutocomplete: React.FC<Props> = ({
   onChange,
   letterMin,
   placeholder,
@@ -84,6 +84,7 @@ const StandaloneAutocomplete: React.FC<Props> = ({
       blurOnSelect={false}
       readOnly={readOnly}
       onChange={onChange}
+      multiple={true}
       openOnFocus
       groupBy={groupBy}
       selectOnFocus
@@ -128,4 +129,4 @@ const StandaloneAutocomplete: React.FC<Props> = ({
   );
 };
 
-export default StandaloneAutocomplete;
+export default MultiAutocomplete;

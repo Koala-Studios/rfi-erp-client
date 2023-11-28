@@ -7,6 +7,7 @@ import { createUser, getUser, IUser, IUserRole, updateUser } from "../../logic/u
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SaveForm from "../../components/forms/SaveForm";
 import StandaloneAutocomplete from "../../components/utils/StandaloneAutocomplete";
+import MultiAutocomplete from "../../components/utils/MultiAutocomplete";
 
 const emptyUser: IUser = {
   _id: "",
@@ -137,7 +138,7 @@ export const UserDetailPage = () => {
             </Grid>
             
           <Grid item xs={6}>
-          <StandaloneAutocomplete //TODO: Make this work properly, for testing purposes rn
+          <MultiAutocomplete //TODO: Make this work properly, for testing purposes rn
             initialValue={user.roles}
             readOnly={false}
             onChange={(e:any, value:any) => {

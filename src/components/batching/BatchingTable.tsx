@@ -51,12 +51,12 @@ export const ExpandableRow = (props: {
       <TableRow
         sx={{
 
-
+            maxHeight:'40px',
           "& > *": {  
           borderRight: "1px solid #00000010",borderBottom: "1px solid #00000010" },
         }}
       >
-        <TableCell sx={{ p: 0.7 }} width={50}>
+        <TableCell sx={{ p: 0.7, mH:40 }} height={35} width={50}>
           <IconButton
             aria-label="expand row"
             size="small"
@@ -120,7 +120,7 @@ export const ExpandableRow = (props: {
                  {props.row.sub_rows.map((row_item: any, index:number) => {
                     return <TableRow
                       sx={{
-                        width: "100%",
+                        width: "100%", height:'40px',
                         "& > *": { border: "1px solid #00000010",borderTop:"none"  },
                       }}
                     >                    
