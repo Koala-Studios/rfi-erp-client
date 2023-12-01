@@ -78,7 +78,7 @@ export const ExpandableRow = (props: {
           }
           if (col.editable) {
             return (
-              <TableCell sx={{ minWidth: col.width, p: 0 }}>
+              <TableCell sx={{width: col.width, maxWidth: col.width, p: 0 }}>
                 <TableTexfield
                   type={col.type}
                   width={col.width}
@@ -86,14 +86,16 @@ export const ExpandableRow = (props: {
                     props.row[col.field] ? props.row[col.field] : "-"
                   }
                   handleEditRow={(value: string) => {
-                    props.handleEditCell(props.row["_id"], col.field, value);
+                    if (value != '') {
+                      props.handleEditCell(props.row["_id"], col.field, value);
+                    }
                   }}
                 />
               </TableCell>
             );
           }
 
-          return <TableCell>{props.row[col.field]}</TableCell>;
+          return <TableCell align={col.align} sx={{  width: col.width, maxWidth: col.width, p: 0 }}>{props.row[col.field]}</TableCell>;
         })}
       </TableRow>
       <TableRow>
@@ -130,7 +132,7 @@ export const ExpandableRow = (props: {
                          }
                          if (col.editable) {
                            return (
-                             <TableCell sx={{ width: col.width, p: 0 }}>
+                             <TableCell sx={{ width: col.width, maxWidth: col.width, p: 0 }}>
                                <TableTexfield
                                  type={col.type}
                                  width={col.width}
@@ -138,11 +140,14 @@ export const ExpandableRow = (props: {
                                     row_item[col.field] ? row_item[col.field] : "-"
                                  }
                                  handleEditRow={(value: string) => {
-                                   props.handleEditCell(
-                                    row_item["_id"],
-                                     col.field,
-                                     value
-                                   );
+                                  if (value != '') {
+                                    props.handleEditCell(
+                                      row_item["_id"],
+                                       col.field,
+                                       value
+                                     );
+                                  }
+                                   
                                  }}
                                />
                              </TableCell>
@@ -150,7 +155,7 @@ export const ExpandableRow = (props: {
                          }
         
                         return (
-                        <TableCell sx={{ width: col.width }}>
+                        <TableCell sx={{ width: col.width, maxWidth: col.width, }}>
                             {props.row[col.field]}
                         </TableCell>
                         );

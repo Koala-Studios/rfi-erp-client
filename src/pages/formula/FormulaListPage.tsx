@@ -87,7 +87,7 @@ const FormulaListPage = () => {
       field: "id",
       headerName: "Actions",
       align: "left",
-      width: 100,
+      width: 120,
       renderCell: (params: GridRenderCellParams<string>) => (
           <Button
             variant="contained"

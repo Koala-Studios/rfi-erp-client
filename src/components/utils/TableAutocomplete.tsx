@@ -28,7 +28,8 @@ interface Props {
   initialValue: string;
   letterMin: number;
   getOptionLabel: (option: any) => any;
-  width?:number
+  width?:number;
+  dropDownWidth?:number
 }
 
 const TableAutocomplete: React.FC<Props> = ({
@@ -37,7 +38,8 @@ const TableAutocomplete: React.FC<Props> = ({
   initialValue,
   letterMin,
   dbOption,
-  width = 240,
+  width = 340,
+  dropDownWidth = 450,
   getOptionLabel,
   readOnly = false
 }) => {
@@ -71,8 +73,8 @@ const TableAutocomplete: React.FC<Props> = ({
             style={{
               background: "#e4e6ee",
               fontSize: "16px",
-              maxWidth: width,
-              minWidth: width,
+              maxWidth: dropDownWidth,
+              minWidth: dropDownWidth,
             }}
           >
             {children}
@@ -98,7 +100,7 @@ const TableAutocomplete: React.FC<Props> = ({
                 minHeight: "39px",
                 maxHeight: "39px",
               }}
-              placeholder={initialValue}
+              placeholder={initialValue }
               {...params}
             />
           );
