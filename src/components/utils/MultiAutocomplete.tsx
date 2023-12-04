@@ -1,7 +1,12 @@
-import { Autocomplete, Paper, TextField } from "@mui/material";
+import { Autocomplete, Checkbox, Paper, TextField } from "@mui/material";
 import React, { useEffect } from "react";
 import { lookup } from "../../logic/autocomplete.logic";
 import { AuthContext } from "../navigation/AuthProvider";
+import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
+import CheckBoxIcon from '@mui/icons-material/CheckBox';
+
+const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 interface Props {
   initialValue: any;
@@ -78,9 +83,10 @@ const MultiAutocomplete: React.FC<Props> = ({
     <Autocomplete
       value={initialValue}
       isOptionEqualToValue={(option, value) =>
-        option._id === value || option._id === value._id
+        option._id === value|| option._id === value._id
       }
-      clearOnBlur={true}
+      disableCloseOnSelect
+      // clearOnBlur={true}
       blurOnSelect={false}
       readOnly={readOnly}
       onChange={onChange}
@@ -90,22 +96,33 @@ const MultiAutocomplete: React.FC<Props> = ({
       selectOnFocus
       getOptionLabel={getOptionLabel}
       options={optionList}
-      PaperComponent={({ children }) => (
-        <Paper
-          variant="outlined"
-          style={{
-            // background: "#e4e6ee",
-            border: "1px solid #00000050",
-            boxShadow: "0 0 10px 0 #00000030",
-            fontSize: "16px",
-            marginTop: 5,
-            overflow: "hidden",
-            // maxWidth: "450px",
-            // minWidth: "450px",
-          }}
-        >
-          <b>{children}</b>
-        </Paper>
+      // PaperComponent={({ children }) => (
+      //   <Paper
+      //     variant="outlined"
+      //     style={{
+      //       // background: "#e4e6ee",
+      //       border: "1px solid #00000050",
+      //       boxShadow: "0 0 10px 0 #00000030",
+      //       fontSize: "16px",
+      //       marginTop: 5,
+      //       overflow: "hidden",
+      //       // maxWidth: "450px",
+      //       // minWidth: "450px",
+      //     }}
+      //   >
+      //     <b>{children}</b>
+      //   </Paper>
+      // )}
+      renderOption={(props, option, { selected }) => (
+        <li {...props}>
+          <Checkbox
+            icon={icon}
+            checkedIcon={checkedIcon}
+            style={{ marginRight: 8 }}
+            checked={selected}
+          />
+          {option.name}
+        </li>
       )}
       onInputChange={handleInputChange}
       renderInput={(params) => {

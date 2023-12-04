@@ -55,6 +55,11 @@ const TableAutocomplete: React.FC<Props> = ({
       setOptionList(result);
     });
   };
+  const handleSelect = async (value:string) =>{
+    lookup(value.toUpperCase(), dbOption, letterMin).then((result) => {
+      setOptionList(result);
+    });
+  }
 
   if (editMode) {
     return (
@@ -64,6 +69,7 @@ const TableAutocomplete: React.FC<Props> = ({
         filterOptions={(x) => x}
         openOnFocus
         selectOnFocus
+        onFocus={()=> {handleSelect(initialValue)}}
         readOnly={readOnly}
         options={optionList}
         getOptionLabel={getOptionLabel}
@@ -101,6 +107,7 @@ const TableAutocomplete: React.FC<Props> = ({
                 maxHeight: "39px",
               }}
               placeholder={initialValue }
+              
               {...params}
             />
           );

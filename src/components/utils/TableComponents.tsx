@@ -1,3 +1,4 @@
+import { Key } from "@mui/icons-material";
 import { Chip, Menu, MenuItem, Select, SelectChangeEvent, TextField, Typography } from "@mui/material";
 import { GridColDef, useGridApiContext } from "@mui/x-data-grid";
 import React, { useState } from "react";
@@ -203,13 +204,16 @@ export const TableTexfield: React.FC<TableTexfieldProps> = ({
     readOnly = false
   }) => {
     const [editMode, setEditMode] = React.useState(false);
-    
+    const [defaultValue, setDefaultValue] = React.useState(initialValue)
     if (readOnly == false && editMode) {
         return (
             <TextField
               variant="outlined"
               autoFocus
               type={type ? type : "text"}
+              onChange={(event) => setDefaultValue(event.target.value)}
+              //TODO: on enter stop edit and commit changes
+              //TODO: on ESC stop edit and commit changes
               onBlur={(event)=> {
                 handleEditRow(event.target.value);
                 setEditMode(false)
@@ -223,7 +227,8 @@ export const TableTexfield: React.FC<TableTexfieldProps> = ({
                 // minHeight: "39px",
                 margin:"0!important",
               }}
-              placeholder={initialValue}
+              value={defaultValue}
+              // placeholder={'-'}
             //   {...params}
             />
           )

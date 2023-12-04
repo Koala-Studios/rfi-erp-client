@@ -15,6 +15,7 @@ const emptyUser: IUser = {
   email: "",
   user_code: "",
   created_date: "",
+  roles:[]
 };
 
 let savedUser: IUser | null = null;
@@ -142,7 +143,8 @@ export const UserDetailPage = () => {
             initialValue={user.roles}
             readOnly={false}
             onChange={(e:any, value:any) => {
-              setUser({...user!, roles: [value] })
+              console.log(value, 'test', e)
+              setUser({...user!, roles: value  })
             }}
             label={"Roles"}
             letterMin={0}

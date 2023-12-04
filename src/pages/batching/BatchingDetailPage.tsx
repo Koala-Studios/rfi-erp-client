@@ -51,17 +51,19 @@ import Battery4BarIcon from "@mui/icons-material/Battery4Bar";
 import BatteryFullIcon from "@mui/icons-material/BatteryFull";
 import { IInventoryStock } from "../../logic/inventory-stock.logic";
 import { TableGridColDef } from "../../components/batching/BatchingTable";
+import { isSet } from "util/types";
 let savedBatching: IBatching | null = null;
 
 interface expBatchIngr extends IBatchingIngredient {
   _id: string;
   container_id: string;
   lot_number: string;
-  amount_to_use: number;
+  required_amount:number;
   total_used_amount: number;
   used_amount: number;
   sub_rows: IBatchingContainer[];
   has_enough: boolean;
+  remaining_amount:number;
 }
 
 
@@ -169,22 +171,16 @@ export const BatchingDetailPage = () => {
           // targetRow.sub_rows.splice(index, 1,
           //   {_id:rowid, container_id: value._id, lot_number: value.lot_number,required_amount: targetRow.required_amount - targetRow.used_amount, used_amount: 0, has_enough: ((value.remaining_amount - (targetRow.required_amount - targetRow.used_amount)) >= 0)}
           // )
-          const req_amt =
-            targetRow.required_amount - targetRow.total_used_amount;
           return {
             ...row,
-            sub_rows: targetRow.sub_rows.toSpliced(index, 1, {
+            sub_rows: [...targetRow.sub_rows.slice(0,index -1), 
+              {
               _id: rowid,
               container_id: value._id,
               confirm_lot_number: "",
               lot_number: value.lot_number,
-              amount_to_use:
-                value.remaining_amount > req_amt
-                  ? req_amt
-                  : value.remaining_amount,
-              amount_used: 0,
-              has_enough: value.remaining_amount - req_amt >= 0,
-            }),
+              used_amount: 0,
+            }, ...targetRow.sub_rows.slice(index, targetRow.sub_rows.length -1)],
           };
         }
         return row;
@@ -246,16 +242,14 @@ export const BatchingDetailPage = () => {
                 item.used_containers.length > 0
                   ? item.used_containers[0].lot_number
                   : "",
-              amount_to_use:
-                item.used_containers.length > 0
-                  ? item.used_containers[0].amount_to_use
-                  : 0,
               total_used_amount: 0,
               sub_rows:
                 item.used_containers.length > 1
                   ? item.used_containers.slice(1, undefined)
                   : [],
               has_enough: true,
+              required_amount: item.required_amount,
+              remaining_amount: item.required_amount
             };
           })
         );
@@ -316,7 +310,7 @@ export const BatchingDetailPage = () => {
     },
 
     {
-      field: "used_amount",
+      field: "total_used_amount",
       headerName: "Total Used Qty",
       type: "number",
       width: 160,
@@ -340,18 +334,19 @@ export const BatchingDetailPage = () => {
             handleEditRow={handleEditProductRow}
             rowParams={{ row: row }}
             letterMin={0}
-            getOptionLabel={(item: IBatchingContainer) => {
-              return (
-                <>
-                  {" "}
-                  {item?.is_open ? (
-                    <Battery4BarIcon sx={{ color: "green" }} />
-                  ) : (
-                    ""
-                  )}{" "}
-                  {item?.lot_number ? `${item.lot_number}` : ""}
-                </>
-              );
+            getOptionLabel={(item: any) => {
+              return item.lot_number != undefined ? item.lot_number : '';
+              // (
+              //   <>
+              //     {" "}
+              //     {item?.is_open ? (
+              //       <Battery4BarIcon sx={{ color: "green" }} />
+              //     ) : (
+              //       ""
+              //     )}{" "}
+              //     {item?.lot_number ? `${item.lot_number}` : ""}
+              //   </>
+              // );
             }}
           />
         </TableCell>
@@ -363,14 +358,6 @@ export const BatchingDetailPage = () => {
       width: 120,
       align: "center",
       editable: true,
-    },
-    {
-      field: "amount_to_use",
-      headerName: "Qty To Use",
-      type: "number",
-      width: 90,
-      align: "center",
-      editable: false,
     },
     {
       field: "used_amount",
@@ -438,23 +425,8 @@ export const BatchingDetailPage = () => {
             handleEditRow={handleEditProductRow}
             rowParams={{ row: row }}
             letterMin={0}
-            getOptionLabel={(item: IInventoryStock) => {
-              return (
-                <>
-                  {" "}
-                  {item.sample ? <h4> [S]</h4> : ""}
-                  {item?.is_open ? (
-                    <Battery4BarIcon sx={{ color: "green" }} />
-                  ) : (
-                    <BatteryFullIcon sx={{ color: "warning" }} />
-                  )}{" "}
-                  {item?.lot_number
-                    ? item.lot_number +
-                      " | Qty:" +
-                      item.remaining_amount.toFixed(5)
-                    : ""}
-                </>
-              );
+            getOptionLabel={(item: any) => {
+              return item.lot_number != undefined ? item.lot_number : '';
             }}
           />
         </TableCell>
@@ -474,14 +446,6 @@ export const BatchingDetailPage = () => {
       width: 90,
       align: "center",
       editable: false,
-    },
-    {
-      field: "amount_used",
-      headerName: "Qty Used",
-      type: "number",
-      width: 110,
-      align: "left",
-      editable: true,
     },
     {
       field: "id",
@@ -561,16 +525,13 @@ export const BatchingDetailPage = () => {
                 item.used_containers.length > 0
                   ? item.used_containers[0].lot_number
                   : "",
-              amount_to_use:
-                item.used_containers.length > 0
-                  ? item.used_containers[0].amount_to_use
-                  : 0,
               used_amount: 0,
               sub_rows:
                 item.used_containers.length > 1
                   ? item.used_containers.slice(1, undefined)
                   : [],
               has_enough: true,
+              remaining_amount: item.required_amount
             };
           })
         );
@@ -620,7 +581,6 @@ export const BatchingDetailPage = () => {
     //TODO: DANIEL THIS NNEEDS FIX
 
     let rowIndex = expandableRows.findIndex((r: any) => r._id === row_id);
-    console.log(rowIndex,  'BRUH')
     let subRow = -1;
     if(rowIndex < 0) {
       expandableRows.forEach((element, index) => {
@@ -630,26 +590,28 @@ export const BatchingDetailPage = () => {
           subRow = temp;
         } 
       });
-      console.log(rowIndex, subRow, 'test indexing!')
     }
+    const total_used = getTotalUsedOnChange(rowIndex, parseFloat(value), subRow);
     const newRow = (subRow === -1) ? {
       ...expandableRows[rowIndex],
-      [field]: value,
-      total_used_amount:
-        field === "amount_used"
-          ? expandableRows[rowIndex].used_amount - (expandableRows[rowIndex].used_amount - value)
-          : expandableRows[rowIndex].total_used_amount,
+      total_used_amount: //TODO: THIS PART NOT WORKING FOR SOME REASON?
+      field === "used_amount"
+        ? total_used
+        : expandableRows[rowIndex].total_used_amount,
+      remaining_amount: expandableRows[rowIndex].required_amount - total_used,
+      [field]: parseFloat(value),
     } :
     {
       ...expandableRows[rowIndex],
-        total_used_amount: //TODO: THIS PART NOT WORKING FOR SOME REASON?
-        field === "amount_used"
-          ? expandableRows[rowIndex].used_amount - (rows[rowIndex].used_amount - value)
-          : expandableRows[rowIndex].total_used_amount,
-          sub_rows: [...expandableRows[rowIndex].sub_rows.slice(0, subRow),
+        total_used_amount: 
+        field === "used_amount"
+        ? total_used
+        : expandableRows[rowIndex].total_used_amount,
+        remaining_amount: expandableRows[rowIndex].required_amount - total_used,
+        sub_rows: [...expandableRows[rowIndex].sub_rows.slice(0, subRow),
        {
         ...expandableRows[rowIndex].sub_rows[subRow],
-        [field]: value
+        [field]: parseFloat(value)
         },
         ...expandableRows[rowIndex].sub_rows.slice(subRow + 1, expandableRows[rowIndex].sub_rows.length)  ]
     }
@@ -663,6 +625,14 @@ export const BatchingDetailPage = () => {
     console.log(row_id, field, value);
     console.log(expandableRows);
   };
+
+  const getTotalUsedOnChange =  (rowIndex:number, currentChange:number, subRow: number) => {
+    let spliced = expandableRows[rowIndex].sub_rows.slice();
+    spliced.splice(subRow,1);
+    let total = subRow === -1 ? currentChange + expandableRows[rowIndex].sub_rows.reduce((a,b) => {return a + b.used_amount},0) :
+    expandableRows[rowIndex].used_amount + currentChange + spliced.reduce((a,b) => { return a + b.used_amount },0)
+    return total;
+  }
 
   const handleChooseContainer = (row_id: string, value: IBatchingContainer) => {
     const index = expandableRows.findIndex((element) => element._id === row_id);
@@ -696,7 +666,7 @@ export const BatchingDetailPage = () => {
                 container_id: "",
                 lot_number: "",
                 confirm_lot_number: "",
-                amount_used: null,
+                used_amount: null,
               },
             ],
           };

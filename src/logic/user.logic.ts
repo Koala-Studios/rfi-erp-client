@@ -9,6 +9,11 @@ export interface INotification {
   ref?: string; //any reference id needed for notification
   sender?: string;
 }
+export interface IUserRole {
+  _id: string;
+  name: string;
+  permissions: string;
+}
 
 export interface IUser {
   _id: string;
@@ -17,7 +22,7 @@ export interface IUser {
   user_code?: string;
   created_date?: string;
   notifications?: INotification[];
-  roles?: { name: string; permissions: string[] }[];
+  roles: IUserRole[];
   permissions?: string[];
   //TODO:ROLES & DATES
 }

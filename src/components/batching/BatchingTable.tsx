@@ -34,18 +34,18 @@ export const ExpandableRow = (props: {
   handleAddRow: (row_id: string) => void;
 }) => {
   const [open, setOpen] = React.useState(false);
-  const getClassName = (row: IBatchingContainer) => {
-    if (
-      row.amount_to_use < row.available_amount ||
-      row.confirm_lot_number === ""
-    ) {
-      return "YellowRow";
-    } else if (row.lot_number != row.confirm_lot_number) {
-      return "RedRow";
-    } else {
-      return "";
-    }
-  };
+  // const getClassName = (row: IBatchingContainer) => { //TODO: Gotta do the row colors if available QTY isn't enough.
+  //   if (
+  //     row.amount_to_use < row.available_amount ||
+  //     row.confirm_lot_number === ""
+  //   ) {
+  //     return "YellowRow";
+  //   } else if (row.lot_number != row.confirm_lot_number) {
+  //     return "RedRow";
+  //   } else {
+  //     return "";
+  //   }
+  // };
   return (
     <>
       <TableRow
@@ -83,7 +83,7 @@ export const ExpandableRow = (props: {
                   type={col.type}
                   width={col.width}
                   initialValue={
-                    props.row[col.field] ? props.row[col.field] : "-"
+                    props.row[col.field] ? props.row[col.field] : ""
                   }
                   handleEditRow={(value: string) => {
                     if (value != '') {
@@ -137,7 +137,7 @@ export const ExpandableRow = (props: {
                                  type={col.type}
                                  width={col.width}
                                  initialValue={
-                                    row_item[col.field] ? row_item[col.field] : "-"
+                                    row_item[col.field] ? row_item[col.field] : ""
                                  }
                                  handleEditRow={(value: string) => {
                                   if (value != '') {

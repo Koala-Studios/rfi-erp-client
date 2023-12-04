@@ -33,11 +33,9 @@ export interface IBatching {
 
 export interface IBatchingContainer {
   _id: string;
-  is_open: string;
   container_id: string;
   lot_number: string;
   confirm_lot_number: string;
-  amount_to_use: number;
   available_amount: number; //TODO: maybe live update somehow? we have sockets setup right?
   used_amount: number;
 }
