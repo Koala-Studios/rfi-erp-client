@@ -215,6 +215,7 @@ export const TableTexfield: React.FC<TableTexfieldProps> = ({
               //TODO: on enter stop edit and commit changes
               //TODO: on ESC stop edit and commit changes
               onBlur={(event)=> {
+                console.log(event, 'react-event')
                 handleEditRow(event.target.value);
                 setEditMode(false)
               }}
@@ -240,7 +241,7 @@ export const TableTexfield: React.FC<TableTexfieldProps> = ({
             maxWidth:width,
             padding: "16px",
           }}
-          onDoubleClick={() => setEditMode(!readOnly)}
+          onClick={() => setEditMode(!readOnly)}
         >
           <Typography variant="subtitle2" style={{ fontSize: "15px" }}>
             {initialValue}

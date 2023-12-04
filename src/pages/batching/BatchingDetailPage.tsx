@@ -158,8 +158,32 @@ export const BatchingDetailPage = () => {
     setBatching({ ...batching! });
     setBatchingSaved(false);
   };
-
+  
   const handleEditProductRow = (rowid: string, value: IInventoryStock) => {
+    //not using right now here
+    const index = expandableRows.findIndex((element) =>
+      element._id === rowid
+    );
+    const targetRow: IBatchingIngredient = expandableRows[index];
+    setExpandableRows(
+      expandableRows.map((row) => {
+        if (row === targetRow) {
+          return (
+            {...row,
+              container_id: value._id,
+              confirm_lot_number: '',
+              lot_number: value.lot_number,
+              used_amount: 0,
+            });
+          };
+        return row;
+      })
+    );
+  };
+
+
+  
+  const handleEditProductSubRow = (rowid: string, value: IInventoryStock) => {
     //not using right now here
     const index = expandableRows.findIndex((element) =>
       element.sub_rows.some((e) => e._id === rowid)
@@ -177,7 +201,7 @@ export const BatchingDetailPage = () => {
               {
               _id: rowid,
               container_id: value._id,
-              confirm_lot_number: "",
+              confirm_lot_number: '',
               lot_number: value.lot_number,
               used_amount: 0,
             }, ...targetRow.sub_rows.slice(index, targetRow.sub_rows.length -1)],
@@ -422,7 +446,7 @@ export const BatchingDetailPage = () => {
             initialValue={row.lot_number}
             // readOnly={batching!.status === 6 || purchase!.status === 4}
             dbOption="container"
-            handleEditRow={handleEditProductRow}
+            handleEditRow={handleEditProductSubRow}
             rowParams={{ row: row }}
             letterMin={0}
             getOptionLabel={(item: any) => {
@@ -440,12 +464,12 @@ export const BatchingDetailPage = () => {
       editable: true,
     },
     {
-      field: "amount_to_use",
-      headerName: "Qty To Use",
+      field: "used_amount",
+      headerName: "Qty Used",
       type: "number",
-      width: 90,
-      align: "center",
-      editable: false,
+      width: 110,
+      align: "right",
+      editable: true,
     },
     {
       field: "id",
@@ -579,7 +603,7 @@ export const BatchingDetailPage = () => {
 
   const handleEditCell = (row_id: string, field: string, value: any) => {
     //TODO: DANIEL THIS NNEEDS FIX
-
+    console.log(value, 'hopefully empty')
     let rowIndex = expandableRows.findIndex((r: any) => r._id === row_id);
     let subRow = -1;
     if(rowIndex < 0) {
@@ -598,8 +622,8 @@ export const BatchingDetailPage = () => {
       field === "used_amount"
         ? total_used
         : expandableRows[rowIndex].total_used_amount,
-      remaining_amount: expandableRows[rowIndex].required_amount - total_used,
-      [field]: parseFloat(value),
+      remaining_amount: field === "used_amount" ? expandableRows[rowIndex].required_amount - total_used : expandableRows[rowIndex].remaining_amount,
+      [field]:  field === "used_amount" ? parseFloat(value) : value,
     } :
     {
       ...expandableRows[rowIndex],
@@ -607,11 +631,11 @@ export const BatchingDetailPage = () => {
         field === "used_amount"
         ? total_used
         : expandableRows[rowIndex].total_used_amount,
-        remaining_amount: expandableRows[rowIndex].required_amount - total_used,
+        remaining_amount: field === "used_amount" ? expandableRows[rowIndex].required_amount - total_used : expandableRows[rowIndex].remaining_amount,
         sub_rows: [...expandableRows[rowIndex].sub_rows.slice(0, subRow),
        {
         ...expandableRows[rowIndex].sub_rows[subRow],
-        [field]: parseFloat(value)
+        [field]:  field === "used_amount" ? parseFloat(value) : value,
         },
         ...expandableRows[rowIndex].sub_rows.slice(subRow + 1, expandableRows[rowIndex].sub_rows.length)  ]
     }
