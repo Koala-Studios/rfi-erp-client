@@ -215,7 +215,6 @@ export const TableTexfield: React.FC<TableTexfieldProps> = ({
               //TODO: on enter stop edit and commit changes
               //TODO: on ESC stop edit and commit changes
               onBlur={(event)=> {
-                console.log(event, 'react-event')
                 handleEditRow(event.target.value);
                 setEditMode(false)
               }}
