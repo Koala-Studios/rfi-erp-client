@@ -56,6 +56,7 @@ export const ExpandableRow = (props: {
             borderBottom: "1px solid #00000010",
           },
         }}
+        key={props.row._id}
       >
         <TableCell sx={{ p: 0, mH: 40 }} height={35} width={50}>
           <IconButton
@@ -64,6 +65,8 @@ export const ExpandableRow = (props: {
             onClick={() => setOpen(!open)}
             // style={{ display: /*!props.row.sub_rows || props.row.sub_rows.length === 0 ? 'none' : */'block' }}
             style={{
+              marginLeft:10,
+              width:40,
               display:
                 !props.row.sub_rows || props.row.sub_rows.length === 0
                   ? "none"

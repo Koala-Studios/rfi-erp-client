@@ -93,8 +93,9 @@ export const BatchingDataTable: React.FC<Props> = ({
           borderBottom: "none",
           borderRadius: "5px 5px 0 0",
         }}
+        
       >
-        <Table aria-label="collapsible table" style={{ position: "relative" }}>
+        <Table aria-label="collapsible table" style={{ position: "relative" }} >
           <TableHead
             style={{
               position: "sticky",
@@ -124,7 +125,7 @@ export const BatchingDataTable: React.FC<Props> = ({
                   ))} */}
             {rows.map((row_item) => (
               <ExpandableRow
-                key={row_item.name}
+                key={row_item._id}
                 columns={columns}
                 sub_columns={sub_columns}
                 row={row_item}
