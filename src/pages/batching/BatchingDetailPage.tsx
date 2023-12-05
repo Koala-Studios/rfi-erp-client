@@ -66,7 +66,7 @@ interface expBatchIngr extends IBatchingIngredient {
   row_id: string;
   container_id: string;
   lot_number: string;
-  confirm_lot_number:string;
+  confirm_lot_number: string;
   used_amount: number;
 }
 
@@ -184,7 +184,9 @@ export const BatchingDetailPage = () => {
     const index = expandableRows.findIndex((element) =>
       element.sub_rows.some((e) => e._id === rowid)
     );
-    const rowIndx = expandableRows[index].sub_rows.findIndex((e) => e._id === rowid);
+    const rowIndx = expandableRows[index].sub_rows.findIndex(
+      (e) => e._id === rowid
+    );
     const targetRow: IBatchingIngredient = expandableRows[index];
     setExpandableRows(
       expandableRows.map((row) => {
@@ -203,7 +205,10 @@ export const BatchingDetailPage = () => {
                 lot_number: value.lot_number,
                 used_amount: 0,
               },
-              ...targetRow.sub_rows.slice(rowIndx +1, targetRow.sub_rows.length - 1),
+              ...targetRow.sub_rows.slice(
+                rowIndx + 1,
+                targetRow.sub_rows.length - 1
+              ),
             ],
           };
         }
@@ -293,7 +298,13 @@ export const BatchingDetailPage = () => {
       width: 160,
       align: "center",
       editable: false,
-      valueGetter: (params:any) => params.required_amount ? params.required_amount.toFixed(4) + (params.required_amount < 0.1 ? '(' + params.required_amount.toFixed(4)*1000 + 'g)' : '') : params.remaining_amount
+      valueGetter: (params: any) =>
+        params.required_amount
+          ? params.required_amount.toFixed(4) +
+            (params.required_amount < 0.1
+              ? "(" + params.required_amount.toFixed(4) * 1000 + "g)"
+              : "")
+          : params.remaining_amount,
     },
     {
       field: "total_used_amount",
@@ -302,7 +313,10 @@ export const BatchingDetailPage = () => {
       width: 160,
       align: "center",
       editable: false,
-      valueGetter: (params:any) => params.total_used_amount ?  params.total_used_amount.toFixed(4) : params.total_used_amount
+      valueGetter: (params: any) =>
+        params.total_used_amount
+          ? params.total_used_amount.toFixed(4)
+          : params.total_used_amount,
     },
     {
       field: "remaining_amount",
@@ -311,7 +325,13 @@ export const BatchingDetailPage = () => {
       width: 160,
       align: "center",
       editable: false,
-      valueGetter: (params:any) => params.remaining_amount ? params.remaining_amount.toFixed(4) + (params.remaining_amount < 0.1 ? '(' + params.remaining_amount.toFixed(4)*1000 + 'g)' : '') : params.remaining_amount
+      valueGetter: (params: any) =>
+        params.remaining_amount
+          ? params.remaining_amount.toFixed(4) +
+            (params.remaining_amount < 0.1
+              ? "(" + params.remaining_amount.toFixed(4) * 1000 + "g)"
+              : "")
+          : params.remaining_amount,
     },
     {
       field: "lot_number",
@@ -394,7 +414,16 @@ export const BatchingDetailPage = () => {
                 minWidth: "40px",
                 minHeight: "30px",
               }}
-              onClick={() => handleAddRow(row["_id"])}
+              onClick={() => {
+                handleAddRow(row["_id"]);
+                window.dispatchEvent(
+                  new CustomEvent("BatchingRowAdd", {
+                    detail: {
+                      _id: row["_id"],
+                    },
+                  })
+                );
+              }}
             >
               +
             </Button>
@@ -484,15 +513,13 @@ export const BatchingDetailPage = () => {
     },
   ];
 
-  const reformatIngredients =(_batching:IBatching) =>{
-
+  const reformatIngredients = (_batching: IBatching) => {
     const newIng = _batching.ingredients.map((item) => {
       return {
         ...item,
         _id: item._id ? item._id : new ObjectID().toHexString(),
-        row_id: item.used_containers.length > 0
-        ? item.used_containers[0]._id
-        : "",
+        row_id:
+          item.used_containers.length > 0 ? item.used_containers[0]._id : "",
         container_id:
           item.used_containers.length > 0
             ? item.used_containers[0].container_id
@@ -502,9 +529,9 @@ export const BatchingDetailPage = () => {
             ? item.used_containers[0].lot_number
             : "",
         confirm_lot_number:
-        item.used_containers.length > 0
-          ? item.used_containers[0].confirm_lot_number
-          : "",
+          item.used_containers.length > 0
+            ? item.used_containers[0].confirm_lot_number
+            : "",
         used_amount: item.used_amount,
         total_used_amount: item.total_used_amount,
         sub_rows:
@@ -514,9 +541,9 @@ export const BatchingDetailPage = () => {
         // has_enough: true,
         remaining_amount: item.required_amount,
       };
-    })
+    });
     return newIng;
-  }
+  };
 
   const handleConfirmBatching = () => {
     confirmBatching(auth.token, batching!).then(
@@ -641,24 +668,35 @@ export const BatchingDetailPage = () => {
               ),
             ],
           };
-    const tempRows = [      ...expandableRows.slice(0, rowIndex),
+    const tempRows = [
+      ...expandableRows.slice(0, rowIndex),
       newRow,
-      ...expandableRows.slice(rowIndex + 1, expandableRows.length),];
+      ...expandableRows.slice(rowIndex + 1, expandableRows.length),
+    ];
     setExpandableRows(tempRows);
 
     const ingredients = tempRows.map((row) => {
       return {
         _id: row._id,
         product_id: row.product_id,
-        product_code:row.product_code,
-        product_name:row.product_name,
-        required_amount:row.required_amount,
+        product_code: row.product_code,
+        product_name: row.product_name,
+        required_amount: row.required_amount,
         used_amount: row.used_amount,
-        used_containers: [{_id: row.row_id,container_id: row.container_id, lot_number: row.lot_number,confirm_lot_number: row.confirm_lot_number, used_amount: row.used_amount } ,...row.sub_rows],
-        total_used_amount: row.total_used_amount
-      }
-    })
-    console.log(ingredients, 'TEST');
+        used_containers: [
+          {
+            _id: row.row_id,
+            container_id: row.container_id,
+            lot_number: row.lot_number,
+            confirm_lot_number: row.confirm_lot_number,
+            used_amount: row.used_amount,
+          },
+          ...row.sub_rows,
+        ],
+        total_used_amount: row.total_used_amount,
+      };
+    });
+    console.log(ingredients, "TEST");
     setBatching({ ...batching!, ingredients: ingredients });
     setBatchingSaved(false);
   };

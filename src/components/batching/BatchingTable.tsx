@@ -73,8 +73,8 @@ export const ExpandableRow = (props: {
             onClick={() => setOpen(!open)}
             // style={{ display: /*!props.row.sub_rows || props.row.sub_rows.length === 0 ? 'none' : */'block' }}
             style={{
-              marginLeft:10,
-              width:40,
+              marginLeft: 10,
+              width: 40,
               display:
                 !props.row.sub_rows || props.row.sub_rows.length === 0
                   ? "none"
@@ -89,10 +89,19 @@ export const ExpandableRow = (props: {
             return <>{col.customRender(props.row)}</>;
           }
           if (col.valueGetter) {
-            return  <TableCell sx={{width: col.width, maxWidth: col.width, p: 0, textAlign:col.align }}>{col.valueGetter(props.row)}
-            </TableCell>;
-            
-           }
+            return (
+              <TableCell
+                sx={{
+                  width: col.width,
+                  maxWidth: col.width,
+                  p: 0,
+                  textAlign: col.align,
+                }}
+              >
+                {col.valueGetter(props.row)}
+              </TableCell>
+            );
+          }
           if (col.editable) {
             return (
               <TableCell sx={{ width: col.width, maxWidth: col.width, p: 0 }}>
