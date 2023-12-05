@@ -212,10 +212,19 @@ export const TableTexfield: React.FC<TableTexfieldProps> = ({
               autoFocus
               type={type ? type : "text"}
               onChange={(event) => setDefaultValue(event.target.value)}
-              //TODO: on enter stop edit and commit changes
-              //TODO: on ESC stop edit and commit changes
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                handleEditRow(defaultValue);
+                setEditMode(false)
+                }
+                if(e.key === "Escape") {
+                  setDefaultValue(initialValue)
+                  setEditMode(false);
+                };
+              }}
+              //TODO: fix can't make field empty
               onBlur={(event)=> {
-                handleEditRow(event.target.value);
+                handleEditRow(defaultValue);
                 setEditMode(false)
               }}
               InputProps={{ sx: { borderRadius: 0 } }}
