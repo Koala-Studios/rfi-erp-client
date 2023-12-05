@@ -100,19 +100,21 @@ const TableAutocomplete: React.FC<Props> = ({
           setEditMode(false);
         }}
         renderInput={(params) => {
-          // params.inputProps.style = { textTransform: "capitalize" }; //textTransform uppercase doesn't work on style
+          params.inputProps.style = { textTransform: "capitalize" }; //textTransform uppercase doesn't work on style
           return (
             <TextField
               variant="outlined"
               autoFocus
               style={{
-                marginLeft: "-5%",
-                minWidth: "110%",
-                minHeight: "39px",
-                maxHeight: "39px",
+                width: width,
+                maxWidth: width,
+                // minHeight: "39px",
+                maxHeight: "100%",
+                borderRadius: 0,
               }}
               placeholder={initialValue}
               {...params}
+              InputProps={{ sx: { borderRadius: 0, maxHeight: "100%" } }}
             />
           );
         }}

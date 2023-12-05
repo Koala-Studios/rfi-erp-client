@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { GridColDef } from "@mui/x-data-grid";
 import { IListOptions } from "../../logic/utils";
-import React from "react";
+import React, { useEffect } from "react";
 import { IBatchingContainer } from "../../logic/batching.logic";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
@@ -34,6 +34,14 @@ export const ExpandableRow = (props: {
   handleAddRow: (row_id: string) => void;
 }) => {
   const [open, setOpen] = React.useState(false);
+
+  useEffect(() => {
+    window.addEventListener("BatchingRowAdd", (e: any) => {
+      if (e.detail._id === props.row["_id"]) {
+        setOpen(true);
+      }
+    });
+  }, []);
   // const getClassName = (row: IBatchingContainer) => { //TODO: Gotta do the row colors if available QTY isn't enough.
   //   if (
   //     row.amount_to_use < row.available_amount ||
