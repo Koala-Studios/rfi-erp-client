@@ -184,7 +184,6 @@ export const BatchingDetailPage = () => {
 
   
   const handleEditProductSubRow = (rowid: string, value: IInventoryStock) => {
-    //not using right now here
     const index = expandableRows.findIndex((element) =>
       element.sub_rows.some((e) => e._id === rowid)
     );

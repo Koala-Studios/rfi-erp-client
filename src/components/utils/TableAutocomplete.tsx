@@ -25,7 +25,7 @@ interface Props {
   handleEditRow: (id: string, newItem: any) => void;
   readOnly?:boolean,
   rowParams: any;
-  initialValue: string;
+  initialValue: any;
   letterMin: number;
   getOptionLabel: (option: any) => any;
   width?:number;
@@ -66,6 +66,9 @@ const TableAutocomplete: React.FC<Props> = ({
       <Autocomplete
         value={initialValue}
         clearOnBlur={false}
+        isOptionEqualToValue={(option, value) =>
+          option._id === value._id || option.lot_number === value
+        }
         filterOptions={(x) => x}
         openOnFocus
         selectOnFocus
