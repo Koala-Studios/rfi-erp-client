@@ -58,15 +58,13 @@ interface expBatchIngr extends IBatchingIngredient {
   _id: string;
   container_id: string;
   lot_number: string;
-  required_amount:number;
+  required_amount: number;
   total_used_amount: number;
   used_amount: number;
   sub_rows: IBatchingContainer[];
   has_enough: boolean;
-  remaining_amount:number;
+  remaining_amount: number;
 }
-
-
 
 const BatchingStatus = [
   ["DRAFT", "warning"],
@@ -158,31 +156,27 @@ export const BatchingDetailPage = () => {
     setBatching({ ...batching! });
     setBatchingSaved(false);
   };
-  
+
   const handleEditProductRow = (rowid: string, value: IInventoryStock) => {
     //not using right now here
-    const index = expandableRows.findIndex((element) =>
-      element._id === rowid
-    );
+    const index = expandableRows.findIndex((element) => element._id === rowid);
     const targetRow: IBatchingIngredient = expandableRows[index];
     setExpandableRows(
       expandableRows.map((row) => {
         if (row === targetRow) {
-          return (
-            {...row,
-              container_id: value._id,
-              confirm_lot_number: '',
-              lot_number: value.lot_number,
-              used_amount: 0,
-            });
+          return {
+            ...row,
+            container_id: value._id,
+            confirm_lot_number: "",
+            lot_number: value.lot_number,
+            used_amount: 0,
           };
+        }
         return row;
       })
     );
   };
 
-
-  
   const handleEditProductSubRow = (rowid: string, value: IInventoryStock) => {
     const index = expandableRows.findIndex((element) =>
       element.sub_rows.some((e) => e._id === rowid)
@@ -196,14 +190,17 @@ export const BatchingDetailPage = () => {
           // )
           return {
             ...row,
-            sub_rows: [...targetRow.sub_rows.slice(0,index -1), 
+            sub_rows: [
+              ...targetRow.sub_rows.slice(0, index - 1),
               {
-              _id: rowid,
-              container_id: value._id,
-              confirm_lot_number: '',
-              lot_number: value.lot_number,
-              used_amount: 0,
-            }, ...targetRow.sub_rows.slice(index, targetRow.sub_rows.length -1)],
+                _id: rowid,
+                container_id: value._id,
+                confirm_lot_number: "",
+                lot_number: value.lot_number,
+                used_amount: 0,
+              },
+              ...targetRow.sub_rows.slice(index, targetRow.sub_rows.length - 1),
+            ],
           };
         }
         return row;
@@ -272,7 +269,7 @@ export const BatchingDetailPage = () => {
                   : [],
               has_enough: true,
               required_amount: item.required_amount,
-              remaining_amount: item.required_amount
+              remaining_amount: item.required_amount,
             };
           })
         );
@@ -347,7 +344,7 @@ export const BatchingDetailPage = () => {
       sortable: false,
       filterable: false,
       customRender: (row: any) => (
-        <TableCell sx={{width: 180, pl: "16px" }}>
+        <TableCell sx={{ width: 180, p: 0 }}>
           <TableAutocomplete
             width={200}
             dropDownWidth={260}
@@ -358,7 +355,7 @@ export const BatchingDetailPage = () => {
             rowParams={{ row: row }}
             letterMin={0}
             getOptionLabel={(item: any) => {
-              return item.lot_number != undefined ? item.lot_number : '';
+              return item.lot_number != undefined ? item.lot_number : "";
               // (
               //   <>
               //     {" "}
@@ -406,7 +403,7 @@ export const BatchingDetailPage = () => {
               pr: "10px",
               fontWeight: "500",
               fontSize: "0.9rem",
-              width:65
+              width: 65,
             }}
           >
             <Button
@@ -439,7 +436,7 @@ export const BatchingDetailPage = () => {
       sortable: false,
       filterable: false,
       customRender: (row: any) => (
-        <TableCell sx={{width: 200,  pl: "16px" }}>
+        <TableCell sx={{ width: 200, p: 0 }}>
           <TableAutocomplete
             width={200}
             initialValue={row.lot_number}
@@ -449,7 +446,7 @@ export const BatchingDetailPage = () => {
             rowParams={{ row: row }}
             letterMin={0}
             getOptionLabel={(item: any) => {
-              return item.lot_number != undefined ? item.lot_number : '';
+              return item.lot_number != undefined ? item.lot_number : "";
             }}
           />
         </TableCell>
@@ -482,7 +479,7 @@ export const BatchingDetailPage = () => {
               p: 1,
               pl: "10px",
               pr: "10px",
-              width:65,
+              width: 65,
               fontWeight: "500",
               fontSize: "0.9rem",
             }}
@@ -554,7 +551,7 @@ export const BatchingDetailPage = () => {
                   ? item.used_containers.slice(1, undefined)
                   : [],
               has_enough: true,
-              remaining_amount: item.required_amount
+              remaining_amount: item.required_amount,
             };
           })
         );
@@ -602,60 +599,91 @@ export const BatchingDetailPage = () => {
 
   const handleEditCell = (row_id: string, field: string, value: any) => {
     //TODO: DANIEL THIS NNEEDS FIX
-    console.log(value, 'hopefully empty')
+    console.log(value, "hopefully empty");
     let rowIndex = expandableRows.findIndex((r: any) => r._id === row_id);
     let subRow = -1;
-    if(rowIndex < 0) {
+    if (rowIndex < 0) {
       expandableRows.forEach((element, index) => {
-        const temp = element.sub_rows.findIndex((r: any) => r._id === row_id)
-        if(temp > - 1) {
+        const temp = element.sub_rows.findIndex((r: any) => r._id === row_id);
+        if (temp > -1) {
           rowIndex = index;
           subRow = temp;
-        } 
+        }
       });
     }
-    const total_used = getTotalUsedOnChange(rowIndex, parseFloat(value), subRow);
-    const newRow = (subRow === -1) ? {
-      ...expandableRows[rowIndex],
-      total_used_amount: //TODO: THIS PART NOT WORKING FOR SOME REASON?
-      field === "used_amount"
-        ? total_used
-        : expandableRows[rowIndex].total_used_amount,
-      remaining_amount: field === "used_amount" ? expandableRows[rowIndex].required_amount - total_used : expandableRows[rowIndex].remaining_amount,
-      [field]:  field === "used_amount" ? parseFloat(value) : value,
-    } :
-    {
-      ...expandableRows[rowIndex],
-        total_used_amount: 
-        field === "used_amount"
-        ? total_used
-        : expandableRows[rowIndex].total_used_amount,
-        remaining_amount: field === "used_amount" ? expandableRows[rowIndex].required_amount - total_used : expandableRows[rowIndex].remaining_amount,
-        sub_rows: [...expandableRows[rowIndex].sub_rows.slice(0, subRow),
-       {
-        ...expandableRows[rowIndex].sub_rows[subRow],
-        [field]:  field === "used_amount" ? parseFloat(value) : value,
-        },
-        ...expandableRows[rowIndex].sub_rows.slice(subRow + 1, expandableRows[rowIndex].sub_rows.length)  ]
-    }
-    console.log(rowIndex, 'found an index')
+    const total_used = getTotalUsedOnChange(
+      rowIndex,
+      parseFloat(value),
+      subRow
+    );
+    const newRow =
+      subRow === -1
+        ? {
+            ...expandableRows[rowIndex],
+            //TODO: THIS PART NOT WORKING FOR SOME REASON?
+            total_used_amount:
+              field === "used_amount"
+                ? total_used
+                : expandableRows[rowIndex].total_used_amount,
+            remaining_amount:
+              field === "used_amount"
+                ? expandableRows[rowIndex].required_amount - total_used
+                : expandableRows[rowIndex].remaining_amount,
+            [field]: field === "used_amount" ? parseFloat(value) : value,
+          }
+        : {
+            ...expandableRows[rowIndex],
+            total_used_amount:
+              field === "used_amount"
+                ? total_used
+                : expandableRows[rowIndex].total_used_amount,
+            remaining_amount:
+              field === "used_amount"
+                ? expandableRows[rowIndex].required_amount - total_used
+                : expandableRows[rowIndex].remaining_amount,
+            sub_rows: [
+              ...expandableRows[rowIndex].sub_rows.slice(0, subRow),
+              {
+                ...expandableRows[rowIndex].sub_rows[subRow],
+                [field]: field === "used_amount" ? parseFloat(value) : value,
+              },
+              ...expandableRows[rowIndex].sub_rows.slice(
+                subRow + 1,
+                expandableRows[rowIndex].sub_rows.length
+              ),
+            ],
+          };
+    console.log(rowIndex, "found an index");
     setExpandableRows([
       ...expandableRows.slice(0, rowIndex),
       newRow,
       ...expandableRows.slice(rowIndex + 1, rows.length),
     ]);
-    
+
     console.log(row_id, field, value);
     console.log(expandableRows);
   };
 
-  const getTotalUsedOnChange =  (rowIndex:number, currentChange:number, subRow: number) => {
+  const getTotalUsedOnChange = (
+    rowIndex: number,
+    currentChange: number,
+    subRow: number
+  ) => {
     let spliced = expandableRows[rowIndex].sub_rows.slice();
-    spliced.splice(subRow,1);
-    let total = subRow === -1 ? currentChange + expandableRows[rowIndex].sub_rows.reduce((a,b) => {return a + b.used_amount},0) :
-    expandableRows[rowIndex].used_amount + currentChange + spliced.reduce((a,b) => { return a + b.used_amount },0)
+    spliced.splice(subRow, 1);
+    let total =
+      subRow === -1
+        ? currentChange +
+          expandableRows[rowIndex].sub_rows.reduce((a, b) => {
+            return a + b.used_amount;
+          }, 0)
+        : expandableRows[rowIndex].used_amount +
+          currentChange +
+          spliced.reduce((a, b) => {
+            return a + b.used_amount;
+          }, 0);
     return total;
-  }
+  };
 
   const handleChooseContainer = (row_id: string, value: IBatchingContainer) => {
     const index = expandableRows.findIndex((element) => element._id === row_id);
