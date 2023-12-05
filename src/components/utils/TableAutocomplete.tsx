@@ -91,7 +91,7 @@ const TableAutocomplete: React.FC<Props> = ({
             {children}
           </Paper>
         )}
-        sx={{ width: width, height: "39px" }}
+        sx={{ width: width }}
         onInputChange={handleInputChange}
         onBlur={() => setEditMode(false)}
         onChange={(event, value) => {
@@ -100,21 +100,17 @@ const TableAutocomplete: React.FC<Props> = ({
           setEditMode(false);
         }}
         renderInput={(params) => {
-          params.inputProps.style = { textTransform: "capitalize" }; //textTransform uppercase doesn't work on style
           return (
             <TextField
               variant="outlined"
               autoFocus
               style={{
-                width: width,
-                maxWidth: width,
-                // minHeight: "39px",
-                maxHeight: "100%",
                 borderRadius: 0,
+                overflow: "hidden",
               }}
               placeholder={initialValue}
               {...params}
-              InputProps={{ sx: { borderRadius: 0, maxHeight: "100%" } }}
+              InputProps={{ sx: { borderRadius: 0, maxHeight: "45px" } }}
             />
           );
         }}
@@ -132,7 +128,10 @@ const TableAutocomplete: React.FC<Props> = ({
         }}
         onDoubleClick={() => setEditMode(!readOnly)}
       >
-        <Typography variant="subtitle2" style={{ fontSize: "15px" }}>
+        <Typography
+          variant="subtitle2"
+          style={{ fontSize: "15px", cursor: "pointer" }}
+        >
           {initialValue}
         </Typography>
       </div>
