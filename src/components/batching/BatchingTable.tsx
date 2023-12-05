@@ -76,6 +76,11 @@ export const ExpandableRow = (props: {
           if (col.customRender) {
             return <>{col.customRender(props.row)}</>;
           }
+          if (col.valueGetter) {
+            return  <TableCell sx={{width: col.width, maxWidth: col.width, p: 0, textAlign:col.align }}>{col.valueGetter(props.row)}
+            </TableCell>;
+            
+           }
           if (col.editable) {
             return (
               <TableCell sx={{width: col.width, maxWidth: col.width, p: 0 }}>
