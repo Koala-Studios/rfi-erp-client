@@ -6,30 +6,30 @@ import { AuthContext } from "../navigation/AuthProvider";
 
 interface Props {
   dbOption:
-  | "customer"
-  | "supplier"
-  | "inventory-stock"
-  | "inventory"// all products and materials
-  | "material" // not for sale
-  | "raw-mat" //is raw, not for sale
-  | "non-raw-mat" //is not raw, not for sale
-  | "product" //for sale
-  | "approved-product" //approved and for sale
-  | "approved-product-all" //for sale and not for sale, just approved that matters
-  | "user"
-  | "product-type"
-  | "product-type-mat"
-  | "location"
-  | "product-type-raw"
-  | "container";
+    | "customer"
+    | "supplier"
+    | "inventory-stock"
+    | "inventory" // all products and materials
+    | "material" // not for sale
+    | "raw-mat" //is raw, not for sale
+    | "non-raw-mat" //is not raw, not for sale
+    | "product" //for sale
+    | "approved-product" //approved and for sale
+    | "approved-product-all" //for sale and not for sale, just approved that matters
+    | "user"
+    | "product-type"
+    | "product-type-mat"
+    | "location"
+    | "product-type-raw"
+    | "container";
   handleEditRow: (id: string, newItem: any) => void;
-  readOnly?:boolean,
+  readOnly?: boolean;
   rowParams: any;
   initialValue: any;
   letterMin: number;
   getOptionLabel: (option: any) => any;
-  width?:number;
-  dropDownWidth?:number
+  width?: number;
+  dropDownWidth?: number;
 }
 
 const TableAutocomplete: React.FC<Props> = ({
@@ -41,7 +41,7 @@ const TableAutocomplete: React.FC<Props> = ({
   width = 340,
   dropDownWidth = 450,
   getOptionLabel,
-  readOnly = false
+  readOnly = false,
 }) => {
   const [editMode, setEditMode] = React.useState(false);
   const [optionList, setOptionList] = React.useState<any>([]);
@@ -55,11 +55,11 @@ const TableAutocomplete: React.FC<Props> = ({
       setOptionList(result);
     });
   };
-  const handleSelect = async (value:string) =>{
+  const handleSelect = async (value: string) => {
     lookup(value.toUpperCase(), dbOption, letterMin).then((result) => {
       setOptionList(result);
     });
-  }
+  };
 
   if (editMode) {
     return (
@@ -72,7 +72,9 @@ const TableAutocomplete: React.FC<Props> = ({
         filterOptions={(x) => x}
         openOnFocus
         selectOnFocus
-        onFocus={()=> {handleSelect(initialValue)}}
+        onFocus={() => {
+          handleSelect(initialValue);
+        }}
         readOnly={readOnly}
         options={optionList}
         getOptionLabel={getOptionLabel}
@@ -93,7 +95,7 @@ const TableAutocomplete: React.FC<Props> = ({
         onInputChange={handleInputChange}
         onBlur={() => setEditMode(false)}
         onChange={(event, value) => {
-          console.log(value)
+          console.log(value);
           handleEditRow(rowParams.row._id, value);
           setEditMode(false);
         }}
@@ -109,8 +111,7 @@ const TableAutocomplete: React.FC<Props> = ({
                 minHeight: "39px",
                 maxHeight: "39px",
               }}
-              placeholder={initialValue }
-              
+              placeholder={initialValue}
               {...params}
             />
           );
@@ -122,9 +123,10 @@ const TableAutocomplete: React.FC<Props> = ({
       <div
         style={{
           minWidth: width,
-          minHeight: "39px",
+          // minHeight: "39px",
           paddingBottom: "10px",
-          paddingTop: "10px",
+          padding: "10px",
+          height: "100%",
         }}
         onDoubleClick={() => setEditMode(!readOnly)}
       >

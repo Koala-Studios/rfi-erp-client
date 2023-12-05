@@ -50,13 +50,14 @@ export const ExpandableRow = (props: {
     <>
       <TableRow
         sx={{
-
-            maxHeight:'40px',
-          "& > *": {  
-          borderRight: "1px solid #00000010",borderBottom: "1px solid #00000010" },
+          maxHeight: "40px",
+          "& > *": {
+            borderRight: "1px solid #00000010",
+            borderBottom: "1px solid #00000010",
+          },
         }}
       >
-        <TableCell sx={{ p: 0.7, mH:40 }} height={35} width={50}>
+        <TableCell sx={{ p: 0, mH: 40 }} height={35} width={50}>
           <IconButton
             aria-label="expand row"
             size="small"
@@ -83,7 +84,7 @@ export const ExpandableRow = (props: {
            }
           if (col.editable) {
             return (
-              <TableCell sx={{width: col.width, maxWidth: col.width, p: 0 }}>
+              <TableCell sx={{ width: col.width, maxWidth: col.width, p: 0 }}>
                 <TableTexfield
                   type={col.type}
                   width={col.width}
@@ -91,7 +92,7 @@ export const ExpandableRow = (props: {
                     props.row[col.field] ? props.row[col.field] : ""
                   }
                   handleEditRow={(value: string) => {
-                    if (value != '') {
+                    if (value != "") {
                       props.handleEditCell(props.row["_id"], col.field, value);
                     }
                   }}
@@ -100,11 +101,18 @@ export const ExpandableRow = (props: {
             );
           }
 
-          return <TableCell align={col.align} sx={{  width: col.width, maxWidth: col.width, p: 0 }}>{props.row[col.field]}</TableCell>;
+          return (
+            <TableCell
+              align={col.align}
+              sx={{ width: col.width, maxWidth: col.width, p: 0, pl: "10px" }}
+            >
+              {props.row[col.field]}
+            </TableCell>
+          );
         })}
       </TableRow>
-      <TableRow>
-        <TableCell colSpan={6}></TableCell>
+      <TableRow sx={{ p: 0, m: 0 }}>
+        <TableCell sx={{ p: 0, m: 0 }} colSpan={6}></TableCell>
         <TableCell
           sx={{ p: 0 }}
           // style={{ paddingBottom: 0, paddingTop: 0 }}
@@ -122,74 +130,81 @@ export const ExpandableRow = (props: {
                 style={{ width: "100%", position: "relative" }}
               >
                 <TableBody
-                  style={{ width: "100%", overflowY: "scroll", height: "400px!important" }}
+                  style={{
+                    width: "100%",
+                    overflowY: "scroll",
+                    height: "400px!important",
+                  }}
                 >
-                 {props.row.sub_rows.map((row_item: any, index:number) => {
-                    return <TableRow
-                      sx={{
-                        width: "100%", height:'40px',
-                        "& > *": { border: "1px solid #00000010",borderTop:"none"  },
-                      }}
-                    >                    
-                      {props.sub_columns.map((col: TableGridColDef, index) => {
-                         if (col.customRender) {
-                           return <>{col.customRender(row_item)}</>;
-                         }
-                         if (col.editable) {
-                           return (
-                             <TableCell sx={{ width: col.width, maxWidth: col.width, p: 0 }}>
-                               <TableTexfield
-                                 type={col.type}
-                                 width={col.width}
-                                 initialValue={
-                                    row_item[col.field] ? row_item[col.field] : ""
-                                 }
-                                 handleEditRow={(value: string) => {
-                                  if (value != '') {
-                                    props.handleEditCell(
-                                      row_item["_id"],
-                                       col.field,
-                                       value
-                                     );
-                                  }
-                                   
-                                 }}
-                               />
-                             </TableCell>
-                           );
-                         }
-        
-                        return (
-                        <TableCell sx={{ width: col.width, maxWidth: col.width, }}>
-                            {props.row[col.field]}
-                        </TableCell>
-                        );
-                    })}
-                    </TableRow>
+                  {props.row.sub_rows.map((row_item: any, index: number) => {
+                    return (
+                      <TableRow
+                        sx={{
+                          p: 0,
+                          m: 0,
+                          width: "100%",
+                          height: "40px",
+                          "& > *": {
+                            border: "1px solid #00000010",
+                            borderTop: "none",
+                          },
+                        }}
+                      >
+                        {props.sub_columns.map(
+                          (col: TableGridColDef, index) => {
+                            if (col.customRender) {
+                              return <>{col.customRender(row_item)}</>;
+                            }
+                            if (col.editable) {
+                              return (
+                                <TableCell
+                                  sx={{
+                                    width: col.width,
+                                    maxWidth: col.width,
+                                    p: 0,
+                                  }}
+                                >
+                                  <TableTexfield
+                                    type={col.type}
+                                    width={col.width}
+                                    initialValue={
+                                      row_item[col.field]
+                                        ? row_item[col.field]
+                                        : ""
+                                    }
+                                    handleEditRow={(value: string) => {
+                                      if (value != "") {
+                                        props.handleEditCell(
+                                          row_item["_id"],
+                                          col.field,
+                                          value
+                                        );
+                                      }
+                                    }}
+                                  />
+                                </TableCell>
+                              );
+                            }
+
+                            return (
+                              <TableCell
+                                sx={{
+                                  width: col.width,
+                                  maxWidth: col.width,
+                                  pl: "10px",
+                                }}
+                              >
+                                {props.row[col.field]}
+                              </TableCell>
+                            );
+                          }
+                        )}
+                      </TableRow>
+                    );
                   })}
                 </TableBody>
               </Table>
             </TableContainer>
-
-            {/* <DataGrid 
-                rows={props.row.sub_rows}
-                headerHeight={0}
-                
-                getRowClassName={(params) => getClassName(params.row)}
-                // components={{
-                //   Header: () => null,
-                // }}
-                // onCellEditCommit={}
-                columns={props.sub_columns}
-                getRowId={(row) => row._id}
-                sx={{ 
-                  '& .MuiDataGrid-cell': {
-                    paddingLeft: "16px",
-                    paddingRight: "16px",
-                  },
-                                  
-                  height: ((40.5 * (props.row.sub_rows.length)))}} rowHeight={40} hideFooter={true}
-              /> */}
           </Collapse>
         </TableCell>
       </TableRow>
