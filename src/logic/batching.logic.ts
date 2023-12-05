@@ -36,12 +36,12 @@ export interface IBatchingContainer {
   container_id: string;
   lot_number: string;
   confirm_lot_number: string;
-  available_amount: number; //TODO: maybe live update somehow? we have sockets setup right?
+  // available_amount: number; //TODO: maybe live update somehow? we have sockets setup right?
   used_amount: number;
 }
 
 export interface IBatchingIngredient {
-  sub_rows: any;
+  sub_rows?: any;
   _id: string;
   product_id: string;
   product_code: string;
@@ -50,7 +50,7 @@ export interface IBatchingIngredient {
   used_containers: IBatchingContainer[];
   used_amount: number;
   total_used_amount: number;
-  has_enough: boolean;
+  // has_enough: boolean;
 }
 
 const api = axios.create({

@@ -224,6 +224,7 @@ export const TableTexfield: React.FC<TableTexfieldProps> = ({
               }}
               //TODO: fix can't make field empty
               onBlur={(event)=> {
+                console.log(event, 'test if empty', event.target.value)
                 handleEditRow(defaultValue);
                 setEditMode(false)
               }}

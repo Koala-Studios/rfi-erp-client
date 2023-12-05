@@ -56,14 +56,18 @@ let savedBatching: IBatching | null = null;
 
 interface expBatchIngr extends IBatchingIngredient {
   _id: string;
-  container_id: string;
-  lot_number: string;
   required_amount: number;
   total_used_amount: number;
-  used_amount: number;
   sub_rows: IBatchingContainer[];
-  has_enough: boolean;
+  // has_enough: boolean;
   remaining_amount: number;
+
+  //used container info
+  row_id: string;
+  container_id: string;
+  lot_number: string;
+  confirm_lot_number:string;
+  used_amount: number;
 }
 
 const BatchingStatus = [
@@ -158,7 +162,6 @@ export const BatchingDetailPage = () => {
   };
 
   const handleEditProductRow = (rowid: string, value: IInventoryStock) => {
-    //not using right now here
     const index = expandableRows.findIndex((element) => element._id === rowid);
     const targetRow: IBatchingIngredient = expandableRows[index];
     setExpandableRows(
@@ -181,6 +184,7 @@ export const BatchingDetailPage = () => {
     const index = expandableRows.findIndex((element) =>
       element.sub_rows.some((e) => e._id === rowid)
     );
+    const rowIndx = expandableRows[index].sub_rows.findIndex((e) => e._id === rowid);
     const targetRow: IBatchingIngredient = expandableRows[index];
     setExpandableRows(
       expandableRows.map((row) => {
@@ -191,7 +195,7 @@ export const BatchingDetailPage = () => {
           return {
             ...row,
             sub_rows: [
-              ...targetRow.sub_rows.slice(0, index - 1),
+              ...targetRow.sub_rows.slice(0, rowIndx),
               {
                 _id: rowid,
                 container_id: value._id,
@@ -199,7 +203,7 @@ export const BatchingDetailPage = () => {
                 lot_number: value.lot_number,
                 used_amount: 0,
               },
-              ...targetRow.sub_rows.slice(index, targetRow.sub_rows.length - 1),
+              ...targetRow.sub_rows.slice(rowIndx +1, targetRow.sub_rows.length - 1),
             ],
           };
         }
@@ -242,37 +246,7 @@ export const BatchingDetailPage = () => {
         //     remaining_amount: item.batchingd_amount - item.received_amount,
         //   };
         // });
-        setRows(
-          p!.ingredients.map((item: IBatchingIngredient) => {
-            item._id = item._id ? item._id : new ObjectID().toHexString();
-
-            return item;
-          })
-        );
-        setExpandableRows(
-          p!.ingredients.map((item) => {
-            return {
-              ...item,
-              _id: item._id ? item._id : new ObjectID().toHexString(),
-              container_id:
-                item.used_containers.length > 0
-                  ? item.used_containers[0].container_id
-                  : "",
-              lot_number:
-                item.used_containers.length > 0
-                  ? item.used_containers[0].lot_number
-                  : "",
-              total_used_amount: 0,
-              sub_rows:
-                item.used_containers.length > 1
-                  ? item.used_containers.slice(1, undefined)
-                  : [],
-              has_enough: true,
-              required_amount: item.required_amount,
-              remaining_amount: item.required_amount,
-            };
-          })
-        );
+        setExpandableRows(reformatIngredients(p!));
         setReceiveMode(p!.status <= 3);
         // setBatchingSaved(true);
       });
@@ -319,6 +293,16 @@ export const BatchingDetailPage = () => {
       width: 160,
       align: "center",
       editable: false,
+      valueGetter: (params:any) => params.required_amount ? params.required_amount.toFixed(4) + (params.required_amount < 0.1 ? '(' + params.required_amount.toFixed(4)*1000 + 'g)' : '') : params.remaining_amount
+    },
+    {
+      field: "total_used_amount",
+      headerName: "Total Used Qty",
+      type: "number",
+      width: 160,
+      align: "center",
+      editable: false,
+      valueGetter: (params:any) => params.total_used_amount ?  params.total_used_amount.toFixed(4) : params.total_used_amount
     },
     {
       field: "remaining_amount",
@@ -327,15 +311,7 @@ export const BatchingDetailPage = () => {
       width: 160,
       align: "center",
       editable: false,
-    },
-
-    {
-      field: "total_used_amount",
-      headerName: "Total Used Qty",
-      type: "number",
-      width: 160,
-      align: "center",
-      editable: false,
+      valueGetter: (params:any) => params.remaining_amount ? params.remaining_amount.toFixed(4) + (params.remaining_amount < 0.1 ? '(' + params.remaining_amount.toFixed(4)*1000 + 'g)' : '') : params.remaining_amount
     },
     {
       field: "lot_number",
@@ -508,6 +484,40 @@ export const BatchingDetailPage = () => {
     },
   ];
 
+  const reformatIngredients =(_batching:IBatching) =>{
+
+    const newIng = _batching.ingredients.map((item) => {
+      return {
+        ...item,
+        _id: item._id ? item._id : new ObjectID().toHexString(),
+        row_id: item.used_containers.length > 0
+        ? item.used_containers[0]._id
+        : "",
+        container_id:
+          item.used_containers.length > 0
+            ? item.used_containers[0].container_id
+            : "",
+        lot_number:
+          item.used_containers.length > 0
+            ? item.used_containers[0].lot_number
+            : "",
+        confirm_lot_number:
+        item.used_containers.length > 0
+          ? item.used_containers[0].confirm_lot_number
+          : "",
+        used_amount: item.used_amount,
+        total_used_amount: item.total_used_amount,
+        sub_rows:
+          item.used_containers.length > 1
+            ? item.used_containers.slice(1, undefined)
+            : [],
+        // has_enough: true,
+        remaining_amount: item.required_amount,
+      };
+    })
+    return newIng;
+  }
+
   const handleConfirmBatching = () => {
     confirmBatching(auth.token, batching!).then(
       (_batching: IBatching | null) => {
@@ -532,29 +542,7 @@ export const BatchingDetailPage = () => {
         savedBatching = _batching;
         setBatching(_batching);
         setBatchingSaved(true);
-        setExpandableRows(
-          _batching.ingredients.map((item) => {
-            return {
-              ...item,
-              _id: item._id ? item._id : new ObjectID().toHexString(),
-              container_id:
-                item.used_containers.length > 0
-                  ? item.used_containers[0].container_id
-                  : "",
-              lot_number:
-                item.used_containers.length > 0
-                  ? item.used_containers[0].lot_number
-                  : "",
-              used_amount: 0,
-              sub_rows:
-                item.used_containers.length > 1
-                  ? item.used_containers.slice(1, undefined)
-                  : [],
-              has_enough: true,
-              remaining_amount: item.required_amount,
-            };
-          })
-        );
+        setExpandableRows(reformatIngredients(_batching));
       } else {
         console.log("Batching Not Updated");
       }
@@ -653,15 +641,26 @@ export const BatchingDetailPage = () => {
               ),
             ],
           };
-    console.log(rowIndex, "found an index");
-    setExpandableRows([
-      ...expandableRows.slice(0, rowIndex),
+    const tempRows = [      ...expandableRows.slice(0, rowIndex),
       newRow,
-      ...expandableRows.slice(rowIndex + 1, rows.length),
-    ]);
+      ...expandableRows.slice(rowIndex + 1, expandableRows.length),];
+    setExpandableRows(tempRows);
 
-    console.log(row_id, field, value);
-    console.log(expandableRows);
+    const ingredients = tempRows.map((row) => {
+      return {
+        _id: row._id,
+        product_id: row.product_id,
+        product_code:row.product_code,
+        product_name:row.product_name,
+        required_amount:row.required_amount,
+        used_amount: row.used_amount,
+        used_containers: [{_id: row.row_id,container_id: row.container_id, lot_number: row.lot_number,confirm_lot_number: row.confirm_lot_number, used_amount: row.used_amount } ,...row.sub_rows],
+        total_used_amount: row.total_used_amount
+      }
+    })
+    console.log(ingredients, 'TEST');
+    setBatching({ ...batching!, ingredients: ingredients });
+    setBatchingSaved(false);
   };
 
   const getTotalUsedOnChange = (
@@ -782,8 +781,9 @@ export const BatchingDetailPage = () => {
   };
   const cancelSaveBatching = () => {
     setBatching(savedBatching);
-    let tempPur = { ...savedBatching! };
-    setRows(tempPur.ingredients); //TODO: change to expRow
+
+    let tempBatching = { ...savedBatching! };
+    setExpandableRows(reformatIngredients(tempBatching));
     setBatchingSaved(true);
   };
 
