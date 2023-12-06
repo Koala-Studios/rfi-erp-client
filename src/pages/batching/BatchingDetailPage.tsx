@@ -290,7 +290,7 @@ export const BatchingDetailPage = () => {
       field: "required_amount",
       headerName: "Required Qty",
       type: "number",
-      width: 160,
+      width: 100,
       align: "center",
       editable: false,
       valueGetter: (params:any) => params.required_amount ? params.required_amount.toFixed(4) + (params.required_amount < 0.1 ? '(' + params.required_amount.toFixed(4)*1000 + 'g)' : '') : params.remaining_amount
@@ -299,7 +299,7 @@ export const BatchingDetailPage = () => {
       field: "total_used_amount",
       headerName: "Total Used Qty",
       type: "number",
-      width: 160,
+      width: 100,
       align: "center",
       editable: false,
       valueGetter: (params:any) => params.total_used_amount ?  params.total_used_amount.toFixed(4) : params.total_used_amount
@@ -308,7 +308,7 @@ export const BatchingDetailPage = () => {
       field: "remaining_amount",
       headerName: "Remaining Qty",
       type: "number",
-      width: 160,
+      width: 100,
       align: "center",
       editable: false,
       valueGetter: (params:any) => params.remaining_amount ? params.remaining_amount.toFixed(4) + (params.remaining_amount < 0.1 ? '(' + params.remaining_amount.toFixed(4)*1000 + 'g)' : '') : params.remaining_amount
