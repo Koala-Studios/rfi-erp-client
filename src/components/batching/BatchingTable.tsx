@@ -11,7 +11,7 @@ import {
 } from "@mui/material";
 import { GridColDef } from "@mui/x-data-grid";
 import { IListOptions } from "../../logic/utils";
-import React from "react";
+import React, { useEffect } from "react";
 import { IBatchingContainer } from "../../logic/batching.logic";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
@@ -34,6 +34,14 @@ export const ExpandableRow = (props: {
   handleAddRow: (row_id: string) => void;
 }) => {
   const [open, setOpen] = React.useState(false);
+
+  useEffect(() => {
+    window.addEventListener("BatchingRowAdd", (e: any) => {
+      if (e.detail._id === props.row["_id"]) {
+        setOpen(true);
+      }
+    });
+  }, []);
   // const getClassName = (row: IBatchingContainer) => { //TODO: Gotta do the row colors if available QTY isn't enough.
   //   if (
   //     row.amount_to_use < row.available_amount ||
@@ -65,8 +73,8 @@ export const ExpandableRow = (props: {
             onClick={() => setOpen(!open)}
             // style={{ display: /*!props.row.sub_rows || props.row.sub_rows.length === 0 ? 'none' : */'block' }}
             style={{
-              marginLeft:10,
-              width:40,
+              marginLeft: 10,
+              width: 40,
               display:
                 !props.row.sub_rows || props.row.sub_rows.length === 0
                   ? "none"
@@ -81,10 +89,19 @@ export const ExpandableRow = (props: {
             return <>{col.customRender(props.row)}</>;
           }
           if (col.valueGetter) {
-            return  <TableCell sx={{width: col.width, maxWidth: col.width, p: 0, textAlign:col.align }}>{col.valueGetter(props.row)}
-            </TableCell>;
-            
-           }
+            return (
+              <TableCell
+                sx={{
+                  width: col.width,
+                  maxWidth: col.width,
+                  p: 0,
+                  textAlign: col.align,
+                }}
+              >
+                {col.valueGetter(props.row)}
+              </TableCell>
+            );
+          }
           if (col.editable) {
             return (
               <TableCell sx={{ width: col.width, maxWidth: col.width, p: 0 }}>
