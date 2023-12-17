@@ -51,13 +51,24 @@ import CategoryIcon from "@mui/icons-material/Category";
 import PERMISSIONS from "../../logic/config.permissions";
 import { hasPermission } from "../../logic/user.logic";
 import LocationOnIcon from '@mui/icons-material/LocationOn';
-import { FactCheck, ManageAccounts } from "@mui/icons-material";
+import { ExpandLess, ExpandMore, FactCheck, ManageAccounts } from "@mui/icons-material";
 import AddShoppingCartIcon from '@mui/icons-material/AddShoppingCart';
 import ScienceIcon from '@mui/icons-material/Science';
 import ValidateForm from "../utils/ValidateForm";
+import { Collapse } from "@mui/material";
 const drawerWidth = 190;
 
-let LinkItems = [
+interface NavItem {
+  text:string;
+  link?:string;
+  icon:JSX.Element;
+  permission:string;
+  children?:NavItem[];
+
+}
+
+let LinkItems:NavItem[] = [
+  
   {
     text: "Projects",
     link: "/projects",
@@ -70,12 +81,45 @@ let LinkItems = [
     icon: <HvacIcon></HvacIcon>,
     permission: PERMISSIONS.batching_page,
   },
-  // {
-  //   text: "Inventory",
-  //   link: "/inventory",
-  //   icon: <StorageIcon></StorageIcon>,
-  //   permission: PERMISSIONS.inventory_page,
-  // },
+  {
+    text: "Expandable",
+    icon: <AccountTreeIcon></AccountTreeIcon>,
+    permission: PERMISSIONS.project_page,
+    children:[
+      {
+        text: "Projects",
+        link: "/projects",
+        icon: <AccountTreeIcon></AccountTreeIcon>,
+        permission: PERMISSIONS.project_page
+      }
+    ]
+  },
+  {
+    text: "Expandable",
+    icon: <AccountTreeIcon></AccountTreeIcon>,
+    permission: PERMISSIONS.project_page,
+    children:[
+      {
+        text: "Projects",
+        link: "/projects",
+        icon: <AccountTreeIcon></AccountTreeIcon>,
+        permission: PERMISSIONS.project_page
+      }
+    ]
+  },
+  {
+    text: "Expandable",
+    icon: <AccountTreeIcon></AccountTreeIcon>,
+    permission: PERMISSIONS.project_page,
+    children:[
+      {
+        text: "Projects",
+        link: "/projects",
+        icon: <AccountTreeIcon></AccountTreeIcon>,
+        permission: PERMISSIONS.project_page
+      }
+    ]
+  },
   {
     // text: "Inv Containers",
     text: "Inventory",
@@ -393,48 +437,16 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
               borderColor: "#ffffff36",
             }}
           /> */}
-          {LinkItems.map((item, index) => (
-            <Link to={item.link} key={index}>
-              <ListItem
-                button
-                sx={{
-                  background:
-                    location.pathname === item.link ? "#0c3467" : "#020818",
-                  border: "1px solid #020818",
-                  transition: "400ms",
-                  "&:hover": {
-                    background: "#061e3d",
-                    border: "1px solid #0c3467",
-                  },
-                  width: "unset",
-                  margin: 0.5,
-                  mb: 0,
-                  mt: 1,
-                  borderRadius: 1,
-                  pt: 0.5,
-                  pb: 0.5,
-                }}
-              >
-                {item.icon}
-                <ListItemText
-                  primaryTypographyProps={{
-                    color: location.pathname === item.link ? "#fff" : "#b2bac2",
-                    fontWeight: "500",
-                    fontSize: "0.85rem",
-                  }}
-                  primary={item.text}
-                  sx={{
-                    marginLeft: 1,
-                  }}
-                />
-              </ListItem>
-              {/* <Divider
-                sx={{
-                  borderColor: "#ffffff36",
-                }}
-              /> */}
-            </Link>
-          ))}
+          {LinkItems.map((nav_item, index) => {
+                if (nav_item.children === undefined){
+                  return <SideNavItem location={location} nav_item={nav_item} key={index}/>
+                } 
+            
+                if( nav_item.children){
+                  return <SideNavCollapsable location={location} nav_item={nav_item} key={index}/>
+                }
+          })
+}
         </List>
       </Drawer>
 
@@ -445,3 +457,103 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
     </Box>
   );
 };
+
+interface SideNavItemProps{
+  nav_item: NavItem;
+  location: any;
+}
+
+
+const SideNavCollapsable: React.FC<SideNavItemProps> = ({ nav_item, location }) => {
+  
+  const [open, setOpen] = React.useState(false);
+
+  const handleClick = () => {
+    setOpen(!open);
+  };
+
+  
+  return (<>
+    <Divider sx={{background:"#15345b"}}/>
+    <ListItem
+    sx={{
+      background:"#020818",
+      transition: "400ms",
+      "&:hover": {
+        background: "#061e3d",
+      },
+      width: "unset",
+      // margin: 0.5,
+      mb: 0,
+      // mt: 1,
+      // borderRadius: 1,
+      pt: 0.5,
+      pb: 0.5,
+      cursor:"pointer"
+    }}
+    onClick={handleClick}>
+      {nav_item.icon}
+      <ListItemText
+                primaryTypographyProps={{
+                  color: "#b2bac2",
+                  fontWeight: "500",
+                  fontSize: "0.85rem",
+                }}
+                primary={nav_item.text}
+                sx={{
+                  marginLeft: 1,
+                }}
+              />
+        {open ? <ExpandLess /> : <ExpandMore />}
+    </ListItem>
+    <Collapse in={open} timeout="auto" unmountOnExit>
+      {nav_item.children!.map((item, index) => (<SideNavItem location={location} nav_item={item} key={index}/>))}
+    </Collapse>
+    <Divider sx={{mt:open ? 1 : 0, background:"#15345b"}}/>
+  </>)
+}
+
+const SideNavItem: React.FC<SideNavItemProps> = ({ nav_item, location }) => {
+
+  return(<Link to={nav_item.link!}>
+            <ListItem
+              button
+              sx={{
+                background:
+                  location.pathname === nav_item.link ? "#0c3467" : "#020818",
+                border: "1px solid #020818",
+                transition: "400ms",
+                "&:hover": {
+                  background: "#061e3d",
+                  border: "1px solid #0c3467",
+                },
+                width: "unset",
+                margin: 0.5,
+                mb: 0,
+                mt: 1,
+                borderRadius: 1,
+                pt: 0.5,
+                pb: 0.5,
+              }}
+            >
+              {nav_item.icon}
+              <ListItemText
+                primaryTypographyProps={{
+                  color: location.pathname === nav_item.link ? "#fff" : "#b2bac2",
+                  fontWeight: "500",
+                  fontSize: "0.85rem",
+                }}
+                primary={nav_item.text}
+                sx={{
+                  marginLeft: 1,
+                }}
+              />
+            </ListItem>
+            {/* <Divider
+              sx={{
+                borderColor: "#ffffff36",
+              }}
+            /> */}
+                </Link>)
+
+}

@@ -106,7 +106,7 @@ const TableAutocomplete: React.FC<Props> = ({
               autoFocus
               style={{
                 borderRadius: 0,
-                overflow: "hidden",
+                // overflow: "hidden",
               }}
               placeholder={initialValue}
               {...params}
