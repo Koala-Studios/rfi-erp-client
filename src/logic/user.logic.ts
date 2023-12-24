@@ -12,7 +12,7 @@ export interface INotification {
 export interface IUserRole {
   _id: string;
   name: string;
-  permissions: string;
+  permissions?: string;
 }
 
 export interface IUser {
@@ -25,11 +25,6 @@ export interface IUser {
   roles: IUserRole[];
   permissions?: string[];
   //TODO:ROLES & DATES
-}
-
-export interface IUserRole {
-  _id: string;
-  name: string;
 }
 
 const api = axios.create({
@@ -107,8 +102,12 @@ export const loadUser = async (token: string): Promise<IUser | undefined> => {
   return user;
 };
 
-export const setupPermissions = (user: IUser): string[] => {
+export const setupPermissions = (
+  user: IUser,
+  userRoles: IUserRole[]
+): string[] => {
   let permissions: string[] = [];
+  console.log(userRoles);
 
   if (!user.roles) return [];
 
@@ -117,13 +116,13 @@ export const setupPermissions = (user: IUser): string[] => {
 
     if (role.name === "Admin") return [PERMISSIONS.admin];
 
-    for (let j = 0; j < role.permissions.length; j++) {
-      const perm = role.permissions[j];
+    // for (let j = 0; j < userRoles.length; j++) {
+    //   const perm = userRoles[i].permissions[j];
 
-      if (!permissions.includes(perm)) {
-        permissions.push(perm);
-      }
-    }
+    //   if (!permissions.includes(perm)) {
+    //     permissions.push(perm);
+    //   }
+    // }
   }
 
   return permissions;
@@ -202,6 +201,15 @@ export const createUser = async (formData: IUser): Promise<string | null> => {
   return rtn;
 };
 export const updateUser = async (formData: IUser): Promise<boolean> => {
+  let _roles: IUserRole[] = [];
+
+  for (let i = 0; i < formData.roles.length; i++) {
+    const r = formData.roles[i];
+    _roles.push({ _id: r._id, name: r.name });
+  }
+
+  formData.roles = _roles;
+
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };

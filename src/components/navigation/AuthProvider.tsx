@@ -46,12 +46,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       loadLocalToken((local_token: string) => {
         console.log("token", local_token);
 
-        loadUser(local_token).then((res: any) => {
+        loadUser(local_token).then(async (res: any) => {
           if (res) {
-            console.log("permissions", res);
-            res.permissions = setupPermissions(res);
+            console.log("RES is", res);
+            res.permissions = setupPermissions(res.user, res.user_roles);
+            console.log("permissions", res.permissions);
             setToken(local_token);
-            setCurrentUser(res);
+
+            let newUser: IUser = {
+              _id: res.user._id,
+              notifications: res.user.notifications,
+              email: res.user.email,
+              username: res.user.username,
+              roles: res.user.roles,
+            };
+            newUser.permissions = setupPermissions(newUser, res.user_roles);
+
+            setCurrentUser(newUser);
             navigate(location.pathname + location.search);
           } else {
             localStorage.removeItem("auth_token");
@@ -77,14 +88,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
       console.log("new user", data);
       let newUser: IUser = {
-        _id: data.user._id,
-        notifications: data.user.notifications,
-        email: data.user.email,
-        username: data.user.username,
-        roles: data.user.roles,
+        _id: data.user.user._id,
+        notifications: data.user.user.notifications,
+        email: data.user.user.email,
+        username: data.user.user.username,
+        roles: data.user.user.roles,
       };
-      newUser.permissions = setupPermissions(newUser);
-      console.log("new user", newUser);
+      newUser.permissions = setupPermissions(newUser, data.user.user_roles);
       setCurrentUser(newUser);
 
       callback();
@@ -130,16 +140,20 @@ export const RequireAuth: React.FC<RequireAuthProps> = ({
   let auth = useAuth();
   let location = useLocation();
   const navigate = useNavigate();
-
   if (!auth.token) {
-    // auth.loadLocalToken((local_token: string) => {
-    //   auth.token = local_token;
-    //   navigate(location);
-    // });
     // Redirect them to the /login page, but save the current location they were
     // trying to go to when they were redirected. This allows us to send them
     // along to that page after they login, which is a nicer user experience
     // than dropping them off on the home page.
+    if (location.pathname !== "/login") {
+      return (
+        <Navigate
+          to={"/login?returnUrl=" + location.pathname + location.search}
+          state={{ from: location }}
+          replace
+        />
+      );
+    }
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

@@ -1,4 +1,11 @@
-import { Card, Chip, Divider, Grid, TextField, Typography } from "@mui/material";
+import {
+  Card,
+  Chip,
+  Divider,
+  Grid,
+  TextField,
+  Typography,
+} from "@mui/material";
 import Button from "@mui/material/Button";
 import { useEffect, useState, useContext, useRef, createRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
@@ -48,10 +55,10 @@ const emptyProject: IProject = {
   name: "",
   project_code: "",
   project_items: [],
-  start_date: new Date().toISOString().split('T')[0],
+  start_date: new Date().toISOString().split("T")[0],
   customer: null,
   iteration: 0,
-  status: 1
+  status: 1,
 };
 
 let savedProject: IProject | null = null;
@@ -61,7 +68,7 @@ const inputRefMap = {
   project_code: 1,
   start_date: 2,
   notes: 3,
-  customer: 4
+  customer: 4,
 };
 
 const inputMap: InputInfo[] = [
@@ -86,7 +93,6 @@ const inputMap: InputInfo[] = [
     ref: 4,
     validation: { required: true, genericVal: "Text" },
   },
-  
 ];
 
 export const ProjectDetails = () => {
@@ -118,6 +124,8 @@ export const ProjectDetails = () => {
   }, []);
 
   useEffect(() => {
+    console.log(project);
+
     if (project == null || projectSaved === false) return;
 
     if (JSON.stringify(savedProject) !== JSON.stringify(project)) {
@@ -206,7 +214,9 @@ export const ProjectDetails = () => {
     setProjectSaved(true);
   };
 
-  if (project == null) return null;
+  if (project == null || project === undefined) return null;
+
+  console.log("PROJECT", project);
 
   return (
     <>
@@ -225,165 +235,162 @@ export const ProjectDetails = () => {
             marginBottom: 10,
           }}
         >
-          
           <div>
-          <Button
-          sx={{ mb: 3 }}
-          aria-label="go back"
-          size="medium"
-          variant="outlined"
-          onClick={() => navigate(-1)}
-        >
-          <ArrowBackIcon fontSize="small" />
-        </Button>
-          <Grid container spacing={3}>
-          <Grid item xs={2}>
-              <TextField
-                defaultValue={project.project_code}
-                inputRef={(el: any) =>
-                  (inputRefs.current[inputRefMap.project_code] = el)
-                }
-                error={inputVisuals[inputRefMap.project_code].error}
-                helperText={inputVisuals[inputRefMap.project_code].helperText}
-                onBlur={(event) =>
-                  onInputBlur(event, inputMap[inputRefMap.project_code])
-                }
-                required={
-                  inputMap[inputRefMap.project_code].validation.required
-                }
-                spellCheck="false"
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-                size="small"
-                variant="outlined"
-                label={"Project Code"}
-              ></TextField>
-            </Grid>
-            <Grid item xs={4}>
-              <TextField
-                defaultValue={project.name}
-                inputRef={(el: any) =>
-                  (inputRefs.current[inputRefMap.name] = el)
-                }
-                error={inputVisuals[inputRefMap.name].error}
-                helperText={inputVisuals[inputRefMap.name].helperText}
-                onBlur={(event) =>
-                  onInputBlur(event, inputMap[inputRefMap.name])
-                }
-                required={inputMap[inputRefMap.name].validation.required}
-                spellCheck="false"
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-                size="small"
-                variant="outlined"
-                label={"Project Title"}
-              ></TextField>
-            </Grid>
-            <Grid item xs={2}>
-            <StandaloneAutocomplete
-                initialValue={project.customer}
-                inputRef={(el: any) =>
-                  (inputRefs.current[inputRefMap.customer] = el)
-                }
-                error={inputVisuals[inputRefMap.customer].error}
-                helperText={inputVisuals[inputRefMap.customer].helperText}
-                onChange={(event, value) => {
-                  setProject({ ...project, customer: value });
-                  // onInputBlur(event, inputMap[inputRefMap.material_type]);
-                }}
-                // onBlur={(event: any) =>
-                //   onInputBlur(event, inputMap[inputRefMap.customer])
-                // }
-                required={
-                  inputMap[inputRefMap.customer].validation.required
-                }
-                label={"Customer"}
-                letterMin={0}
-                dbOption={"customer"}
-                // getOptionLabel={(item: ICustomer) => item.code + ' | ' + item.name}
-                getOptionLabel={(item: ICustomer) => item ? item.name : ''}
-              />
-            </Grid>
-            <Grid item xs={2}></Grid>
-            <Grid item xs={2}>
+            <Button
+              sx={{ mb: 3 }}
+              aria-label="go back"
+              size="medium"
+              variant="outlined"
+              onClick={() => navigate(-1)}
+            >
+              <ArrowBackIcon fontSize="small" />
+            </Button>
+            <Grid container spacing={3}>
+              <Grid item xs={2}>
+                <TextField
+                  defaultValue={project.project_code}
+                  inputRef={(el: any) =>
+                    (inputRefs.current[inputRefMap.project_code] = el)
+                  }
+                  error={inputVisuals[inputRefMap.project_code].error}
+                  helperText={inputVisuals[inputRefMap.project_code].helperText}
+                  onBlur={(event) =>
+                    onInputBlur(event, inputMap[inputRefMap.project_code])
+                  }
+                  required={
+                    inputMap[inputRefMap.project_code].validation.required
+                  }
+                  spellCheck="false"
+                  InputLabelProps={{ shrink: true }}
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  label={"Project Code"}
+                ></TextField>
+              </Grid>
+              <Grid item xs={4}>
+                <TextField
+                  defaultValue={project.name}
+                  inputRef={(el: any) =>
+                    (inputRefs.current[inputRefMap.name] = el)
+                  }
+                  error={inputVisuals[inputRefMap.name].error}
+                  helperText={inputVisuals[inputRefMap.name].helperText}
+                  onBlur={(event) =>
+                    onInputBlur(event, inputMap[inputRefMap.name])
+                  }
+                  required={inputMap[inputRefMap.name].validation.required}
+                  spellCheck="false"
+                  InputLabelProps={{ shrink: true }}
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  label={"Project Title"}
+                ></TextField>
+              </Grid>
+              <Grid item xs={2}>
+                <StandaloneAutocomplete
+                  initialValue={project.customer}
+                  inputRef={(el: any) =>
+                    (inputRefs.current[inputRefMap.customer] = el)
+                  }
+                  error={inputVisuals[inputRefMap.customer].error}
+                  helperText={inputVisuals[inputRefMap.customer].helperText}
+                  onChange={(event, value) => {
+                    setProject({ ...project, customer: value });
+                    // onInputBlur(event, inputMap[inputRefMap.material_type]);
+                  }}
+                  // onBlur={(event: any) =>
+                  //   onInputBlur(event, inputMap[inputRefMap.customer])
+                  // }
+                  required={inputMap[inputRefMap.customer].validation.required}
+                  label={"Customer"}
+                  letterMin={0}
+                  dbOption={"customer"}
+                  // getOptionLabel={(item: ICustomer) => item.code + ' | ' + item.name}
+                  getOptionLabel={(item: ICustomer) => (item ? item.name : "")}
+                />
+              </Grid>
+              <Grid item xs={2}></Grid>
+              <Grid item xs={2}>
                 <Chip
-                //@ts-ignore
-                label={ProjectStatus[project ? project!.status - 1: 5][0]}
-                sx={{
-                  width: "100%",
-                  height: "100%",
-                  maxHeight:"40px",
-                  borderRadius: 10,
-                  fontWeight: 600,
-                }}
-                //@ts-ignore
-                color={ProjectStatus[project ? project!.status - 1: 5][1]}
-                variant="outlined"
-              />
+                  //@ts-ignore
+                  label={ProjectStatus[project ? project!.status - 1 : 5][0]}
+                  sx={{
+                    width: "100%",
+                    height: "100%",
+                    maxHeight: "40px",
+                    borderRadius: 10,
+                    fontWeight: 600,
+                  }}
+                  //@ts-ignore
+                  color={ProjectStatus[project ? project!.status - 1 : 5][1]}
+                  variant="outlined"
+                />
+              </Grid>
+              <Grid item xs={8}></Grid>
+              <Grid item xs={2}>
+                <TextField
+                  defaultValue={project.start_date.toString().split("T")[0]}
+                  inputRef={(el: any) =>
+                    (inputRefs.current[inputRefMap.start_date] = el)
+                  }
+                  error={inputVisuals[inputRefMap.start_date].error}
+                  helperText={inputVisuals[inputRefMap.start_date].helperText}
+                  onBlur={(event) =>
+                    onInputBlur(event, inputMap[inputRefMap.start_date])
+                  }
+                  required={
+                    inputMap[inputRefMap.start_date].validation.required
+                  }
+                  // onChange={(e) =>
+                  //   setProject({ ...project, start_date: e.target.value })
+                  // }
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  size="small"
+                  variant="outlined"
+                  label={"Start Date"}
+                  type={"date"}
+                ></TextField>
+              </Grid>
+              <Grid item xs={2}>
+                <TextField
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  size="small"
+                  variant="outlined"
+                  label={"End Date"}
+                  value={project.finish_date}
+                  type={"date"}
+                  onChange={(e) =>
+                    setProject({ ...project, finish_date: e.target.value })
+                  }
+                ></TextField>
+              </Grid>
+              <Grid item xs={12}>
+                <TextField
+                  defaultValue={project.notes}
+                  inputRef={(el: any) =>
+                    (inputRefs.current[inputRefMap.notes] = el)
+                  }
+                  error={inputVisuals[inputRefMap.notes].error}
+                  helperText={inputVisuals[inputRefMap.notes].helperText}
+                  onBlur={(event) =>
+                    onInputBlur(event, inputMap[inputRefMap.notes])
+                  }
+                  required={inputMap[inputRefMap.notes].validation.required}
+                  spellCheck="false"
+                  InputLabelProps={{ shrink: true }}
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  label={"Notes"}
+                  multiline
+                  rows={8}
+                ></TextField>
+              </Grid>
             </Grid>
-            <Grid item xs={8}></Grid>
-            <Grid item xs={2}>
-              <TextField
-                defaultValue={project.start_date.toString().split('T')[0]}
-                inputRef={(el: any) =>
-                  (inputRefs.current[inputRefMap.start_date] = el)
-                }
-                error={inputVisuals[inputRefMap.start_date].error}
-                helperText={inputVisuals[inputRefMap.start_date].helperText}
-                onBlur={(event) =>
-                  onInputBlur(event, inputMap[inputRefMap.start_date])
-                }
-                required={inputMap[inputRefMap.start_date].validation.required}
-                // onChange={(e) =>
-                //   setProject({ ...project, start_date: e.target.value })
-                // }
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                size="small"
-                variant="outlined"
-                label={"Start Date"}
-                type={"date"}
-              ></TextField>
-            </Grid>
-            <Grid item xs={2}>
-              <TextField
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                size="small"
-                variant="outlined"
-                label={"End Date"}
-                value={project.finish_date}
-                type={"date"}
-                onChange={(e) =>
-                  setProject({ ...project, finish_date: e.target.value })
-                }
-              ></TextField>
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                defaultValue={project.notes}
-                inputRef={(el: any) =>
-                  (inputRefs.current[inputRefMap.notes] = el)
-                }
-                error={inputVisuals[inputRefMap.notes].error}
-                helperText={inputVisuals[inputRefMap.notes].helperText}
-                onBlur={(event) =>
-                  onInputBlur(event, inputMap[inputRefMap.notes])
-                }
-                required={
-                  inputMap[inputRefMap.notes].validation.required
-                }
-                spellCheck="false"
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-                size="small"
-                variant="outlined"
-                label={"Notes"}
-                multiline
-                rows={8}
-              ></TextField>
-            </Grid>
-          </Grid>
           </div>
 
           <Card
@@ -430,14 +437,13 @@ export const ProjectDetails = () => {
         </div>
       </Card>
       <Card variant="outlined" style={{ marginTop: 16, padding: 16 }}>
-         <ProjectDetailsTable
+        <ProjectDetailsTable
           projectItems={project.project_items}
           setProjectItems={(pItems: IProjectItem[]) => {
             setProject({ ...project, project_items: pItems });
             setProjectSaved(false);
           }}
         />
-        
       </Card>
     </>
   );

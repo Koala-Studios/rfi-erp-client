@@ -48,6 +48,7 @@ import LocationListPage from "./pages/location/LocationListPage";
 import { LocationDetailPage } from "./pages/location/LocationDetailPage";
 import PERMISSIONS from "./logic/config.permissions";
 import QualityControlListPage from "./pages/quality-control/QualityControlListPage";
+import ActivityLogList from "./pages/activity-log/ActivityLogList";
 
 const mainTheme = createTheme({
   palette: {
@@ -222,6 +223,16 @@ function App() {
                   <RequireAuth permission={PERMISSIONS.users_page}>
                     <Navbar title="User Details">
                       <UserDetailPage />
+                    </Navbar>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/activity"
+                element={
+                  <RequireAuth permission={PERMISSIONS.users_page}>
+                    <Navbar title="Activity Log">
+                      <ActivityLogList />
                     </Navbar>
                   </RequireAuth>
                 }
