@@ -52,6 +52,15 @@ import BatteryFullIcon from "@mui/icons-material/BatteryFull";
 import { IInventoryStock } from "../../logic/inventory-stock.logic";
 import { TableGridColDef } from "../../components/batching/BatchingTable";
 import { isSet } from "util/types";
+
+
+
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+
 let savedBatching: IBatching | null = null;
 
 interface expBatchIngr extends IBatchingIngredient {
@@ -88,7 +97,8 @@ const addDays = (date: Date, days: number) => {
 const emptyBatching: IBatching = {
   _id: "",
   status: 1,
-  sales_id: undefined,
+  source_id: undefined,
+  source_type:undefined,
   batch_code: "",
   ingredients: [],
   notes: "",
@@ -179,6 +189,10 @@ export const BatchingDetailPage = () => {
       })
     );
   };
+
+  const handleBatchRecursive = (prod_id: string) => {
+
+  }
 
   const handleEditProductSubRow = (rowid: string, value: IInventoryStock) => {
     const index = expandableRows.findIndex((element) =>
@@ -387,7 +401,7 @@ export const BatchingDetailPage = () => {
       field: "product_id",
       headerName: "Actions",
       type: "boolean",
-      width: 65,
+      width: 125,
       align: "right",
       editable: false,
       customRender: (row: any) => {
@@ -413,6 +427,7 @@ export const BatchingDetailPage = () => {
                 maxHeight: "30px",
                 minWidth: "40px",
                 minHeight: "30px",
+                marginRight:2,
               }}
               onClick={() => {
                 handleAddRow(row["_id"]);
@@ -427,7 +442,8 @@ export const BatchingDetailPage = () => {
             >
               +
             </Button>
-          </TableCell>
+            {row['avoid_recur'] && <FormDialog product={{_id: row['product_id'], code: row['product_code'],name: row['product_name']}} batching_id={batching!._id}/>
+}          </TableCell>
         );
       },
     },
@@ -540,6 +556,7 @@ export const BatchingDetailPage = () => {
             : [],
         // has_enough: true,
         remaining_amount: item.required_amount,
+        avoid_recur: item.avoid_recur
       };
     });
     return newIng;
@@ -694,6 +711,7 @@ export const BatchingDetailPage = () => {
           ...row.sub_rows,
         ],
         total_used_amount: row.total_used_amount,
+        avoid_recur: row.avoid_recur
       };
     });
     console.log(ingredients, "TEST");
@@ -921,7 +939,7 @@ export const BatchingDetailPage = () => {
                   readOnly={batching.status != batchingStatus.DRAFT}
                   label={"Product"}
                   letterMin={0}
-                  dbOption={"approved-product"}
+                  dbOption={"approved-product-all"}
                   getOptionLabel={(item: IProduct) =>
                     item.product_code
                       ? item.product_code + " | " + item.name
@@ -1012,14 +1030,14 @@ export const BatchingDetailPage = () => {
                   variant="outlined"
                 />
               </Grid>
-              {batching.sales_id != undefined && (
+              {batching.source_id != undefined && (
                 <Grid item xs={2}>
                   <Button
                     aria-label="go back"
                     size="medium"
                     variant="outlined"
                     onClick={() =>
-                      navigate("/sales-orders/" + batching!.sales_id)
+                      navigate("/sales-orders/" + batching!.source_type + '/' + batching!.source_id)
                     }
                   >
                     View Source
@@ -1102,7 +1120,7 @@ export const BatchingDetailPage = () => {
       </Card>
 
       {batching!.status >= 2 && (
-        <Card sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
+        <Card sx={{ mt: 2, padding: 2, overflowY: "hidden", height: "calc(100%)" }}>
           <BatchingDataTable
             rows={expandableRows!}
             columns={expandableColumns}
@@ -1141,3 +1159,94 @@ const CustomTableAdd = (handleAddRow: any, row_id: string) => {
     </TableCell>
   );
 };
+
+
+
+export default function FormDialog(props:{product:{_id:string,code:string,name:string,}, batching_id:string}) {
+  const [open, setOpen] = React.useState(false);
+  const [quantity, setQuantity] = React.useState(0);
+  const navigate = useNavigate();
+  const auth = React.useContext(AuthContext);
+  const batching:IBatching = {
+    _id: "",
+    status: 1,
+    source_id:props.batching_id,
+    source_type:'batching',
+    batch_code: "test"+Math.random(),
+    ingredients: [],
+    notes: "",
+    product_code: props.product.code,
+    name: props.product.name,
+    product_id: props.product._id,
+    quantity: quantity,
+    date_created: new Date().toISOString().split("T")[0],
+    date_needed: addDays(new Date(), 5).toISOString().split("T")[0],
+  }
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleConfirm = async () => {
+      const newBatchingId = await createBatching(auth.token, batching!);
+      handleClose();
+      if (newBatchingId) {
+        let handle = window.open('../batching/'+newBatchingId,'_blank');
+        handle?.blur();
+        window.focus();
+        // setBatching({ ...batching!, _id: newBatchingId });
+      } else {
+          throw Error("Recursive Batch Creation Error");
+      }
+  }
+  const handleClose = () => {
+    setOpen(false);
+  };
+
+  return (
+    <React.Fragment>
+            <Button
+        variant="outlined"
+        color="info"
+        size="small"
+        style={{
+          backgroundColor: "#1144ff15",
+          fontSize: "19px",
+          maxWidth: "40px",
+          maxHeight: "30px",
+          minWidth: "40px",
+          minHeight: "30px",
+        }}
+        onClick={() => {
+          // handleBatchRecursive(row["product_id"]);
+          handleClickOpen()
+          console.log(props.product._id, 'TEST')
+        }}
+      >
+        B
+      </Button>
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>Create {props.product.code} Batch</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            How much would you like to produce?
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="Qty"
+            type="number"
+            variant="standard"
+            value={quantity}
+            onChange={(e)=>{setQuantity(parseFloat(e.target.value))}}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose}>Cancel</Button>
+          <Button onClick={handleConfirm}>Confirm</Button>
+        </DialogActions>
+      </Dialog>
+
+    </React.Fragment>
+  );
+}

@@ -21,7 +21,8 @@ export interface IBatching {
   product_id: string | null;
   product_code: string;
   name: string;
-  sales_id: string | undefined;
+  source_id: string | undefined;
+  source_type: string | undefined;
   quantity: number;
   date_created: string;
   date_needed: string;
@@ -50,7 +51,7 @@ export interface IBatchingIngredient {
   used_containers: IBatchingContainer[];
   used_amount: number;
   total_used_amount: number;
-  // has_enough: boolean;
+  avoid_recur: boolean;
 }
 
 const api = axios.create({
