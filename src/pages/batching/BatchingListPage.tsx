@@ -12,6 +12,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import DataFilter from "../../components/utils/DataFilter";
+import RunningWithErrorsIcon from '@mui/icons-material/RunningWithErrors';
 
 //label,field,type
 const filterArray: FilterElement[] = [
@@ -48,6 +49,9 @@ const BatchingListPage = () => {
 
   const columns: GridColDef[] = [
     // { field: "id", headerName: "ID", width: 300 },
+    {field: "has_enough", headerName: 'Inv', width: 30, renderCell: (params: GridRenderCellParams<number>) => (
+      <div> {params.row.has_enough == false ? <RunningWithErrorsIcon style={{color:params.row.status === 1 ? 'orange' : 'red'}}></RunningWithErrorsIcon> :  ''}</div>
+    ),},
     { field: "date", headerName: "Date Created", width: 120 },
     { field: "date_needed",  headerName: "Date Due", type: "date" },
     { field: "product_code", headerName: "Product Code", width: 120 },
@@ -106,7 +110,8 @@ const BatchingListPage = () => {
           quantity: batch.quantity,
           product_code: batch.product_code,
           name: batch.name,
-          status: batch.status
+          status: batch.status,
+          has_enough: batch.has_enough
         };
       });
       setDataOptions({ rows: newRows, listOptions: list! });

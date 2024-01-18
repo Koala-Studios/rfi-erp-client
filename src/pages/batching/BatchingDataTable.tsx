@@ -174,12 +174,16 @@ const CustomTableCell = (props: any) => {
             defaultValue={props.row[props.column.field]}
             style={{ height: 19, margin: 0, padding: 0 }}
             name={props.name ?? ""}
-            onChange={(e) =>
+            type={props.column.type}
+            inputProps={props.column.type === 'number' ? { min: 0 } : {}}
+            
+            onChange={(e) =>{
+              console.log('aaaaa', e.target.value);
               props.handleEditCell(
                 props.row._id,
                 props.column.field,
                 e.target.value
-              )
+              )}
             }
           />
         ) : (

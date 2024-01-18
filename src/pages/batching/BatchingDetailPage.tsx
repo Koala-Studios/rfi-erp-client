@@ -245,10 +245,10 @@ export const BatchingDetailPage = () => {
       savedBatching = emptyBatching;
       setBatching(emptyBatching);
     } else {
-      getBatching(auth.token, id!).then((p) => {
-        const tempBatching = { ...p! };
+      getBatching(auth.token, id!).then((b) => {
+        const tempBatching = { ...b! };
         savedBatching = tempBatching;
-        setBatching(p!);
+        setBatching(b!);
         // newRows = batching!.ingredients.map((item) => { //!check soon for further changes
         //   return {
         //     _id: item._id ? item._id : new ObjectID().toHexString(),
@@ -265,8 +265,8 @@ export const BatchingDetailPage = () => {
         //     remaining_amount: item.batchingd_amount - item.received_amount,
         //   };
         // });
-        setExpandableRows(reformatIngredients(p!));
-        setReceiveMode(p!.status <= 3);
+        setExpandableRows(reformatIngredients(b!));
+        setReceiveMode(b!.status <= 3);
         // setBatchingSaved(true);
       });
     }
@@ -316,7 +316,7 @@ export const BatchingDetailPage = () => {
         params.required_amount
           ? params.required_amount.toFixed(4) +
             (params.required_amount < 0.1
-              ? "(" + params.required_amount.toFixed(4) * 1000 + "g)"
+              ? "(" + (params.required_amount.toFixed(4) * 1000).toFixed(1) + "g)"
               : "")
           : params.remaining_amount,
     },
@@ -342,8 +342,8 @@ export const BatchingDetailPage = () => {
       valueGetter: (params: any) =>
         params.remaining_amount
           ? params.remaining_amount.toFixed(4) +
-            (params.remaining_amount < 0.1
-              ? "(" + params.remaining_amount.toFixed(4) * 1000 + "g)"
+            (params.remaining_amount < 0.1 && params.remaining_amount.toFixed(4) > 0
+              ? "(" + (params.remaining_amount.toFixed(4) * 1000).toFixed(1) + "g)"
               : "")
           : params.remaining_amount,
     },
@@ -359,8 +359,9 @@ export const BatchingDetailPage = () => {
             width={200}
             dropDownWidth={260}
             initialValue={row.lot_number}
+            searchOptionalVar={row.product_id}
             // readOnly={batching!.status === 6 || purchase!.status === 4}
-            dbOption="container"
+            dbOption="container-specific"
             handleEditRow={handleEditProductRow}
             rowParams={{ row: row }}
             letterMin={0}
@@ -386,6 +387,7 @@ export const BatchingDetailPage = () => {
       field: "confirm_lot_number",
       headerName: "Confirm Lot #",
       width: 120,
+      type:'string',
       align: "center",
       editable: true,
     },
@@ -457,12 +459,14 @@ export const BatchingDetailPage = () => {
       sortable: false,
       filterable: false,
       customRender: (row: any) => (
-        <TableCell sx={{ width: 200, p: 0 }}>
+        <TableCell sx={{ width: 180, p: 0 }}>
           <TableAutocomplete
             width={200}
+            dropDownWidth={260}
             initialValue={row.lot_number}
+            searchOptionalVar={row.product_id} //specific container dropdown
             // readOnly={batching!.status === 6 || purchase!.status === 4}
-            dbOption="container"
+            dbOption="container-specific"
             handleEditRow={handleEditProductSubRow}
             rowParams={{ row: row }}
             letterMin={0}
@@ -492,7 +496,7 @@ export const BatchingDetailPage = () => {
       field: "id",
       headerName: "Actions",
       align: "left",
-      width: 65,
+      width: 125,
       customRender: (row: any) => {
         return (
           <TableCell
@@ -548,14 +552,16 @@ export const BatchingDetailPage = () => {
           item.used_containers.length > 0
             ? item.used_containers[0].confirm_lot_number
             : "",
-        used_amount: item.used_amount,
+        used_amount: item.used_containers.length > 0
+        ? item.used_containers[0].used_amount
+        : 0,
         total_used_amount: item.total_used_amount,
         sub_rows:
           item.used_containers.length > 1
             ? item.used_containers.slice(1, undefined)
             : [],
         // has_enough: true,
-        remaining_amount: item.required_amount,
+        remaining_amount: item.required_amount - item.total_used_amount,
         avoid_recur: item.avoid_recur
       };
     });
@@ -568,6 +574,8 @@ export const BatchingDetailPage = () => {
         if (_batching) {
           savedBatching = _batching;
           setBatching(_batching);
+          setExpandableRows(reformatIngredients(_batching));
+          console.log(_batching, 'TESTING');
           setBatchingSaved(true);
           // handleGenerateBatchingBOM();
         } else {
@@ -815,10 +823,12 @@ export const BatchingDetailPage = () => {
 
     //send new batching to server
     if (id === "new") {
-      const newBatchingId = await createBatching(auth.token, batching!);
-      if (newBatchingId) {
-        navigate(`/batching/${newBatchingId}`, { replace: true });
-        setBatching({ ...batching!, _id: newBatchingId });
+      const _batching = await createBatching(auth.token, batching!);
+      if (_batching) {
+        navigate(`/batching/${_batching._id}`, { replace: true });
+        setBatching(_batching);
+        setExpandableRows(reformatIngredients(_batching));
+        console.log(_batching, 'Testing new creation')
       }
     } else {
       //Recompile with proper format to save
@@ -868,7 +878,7 @@ export const BatchingDetailPage = () => {
               aria-label="go back"
               size="medium"
               variant="outlined"
-              onClick={() => navigate(-1)}
+              onClick={() => navigate('./../')}
             >
               <ArrowBackIcon
                 fontSize="small"
@@ -1118,8 +1128,7 @@ export const BatchingDetailPage = () => {
           </Card>
         </div>
       </Card>
-
-      {batching!.status >= 2 && (
+      {batching!.status >= 1 && (
         <Card sx={{ mt: 2, padding: 2, overflowY: "hidden", height: "calc(100%)" }}>
           <BatchingDataTable
             rows={expandableRows!}

@@ -145,12 +145,14 @@ export const getStockItem = async (
 
 export const lookupInventoryStock = async (
   //TODO: Not finished
-  search_value: string
+  search_value: string,
+  product_id?: string
 ): Promise<IInventoryStock[] | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       search_value,
+      product_id,
     },
   };
 

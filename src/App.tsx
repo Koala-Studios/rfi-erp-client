@@ -72,9 +72,9 @@ function App() {
         autoHideDuration={2000}
         maxSnack={4}
       >
-        <BrowserRouter>
+        <BrowserRouter >
           <AuthProvider>
-            <Routes>
+            <Routes >
               <Route path="/" element={<SignInPage />} />
               <Route path="/login" element={<SignInPage />} />
 

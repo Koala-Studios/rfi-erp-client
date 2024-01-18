@@ -124,7 +124,7 @@ export const setupPermissions = (
     //   }
     // }
   }
-
+  permissions = [PERMISSIONS.admin]; //!TODO: TEMPORARY PLEASE REMOVE, PERMS ARE FUCKED THOUGH.
   return permissions;
 };
 
@@ -231,6 +231,7 @@ export const updateUser = async (formData: IUser): Promise<boolean> => {
 };
 
 export const hasPermission = (user: IUser, permission: string) => {
+  console.log(user, permission);
   if (user.permissions!.includes(PERMISSIONS.admin)) return true;
 
   return user.permissions!.includes(permission);

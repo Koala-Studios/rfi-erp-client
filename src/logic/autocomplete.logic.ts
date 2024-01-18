@@ -27,8 +27,10 @@ export const lookup = async (
     | "product-type-raw"
     | "location"
     | "container"
+    | "container-specific"
     | "roles",
-  letterMin: number
+  letterMin: number,
+  variable?: any
 ) => {
   if (query.length < letterMin) return [];
   //TODO: CONVERT TO SWITCH STATEMENT LOL..
@@ -68,6 +70,8 @@ export const lookup = async (
     return await lookupLocation(query);
   } else if (dbOption === "container") {
     return await lookupInventoryStock(query);
+  } else if (dbOption === "container-specific") {
+    return await lookupInventoryStock(query, variable);
   } else if (dbOption === "roles") {
     return await lookupRoles(query);
   }

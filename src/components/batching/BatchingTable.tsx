@@ -8,6 +8,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Tooltip,
 } from "@mui/material";
 import { GridColDef } from "@mui/x-data-grid";
 import { IListOptions } from "../../logic/utils";
@@ -34,7 +35,36 @@ export const ExpandableRow = (props: {
   handleAddRow: (row_id: string) => void;
 }) => {
   const [open, setOpen] = React.useState(false);
-
+  const getQtyColor = (has_enough:boolean) => {
+    switch(has_enough) {
+      case false:
+        return "#EEB9BA";
+      case true:
+        return "#a1eb7c";
+    }
+    /*Explanation:
+    0: not enough,
+    1: enough,
+    2: enough with incoming,
+    3: enough for this, but not for all,
+    4: enough for this, but not for all with incoming
+    */
+  }
+  const getQtyToolTip = (has_enough:boolean) => {
+    switch(has_enough) {
+      case false:
+        return "Not Enough";
+      case true:
+        return "Enough";
+    }
+    /*Explanation:
+    0: not enough,
+    1: enough,
+    2: enough with incoming,
+    3: enough for this, but not for all,
+    4: enough for this, but not for all with incoming
+    */
+  }
   useEffect(() => {
     window.addEventListener("BatchingRowAdd", (e: any) => {
       if (e.detail._id === props.row["_id"]) {
@@ -66,14 +96,17 @@ export const ExpandableRow = (props: {
         }}
         key={props.row._id}
       >
-        <TableCell sx={{ p: 0, mH: 40 }} height={35} width={50}>
+         <Tooltip title={getQtyToolTip(props.row.has_enough)} TransitionProps={{ timeout: 350 }} placement="right">
+        <TableCell sx={{ p: 0, mH: 40,
+              backgroundColor: getQtyColor(props.row.has_enough) }} height={35} width={50}>
+         
           <IconButton
             aria-label="expand row"
             size="small"
             onClick={() => setOpen(!open)}
             // style={{ display: /*!props.row.sub_rows || props.row.sub_rows.length === 0 ? 'none' : */'block' }}
             style={{
-              marginLeft: 10,
+              marginLeft: 5,
               width: 40,
               display:
                 !props.row.sub_rows || props.row.sub_rows.length === 0
@@ -84,6 +117,7 @@ export const ExpandableRow = (props: {
             {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
           </IconButton>
         </TableCell>
+        </Tooltip>
         {props.columns.map((col: TableGridColDef, index) => {
           if (col.customRender) {
             return <>{col.customRender(props.row)}</>;

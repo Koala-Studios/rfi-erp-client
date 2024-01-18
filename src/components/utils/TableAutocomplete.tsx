@@ -21,7 +21,8 @@ interface Props {
     | "product-type-mat"
     | "location"
     | "product-type-raw"
-    | "container";
+    | "container"
+    | "container-specific";
   handleEditRow: (id: string, newItem: any) => void;
   readOnly?: boolean;
   rowParams: any;
@@ -29,6 +30,7 @@ interface Props {
   letterMin: number;
   getOptionLabel: (option: any) => any;
   width?: number;
+  searchOptionalVar?: any;
   dropDownWidth?: number;
 }
 
@@ -40,6 +42,7 @@ const TableAutocomplete: React.FC<Props> = ({
   dbOption,
   width = 340,
   dropDownWidth = 450,
+  searchOptionalVar = null,
   getOptionLabel,
   readOnly = false,
 }) => {
@@ -51,12 +54,12 @@ const TableAutocomplete: React.FC<Props> = ({
     event: React.SyntheticEvent<Element, Event>,
     value: string
   ) => {
-    lookup(value.toUpperCase(), dbOption, letterMin).then((result) => {
+    lookup(value.toUpperCase(), dbOption, letterMin,searchOptionalVar).then((result) => {
       setOptionList(result);
     });
   };
   const handleSelect = async (value: string) => {
-    lookup(value.toUpperCase(), dbOption, letterMin).then((result) => {
+    lookup(value.toUpperCase(), dbOption, letterMin, searchOptionalVar).then((result) => {
       setOptionList(result);
     });
   };
@@ -110,7 +113,7 @@ const TableAutocomplete: React.FC<Props> = ({
               }}
               placeholder={initialValue}
               {...params}
-              InputProps={{ sx: { borderRadius: 0, maxHeight: "45px" } }}
+              // InputProps={{ sx: { borderRadius: 0, maxHeight: "45px" } }}
             />
           );
         }}

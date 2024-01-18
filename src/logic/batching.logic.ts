@@ -30,6 +30,7 @@ export interface IBatching {
   batch_code: string;
   status: number;
   notes: string;
+  has_enough?: boolean;
 }
 
 export interface IBatchingContainer {
@@ -52,6 +53,7 @@ export interface IBatchingIngredient {
   used_amount: number;
   total_used_amount: number;
   avoid_recur: boolean;
+  has_enough?: boolean;
 }
 
 const api = axios.create({
@@ -146,7 +148,7 @@ export const updateBatchingOrder = async (
 export const createBatching = async (
   token: string,
   formData: IBatching
-): Promise<string | null> => {
+): Promise<IBatching | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
@@ -159,7 +161,7 @@ export const createBatching = async (
       console.log(res);
       if (res.status === apiStatus.CREATED) {
         console.log(res.data);
-        rtn = res.data;
+        rtn = res.data.res;
       }
     })
     .catch((err) => {

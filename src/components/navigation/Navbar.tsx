@@ -51,7 +51,9 @@ import CategoryIcon from "@mui/icons-material/Category";
 import PERMISSIONS from "../../logic/config.permissions";
 import { hasPermission } from "../../logic/user.logic";
 import LocationOnIcon from "@mui/icons-material/LocationOn";
+import AssessmentIcon from '@mui/icons-material/Assessment';
 import {
+  Cake,
   ExpandLess,
   ExpandMore,
   FactCheck,
@@ -63,8 +65,9 @@ import ValidateForm from "../utils/ValidateForm";
 import { Collapse } from "@mui/material";
 import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import DescriptionIcon from "@mui/icons-material/Description";
+import AutoAwesomeMosaicIcon from '@mui/icons-material/AutoAwesomeMosaic';
 
-const drawerWidth = 190;
+const drawerWidth = 220;
 
 interface NavItem {
   text: string;
@@ -82,31 +85,58 @@ let LinkItems: NavItem[] = [
     permission: PERMISSIONS.project_page,
   },
   {
+    text: "Forecast",
+    link: "/forecast",
+    icon: <AssessmentIcon></AssessmentIcon>,
+    permission: PERMISSIONS.forecast_page,
+  },
+  {
     text: "Batching",
     link: "/batching",
     icon: <HvacIcon></HvacIcon>,
     permission: PERMISSIONS.batching_page,
   },
   {
-    // text: "Inv Containers",
-    text: "Inventory",
-    link: "/inventory-stock",
-    // icon: <Battery90Icon></Battery90Icon>,
-    icon: <StorageIcon></StorageIcon>,
-    permission: PERMISSIONS.inventorystock_page,
+    text: "Inv Dropdown",
+    icon: <AdminPanelSettingsIcon></AdminPanelSettingsIcon>,
+    permission: PERMISSIONS.users_page,
+    children: [
+      {
+        // text: "Inv Containers",
+        text: "Inventory",
+        link: "/inventory-stock",
+        // icon: <Battery90Icon></Battery90Icon>,
+        icon: <StorageIcon></StorageIcon>,
+        permission: PERMISSIONS.inventorystock_page,
+      },
+      {
+        text: "Materials",
+        link: "/materials",
+        icon: <OilBarrelIcon></OilBarrelIcon>,
+        permission: PERMISSIONS.materials_page,
+      },
+      {
+        text: "Products",
+        link: "/products",
+        icon: <AttachMoneyIcon></AttachMoneyIcon>,
+        permission: PERMISSIONS.products_page,
+      },
+      {
+        text: "Movement Center",
+        link: "/move-inventory",
+        icon: <DescriptionIcon></DescriptionIcon>,
+        permission: PERMISSIONS.users_page,
+      },
+      {
+        text: "Stock Count",
+        link: "/stock-counts",
+        icon: <ContentPasteIcon></ContentPasteIcon>,
+        permission: PERMISSIONS.stockcount_page,
+      },
+    ],
   },
-  {
-    text: "Materials",
-    link: "/materials",
-    icon: <OilBarrelIcon></OilBarrelIcon>,
-    permission: PERMISSIONS.materials_page,
-  },
-  {
-    text: "Products",
-    link: "/products",
-    icon: <AttachMoneyIcon></AttachMoneyIcon>,
-    permission: PERMISSIONS.products_page,
-  },
+
+
   {
     text: "Development",
     link: "/development",
@@ -119,12 +149,8 @@ let LinkItems: NavItem[] = [
     icon: <FactCheck></FactCheck>,
     permission: PERMISSIONS.qc_page,
   },
-  {
-    text: "Forecast",
-    link: "/forecast",
-    icon: <BiotechIcon></BiotechIcon>,
-    permission: PERMISSIONS.forecast_page,
-  },
+
+
   {
     text: "Purchase Orders",
     link: "/purchase-orders",
@@ -137,12 +163,7 @@ let LinkItems: NavItem[] = [
     icon: <ShoppingBasketIcon></ShoppingBasketIcon>,
     permission: PERMISSIONS.salesorders_page,
   },
-  {
-    text: "Stock Count",
-    link: "/stock-counts",
-    icon: <ContentPasteIcon></ContentPasteIcon>,
-    permission: PERMISSIONS.stockcount_page,
-  },
+
   {
     text: "Customers",
     link: "/customers",
@@ -155,17 +176,37 @@ let LinkItems: NavItem[] = [
     icon: <PersonPinCircleIcon></PersonPinCircleIcon>,
     permission: PERMISSIONS.suppliers_page,
   },
+
   {
-    text: "Product Types",
-    link: "/product-types",
-    icon: <CategoryIcon></CategoryIcon>,
-    permission: PERMISSIONS.producttypes_page,
-  },
-  {
-    text: "Stock Locations",
-    link: "/locations",
-    icon: <LocationOnIcon></LocationOnIcon>,
-    permission: PERMISSIONS.inventorystock_page,
+    text: "General Setup",
+    icon: <AdminPanelSettingsIcon></AdminPanelSettingsIcon>,
+    permission: PERMISSIONS.users_page,
+    children: [
+      {
+        text: "Product Types",
+        link: "/product-types",
+        icon: <CategoryIcon></CategoryIcon>,
+        permission: PERMISSIONS.producttypes_page,
+      },
+      {
+        text: "Stock Locations",
+        link: "/locations",
+        icon: <LocationOnIcon></LocationOnIcon>,
+        permission: PERMISSIONS.inventorystock_page,
+      },
+      {
+        text: "Applications",
+        link: "/locations",
+        icon: <Cake></Cake>,
+        permission: PERMISSIONS.inventorystock_page,
+      },
+      {
+        text: "Container Sizes",
+        link: "/locations",
+        icon: <AutoAwesomeMosaicIcon></AutoAwesomeMosaicIcon>,
+        permission: PERMISSIONS.inventorystock_page,
+      },
+    ],
   },
   {
     text: "Admin",
@@ -283,7 +324,7 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
   return (
     <Box sx={{ display: "flex" }}>
       <CssBaseline />
-      <AppBar position="fixed" open={open}>
+      <AppBar position="fixed"  open={open}>
         <Toolbar style={{ minHeight: 55 }}>
           <IconButton
             color="inherit"
@@ -405,10 +446,12 @@ export const Navbar: React.FC<Props> = ({ title, children }) => {
         </DrawerHeader>
 
         <List
+          
           sx={{
-            backgroundColor: "#020818",
+            backgroundColor: "#051235",
+            // overflow:'hidden',
             color: "white",
-            height: "100%",
+            height: "200%",
             paddingTop: 0,
           }}
         >
@@ -471,6 +514,8 @@ const SideNavCollapsable: React.FC<SideNavItemProps> = ({
         sx={{
           background: "#020818",
           transition: "400ms",
+          msOverflowStyle: 'none',
+          scrollbarWidth: 'none',  /* Firefox */
           "&:hover": {
             background: "#061e3d",
           },
@@ -481,6 +526,8 @@ const SideNavCollapsable: React.FC<SideNavItemProps> = ({
           // borderRadius: 1,
           pt: 0.5,
           pb: 0.5,
+          mt: 0.5,
+          mr: 0.5,
           cursor: "pointer",
         }}
         onClick={handleClick}
@@ -499,7 +546,7 @@ const SideNavCollapsable: React.FC<SideNavItemProps> = ({
         />
         {open ? <ExpandLess /> : <ExpandMore />}
       </ListItem>
-      <Collapse in={open} timeout="auto" unmountOnExit>
+      <Collapse sx={{backgroundColor:'#343f6c'}} in={open} timeout="auto" unmountOnExit>
         {nav_item.children!.map((item, index) => (
           <SideNavItem location={location} nav_item={item} key={index} />
         ))}
@@ -525,8 +572,9 @@ const SideNavItem: React.FC<SideNavItemProps> = ({ nav_item, location }) => {
           },
           width: "unset",
           margin: 0.5,
-          mb: 0,
-          mt: 1,
+          mb: 0.75,
+          mt: 0.75,
+          mr: 0,
           borderRadius: 1,
           pt: 0.5,
           pb: 0.5,
