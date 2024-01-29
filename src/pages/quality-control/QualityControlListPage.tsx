@@ -5,14 +5,19 @@ import {
   GridRenderCellParams,
   GridValueGetterParams,
 } from "@mui/x-data-grid";
-import { listProducts } from "../../logic/product.logic";
+import { listQualityControl } from "../../logic/quality-control.logic";
 import { AuthContext } from "../../components/navigation/AuthProvider";
-import { Button, Card } from "@mui/material";
+import { Button, Card, Chip } from "@mui/material";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
 import { FilterElement, IListData } from "../../logic/utils";
 import DataFilter from "../../components/utils/DataFilter";
-
+import VisibilityIcon from '@mui/icons-material/Visibility';
 const QualityControlListPage = () => {
+  const orderStatus = 
+    [['PENDING','warning'],['FAILED','error'],['APPROVED','success'], ['ERROR','info']]
+  ;
+
+
   const navigate = useNavigate();
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -23,41 +28,64 @@ const QualityControlListPage = () => {
       field: "product_code",
       type: "text",
     },
-    { label: "Product Name", field: "name", type: "text"},
-    { label: "Product Alias", field: "aliases", type: "text"},
-    { label: "Regulatory", field: "regulatory", type: "text"}, // Look at regulatory obj
-    { label: "Dietary", field: "dietary", type: "text"},
-    { label: "Product Type", field: "product_type", type: "text"},
-    { label: "Date Created", field: "date_created", type: "date"},
-    { label: "Solid", field: "is_solid", type: "text"},
-    { label: "Quantity", field: "quantity", type: "number", regexOption: null },
+    { label: "Product Name", field: "product_name", type: "text"},
+    { label: "Lot Number", field: "lot_number", type: "text"},
+    { label: "Request Source", field: "request_source", type: "text"},
+    { label: "Request Type", field: "request_type", type: "text"},
+    { label: "Created Date", field: "created_date", type: "date"},
+    { label: "Completed Date", field: "completed_date", type: "text"},
   
   ];
   const columns: GridColDef[] = [
     // { field: "id", headerName: "ID", width: 300 },
     { field: "product_code", headerName: "Product Code", width: 120 },
-    { field: "name", headerName: "Product Name", width: 300 },
+    { headerName: "Lot Number", field: "lot_number", type: "text", width:120},
+    { field: "product_name", headerName: "Product Name", width: 300 },
     {
-      field: "approved_version",
-      headerName: "Appr Version",
-      width: 100,
-      align: 'center'
+      field: "status",
+      headerName: "Status",
+      width: 120,
+      align: 'center',
+      renderCell: (params: GridRenderCellParams<number>) => (
+        <Chip
+          label={orderStatus[params.value ?? 3][0]}
+          sx={{
+            fontWeight: 600,
+          }}
+          //@ts-ignore
+          color={orderStatus[params.value ?? 3][1]}
+          variant="outlined"
+        />
+      ),
     },
-    { field: "cost", headerName: "Cost/KG", width: 100, align: "right"},
-    { field: "on_hand", headerName: "On Hand", width: 100, align: "right" },
-    { field: "ordered", headerName: "Ordered", width: 100, align: "right" },
+    { field: "request_type", headerName: "Type", width: 120, align: "right"},
+    { field: "created_date", headerName: "Created Date", width: 100, align: "right" },
+    { field: "completed_date", headerName: "Comp Date", width: 100, align: "right" },
     {
-      field: "quarantined",
-      headerName: "Quarantined",
-      width: 100,
-      align: "right",
+      field: "request_source",
+      headerName: "Src",
+      width: 35,
+      align: 'center',
+      renderCell: (params: GridRenderCellParams<Date>) => (
+        <strong>
+          <Button
+            variant="contained"
+            color="secondary"
+            size="small"
+            onClick={() =>
+              navigate(`/products/${params.value}`, { replace: false }) //TODO: make this work properly lol.
+            }
+          >
+            <VisibilityIcon></VisibilityIcon>
+          </Button>
+        </strong>
+      ),
     },
-    { field: "allocated", headerName: "Allocated", width: 100, align: "right" },
     {
       field: "id",
       headerName: "Actions",
       align: "left",
-      width: 250,
+      width: 150,
       renderCell: (params: GridRenderCellParams<Date>) => (
         <strong>
           <Button
@@ -78,44 +106,23 @@ const QualityControlListPage = () => {
   const auth = React.useContext(AuthContext);
 
   React.useEffect(() => {
-    listProducts(searchParams ,filterArray, true, true).then((list) => {
+    listQualityControl(searchParams ,filterArray).then((list) => {
       const newRows = list!.docs.map((product) => {
         return {
           id: product._id,
-          product_code: product.product_code,
-          name: product.name,
-          approved_version: product.approved_version,
-          cost: `$${product.cost.toFixed(2)}`,
-          on_hand: product.on_hand ? product.on_hand : 0,
-          ordered: product.ordered ? product.ordered : 0,
-          quarantined: product.quarantined ? product.quarantined : 0,
-          allocated: product.allocated ? product.allocated : 0,
+          ...product
         };
       });
       setDataOptions({ rows: newRows, listOptions: list! });
     });
   }, [location.key]);
-  const createNewProduct = () => {
-    navigate(`/products/new`, { replace: false });
-  };
-
   if (dataOptions == null) return null;
 
   return (
     <>
-            <div
-          style={{
-            display: "flex",
-            justifyContent: "normal",
-            flexWrap:'wrap',
-            maxWidth:'100vw',
-            gap: 20,
-            marginBottom: 10,
-          }}
-        >
       <Card
         variant="outlined"
-        sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9", width:'42vw', height:'40vh' }}
+        sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
       >
         <DataFilter filters={filterArray}></DataFilter>
         {/* <Button variant="contained" color="primary" onClick={createNewProduct}>
@@ -129,56 +136,6 @@ const QualityControlListPage = () => {
       ></DataTable>
       
       </Card>
-      <Card
-        variant="outlined"
-        sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9", width:'42vw', height:'40vh' }}
-      >
-        <DataFilter filters={filterArray}></DataFilter>
-        {/* <Button variant="contained" color="primary" onClick={createNewProduct}>
-          + New Product
-        </Button> */}
-      <DataTable
-        rows={dataOptions.rows}
-        columns={columns}
-        auto_height={true}
-        listOptions={dataOptions.listOptions}
-      ></DataTable>
-      
-      </Card>
-      <Card
-        variant="outlined"
-        sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9", width:'42vw', maxHeight:'40vh' }}
-      >
-        <DataFilter filters={filterArray}></DataFilter>
-        {/* <Button variant="contained" color="primary" onClick={createNewProduct}>
-          + New Product
-        </Button> */}
-      <DataTable
-        rows={dataOptions.rows}
-        columns={columns}
-        auto_height={true}
-        listOptions={dataOptions.listOptions}
-      ></DataTable>
-      
-      </Card>
-      <Card
-        variant="outlined"
-        sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9", width:'42vw', maxHeight:'40vh' }}
-      >
-        <DataFilter filters={filterArray}></DataFilter>
-        {/* <Button variant="contained" color="primary" onClick={createNewProduct}>
-          + New Product
-        </Button> */}
-      <DataTable
-        rows={dataOptions.rows}
-        
-        columns={columns}
-        auto_height={true}
-        listOptions={dataOptions.listOptions}
-      ></DataTable>
-      
-      </Card>
-      </div>
     </>
   );
 };
