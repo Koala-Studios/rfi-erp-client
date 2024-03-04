@@ -117,6 +117,32 @@ export const listInventoryContainers = async (
   return list;
 };
 
+export const listLocationContainers = async (
+  location_id: string
+): Promise<IInventoryStock[] | null> => {
+  const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+    params: {
+      location_id,
+    },
+  };
+
+  let list: IListOptions | null = null;
+
+  await api
+    .get("/list-location-containers", config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        list = res.data.res;
+      }
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+
+  return list;
+};
+
 export const getStockItem = async (
   id: string
 ): Promise<IInventoryStock | null> => {
@@ -169,4 +195,35 @@ export const lookupInventoryStock = async (
       console.log(err);
     });
   return list;
+};
+
+export const moveBulkContainers = async (
+  container_ids: string[],
+  location: { _id: string; code: string }
+): Promise<boolean> => {
+  const config = {
+    headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+    params: {
+      container_ids: container_ids,
+    },
+  };
+
+  let result: boolean = false;
+
+  await api
+    .post("/move-bulk", location, config)
+    .then((res) => {
+      if (res.status === apiStatus.OK) {
+        result = res.data.res;
+      }
+      window.dispatchEvent(
+        new CustomEvent("NotificationEvent", {
+          detail: { text: res.data.message },
+        })
+      );
+    })
+    .catch((err) => {
+      console.log(err);
+    });
+  return result;
 };

@@ -60,7 +60,7 @@ const QualityControlListPage = () => {
     },
     { field: "request_type", headerName: "Type", width: 120, align: "right"},
     { field: "created_date", headerName: "Created Date", width: 100, align: "right" },
-    { field: "completed_date", headerName: "Comp Date", width: 100, align: "right" },
+    { field: "completed_date", headerName: "Complete Date", width: 120, align: "right" },
     {
       field: "request_source",
       headerName: "Src",
@@ -72,11 +72,12 @@ const QualityControlListPage = () => {
             variant="contained"
             color="secondary"
             size="small"
+            style={{borderRadius:12}}
             onClick={() =>
               navigate(`/products/${params.value}`, { replace: false }) //TODO: make this work properly lol.
             }
           >
-            <VisibilityIcon></VisibilityIcon>
+            <VisibilityIcon ></VisibilityIcon>
           </Button>
         </strong>
       ),
@@ -93,10 +94,10 @@ const QualityControlListPage = () => {
             color="primary"
             size="small"
             onClick={() =>
-              navigate(`/products/${params.value}`, { replace: false })
+              navigate(`/qc/${params.value}`, { replace: false })
             }
           >
-            View Details
+            Fill
           </Button>
         </strong>
       ),

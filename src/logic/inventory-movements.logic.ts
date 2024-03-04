@@ -1,16 +1,28 @@
 import axios from "axios";
-import { ObjectId } from "bson";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
+
+export const movementTypes = {
+  ON_HOLD: "on_hold",
+  ON_HAND: "on_hand",
+  ORDERED: "ordered",
+  IN_TRANSIT: "in_transit",
+  QUARANTINED: "quarantined",
+  ALLOCATED: "allocated",
+  MOVED: "moved",
+};
 
 export interface IMovement {
   product_id: string;
   product_code: string;
   name: string;
   module_source: string;
+  movement_source_type: string;
   movement_target_type: string;
   amount: number;
-  container_id?: string;
+  source_lot_number?: string;
   lot_number?: string;
+  source_location?: { _id: string; code: string };
+  target_location: { _id: string; code: string };
   movement_date: Date;
 }
 

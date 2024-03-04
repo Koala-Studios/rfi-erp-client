@@ -49,6 +49,8 @@ import { LocationDetailPage } from "./pages/location/LocationDetailPage";
 import PERMISSIONS from "./logic/config.permissions";
 import QualityControlListPage from "./pages/quality-control/QualityControlListPage";
 import ActivityLogList from "./pages/activity-log/ActivityLogList";
+import { QualityControlDetailPage } from "./pages/quality-control/QualityControlDetailPage";
+import InventoryTransferPage from "./pages/inventory/InventoryTransferPage";
 
 const mainTheme = createTheme({
   palette: {
@@ -116,7 +118,16 @@ function App() {
                   </RequireAuth>
                 }
               />
-
+              <Route
+                path="/move-inventory"
+                element={
+                  <RequireAuth permission={PERMISSIONS.inventorystock_page}>
+                    <Navbar title="Inventory Movements">
+                      <InventoryTransferPage />
+                    </Navbar>
+                  </RequireAuth>
+                }
+              />
               <Route
                 path="/inventory-stock"
                 element={
@@ -404,9 +415,19 @@ function App() {
               <Route
                 path="/qc"
                 element={
-                  <RequireAuth permission={PERMISSIONS.batching_page}>
+                  <RequireAuth permission={PERMISSIONS.qc_page}>
                     <Navbar title="Quality Control Dashboard">
                       <QualityControlListPage />
+                    </Navbar>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/qc/:id"
+                element={
+                  <RequireAuth permission={PERMISSIONS.qc_page}>
+                    <Navbar title="Quality Control Details">
+                      <QualityControlDetailPage />
                     </Navbar>
                   </RequireAuth>
                 }

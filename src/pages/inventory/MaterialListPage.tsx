@@ -22,13 +22,13 @@ const filterArray: FilterElement[] = [
     regexOption: null,
   },
   { label: "Item Name", field: "name", type: "text" },
-  { label: "Product Alias", field: "aliases", type: "text"},
-  { label: "Cas number", field: "cas_number", type: "text"},
-  { label: "Regulatory", field: "regulatory", type: "text"}, // Look at regulatory obj
-  { label: "Dietary", field: "dietary", type: "text"},
-  { label: "Product Type", field: "product_type", type: "text"},
-  { label: "Date Created", field: "date_created", type: "date"},
-  { label: "Solid", field: "is_solid", type: "text"},
+  { label: "Product Alias", field: "aliases", type: "text" },
+  { label: "Cas number", field: "cas_number", type: "text" },
+  { label: "Regulatory", field: "regulatory", type: "text" }, // Look at regulatory obj
+  { label: "Dietary", field: "dietary", type: "text" },
+  { label: "Product Type", field: "product_type", type: "text" },
+  { label: "Date Created", field: "date_created", type: "date" },
+  { label: "Solid", field: "is_solid", type: "text" },
 ];
 
 const MaterialListPage = () => {
@@ -70,14 +70,13 @@ const MaterialListPage = () => {
             color="primary"
             size="small"
             onClick={() => {
-              console.log(params.row)
-              if(params.row.is_raw) {
-              navigate(`/inventory/${params.value}`, { replace: false })
+              console.log(params.row);
+              if (params.row.is_raw) {
+                navigate(`/inventory/${params.value}`, { replace: false });
               } else {
-              navigate(`/products/${params.value}`, { replace: false })
+                navigate(`/products/${params.value}`, { replace: false });
               }
-            }
-            }
+            }}
           >
             View Details
           </Button>
@@ -86,7 +85,8 @@ const MaterialListPage = () => {
     },
   ];
 
-  React.useEffect(() => { //TODO: SET THE LIST HERE TO ONLY RAW MATERIALS, DO THIS WITH FILTERS!
+  React.useEffect(() => {
+    //TODO: SET THE LIST HERE TO ONLY RAW MATERIALS, DO THIS WITH FILTERS!
     listInventory(searchParams, filterArray, false).then((list) => {
       const newRows = list!.docs.map((item) => {
         return {
@@ -99,14 +99,16 @@ const MaterialListPage = () => {
           ordered: item.ordered ?? 0,
           quarantined: item.quarantined ?? 0,
           allocated: item.allocated ?? 0,
-          is_raw: item.is_raw
+          is_raw: item.is_raw,
         };
       });
       setDataOptions({ rows: newRows, listOptions: list! });
     });
   }, [currPage, location.key]);
-  const createNewMaterial = (is_raw:boolean) => {
-    navigate( is_raw ? `/inventory/new` : `/products/new/material` , { replace: false });
+  const createNewMaterial = (is_raw: boolean) => {
+    navigate(is_raw ? `/inventory/new` : `/products/new/material`, {
+      replace: false,
+    });
   };
 
   if (dataOptions == null) return null;
@@ -119,10 +121,23 @@ const MaterialListPage = () => {
       >
         <DataFilter filters={filterArray}></DataFilter>
 
-        <Button variant="contained" color="primary" onClick={() => {createNewMaterial(true)}} sx={{mr:2}}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            createNewMaterial(true);
+          }}
+          sx={{ mr: 2 }}
+        >
           + New Raw Mat
         </Button>
-        <Button variant="contained" color="primary" onClick={() => {createNewMaterial(false)}}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={() => {
+            createNewMaterial(false);
+          }}
+        >
           + New N-Raw Mat
         </Button>
       </Card>

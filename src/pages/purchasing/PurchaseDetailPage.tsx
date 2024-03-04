@@ -321,7 +321,15 @@ export const PurchaseDetailPage = () => {
     },
     {
       field: "process_amount",
-      headerName: "Qty to Process",
+      headerName: "Process Qty",
+      type: "number",
+      width: 120,
+      editable: true,
+      align: "center",
+    },
+    {
+      field: "tare_amount",
+      headerName: "Tare Qty",
       type: "number",
       width: 120,
       editable: true,
@@ -368,7 +376,7 @@ export const PurchaseDetailPage = () => {
             size="small"
             onClick={() => handleReceiveRow(params.row, false)}
           >
-            Send to Qc
+            Qc
           </Button>
 
           <Button
