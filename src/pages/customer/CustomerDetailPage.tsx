@@ -1,4 +1,12 @@
-import { Card, Button, Grid, TextField, Chip, Typography, Rating } from "@mui/material";
+import {
+  Card,
+  Button,
+  Grid,
+  TextField,
+  Chip,
+  Typography,
+  Rating,
+} from "@mui/material";
 import { useEffect, useState, useContext, useRef } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../components/navigation/AuthProvider";
@@ -14,12 +22,13 @@ import SaveForm from "../../components/forms/SaveForm";
 import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
 import NavTab from "../../components/utils/NavTab";
 import LinkTab from "../../components/utils/LinkTab";
+import CustomerProductPage from "./CustomerProductPage";
 
 const emptyCustomer: ICustomer = {
   _id: "new",
   name: "",
   contact_name: "",
-  created_date:new Date().toISOString().split('T')[0],
+  created_date: new Date().toISOString().split("T")[0],
   email: "",
   address_one: "",
   address_two: "",
@@ -48,9 +57,7 @@ const inputMap: InputInfo[] = [
     ref: 2,
     validation: { required: true, genericVal: "Date" },
   },
-
 ];
-
 
 export const CustomerDetailPage = () => {
   const navigate = useNavigate();
@@ -234,8 +241,7 @@ export const CustomerDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
-            <Grid item xs={1}>
-            </Grid>
+            <Grid item xs={1}></Grid>
             <Grid item xs={2.5}>
               <TextField
                 defaultValue={customer.created_date}
@@ -247,7 +253,9 @@ export const CustomerDetailPage = () => {
                 onBlur={(event) =>
                   onInputBlur(event, inputMap[inputRefMap.created_date])
                 }
-                required={inputMap[inputRefMap.created_date].validation.required}
+                required={
+                  inputMap[inputRefMap.created_date].validation.required
+                }
                 fullWidth
                 InputLabelProps={{ shrink: true }}
                 size="small"
@@ -345,16 +353,23 @@ export const CustomerDetailPage = () => {
         </div>
       </Card>
       <NavTab>
-
-<LinkTab label="Products" href= "products" tab_id={tab_id} disable={id === 'new'}/>
-<LinkTab label="Order History" href= "order-history" tab_id={tab_id} disable={id === 'new'}/>
-</NavTab>
-{
-  (tab_id && tab_id === "products" && 
-  <div></div>) || 
-  (tab_id && tab_id === "order-history" && 
-  <div></div>)
-}
+        <LinkTab
+          label="Products"
+          href="products"
+          tab_id={tab_id}
+          disable={id === "new"}
+        />
+        <LinkTab
+          label="Order History"
+          href="order-history"
+          tab_id={tab_id}
+          disable={id === "new"}
+        />
+      </NavTab>
+      {(tab_id && tab_id === "products" && (
+        <CustomerProductPage></CustomerProductPage>
+      )) ||
+        (tab_id && tab_id === "order-history" && <div></div>)}
     </>
   );
 };

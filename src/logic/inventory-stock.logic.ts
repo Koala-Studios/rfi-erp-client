@@ -39,7 +39,7 @@ export interface IInventoryStock {
   received_amount: number;
   remaining_amount: number;
   allocated_amount: number;
-  quarantined_containers: number;
+  quarantined: boolean;
 
   lot_number: string;
 

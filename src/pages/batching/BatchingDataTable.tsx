@@ -76,8 +76,7 @@ export const BatchingDataTable: React.FC<Props> = ({
           display: "flex",
           alignItems: "center",
         }}
-      >         
-      </div>
+      ></div>
     );
   };
 
@@ -93,9 +92,8 @@ export const BatchingDataTable: React.FC<Props> = ({
           borderBottom: "none",
           borderRadius: "5px 5px 0 0",
         }}
-        
       >
-        <Table aria-label="collapsible table" style={{ position: "relative" }} >
+        <Table aria-label="collapsible table" style={{ position: "relative" }}>
           <TableHead
             style={{
               position: "sticky",
@@ -120,9 +118,6 @@ export const BatchingDataTable: React.FC<Props> = ({
             </TableRow>
           </TableHead>
           <TableBody style={{ overflowY: "scroll", height: "400px!important" }}>
-            {/* {dataOptions.rows.map((row: IInventoryStockGrouped) => (
-                    <ExpandableRow key={row.name} row={row} />
-                  ))} */}
             {rows.map((row_item) => (
               <ExpandableRow
                 key={row_item._id}
@@ -155,7 +150,6 @@ export const BatchingDataTable: React.FC<Props> = ({
   );
 };
 
-
 const CustomTableCell = (props: any) => {
   const [isEditMode, setEditMode] = React.useState<boolean>(false);
   if (!props.row.renderCell) {
@@ -175,16 +169,15 @@ const CustomTableCell = (props: any) => {
             style={{ height: 19, margin: 0, padding: 0 }}
             name={props.name ?? ""}
             type={props.column.type}
-            inputProps={props.column.type === 'number' ? { min: 0 } : {}}
-            
-            onChange={(e) =>{
-              console.log('aaaaa', e.target.value);
+            inputProps={props.column.type === "number" ? { min: 0 } : {}}
+            onChange={(e) => {
+              console.log("aaaaa", e.target.value);
               props.handleEditCell(
                 props.row._id,
                 props.column.field,
                 e.target.value
-              )}
-            }
+              );
+            }}
           />
         ) : (
           props.row[props.column.field]

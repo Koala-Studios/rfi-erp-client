@@ -67,6 +67,7 @@ const emptyInventory: IInventory = {
   product_type: null,
   cas_number: "",
   reorder_amount: 0,
+  default_location: null,
 };
 
 let savedInventory: IInventory | null = null;
@@ -343,22 +344,44 @@ export const InventoryDetailPage = () => {
                 rows={2}
               ></TextField>
             </Grid>
-            <Grid item xs={2}></Grid>
-            <Grid item xs={2}>
+            <Grid item xs={3}>
+              <StandaloneAutocomplete
+                initialValue={inventory.default_location}
+                onChange={(e, value) =>
+                  setInventory({
+                    ...inventory,
+                    default_location: value
+                      ? { _id: value._id, code: value.code, name: value.name }
+                      : null,
+                  })
+                }
+                // readOnly={!isNewId}
+                // onChange={(e, value) => {}}
+                label={"Default Location"}
+                letterMin={0}
+                dbOption={"location"}
+                getOptionLabel={(item: {
+                  _id: string;
+                  code: string;
+                  name: string;
+                }) => item.code + " | " + item.name}
+              />
+            </Grid>
+            <Grid item xs={1.3}>
               <TextField
                 spellCheck="false"
                 InputLabelProps={{ shrink: true }}
                 fullWidth
                 size="small"
                 variant="outlined"
-                label={"Cost"}
+                label={"Cost/Kg"}
                 value={inventory.cost.toFixed(2)}
                 InputProps={{
                   readOnly: true,
                 }}
               ></TextField>
             </Grid>
-            <Grid item xs={2}>
+            <Grid item xs={1.7}>
               <TextField
                 defaultValue={inventory.date_created}
                 inputRef={(el: any) =>

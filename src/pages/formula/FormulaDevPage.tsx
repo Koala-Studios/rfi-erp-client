@@ -2,7 +2,12 @@ import React from "react";
 import { DataTable } from "../../components/utils/DataTable";
 import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { AuthContext } from "../../components/navigation/AuthProvider";
-import { approveFormula, disapproveFormula, getFormula, submitFormula } from "../../logic/formula.logic";
+import {
+  approveFormula,
+  disapproveFormula,
+  getFormula,
+  submitFormula,
+} from "../../logic/formula.logic";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   Button,
@@ -25,7 +30,7 @@ import { IProduct } from "../../logic/product.logic";
 import WarningIcon from "@mui/icons-material/Warning";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { ObjectID, ObjectId } from "bson";
-import SpaIcon from '@mui/icons-material/Spa';
+import SpaIcon from "@mui/icons-material/Spa";
 import PERMISSIONS from "../../logic/config.permissions";
 import { hasPermission } from "../../logic/user.logic";
 
@@ -40,13 +45,9 @@ const emptyFormula: IFormula = {
   version: 0,
   base: 100,
   date_created: new Date(),
-}
-
+};
 
 const FormulaDevPage = () => {
-
-
-
   const navigate = useNavigate();
   const auth = React.useContext(AuthContext);
   const [cost, setCost] = React.useState<number>(0);
@@ -68,38 +69,37 @@ const FormulaDevPage = () => {
     ["Error", "error"],
   ];
 
-
   React.useEffect(() => {
     getProduct(id!).then((_product) => {
       setProduct(_product);
       getFormula(id!, parseInt(version!)).then((_formula) => {
-        if(_formula){
-  
+        if (_formula) {
           setFormula(_formula);
-            const newRows = _formula?.formula_items.map((item, index) => {
-              return {
-                _id: new ObjectID().toHexString(),
-                material_id: item.material_id,
-                material_code: item.material_code,
-                material_name: item.material_name,
-                item_cost: item.cost,
-                cost: 0,
-                amount: 0,
-                last_cost: (item.cost * item.amount) / 100,
-                last_amount: item.amount,
-                notes: item.notes,
-              };
-            });
-            setRows(newRows);
+          const newRows = _formula?.formula_items.map((item, index) => {
+            return {
+              _id: new ObjectID().toHexString(),
+              material_id: item.material_id,
+              material_code: item.material_code,
+              material_name: item.material_name,
+              item_cost: item.cost,
+              cost: 0,
+              amount: 0,
+              last_cost: (item.cost * item.amount) / 100,
+              last_amount: item.amount,
+              notes: item.notes,
+            };
+          });
+          setRows(newRows);
         } else {
-          setFormula({...emptyFormula, product_code: _product!.product_code, product_id: id!});
-          setRows([{_id:new ObjectID().toHexString(), material_id: null, material_code: null, material_name: '', item_cost: 0, amount: 0, last_cost:0,last_amount: null, notes: ''}]);
+          setFormula({
+            ...emptyFormula,
+            product_code: _product!.product_code,
+            product_id: id!,
+          });
+          handleAddRow();
         }
-      }
-    )
+      });
     });
-    
-
   }, []);
 
   React.useEffect(() => {
@@ -196,11 +196,21 @@ const FormulaDevPage = () => {
           rowParams={row_params}
           initialValue={row_params.row.material_name}
           letterMin={2}
-          getOptionLabel={(item: IInventory) =>
-            { return <> {item?.regulatory.fda_status === "Natural" ? <SpaIcon sx={{ color: 'green' }}/> : ''} {item?.product_code ?  (`${item.product_code} | ${item.name}`) : '' }
-            </> 
-            }
-          }
+          getOptionLabel={(item: IInventory) => {
+            return (
+              <>
+                {" "}
+                {item?.regulatory.fda_status === "Natural" ? (
+                  <SpaIcon sx={{ color: "green" }} />
+                ) : (
+                  ""
+                )}{" "}
+                {item?.product_code
+                  ? `${item.product_code} | ${item.name}`
+                  : ""}
+              </>
+            );
+          }}
         />
       ),
     },
@@ -264,25 +274,36 @@ const FormulaDevPage = () => {
       filterable: false,
       width: 400,
       editable: true,
-    }
+    },
   ];
 
-  const handleAddRow = (row_id: string) => {
-    const index = rows.findIndex(
-      (element: IFormulaDevRow) => element._id === row_id
-    );
-    setRows([
-      ...rows.slice(0, index + 1),
-      {
-        _id: new ObjectID().toHexString(),
-        amount: 0,
-        last_amount: null,
-        item_cost: 0,
-        cost: 0,
-      },
-      ...rows.slice(index == rows.length - 1 ? index + 2 : index + 1),
-    ]);
-  
+  const handleAddRow = (row_id?: string) => {
+    if (row_id) {
+      const index = rows.findIndex(
+        (element: IFormulaDevRow) => element._id === row_id
+      );
+      setRows([
+        ...rows.slice(0, index + 1),
+        {
+          _id: new ObjectID().toHexString(),
+          amount: 0,
+          last_amount: null,
+          item_cost: 0,
+          cost: 0,
+        },
+        ...rows.slice(index == rows.length - 1 ? index + 2 : index + 1),
+      ]);
+    } else {
+      setRows([
+        {
+          _id: new ObjectID().toHexString(),
+          amount: 0,
+          last_amount: null,
+          item_cost: 0,
+          cost: 0,
+        },
+      ]);
+    }
   };
 
   const handleMultiplier = (mult_amount: number) => {
@@ -297,7 +318,6 @@ const FormulaDevPage = () => {
         return material;
       })
     );
-    
   };
 
   const handleEditRow = (rowid: string, value: any) => {
@@ -311,7 +331,6 @@ const FormulaDevPage = () => {
     pList[rowIndex].item_cost = value.cost;
 
     setRows(pList);
-
   };
 
   const handleEditCell = (row_id: string, field: string, value: any) => {
@@ -324,8 +343,6 @@ const FormulaDevPage = () => {
       },
       ...rows.slice(rowIndex == rows.length ? rowIndex : rowIndex + 1),
     ]);
-
-    
   };
 
   const handleDeleteRow = (row_id: string) => {
@@ -333,8 +350,6 @@ const FormulaDevPage = () => {
       setCarrier(null);
     }
     setRows([...rows.filter((m: IFormulaDevRow) => m._id !== row_id)]);
-
-    
   };
 
   const handleSetCost = () => {
@@ -368,8 +383,6 @@ const FormulaDevPage = () => {
       }
       handleEditCell(carrier, "amount", totalMat < 100 ? 100 - totalMat : NaN);
     }
-
-    
   };
 
   const handleDisapprove = async () => {
@@ -377,17 +390,16 @@ const FormulaDevPage = () => {
     if (_product) {
       setProduct(_product);
     }
-  }
+  };
 
   const handleAdminApprove = async () => {
     const _product = await approveFormula(product!);
     if (_product) {
       setProduct(_product);
     }
-  }
+  };
 
-
-  const handleSubmit = async (approve:boolean = false) => {
+  const handleSubmit = async (approve: boolean = false) => {
     const _formula_items = rows.map((material: IFormulaDevRow) => {
       return {
         material_code: material.material_code,
@@ -397,29 +409,31 @@ const FormulaDevPage = () => {
         material_name: material.material_name,
       };
     });
-    let newVersion:IFormula = formula!;
-    newVersion.formula_items = _formula_items
+    let newVersion: IFormula = formula!;
+    newVersion.formula_items = _formula_items;
     const res = await submitFormula(approve, newVersion, product!.description);
 
     if (res) {
       const _product = res[0];
       const _formula = res[1];
-      setProduct(_product)
+      setProduct(_product);
       setFormula(_formula);
-      setRows(_formula?.formula_items.map((item, index) => {
-        return {
-          _id: new ObjectID().toHexString(),
-          material_id: item.material_id,
-          material_code: item.material_code,
-          material_name: item.material_name,
-          item_cost: item.cost,
-          cost: 0,
-          amount: 0,
-          last_cost: (item.cost * item.amount) / 100,
-          last_amount: item.amount,
-          notes: item.notes,
-        };
-      }));
+      setRows(
+        _formula?.formula_items.map((item, index) => {
+          return {
+            _id: new ObjectID().toHexString(),
+            material_id: item.material_id,
+            material_code: item.material_code,
+            material_name: item.material_name,
+            item_cost: item.cost,
+            cost: 0,
+            amount: 0,
+            last_cost: (item.cost * item.amount) / 100,
+            last_amount: item.amount,
+            notes: item.notes,
+          };
+        })
+      );
       navigate(`/formula/develop/${_product._id}/${_product.versions}`, {
         replace: true,
       });
@@ -431,144 +445,138 @@ const FormulaDevPage = () => {
   return (
     <>
       <Card variant="outlined" style={{ padding: 16, marginBottom: 10 }}>
-      <div
+        <div
           style={{
             display: "flex",
             justifyContent: "space-between",
             gap: 100,
             marginBottom: 10,
           }}
-      >
-      <div>
-      <Button
-          sx={{ mb: 3 }}
-          aria-label="go back"
-          size="medium"
-          variant="outlined"
-          onClick={() => navigate(-1)}
         >
-          <ArrowBackIcon fontSize="small" />
-        </Button>
-        
-        <Grid sx={{ maxWidth: "85%" }} container spacing={3}>
-          <Grid item xs={2}>
-              <TextField
-                spellCheck="false"
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-                size="small"
-                variant="outlined"
-                InputProps={{
-                  readOnly: true,
-                }}
-                label={"Product Code"}
-                value={product?.product_code}
-              ></TextField>
-            </Grid>
-            <Grid item xs={5}>
-              <TextField
-                spellCheck="false"
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-                size="small"
-                variant="outlined"
-                label={"Product Name"}
-                InputProps={{
-                  readOnly: true,
-                }}
-                value={product?.name}
-              ></TextField>
-            </Grid>
-            <Grid item xs={1.5}></Grid>
-            <Grid item xs={1.5}>
-              <TextField
-                spellCheck="false"
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-                size="small"
-                variant="outlined"
-                label={"Versions"}
-                InputProps={{
-                  readOnly: true,
-                }}
-                value={product?.versions}
-              ></TextField>
-            </Grid>
-            <Grid item xs={2}>
-            <Chip
-                  label={
-                    ProductStatus[
-                      product ? product?.status - 1 : 4
-                    ][0]
-                  }
+          <div>
+            <Button
+              sx={{ mb: 3 }}
+              aria-label="go back"
+              size="medium"
+              variant="outlined"
+              onClick={() => navigate(-1)}
+            >
+              <ArrowBackIcon fontSize="small" />
+            </Button>
+
+            <Grid sx={{ maxWidth: "85%" }} container spacing={3}>
+              <Grid item xs={2}>
+                <TextField
+                  spellCheck="false"
+                  InputLabelProps={{ shrink: true }}
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                  label={"Product Code"}
+                  value={product?.product_code}
+                ></TextField>
+              </Grid>
+              <Grid item xs={5}>
+                <TextField
+                  spellCheck="false"
+                  InputLabelProps={{ shrink: true }}
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  label={"Product Name"}
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                  value={product?.name}
+                ></TextField>
+              </Grid>
+              <Grid item xs={1.5}></Grid>
+              <Grid item xs={1.5}>
+                <TextField
+                  spellCheck="false"
+                  InputLabelProps={{ shrink: true }}
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  label={"Versions"}
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                  value={product?.versions}
+                ></TextField>
+              </Grid>
+              <Grid item xs={2}>
+                <Chip
+                  label={ProductStatus[product ? product?.status - 1 : 4][0]}
                   sx={{
                     width: "100%",
                     height: "100%",
-                    maxHeight:40,
+                    maxHeight: 40,
                     borderRadius: 10,
                     fontWeight: 600,
                   }}
                   //@ts-ignore
-                  color={
-                    ProductStatus[
-                      product ? product?.status - 1 : 4
-                    ][1]
-                  }
+                  color={ProductStatus[product ? product?.status - 1 : 4][1]}
                   variant="outlined"
                 />
-            </Grid>
-            <Grid item xs={2.5}>
-              <TextField
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                size="small"
-                variant="outlined"
-                label={"Created Date"}
-                InputProps={{
-                  readOnly: true,
-                }}
-                type={"date"}
-                value={product?.date_created}
-              ></TextField>
-            </Grid>
-            <Grid item xs={2.5}>
-              <TextField
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                size="small"
-                variant="outlined"
-                label={"Approved Date"}
-                InputProps={{
-                  readOnly: true,
-                }}
-                type={"date"}
-                value={product?.date_created}
-              ></TextField>
-            </Grid>
-            <Grid item xs={5}></Grid>
+              </Grid>
+              <Grid item xs={2.5}>
+                <TextField
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  size="small"
+                  variant="outlined"
+                  label={"Created Date"}
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                  type={"date"}
+                  value={product?.date_created}
+                ></TextField>
+              </Grid>
+              <Grid item xs={2.5}>
+                <TextField
+                  fullWidth
+                  InputLabelProps={{ shrink: true }}
+                  size="small"
+                  variant="outlined"
+                  label={"Approved Date"}
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                  type={"date"}
+                  value={product?.date_created}
+                ></TextField>
+              </Grid>
+              <Grid item xs={5}></Grid>
 
-            <Grid item xs={12}>
-              <TextField
-                defaultValue={product?.description}
-                onBlur={(event) => {
-                  const new_prod = {...product!, description: event.target.value}
-                  setProduct(new_prod)
-                  console.log("test", new_prod)
-                }}
-                spellCheck="false"
-                InputLabelProps={{ shrink: true }}
-                fullWidth
-                size="small"
-                variant="outlined"
-                label={"Flavor Profile"}
-                multiline
-                rows={6}
-              ></TextField>
+              <Grid item xs={12}>
+                <TextField
+                  defaultValue={product?.description}
+                  onBlur={(event) => {
+                    const new_prod = {
+                      ...product!,
+                      description: event.target.value,
+                    };
+                    setProduct(new_prod);
+                    console.log("test", new_prod);
+                  }}
+                  spellCheck="false"
+                  InputLabelProps={{ shrink: true }}
+                  fullWidth
+                  size="small"
+                  variant="outlined"
+                  label={"Flavor Profile"}
+                  multiline
+                  rows={6}
+                ></TextField>
+              </Grid>
             </Grid>
-          </Grid>
-
           </div>
-          
+
           <Card
             variant="outlined"
             style={{
@@ -586,10 +594,15 @@ const FormulaDevPage = () => {
             </div>
             <Divider></Divider>
             <Button
-              style={{
-                // display: `${purchase.status === 6 ? "box" : "none"}`,
-              }}
-              disabled={id === "new" || ( product! && product!.status != 1 && product!.status != 2)}
+              style={
+                {
+                  // display: `${purchase.status === 6 ? "box" : "none"}`,
+                }
+              }
+              disabled={
+                id === "new" ||
+                (product! && product!.status != 1 && product!.status != 2)
+              }
               variant="contained"
               onClick={() => handleSubmit(false)}
             >
@@ -599,7 +612,11 @@ const FormulaDevPage = () => {
             <Button
               color="info"
               variant="contained"
-              disabled={id === "new" || ( product! && product!.status != 2) || !hasPermission(auth.user!, PERMISSIONS.development_actions)}
+              disabled={
+                id === "new" ||
+                (product! && product!.status != 2) ||
+                !hasPermission(auth.user!, PERMISSIONS.development_actions)
+              }
               onClick={() => handleSubmit(true)}
             >
               APPROVE & SUBMIT
@@ -607,7 +624,11 @@ const FormulaDevPage = () => {
             <Button
               color="success"
               variant="contained"
-              disabled={id === "new" || ( product! &&  product!.status != 3) || !hasPermission(auth.user!, PERMISSIONS.development_admin)}
+              disabled={
+                id === "new" ||
+                (product! && product!.status != 3) ||
+                !hasPermission(auth.user!, PERMISSIONS.development_admin)
+              }
               onClick={() => handleAdminApprove()}
             >
               ADMIN APPROVE
@@ -615,7 +636,11 @@ const FormulaDevPage = () => {
             <Button
               color="warning"
               variant="contained"
-              disabled={id === "new" || ( product! && product!.status != 3 )|| !hasPermission(auth.user!, PERMISSIONS.development_actions)}
+              disabled={
+                id === "new" ||
+                (product! && product!.status != 3) ||
+                !hasPermission(auth.user!, PERMISSIONS.development_actions)
+              }
               onClick={() => handleDisapprove()}
             >
               DISAPPROVE / REDRAFT
@@ -671,7 +696,7 @@ const FormulaDevPage = () => {
                 label={"Base"}
                 defaultValue={formula?.base}
                 onBlur={(e) => {
-                  setFormula({...formula! , base: parseFloat(e.target.value)})
+                  setFormula({ ...formula!, base: parseFloat(e.target.value) });
                 }} //here
               ></TextField>
             </Grid>
@@ -685,7 +710,10 @@ const FormulaDevPage = () => {
                 label={"Yield Ratio"}
                 defaultValue={formula?.yield.toFixed(2)}
                 onBlur={(e) => {
-                  setFormula({...formula! , yield: parseFloat(e.target.value)})
+                  setFormula({
+                    ...formula!,
+                    yield: parseFloat(e.target.value),
+                  });
                 }} //here
               ></TextField>
             </Grid>
@@ -701,7 +729,10 @@ const FormulaDevPage = () => {
                 defaultValue={formula?.rec_dose_rate.toFixed(2)}
                 type="number"
                 onBlur={(e) => {
-                  setFormula({...formula! , rec_dose_rate: parseFloat(e.target.value)})
+                  setFormula({
+                    ...formula!,
+                    rec_dose_rate: parseFloat(e.target.value),
+                  });
                 }} //here
               ></TextField>
             </Grid>
@@ -716,9 +747,15 @@ const FormulaDevPage = () => {
               <div hidden={!(formula?.yield === 1 && totalAmt != formula.base)}>
                 <Tooltip
                   placement="top"
-                  title={"The total Qty does not match with the base of " + formula?.base}
+                  title={
+                    "The total Qty does not match with the base of " +
+                    formula?.base
+                  }
                 >
-                  <WarningIcon sx={{ color: "orange" }} style={{fontSize:50}} />
+                  <WarningIcon
+                    sx={{ color: "orange" }}
+                    style={{ fontSize: 50 }}
+                  />
                 </Tooltip>
               </div>
             </Grid>
@@ -736,7 +773,7 @@ const FormulaDevPage = () => {
           experimentalFeatures={{ newEditingApi: true }}
           processRowUpdate={(newRow) => {
             let pList = rows.slice();
-            const rowIdx = rows.findIndex((r:any) => r._id === newRow._id);
+            const rowIdx = rows.findIndex((r: any) => r._id === newRow._id);
             pList[rowIdx] = newRow;
             setRows(pList);
             return newRow;

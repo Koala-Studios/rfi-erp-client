@@ -25,7 +25,12 @@ import {
   updateSales,
 } from "../../logic/sales-order.logic";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridCellParams,
+  GridColDef,
+  GridRenderCellParams,
+} from "@mui/x-data-grid";
 
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import TableAutocomplete from "../../components/utils/TableAutocomplete";
@@ -61,7 +66,7 @@ const ItemStatus = [
 const emptySales: ISalesOrder = {
   _id: "",
   customer: { _id: "", code: "", name: "" },
-  date_sold: new Date().toISOString().split('T')[0],
+  date_sold: new Date().toISOString().split("T")[0],
   date_shipped: "",
   shipping_code: "",
   status: 6,
@@ -73,12 +78,16 @@ const emptySales: ISalesOrder = {
 const inputRefMap = {
   order_code: 0,
   date_sold: 1,
-  customer:2
+  customer: 2,
   //TODO: Customer
 };
 
 const inputMap: InputInfo[] = [
-  { label: "order_code", ref: 0, validation: { required: true, genericVal: "Text" } },
+  {
+    label: "order_code",
+    ref: 0,
+    validation: { required: true, genericVal: "Text" },
+  },
   {
     label: "date_sold",
     ref: 1,
@@ -96,9 +105,7 @@ export const SalesDetailPage = () => {
   const { id } = useParams();
   const auth = React.useContext(AuthContext);
   const [salesSaved, setSalesSaved] = React.useState<boolean>(true);
-  const [sales, setSales] = React.useState<ISalesOrder | null>(
-    null
-  );
+  const [sales, setSales] = React.useState<ISalesOrder | null>(null);
   const [rows, setRows] = React.useState<IOrderItem[]>([]);
   const [receiveMode, setReceiveMode] = React.useState<boolean>(false);
 
@@ -107,8 +114,6 @@ export const SalesDetailPage = () => {
     Array(inputMap.length).fill({ helperText: "", error: false })
   );
 
-
-  
   const onInputBlur = (
     event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement, Element>,
     input: InputInfo
@@ -131,8 +136,6 @@ export const SalesDetailPage = () => {
     setSalesSaved(false);
   };
 
-
-  
   const saveSales = async () => {
     let allValid = true;
     //do client side validation
@@ -165,7 +168,7 @@ export const SalesDetailPage = () => {
     }
     //send new sales to server
     if (id === "new") {
-      await createSales(sales!).then((_sales:ISalesOrder | null) => {
+      await createSales(sales!).then((_sales: ISalesOrder | null) => {
         if (_sales) {
           navigate(`/sales-orders/${_sales._id}`, { replace: true });
           savedSales = _sales;
@@ -174,9 +177,9 @@ export const SalesDetailPage = () => {
         } else {
           console.log("Sales Not Saved");
         }
-      })
-
-    } else { //TODO: Ensure user can't save sales with empty rows
+      });
+    } else {
+      //TODO: Ensure user can't save sales with empty rows
       const updated = await updateSales(sales!);
 
       if (updated === false) {
@@ -206,21 +209,18 @@ export const SalesDetailPage = () => {
     setRows(pList);
   };
 
-
-
-
   useEffect(() => {
     if (id === "new") {
       savedSales = emptySales;
       setSales(emptySales);
       setRows([]);
     } else {
-      getSalesOrder(id!).then((p:any) => {
+      getSalesOrder(id!).then((p: any) => {
         const tempSales = { ...p! };
         savedSales = tempSales;
         setSales(p!);
         setRows(
-          p!.order_items.map((item:any) => {
+          p!.order_items.map((item: any) => {
             item._id = item._id ? item._id : new ObjectID().toHexString(); // can remove this in future after migrations.
             return item;
           })
@@ -297,7 +297,7 @@ export const SalesDetailPage = () => {
     // },
     {
       field: "unit_price",
-      headerName: "Cost($/KG)",
+      headerName: "Price($/KG)",
       type: "number",
       width: 100,
       align: "center",
@@ -307,7 +307,7 @@ export const SalesDetailPage = () => {
       field: "status",
       headerName: "Status",
       width: 200,
-      align: 'center',
+      align: "center",
       renderCell: (params: GridRenderCellParams<number>) => (
         <Chip
           label={ItemStatus[params.value ? params.value - 1 : 4][0]}
@@ -371,22 +371,26 @@ export const SalesDetailPage = () => {
       width: 250,
       renderCell: (params: GridRenderCellParams<string>) => (
         <strong>
-          { params.row.batch_id === "" && <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            onClick={() => handleRow(params.row)}
-          >
-            Schedule Batching
-          </Button> }
-          { params.row.batch_id != "" && <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            onClick={() => navigate("/batching/" + params.row.batch_id)}
-          >
-            See Batching
-          </Button> }
+          {params.row.batch_id === "" && (
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              onClick={() => handleRow(params.row)}
+            >
+              Schedule Batching
+            </Button>
+          )}
+          {params.row.batch_id != "" && (
+            <Button
+              variant="contained"
+              color="primary"
+              size="small"
+              onClick={() => navigate("/batching/" + params.row.batch_id)}
+            >
+              See Batching
+            </Button>
+          )}
           {/* <Button
             variant="outlined"
             color="warning"
@@ -436,14 +440,14 @@ export const SalesDetailPage = () => {
       filterable: false,
       renderCell: (row_params: GridRenderCellParams<string>) => (
         <TableAutocomplete
-        initialValue={row_params.row.product_name}
+          initialValue={row_params.row.product_name}
           readOnly={sales!.status != 6}
           dbOption="approved-product"
           handleEditRow={handleEditProductRow}
           rowParams={row_params}
           letterMin={3}
-          getOptionLabel={(item: IInventory) => item.name ?
-            `${item.product_code} | ${item.name}` : ''
+          getOptionLabel={(item: IInventory) =>
+            item.name ? `${item.product_code} | ${item.name}` : ""
           }
         />
       ),
@@ -484,9 +488,7 @@ export const SalesDetailPage = () => {
   ];
 
   const handleRow = (row: IOrderItemProcess) => {
-    if (
-      !row.process_amount
-    ) {
+    if (!row.process_amount) {
       window.dispatchEvent(
         new CustomEvent("NotificationEvent", {
           detail: { color: "warning", text: "Missing Fields in this Row" },
@@ -497,7 +499,7 @@ export const SalesDetailPage = () => {
         if (_sales) {
           savedSales = _sales;
           setSales(_sales);
-          setRows(_sales.order_items)
+          setRows(_sales.order_items);
           setSalesSaved(true);
         } else {
           console.log("Sales Not Updated");
@@ -589,8 +591,8 @@ export const SalesDetailPage = () => {
         shipped_amount: 0,
         unit_price: 0,
         batch_id: "",
-        sample:false,
-        status: 1
+        sample: false,
+        status: 1,
       },
       ...rows.slice(0),
     ]);
@@ -644,7 +646,9 @@ export const SalesDetailPage = () => {
                   onBlur={(event) =>
                     onInputBlur(event, inputMap[inputRefMap.order_code])
                   }
-                  required={inputMap[inputRefMap.order_code].validation.required}
+                  required={
+                    inputMap[inputRefMap.order_code].validation.required
+                  }
                   spellCheck="false"
                   InputLabelProps={{ shrink: true }}
                   fullWidth
@@ -655,7 +659,9 @@ export const SalesDetailPage = () => {
               </Grid>
               <Grid item xs={3}>
                 <TextField
-                  defaultValue={sales.date_sold ? sales.date_sold.split('T')[0] : ''}
+                  defaultValue={
+                    sales.date_sold ? sales.date_sold.split("T")[0] : ""
+                  }
                   inputRef={(el: any) =>
                     (inputRefs.current[inputRefMap.date_sold] = el)
                   }
@@ -692,24 +698,16 @@ export const SalesDetailPage = () => {
               </Grid>
               <Grid item xs={2}>
                 <Chip
-                  label={
-                    SalesStatus[
-                      sales?.status ? sales?.status - 1 : 5
-                    ][0]
-                  }
+                  label={SalesStatus[sales?.status ? sales?.status - 1 : 5][0]}
                   sx={{
                     width: "100%",
                     height: "100%",
-                    maxHeight:40,
+                    maxHeight: 40,
                     borderRadius: 10,
                     fontWeight: 600,
                   }}
                   //@ts-ignore
-                  color={
-                    SalesStatus[
-                      sales?.status ? sales?.status - 1 : 5
-                    ][1]
-                  }
+                  color={SalesStatus[sales?.status ? sales?.status - 1 : 5][1]}
                   variant="outlined"
                 />
               </Grid>
@@ -740,22 +738,27 @@ export const SalesDetailPage = () => {
                   error={inputVisuals[inputRefMap.customer].error}
                   helperText={inputVisuals[inputRefMap.customer].helperText}
                   onChange={(event, value) => {
-                    console.log(value, 'testing ')
-                    setSales({ ...sales, customer: {_id: value._id, code: value.code, name: value.name} });
+                    console.log(value, "testing ");
+                    setSales({
+                      ...sales,
+                      customer: {
+                        _id: value._id,
+                        code: value.code,
+                        name: value.name,
+                      },
+                    });
                     // onInputBlur(event, inputMap[inputRefMap.material_type]);
                   }}
                   // onBlur={(event: any) =>
                   //   onInputBlur(event, inputMap[inputRefMap.customer])
                   // }
-                  required={
-                    inputMap[inputRefMap.customer].validation.required
-                  }
+                  required={inputMap[inputRefMap.customer].validation.required}
                   label={"Customer"}
                   letterMin={0}
                   readOnly={sales.status != 6}
                   dbOption={"customer"}
-                  getOptionLabel={(item: ICustomer) => item.code ?
-                    `${item.code}`+ ' | ' + `${item.name}`  : ''
+                  getOptionLabel={(item: ICustomer) =>
+                    item.code ? `${item.code}` + " | " + `${item.name}` : ""
                   }
                 />
               </Grid>
@@ -850,7 +853,7 @@ export const SalesDetailPage = () => {
           rows={rows!}
           getRowId={(row) => row._id}
           getCellClassName={(params: GridCellParams<number>) => {
-            return '';
+            return "";
           }}
           processRowUpdate={(newRow) => {
             console.log(newRow);

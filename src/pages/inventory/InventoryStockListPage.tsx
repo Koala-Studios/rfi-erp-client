@@ -17,12 +17,12 @@ import DataFilter from "../../components/utils/DataFilter";
 import { ExpandableDataTable } from "../../components/utils/ExpandableDataTable";
 
 const filterArray: FilterElement[] = [
-  { label: "Product Code", field: "product_code", type: "text"},
-  { label: "Product Name", field: "name", type: "text"},
-  { label: "Lot Number", field: "lot_number", type: "text"},
-  { label: "Expirey Date", field: "expiry_date", type: "date"},
-  { label: "Supplier Sku", field: "supplier_sku", type: "text"},
-  { label: "Container Size", field: "container_size", type: "number"},
+  { label: "Product Code", field: "product_code", type: "text" },
+  { label: "Product Name", field: "name", type: "text" },
+  { label: "Lot Number", field: "lot_number", type: "text" },
+  { label: "Expirey Date", field: "expiry_date", type: "date" },
+  { label: "Supplier Sku", field: "supplier_sku", type: "text" },
+  { label: "Container Size", field: "container_size", type: "number" },
 ];
 
 const InventoryStockListPage = () => {
@@ -60,8 +60,8 @@ const InventoryStockListPage = () => {
     { field: "extensions", headerName: "Extensions", width: 120 },
     { field: "supplier_sku", headerName: "Supplier SKU#", width: 120 },
     {
-      field: "quarantined_containers",
-      headerName: "Quarantined Containers",
+      field: "quarantined",
+      headerName: "Quarantined?",
       width: 120,
     },
   ];
@@ -78,7 +78,7 @@ const InventoryStockListPage = () => {
           product_id: item.product_id,
           product_code: item.product_code,
           name: item.name,
-          sample:item.sample,
+          sample: item.sample,
           average_cost: item.average_cost,
           received_amount: item.received_amount,
           remaining_amount: item.remaining_amount,
@@ -88,14 +88,14 @@ const InventoryStockListPage = () => {
             return {
               _id: container._id,
               product_id: container.product_id,
-              product_code: container.product_code, 
+              product_code: container.product_code,
               name: container.name,
               unit_cost: container.unit_cost,
               container_size: container.container_size,
               received_amount: container.received_amount,
               remaining_amount: container.remaining_amount,
               allocated_amount: container.allocated_amount,
-              quarantined_containers: container.quarantined_containers,
+              quarantined: container.quarantined,
 
               lot_number: container.lot_number,
 

@@ -35,8 +35,8 @@ export const ExpandableRow = (props: {
   handleAddRow: (row_id: string) => void;
 }) => {
   const [open, setOpen] = React.useState(false);
-  const getQtyColor = (has_enough:boolean) => {
-    switch(has_enough) {
+  const getQtyColor = (has_enough: boolean) => {
+    switch (has_enough) {
       case false:
         return "#EEB9BA";
       case true:
@@ -49,9 +49,9 @@ export const ExpandableRow = (props: {
     3: enough for this, but not for all,
     4: enough for this, but not for all with incoming
     */
-  }
-  const getQtyToolTip = (has_enough:boolean) => {
-    switch(has_enough) {
+  };
+  const getQtyToolTip = (has_enough: boolean) => {
+    switch (has_enough) {
       case false:
         return "Not Enough";
       case true:
@@ -64,7 +64,7 @@ export const ExpandableRow = (props: {
     3: enough for this, but not for all,
     4: enough for this, but not for all with incoming
     */
-  }
+  };
   useEffect(() => {
     window.addEventListener("BatchingRowAdd", (e: any) => {
       if (e.detail._id === props.row["_id"]) {
@@ -96,27 +96,37 @@ export const ExpandableRow = (props: {
         }}
         key={props.row._id}
       >
-         <Tooltip title={getQtyToolTip(props.row.has_enough)} TransitionProps={{ timeout: 350 }} placement="right">
-        <TableCell sx={{ p: 0, mH: 40,
-              backgroundColor: getQtyColor(props.row.has_enough) }} height={35} width={50}>
-         
-          <IconButton
-            aria-label="expand row"
-            size="small"
-            onClick={() => setOpen(!open)}
-            // style={{ display: /*!props.row.sub_rows || props.row.sub_rows.length === 0 ? 'none' : */'block' }}
-            style={{
-              marginLeft: 5,
-              width: 40,
-              display:
-                !props.row.sub_rows || props.row.sub_rows.length === 0
-                  ? "none"
-                  : "block",
+        <Tooltip
+          title={getQtyToolTip(props.row.has_enough)}
+          TransitionProps={{ timeout: 350 }}
+          placement="right"
+        >
+          <TableCell
+            sx={{
+              p: 0,
+              mH: 40,
+              backgroundColor: getQtyColor(props.row.has_enough),
             }}
+            height={35}
+            width={25}
           >
-            {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
-          </IconButton>
-        </TableCell>
+            <IconButton
+              aria-label="expand row"
+              size="small"
+              onClick={() => setOpen(!open)}
+              // style={{ display: /*!props.row.sub_rows || props.row.sub_rows.length === 0 ? 'none' : */'block' }}
+              style={{
+                marginLeft: 5,
+                width: 40,
+                display:
+                  !props.row.sub_rows || props.row.sub_rows.length === 0
+                    ? "none"
+                    : "block",
+              }}
+            >
+              {open ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
+            </IconButton>
+          </TableCell>
         </Tooltip>
         {props.columns.map((col: TableGridColDef, index) => {
           if (col.customRender) {
@@ -166,7 +176,7 @@ export const ExpandableRow = (props: {
         })}
       </TableRow>
       <TableRow sx={{ p: 0, m: 0 }}>
-        <TableCell sx={{ p: 0, m: 0 }} colSpan={6}></TableCell>
+        <TableCell sx={{ p: 0, m: 0 }} colSpan={7}></TableCell>
         <TableCell
           sx={{ p: 0 }}
           // style={{ paddingBottom: 0, paddingTop: 0 }}

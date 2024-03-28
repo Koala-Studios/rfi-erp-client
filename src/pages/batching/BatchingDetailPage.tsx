@@ -53,13 +53,11 @@ import { IInventoryStock } from "../../logic/inventory-stock.logic";
 import { TableGridColDef } from "../../components/batching/BatchingTable";
 import { isSet } from "util/types";
 
-
-
-import Dialog from '@mui/material/Dialog';
-import DialogActions from '@mui/material/DialogActions';
-import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
-import DialogTitle from '@mui/material/DialogTitle';
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
 
 let savedBatching: IBatching | null = null;
 
@@ -98,7 +96,7 @@ const emptyBatching: IBatching = {
   _id: "",
   status: 1,
   source_id: undefined,
-  source_type:undefined,
+  source_type: undefined,
   batch_code: "",
   ingredients: [],
   notes: "",
@@ -190,9 +188,7 @@ export const BatchingDetailPage = () => {
     );
   };
 
-  const handleBatchRecursive = (prod_id: string) => {
-
-  }
+  const handleBatchRecursive = (prod_id: string) => {};
 
   const handleEditProductSubRow = (rowid: string, value: IInventoryStock) => {
     const index = expandableRows.findIndex((element) =>
@@ -297,11 +293,18 @@ export const BatchingDetailPage = () => {
   }, [rows]);
 
   const expandableColumns: TableGridColDef[] = [
-    { field: "product_code", headerName: "Product Code", width: 125 },
+    { field: "product_code", headerName: "Product Code", width: 70 },
     {
       field: "product_name",
       headerName: "Product Name",
-      width: 350,
+      width: 250,
+      sortable: false,
+      filterable: false,
+    },
+    {
+      field: "instructions",
+      headerName: "Instructions",
+      width: 250,
       sortable: false,
       filterable: false,
     },
@@ -316,7 +319,9 @@ export const BatchingDetailPage = () => {
         params.required_amount
           ? params.required_amount.toFixed(4) +
             (params.required_amount < 0.1
-              ? "(" + (params.required_amount.toFixed(4) * 1000).toFixed(1) + "g)"
+              ? "(" +
+                (params.required_amount.toFixed(4) * 1000).toFixed(1) +
+                "g)"
               : "")
           : params.remaining_amount,
     },
@@ -342,19 +347,22 @@ export const BatchingDetailPage = () => {
       valueGetter: (params: any) =>
         params.remaining_amount
           ? params.remaining_amount.toFixed(4) +
-            (params.remaining_amount < 0.1 && params.remaining_amount.toFixed(4) > 0
-              ? "(" + (params.remaining_amount.toFixed(4) * 1000).toFixed(1) + "g)"
+            (params.remaining_amount < 0.1 &&
+            params.remaining_amount.toFixed(4) > 0
+              ? "(" +
+                (params.remaining_amount.toFixed(4) * 1000).toFixed(1) +
+                "g)"
               : "")
           : params.remaining_amount,
     },
     {
       field: "lot_number",
       headerName: "Lot #",
-      width: 200,
+      width: 100,
       sortable: false,
       filterable: false,
       customRender: (row: any) => (
-        <TableCell sx={{ width: 180, p: 0 }}>
+        <TableCell sx={{ width: 100, p: 0 }}>
           <TableAutocomplete
             width={200}
             dropDownWidth={260}
@@ -387,7 +395,7 @@ export const BatchingDetailPage = () => {
       field: "confirm_lot_number",
       headerName: "Confirm Lot #",
       width: 120,
-      type:'string',
+      type: "string",
       align: "center",
       editable: true,
     },
@@ -395,7 +403,7 @@ export const BatchingDetailPage = () => {
       field: "used_amount",
       headerName: "Qty Used",
       type: "number",
-      width: 110,
+      width: 80,
       align: "right",
       editable: true,
     },
@@ -403,7 +411,7 @@ export const BatchingDetailPage = () => {
       field: "product_id",
       headerName: "Actions",
       type: "boolean",
-      width: 125,
+      width: 100,
       align: "right",
       editable: false,
       customRender: (row: any) => {
@@ -429,7 +437,7 @@ export const BatchingDetailPage = () => {
                 maxHeight: "30px",
                 minWidth: "40px",
                 minHeight: "30px",
-                marginRight:2,
+                marginRight: 2,
               }}
               onClick={() => {
                 handleAddRow(row["_id"]);
@@ -444,8 +452,18 @@ export const BatchingDetailPage = () => {
             >
               +
             </Button>
-            {row['avoid_recur'] && <FormDialog product={{_id: row['product_id'], code: row['product_code'],name: row['product_name']}} batching_id={batching!._id}/>
-}          </TableCell>
+            {/* KEY BATCHING BUTTON! */}
+            {row["avoid_recur"] && (
+              <FormDialog
+                product={{
+                  _id: row["product_id"],
+                  code: row["product_code"],
+                  name: row["product_name"],
+                }}
+                batching_id={batching!._id}
+              />
+            )}{" "}
+          </TableCell>
         );
       },
     },
@@ -454,12 +472,12 @@ export const BatchingDetailPage = () => {
     {
       field: "lot_number",
       headerName: "Lot #",
-      width: 200,
+      width: 100,
       align: "left",
       sortable: false,
       filterable: false,
       customRender: (row: any) => (
-        <TableCell sx={{ width: 180, p: 0 }}>
+        <TableCell sx={{ width: 100, p: 0 }}>
           <TableAutocomplete
             width={200}
             dropDownWidth={260}
@@ -496,7 +514,7 @@ export const BatchingDetailPage = () => {
       field: "id",
       headerName: "Actions",
       align: "left",
-      width: 125,
+      width: 120,
       customRender: (row: any) => {
         return (
           <TableCell
@@ -504,7 +522,7 @@ export const BatchingDetailPage = () => {
               p: 1,
               pl: "10px",
               pr: "10px",
-              width: 65,
+              width: 120,
               fontWeight: "500",
               fontSize: "0.9rem",
             }}
@@ -552,9 +570,10 @@ export const BatchingDetailPage = () => {
           item.used_containers.length > 0
             ? item.used_containers[0].confirm_lot_number
             : "",
-        used_amount: item.used_containers.length > 0
-        ? item.used_containers[0].used_amount
-        : 0,
+        used_amount:
+          item.used_containers.length > 0
+            ? item.used_containers[0].used_amount
+            : 0,
         total_used_amount: item.total_used_amount,
         sub_rows:
           item.used_containers.length > 1
@@ -562,7 +581,7 @@ export const BatchingDetailPage = () => {
             : [],
         // has_enough: true,
         remaining_amount: item.required_amount - item.total_used_amount,
-        avoid_recur: item.avoid_recur
+        avoid_recur: item.avoid_recur,
       };
     });
     return newIng;
@@ -575,7 +594,7 @@ export const BatchingDetailPage = () => {
           savedBatching = _batching;
           setBatching(_batching);
           setExpandableRows(reformatIngredients(_batching));
-          console.log(_batching, 'TESTING');
+          console.log(_batching, "TESTING");
           setBatchingSaved(true);
           // handleGenerateBatchingBOM();
         } else {
@@ -711,6 +730,7 @@ export const BatchingDetailPage = () => {
         used_containers: [
           {
             _id: row.row_id,
+            product_id: row.product_id,
             container_id: row.container_id,
             lot_number: row.lot_number,
             confirm_lot_number: row.confirm_lot_number,
@@ -719,7 +739,7 @@ export const BatchingDetailPage = () => {
           ...row.sub_rows,
         ],
         total_used_amount: row.total_used_amount,
-        avoid_recur: row.avoid_recur
+        avoid_recur: row.avoid_recur,
       };
     });
     console.log(ingredients, "TEST");
@@ -777,6 +797,7 @@ export const BatchingDetailPage = () => {
               ...targetRow.sub_rows,
               {
                 _id: new ObjectID().toHexString(),
+                product_id: row.product_id,
                 container_id: "",
                 lot_number: "",
                 confirm_lot_number: "",
@@ -828,7 +849,7 @@ export const BatchingDetailPage = () => {
         navigate(`/batching/${_batching._id}`, { replace: true });
         setBatching(_batching);
         setExpandableRows(reformatIngredients(_batching));
-        console.log(_batching, 'Testing new creation')
+        console.log(_batching, "Testing new creation");
       }
     } else {
       //Recompile with proper format to save
@@ -878,7 +899,7 @@ export const BatchingDetailPage = () => {
               aria-label="go back"
               size="medium"
               variant="outlined"
-              onClick={() => navigate('./../')}
+              onClick={() => navigate("./../")}
             >
               <ArrowBackIcon
                 fontSize="small"
@@ -1047,7 +1068,12 @@ export const BatchingDetailPage = () => {
                     size="medium"
                     variant="outlined"
                     onClick={() =>
-                      navigate("/sales-orders/" + batching!.source_type + '/' + batching!.source_id)
+                      navigate(
+                        "/sales-orders/" +
+                          batching!.source_type +
+                          "/" +
+                          batching!.source_id
+                      )
                     }
                   >
                     View Source
@@ -1129,7 +1155,9 @@ export const BatchingDetailPage = () => {
         </div>
       </Card>
       {batching!.status >= 1 && (
-        <Card sx={{ mt: 2, padding: 2, overflowY: "hidden", height: "calc(100%)" }}>
+        <Card
+          sx={{ mt: 2, padding: 2, overflowY: "hidden", height: "calc(100%)" }}
+        >
           <BatchingDataTable
             rows={expandableRows!}
             columns={expandableColumns}
@@ -1169,19 +1197,20 @@ const CustomTableAdd = (handleAddRow: any, row_id: string) => {
   );
 };
 
-
-
-export default function FormDialog(props:{product:{_id:string,code:string,name:string,}, batching_id:string}) {
+export default function FormDialog(props: {
+  product: { _id: string; code: string; name: string };
+  batching_id: string;
+}) {
   const [open, setOpen] = React.useState(false);
   const [quantity, setQuantity] = React.useState(0);
   const navigate = useNavigate();
   const auth = React.useContext(AuthContext);
-  const batching:IBatching = {
+  const batching: IBatching = {
     _id: "",
     status: 1,
-    source_id:props.batching_id,
-    source_type:'batching',
-    batch_code: "test"+Math.random(),
+    source_id: props.batching_id,
+    source_type: "batching",
+    batch_code: "test" + Math.random(),
     ingredients: [],
     notes: "",
     product_code: props.product.code,
@@ -1190,30 +1219,30 @@ export default function FormDialog(props:{product:{_id:string,code:string,name:s
     quantity: quantity,
     date_created: new Date().toISOString().split("T")[0],
     date_needed: addDays(new Date(), 5).toISOString().split("T")[0],
-  }
+  };
   const handleClickOpen = () => {
     setOpen(true);
   };
 
   const handleConfirm = async () => {
-      const newBatchingId = await createBatching(auth.token, batching!);
-      handleClose();
-      if (newBatchingId) {
-        let handle = window.open('../batching/'+newBatchingId,'_blank');
-        handle?.blur();
-        window.focus();
-        // setBatching({ ...batching!, _id: newBatchingId });
-      } else {
-          throw Error("Recursive Batch Creation Error");
-      }
-  }
+    const newBatchingId = await createBatching(auth.token, batching!);
+    handleClose();
+    if (newBatchingId) {
+      let handle = window.open("../batching/" + newBatchingId, "_blank");
+      handle?.blur();
+      window.focus();
+      // setBatching({ ...batching!, _id: newBatchingId });
+    } else {
+      throw Error("Recursive Batch Creation Error");
+    }
+  };
   const handleClose = () => {
     setOpen(false);
   };
 
   return (
     <React.Fragment>
-            <Button
+      <Button
         variant="outlined"
         color="info"
         size="small"
@@ -1227,8 +1256,8 @@ export default function FormDialog(props:{product:{_id:string,code:string,name:s
         }}
         onClick={() => {
           // handleBatchRecursive(row["product_id"]);
-          handleClickOpen()
-          console.log(props.product._id, 'TEST')
+          handleClickOpen();
+          console.log(props.product._id, "TEST");
         }}
       >
         B
@@ -1247,7 +1276,9 @@ export default function FormDialog(props:{product:{_id:string,code:string,name:s
             type="number"
             variant="standard"
             value={quantity}
-            onChange={(e)=>{setQuantity(parseFloat(e.target.value))}}
+            onChange={(e) => {
+              setQuantity(parseFloat(e.target.value));
+            }}
           />
         </DialogContent>
         <DialogActions>
@@ -1255,7 +1286,6 @@ export default function FormDialog(props:{product:{_id:string,code:string,name:s
           <Button onClick={handleConfirm}>Confirm</Button>
         </DialogActions>
       </Dialog>
-
     </React.Fragment>
   );
 }

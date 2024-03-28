@@ -54,6 +54,7 @@ export interface IInventory {
   regulatory: IRegulatory;
   dietary: IDietary;
   product_type: { name: string; _id: string } | null;
+  default_location: { _id: string; code: string; name: string } | null;
 }
 
 const api = axios.create({

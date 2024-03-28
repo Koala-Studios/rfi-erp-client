@@ -74,9 +74,9 @@ function App() {
         autoHideDuration={2000}
         maxSnack={4}
       >
-        <BrowserRouter >
+        <BrowserRouter>
           <AuthProvider>
-            <Routes >
+            <Routes>
               <Route path="/" element={<SignInPage />} />
               <Route path="/login" element={<SignInPage />} />
 
@@ -299,7 +299,7 @@ function App() {
                 }
               />
               <Route
-                path="/customers/:id"
+                path="/customers/:id/:tab_id?"
                 element={
                   <RequireAuth permission={PERMISSIONS.customers_page}>
                     <Navbar title="Customer Details">

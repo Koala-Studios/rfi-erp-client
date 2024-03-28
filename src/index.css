@@ -74,3 +74,17 @@ a {
 .SnackbarContent-root {
   box-shadow: 0 5px 10px 0 rgb(200, 200, 200)!important;
 }
+
+/* NOT WORKING RIGHT noW BUT IMPORTANT MAYBE LATER */
+input[type=number] {
+  -moz-appearance: 'textfield';
+}
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: 'none';
+  margin: 0;
+}
+
+input[type=number]::-webkit-inner-spin-button {
+-webkit-appearance: 'none';
+margin: 0;
+}

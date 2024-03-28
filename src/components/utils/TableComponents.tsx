@@ -249,7 +249,13 @@ export const TableTexfield: React.FC<TableTexfieldProps> = ({
         //TODO: fix can't make field empty
         onBlur={(event) => {
           // console.log(event, "test if empty", event.target.value); //!Line below fixes weird bug for 0 values in textfield not updating.. nvm.. wtv.. works with '-' for now for strings
-          handleEditRow(event.target.value == '' ? (type === 'number' ? '0' : '-') : defaultValue);
+          handleEditRow(
+            event.target.value == ""
+              ? type === "number"
+                ? "0"
+                : "-"
+              : defaultValue
+          );
           setEditMode(false);
         }}
         InputProps={{

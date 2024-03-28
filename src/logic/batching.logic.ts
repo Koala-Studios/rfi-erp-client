@@ -35,6 +35,7 @@ export interface IBatching {
 
 export interface IBatchingContainer {
   _id: string;
+  product_id: string;
   container_id: string;
   lot_number: string;
   confirm_lot_number: string;
