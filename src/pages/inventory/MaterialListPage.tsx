@@ -88,6 +88,7 @@ const MaterialListPage = () => {
   React.useEffect(() => {
     //TODO: SET THE LIST HERE TO ONLY RAW MATERIALS, DO THIS WITH FILTERS!
     listInventory(searchParams, filterArray, false).then((list) => {
+      console.log("testing", list!.docs);
       const newRows = list!.docs.map((item) => {
         return {
           id: item._id,
@@ -95,10 +96,10 @@ const MaterialListPage = () => {
           name: item.name,
           cost: item.cost,
           reorder_amount: item.reorder_amount ?? 0,
-          on_hand: item.on_hand ?? 0,
-          ordered: item.ordered ?? 0,
-          quarantined: item.quarantined ?? 0,
-          allocated: item.allocated ?? 0,
+          on_hand: item.stock.on_hand ?? 0,
+          ordered: item.stock.ordered ?? 0,
+          quarantined: item.stock.quarantined ?? 0,
+          allocated: item.stock.allocated ?? 0,
           is_raw: item.is_raw,
         };
       });

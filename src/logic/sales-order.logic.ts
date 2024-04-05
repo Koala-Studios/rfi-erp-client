@@ -3,15 +3,17 @@ import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
 
 export interface IOrderItem {
   _id: string;
-  product_id: string;
-  product_code: string;
-  product_name: string;
-  batch_id: string;
+  product: { _id: string; product_code: string; name: string };
+  customer_sku: string;
+  c_prod_name: string;
   sold_amount: number;
-  sample: boolean;
   shipped_amount: number;
   unit_price: number;
   status: number;
+  batch_id: string;
+  lot_number: string;
+  sample: boolean;
+  container_size: number;
 }
 
 export const itemStatus = {

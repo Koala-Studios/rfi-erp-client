@@ -108,7 +108,7 @@ export const SalesDetailPage = () => {
   const [salesSaved, setSalesSaved] = React.useState<boolean>(true);
   const [sales, setSales] = React.useState<ISalesOrder | null>(null);
   const [rows, setRows] = React.useState<IOrderItem[]>([]);
-  const [receiveMode, setReceiveMode] = React.useState<boolean>(false);
+  const [handleMode, setHandleMode] = React.useState<boolean>(false);
 
   const inputRefs = React.useRef<any[]>([]);
   const [inputVisuals, setInputVisuals] = React.useState<InputVisual[]>(
@@ -196,17 +196,20 @@ export const SalesDetailPage = () => {
   };
   const cancelSaveSales = () => {
     setSales(savedSales);
-    let tempPur = { ...savedSales! };
-    setRows(tempPur.order_items);
+    setRows(savedSales!.order_items);
     setSalesSaved(true);
   };
 
-  const handleEditProductRow = (rowid: string, value: IInventory) => {
+  const handleEditProductRow = (rowid: string, value: ICustomerProduct) => {
     let pList = rows!.slice();
     const rowIdx = rows!.findIndex((r: any) => r._id === rowid);
-    pList[rowIdx].product_code = value.product_code;
-    pList[rowIdx].product_id = value._id;
-    pList[rowIdx].product_name = value.name;
+    pList[rowIdx].product.product_code = value.product.product_code;
+    pList[rowIdx].product._id = value.product._id;
+    pList[rowIdx].product.name = value.product.name;
+    pList[rowIdx].customer_sku = value.customer_sku;
+    pList[rowIdx].c_prod_name = value.c_prod_name;
+    pList[rowIdx].unit_price = value.price;
+
     setRows(pList);
   };
 
@@ -226,7 +229,7 @@ export const SalesDetailPage = () => {
             return item;
           })
         );
-        setReceiveMode(p!.status <= 3);
+        setHandleMode(p!.status <= 3);
         // setSalesSaved(true);
       });
     }
@@ -234,7 +237,7 @@ export const SalesDetailPage = () => {
 
   useEffect(() => {
     if (sales == null) return;
-    setReceiveMode(sales.status <= 3);
+    setHandleMode(sales.status <= 3);
 
     if (salesSaved === false) return;
 
@@ -245,7 +248,7 @@ export const SalesDetailPage = () => {
 
   useEffect(() => {
     //temp maybe
-    if (rows.length != 0 && rows != null && !receiveMode) {
+    if (rows.length != 0 && rows != null && !handleMode) {
       if (JSON.stringify(savedSales?.order_items) !== JSON.stringify(rows)) {
         setSalesSaved(false);
       }
@@ -256,9 +259,9 @@ export const SalesDetailPage = () => {
     }
   }, [rows]);
 
-  const receiveColumns: GridColDef[] = [
+  const handleColumns: GridColDef[] = [
     {
-      field: "product_code",
+      field: "product.product_code",
       headerName: "Product Code",
       width: 120,
       editable: false,
@@ -270,11 +273,10 @@ export const SalesDetailPage = () => {
       editable: false,
     },
     {
-      field: "product_name",
+      field: "c_prod_name",
       headerName: "Product Name",
       width: 280,
       editable: false,
-      renderCell: undefined,
     },
     {
       field: "sold_amount",
@@ -284,24 +286,6 @@ export const SalesDetailPage = () => {
       align: "center",
       editable: false,
     },
-    // {
-    //   field: "received_amount",
-    //   headerName: "Received Qty",
-    //   type: "number",
-    //   width: 100,
-    //   align: "center",
-    //   editable: false,
-    // },
-    // {
-    //   field: "remaining_amount",
-    //   headerName: "Awaiting Qty",
-    //   type: "number",
-    //   width: 100,
-    //   align: "center",
-    //   editable: false,
-    //   valueGetter: (params) =>
-    //     params.row.salesd_amount - params.row.received_amount,
-    // },
     {
       field: "unit_price",
       headerName: "Price($/KG)",
@@ -343,26 +327,7 @@ export const SalesDetailPage = () => {
       editable: true,
       align: "center",
     },
-    // {
-    //   field: "location",
-    //   headerName: "Location",
-    //   width: 140,
-    //   sortable: false,
-    //   filterable: false,
-    //   renderCell: (row_params: GridRenderCellParams<string>) => (
-    //     <TableAutocomplete
-    //     initialValue={row_params.row.location}
-    //       readOnly={sales!.status === 6 || sales!.status === 4}
-    //       dbOption="location"
-    //       handleEditRow={handleEditProductRow}
-    //       rowParams={row_params}
-    //       letterMin={0}
-    //       getOptionLabel={(item: ILocation) => item ?
-    //         `${item.code} | ${item.name}` : ''
-    //       }
-    //     />
-    //   ),
-    // },
+
     {
       field: "id",
       headerName: "Actions",
@@ -430,16 +395,30 @@ export const SalesDetailPage = () => {
         </div>
       ),
     },
-    { field: "product_code", headerName: "Product Code", width: 150 },
     {
-      field: "product_name",
+      field: "product.product_code",
+      headerName: "Product Code",
+      width: 120,
+      editable: false,
+      valueGetter(params) {
+        return params.row.product.product_code;
+      },
+    },
+    {
+      field: "customer_sku",
+      headerName: "Customer Sku",
+      width: 120,
+      editable: false,
+    },
+    {
+      field: "c_prod_name",
       headerName: "Product Name",
       width: 350,
       sortable: false,
       filterable: false,
       renderCell: (row_params: GridRenderCellParams<string>) => (
         <TableAutocomplete
-          initialValue={row_params.row.product_name}
+          initialValue={row_params.row.c_prod_name}
           readOnly={sales!.status != 6}
           dbOption="customer-product"
           searchOptionalVar={sales!.customer._id}
@@ -447,7 +426,9 @@ export const SalesDetailPage = () => {
           rowParams={row_params}
           letterMin={0}
           getOptionLabel={(item: ICustomerProduct) =>
-            item.c_prod_name ? `${item.customer_sku} | ${item.c_prod_name}` : ""
+            item.c_prod_name
+              ? `${item.customer_sku} | ${item.c_prod_name} | ${item.product.product_code}`
+              : ""
           }
         />
       ),
@@ -488,24 +469,16 @@ export const SalesDetailPage = () => {
   ];
 
   const handleRow = (row: IOrderItemProcess) => {
-    if (!row.process_amount) {
-      window.dispatchEvent(
-        new CustomEvent("NotificationEvent", {
-          detail: { color: "warning", text: "Missing Fields in this Row" },
-        })
-      );
-    } else {
-      handleSalesItem(row, sales!._id).then((_sales) => {
-        if (_sales) {
-          savedSales = _sales;
-          setSales(_sales);
-          setRows(_sales.order_items);
-          setSalesSaved(true);
-        } else {
-          console.log("Sales Not Updated");
-        }
-      });
-    }
+    handleSalesItem(row, sales!._id).then((_sales) => {
+      if (_sales) {
+        savedSales = _sales;
+        setSales(_sales);
+        setRows(_sales.order_items);
+        setSalesSaved(true);
+      } else {
+        console.log("Sales Not Updated");
+      }
+    });
   };
 
   const handleConfirmSales = () => {
@@ -563,36 +536,21 @@ export const SalesDetailPage = () => {
     ]);
   };
 
-  // const handleInsertRow = (row_id: string) => { //!not being used atm
-  //   const index = rows.findIndex(
-  //     (element: { id: string }) => element.id === row_id
-  //   );
-  //   setRows([
-  //     ...rows.slice(0, index + 1),
-  //     {
-  //       _id: new ObjectID().toHexString(),
-  //       amount: 0,
-  //       last_amount: 0,
-  //       item_cost: 0,
-  //       cost: 0,
-  //     },
-  //     ...rows.slice(index == rows.length - 1 ? index + 2 : index + 1),
-  //   ]);
-  // };
-
   const handleAddRow = () => {
     setRows([
       {
         _id: new ObjectID().toHexString(),
-        product_id: "",
-        product_code: "",
-        product_name: "",
+        product: { _id: "", product_code: "", name: "" },
+        customer_sku: "",
+        c_prod_name: "",
         sold_amount: 0,
         shipped_amount: 0,
         unit_price: 0,
         batch_id: "",
+        lot_number: "",
         sample: false,
         status: 1,
+        container_size: 10,
       },
       ...rows.slice(0),
     ]);
@@ -845,7 +803,7 @@ export const SalesDetailPage = () => {
             </Button>
             {/* <Switch color="primary"
           disabled={id=== "new"}
-          onChange={() => setReceiveMode(!receiveMode)}/>
+          onChange={() => setHandleMode(!handleMode)}/>
           Receive Mode */}
           </div>
           <DataGrid
@@ -879,7 +837,7 @@ export const SalesDetailPage = () => {
                 },
               },
             }}
-            columns={receiveMode ? receiveColumns : draftColumns}
+            columns={handleMode ? handleColumns : draftColumns}
             onCellEditCommit={(e, value) => {
               handleEditCell(e.id.toString(), e.field, e.value);
               console.log("test", rows);

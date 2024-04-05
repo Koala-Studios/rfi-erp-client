@@ -40,7 +40,7 @@ const TableAutocomplete: React.FC<Props> = ({
   handleEditRow,
   rowParams,
   initialValue,
-  letterMin,
+  letterMin = 0,
   dbOption,
   width = 340,
   dropDownWidth = 450,
@@ -56,25 +56,21 @@ const TableAutocomplete: React.FC<Props> = ({
     event: React.SyntheticEvent<Element, Event>,
     value: string
   ) => {
-    lookup(value.toUpperCase(), dbOption, letterMin, searchOptionalVar).then(
-      (result) => {
-        setOptionList(result);
-      }
-    );
+    lookup(value, dbOption, letterMin, searchOptionalVar).then((result) => {
+      setOptionList(result);
+    });
   };
   const handleSelect = async (value: string) => {
-    lookup(value.toUpperCase(), dbOption, letterMin, searchOptionalVar).then(
-      (result) => {
-        setOptionList(result);
-      }
-    );
+    lookup(value, dbOption, letterMin, searchOptionalVar).then((result) => {
+      setOptionList(result);
+    });
   };
 
   if (editMode) {
     return (
       <Autocomplete
         value={initialValue}
-        // clearOnBlur={false}
+        clearOnBlur={false}
         isOptionEqualToValue={(option, value) =>
           option._id === value._id || option.lot_number === value
         }
@@ -104,9 +100,7 @@ const TableAutocomplete: React.FC<Props> = ({
         onInputChange={handleInputChange}
         onBlur={() => setEditMode(false)}
         onChange={(event, value) => {
-          console.log(value);
           handleEditRow(rowParams.row._id, value);
-          console.log(value);
           setEditMode(value == null);
         }}
         renderInput={(params) => {

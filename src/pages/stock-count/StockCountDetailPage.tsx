@@ -37,7 +37,7 @@ import {
 } from "../../logic/stock-count.logic";
 import { IInventoryStock } from "../../logic/inventory-stock.logic";
 import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
-import Battery0BarTwoToneIcon from '@mui/icons-material/Battery0BarTwoTone';
+import Battery0BarTwoToneIcon from "@mui/icons-material/Battery0BarTwoTone";
 import { ILocation } from "../../logic/location.logic";
 let savedStockCount: IStockCount | null = null;
 
@@ -66,7 +66,7 @@ export const StockCountDetailPage = () => {
   const emptyStockCount: IStockCount = {
     _id: "",
     status: 1,
-    created_date: new Date().toISOString().split('T')[0],
+    created_date: new Date().toISOString().split("T")[0],
     approved_date: "",
     count_code: "",
     count_items: [],
@@ -76,44 +76,51 @@ export const StockCountDetailPage = () => {
   const [stockCountSaved, setStockCountSaved] = React.useState<boolean>(true);
   const [stockCount, setStockCount] = React.useState<IStockCount | null>(null);
 
-  
-const inputRefMap = {
-  count_code: 0,
-  created_date: 1,
-  approved_date: 2,
-  notes:3
-  //TODO: Supplier
-};
+  const inputRefMap = {
+    count_code: 0,
+    created_date: 1,
+    approved_date: 2,
+    notes: 3,
+    //TODO: Supplier
+  };
 
-const inputMap: InputInfo[] = [
-  { label: "count_code", ref: 0, validation: { required: true, genericVal: "Text" } },
-  {
-    label: "created_date",
-    ref: 1,
-    validation: { required: true, genericVal: "Date" },
-  },
-  {
-    label: "approved_date",
-    ref: 2,
-    validation: { required: false, genericVal: "Date" },
-  },
-  { label: "notes", ref: 3, validation: { required: false, genericVal: "Text" } },
-];
-  
-const [selectedContainer, setSelectedContainer] = React.useState<IInventoryStock | null>(null);
-const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>(null);
+  const inputMap: InputInfo[] = [
+    {
+      label: "count_code",
+      ref: 0,
+      validation: { required: true, genericVal: "Text" },
+    },
+    {
+      label: "created_date",
+      ref: 1,
+      validation: { required: true, genericVal: "Date" },
+    },
+    {
+      label: "approved_date",
+      ref: 2,
+      validation: { required: false, genericVal: "Date" },
+    },
+    {
+      label: "notes",
+      ref: 3,
+      validation: { required: false, genericVal: "Text" },
+    },
+  ];
+
+  const [selectedContainer, setSelectedContainer] =
+    React.useState<IInventoryStock | null>(null);
+  const [selectedLocation, setSelectedLocation] =
+    React.useState<ILocation | null>(null);
   const [weighedAmt, setWeighedAmt] = React.useState<number>(NaN);
 
   const [rows, setRows] = React.useState<ICountItem[]>([]);
   const [receiveMode, setReceiveMode] = React.useState<boolean>(false);
-  
+
   const inputRefs = React.useRef<any[]>([]);
   const [inputVisuals, setInputVisuals] = React.useState<InputVisual[]>(
     Array(inputMap.length).fill({ helperText: "", error: false })
   );
 
-
-  
   const onInputBlur = (
     event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement, Element>,
     input: InputInfo
@@ -135,7 +142,6 @@ const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>
     setStockCount({ ...stockCount! });
     setStockCountSaved(false);
   };
-
 
   useEffect(() => {
     if (id === "new") {
@@ -233,7 +239,8 @@ const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>
       width: 120,
       editable: false,
       align: "right",
-      valueGetter: (params) => params.row.expiry_date ? params.row.expiry_date.split('T')[0] : ''
+      valueGetter: (params) =>
+        params.row.expiry_date ? params.row.expiry_date.split("T")[0] : "",
     },
     {
       field: "container_size",
@@ -267,11 +274,10 @@ const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>
       editable: stockCount ? stockCount!.status === 1 : true,
       align: "center",
     },
-
   ];
 
   const handleSubmitStockCount = () => {
-    if(stockCount?.count_items.length === 0) {
+    if (stockCount?.count_items.length === 0) {
       window.dispatchEvent(
         new CustomEvent("NotificationEvent", {
           detail: {
@@ -282,18 +288,16 @@ const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>
       );
       return;
     }
-    submitStockCount(stockCount!).then(
-      (_stockCount) => {
-        if (_stockCount) {
-          // window.location.reload();
-          savedStockCount = _stockCount;
-          setStockCount(_stockCount);
-          setStockCountSaved(true);
-        } else {
-          console.log("Stock Count Not Updated");
-        }
+    submitStockCount(stockCount!).then((_stockCount) => {
+      if (_stockCount) {
+        // window.location.reload();
+        savedStockCount = _stockCount;
+        setStockCount(_stockCount);
+        setStockCountSaved(true);
+      } else {
+        console.log("Stock Count Not Updated");
       }
-    );
+    });
   };
 
   const handleApproveStockCount = () => {
@@ -335,7 +339,6 @@ const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>
     });
   };
 
-
   const handleDeleteRow = (row_id: string) => {
     setRows([...rows.filter((m: ICountItem) => m._id !== row_id)]);
   };
@@ -350,7 +353,7 @@ const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>
       },
       ...rows.slice(rowIndex == rows.length ? rowIndex : rowIndex + 1),
     ]);
-    console.log(rows, 'pizzeria mama mia')
+    console.log(rows, "pizzeria mama mia");
   };
 
   // const handleInsertRow = (row_id: string) => { //!not being used atm
@@ -371,9 +374,16 @@ const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>
   // };
 
   const handleAddRow = () => {
-    if(selectedContainer && !Number.isNaN(weighedAmt)) {
-      if(rows.findIndex(e => e.container_id === selectedContainer._id) != -1) {
-        console.log(rows.findIndex(e => e.container_id === selectedContainer._id), rows, selectedContainer, 'BRUH.')
+    if (selectedContainer && !Number.isNaN(weighedAmt)) {
+      if (
+        rows.findIndex((e) => e.container_id === selectedContainer._id) != -1
+      ) {
+        console.log(
+          rows.findIndex((e) => e.container_id === selectedContainer._id),
+          rows,
+          selectedContainer,
+          "BRUH."
+        );
         window.dispatchEvent(
           new CustomEvent("NotificationEvent", {
             detail: {
@@ -395,9 +405,12 @@ const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>
           name: selectedContainer.name,
           expiry_date: selectedContainer.expiry_date,
           lot_number: selectedContainer.lot_number,
-          container_id:selectedContainer._id,
+          container_id: selectedContainer._id,
           container_size: selectedContainer.container_size,
-          container_amount: Math.ceil(selectedContainer.remaining_amount / selectedContainer.container_size),
+          container_amount: Math.ceil(
+            selectedContainer.remaining_amount /
+              selectedContainer.container_size
+          ),
           current_amount: selectedContainer.remaining_amount,
           proposed_amount: weighedAmt,
         },
@@ -415,11 +428,10 @@ const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>
         })
       );
     }
-
   };
   const handlefillAllStockCount = () => {
     fillAllStockCount().then((containers) => {
-      containers?.map((container:IInventoryStock) => {
+      containers?.map((container: IInventoryStock) => {
         setRows([
           {
             _id: new ObjectID().toHexString(),
@@ -429,24 +441,27 @@ const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>
             name: container.name,
             expiry_date: container.expiry_date,
             lot_number: container.lot_number,
-            container_id:container._id,
+            container_id: container._id,
             container_size: container.container_size ?? 0,
-            container_amount: (container.remaining_amount && container.container_size) ? Math.ceil(container.remaining_amount / container.container_size) : 0,
+            container_amount:
+              container.remaining_amount && container.container_size
+                ? Math.ceil(
+                    container.remaining_amount / container.container_size
+                  )
+                : 0,
             current_amount: container.remaining_amount ?? 0,
             proposed_amount: 0,
           },
           ...rows.slice(0),
         ]);
-      })
-    }
-    );
-   
-  }
+      });
+    });
+  };
   const handlefillLocation = () => {
-    if(selectedLocation) {
-      console.log(selectedLocation)
+    if (selectedLocation) {
+      console.log(selectedLocation);
       fillAllLocation(selectedLocation!._id).then((containers) => {
-        containers?.map((container:IInventoryStock) => {
+        containers?.map((container: IInventoryStock) => {
           setRows([
             {
               _id: new ObjectID().toHexString(),
@@ -456,18 +471,23 @@ const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>
               name: container.name,
               expiry_date: container.expiry_date,
               lot_number: container.lot_number,
-              container_id:container._id,
+              container_id: container._id,
               container_size: container.container_size ?? 0,
-              container_amount: (container.remaining_amount && container.container_size) ? Math.ceil(container.remaining_amount / container.container_size) : 0,
+              container_amount:
+                container.remaining_amount && container.container_size
+                  ? Math.ceil(
+                      container.remaining_amount / container.container_size
+                    )
+                  : 0,
               current_amount: container.remaining_amount ?? 0,
               proposed_amount: 0,
             },
             ...rows.slice(0),
           ]);
-        })
-      })
+        });
+      });
     }
-  }
+  };
 
   const saveStockCount = async () => {
     let allValid = true;
@@ -502,14 +522,13 @@ const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>
     //send new stockCount to server
     if (id === "new") {
       const _stockCount = await createStockCount(stockCount!);
-      console.log(_stockCount)
+      console.log(_stockCount);
       if (_stockCount) {
         navigate(`/stock-counts/${_stockCount._id}`, { replace: true });
-        setStockCount({  ..._stockCount });
-        savedStockCount = _stockCount
+        setStockCount({ ..._stockCount });
+        savedStockCount = _stockCount;
         setStockCountSaved(true);
       } else {
-
       }
     } else {
       const updated = await updateStockCount(stockCount!);
@@ -574,7 +593,9 @@ const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>
                   onBlur={(event) =>
                     onInputBlur(event, inputMap[inputRefMap.count_code])
                   }
-                  required={inputMap[inputRefMap.count_code].validation.required}
+                  required={
+                    inputMap[inputRefMap.count_code].validation.required
+                  }
                   spellCheck="false"
                   InputLabelProps={{ shrink: true }}
                   fullWidth
@@ -585,7 +606,7 @@ const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>
               </Grid>
               <Grid item xs={3}>
                 <TextField
-                  defaultValue={stockCount.created_date.split('T')[0]}
+                  defaultValue={stockCount.created_date.split("T")[0]}
                   inputRef={(el: any) =>
                     (inputRefs.current[inputRefMap.created_date] = el)
                   }
@@ -594,7 +615,9 @@ const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>
                   onBlur={(event) =>
                     onInputBlur(event, inputMap[inputRefMap.created_date])
                   }
-                  required={inputMap[inputRefMap.created_date].validation.required}
+                  required={
+                    inputMap[inputRefMap.created_date].validation.required
+                  }
                   fullWidth
                   InputLabelProps={{ shrink: true }}
                   size="small"
@@ -605,16 +628,24 @@ const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>
               </Grid>
               <Grid item xs={3}>
                 <TextField
-                  defaultValue={stockCount.approved_date ? stockCount.approved_date.split('T')[0] : null}
+                  defaultValue={
+                    stockCount.approved_date
+                      ? stockCount.approved_date.split("T")[0]
+                      : null
+                  }
                   inputRef={(el: any) =>
                     (inputRefs.current[inputRefMap.approved_date] = el)
                   }
                   error={inputVisuals[inputRefMap.approved_date].error}
-                  helperText={inputVisuals[inputRefMap.approved_date].helperText}
+                  helperText={
+                    inputVisuals[inputRefMap.approved_date].helperText
+                  }
                   onBlur={(event) =>
                     onInputBlur(event, inputMap[inputRefMap.approved_date])
                   }
-                  required={inputMap[inputRefMap.approved_date].validation.required}
+                  required={
+                    inputMap[inputRefMap.approved_date].validation.required
+                  }
                   fullWidth
                   InputLabelProps={{ shrink: true }}
                   size="small"
@@ -633,7 +664,7 @@ const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>
                   sx={{
                     width: "100%",
                     height: "100%",
-                    maxHeight:40,
+                    maxHeight: 40,
                     borderRadius: 10,
                     fontWeight: 600,
                   }}
@@ -713,7 +744,11 @@ const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>
             <Button
               color="error"
               variant="outlined"
-              disabled={id === "new" || stockCount!.status == 4 ||  stockCount!.status == 3}
+              disabled={
+                id === "new" ||
+                stockCount!.status == 4 ||
+                stockCount!.status == 3
+              }
               onClick={() => handleAbandonStockCount()}
             >
               Abandon
@@ -723,160 +758,183 @@ const [selectedLocation, setSelectedLocation] = React.useState<ILocation | null>
       </Card>
       <Card variant="outlined" sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
         {/* <div style={{ display: "flex", flexDirection: "row", gap: 10 }}> */}
-        <Grid container spacing={3} sx={{mb:3}}>
-        <Grid item xs={3}>
-        <StandaloneAutocomplete
-            initialValue={selectedLocation}
-            readOnly={stockCount.status!= 1}
-            onChange={(e, value) => {
-              setSelectedLocation(value)
-            }}
-            label={"Location Lookup"}
-            letterMin={0}
-            dbOption={"location"}
-            getOptionLabel={(item: ILocation) => {
-              return (
-                item.code + ' | ' + item.name + ' | Containers: ' + item.total_containers
-              );
-            }}
-          />
-        </Grid>  
-        <Grid item xs={2}>
-        <Button variant="contained" onClick={() => handlefillLocation()}>Import Location</Button>
-        </Grid>  
-        <Grid item xs={2}>
-        <Button color="info" variant="contained" onClick={() => handlefillAllStockCount()}>Import All</Button>
-        </Grid>  
-        <Grid item xs={5}/>
-        <Grid item xs={4.5}>
-          <StandaloneAutocomplete
-            initialValue={selectedContainer}
-            readOnly={stockCount.status!= 1}
-            onChange={(e, value) => {
-              setSelectedContainer(value)
-              console.log(value)
-            }}
-            // groupBy={(option:IInventoryStock) => option.product_code + ' | ' + option.name}
-            label={"Container Lookup"}
-            letterMin={1}
-            dbOption={"inventory-stock"}
-            getOptionLabel={(item: IInventoryStock) => {
-              return (
-                item.product_code +
-                " | " +
-                item.name +
-                " | LOT#: " +
-                item.lot_number + 
-                " | CONT SIZE: " +
-                item.container_size 
-                // +
-                // " | CONT AMT: " +
-                // Math.floor(item.received_amount / item.container_size) +
-                // " | CURR AMT: " +
-                // (item.received_amount - item.used_amount)
-              );
-            }}
-          />
-        </Grid>
-        <Grid item xs={1}>
-            
+        <Grid container spacing={3} sx={{ mb: 3 }}>
+          <Grid item xs={3}>
+            <StandaloneAutocomplete
+              initialValue={selectedLocation}
+              readOnly={stockCount.status != 1}
+              onChange={(e, value) => {
+                setSelectedLocation(value);
+              }}
+              label={"Location Lookup"}
+              letterMin={0}
+              dbOption={"location"}
+              getOptionLabel={(item: ILocation) => {
+                return (
+                  item.code +
+                  " | " +
+                  item.name +
+                  " | Containers: " +
+                  item.total_containers
+                );
+              }}
+            />
+          </Grid>
+          <Grid item xs={2}>
+            <Button variant="contained" onClick={() => handlefillLocation()}>
+              Import Location
+            </Button>
+          </Grid>
+          <Grid item xs={2}>
+            <Button
+              color="info"
+              variant="contained"
+              onClick={() => handlefillAllStockCount()}
+            >
+              Import All
+            </Button>
+          </Grid>
+          <Grid item xs={5} />
+          <Grid item xs={4.5}>
+            <StandaloneAutocomplete
+              initialValue={selectedContainer}
+              readOnly={stockCount.status != 1}
+              onChange={(e, value) => {
+                setSelectedContainer(value);
+                console.log(value);
+              }}
+              // groupBy={(option:IInventoryStock) => option.product_code + ' | ' + option.name}
+              label={"Container Lookup"}
+              letterMin={0}
+              dbOption={"inventory-stock"}
+              getOptionLabel={(item: IInventoryStock) => {
+                return (
+                  item.product_code +
+                  " | " +
+                  item.name +
+                  " | LOT#: " +
+                  item.lot_number +
+                  " | CONT SIZE: " +
+                  item.container_size
+                  // +
+                  // " | CONT AMT: " +
+                  // Math.floor(item.received_amount / item.container_size) +
+                  // " | CURR AMT: " +
+                  // (item.received_amount - item.used_amount)
+                );
+              }}
+            />
+          </Grid>
+          <Grid item xs={1}>
             <TextField
-              disabled={stockCount.status!= 1}
+              disabled={stockCount.status != 1}
               spellCheck="false"
               InputLabelProps={{ shrink: true }}
               size="small"
               InputProps={{
-                endAdornment: <InputAdornment position="end">KG</InputAdornment>,
-                readOnly:true
+                endAdornment: (
+                  <InputAdornment position="end">KG</InputAdornment>
+                ),
+                readOnly: true,
               }}
               variant="outlined"
               label={"Total in Inv"}
               //@ts-ignore
               // value={selectedContainer ? (selectedContainer?.product_id.stock.on_hand).toFixed(4) : 0}
             />
-            </Grid>
-        <Grid item xs={1}>
-            
+          </Grid>
+          <Grid item xs={1}>
             <TextField
-              disabled={stockCount.status!= 1}
+              disabled={stockCount.status != 1}
               spellCheck="false"
               InputLabelProps={{ shrink: true }}
               size="small"
               InputProps={{
-                endAdornment: <InputAdornment position="end">KG</InputAdornment>,
-                readOnly:true
+                endAdornment: (
+                  <InputAdornment position="end">KG</InputAdornment>
+                ),
+                readOnly: true,
               }}
-              variant="outlined"              
+              variant="outlined"
               label={"Cont Size"}
               value={selectedContainer ? selectedContainer?.container_size : 0}
             />
-            </Grid>
-            <Grid item xs={1}>
-            
+          </Grid>
+          <Grid item xs={1}>
             <TextField
-              disabled={stockCount.status!= 1}
+              disabled={stockCount.status != 1}
               spellCheck="false"
               InputLabelProps={{ shrink: true }}
               size="small"
               InputProps={{
-                endAdornment: <Battery0BarTwoToneIcon/>,
-                readOnly:true
+                endAdornment: <Battery0BarTwoToneIcon />,
+                readOnly: true,
               }}
               variant="outlined"
               label={"Cont Qty"}
-              value={ selectedContainer ? Math.ceil((selectedContainer?.remaining_amount) / selectedContainer?.container_size ) : 0 }
+              value={
+                selectedContainer
+                  ? Math.ceil(
+                      selectedContainer?.remaining_amount /
+                        selectedContainer?.container_size
+                    )
+                  : 0
+              }
             />
-            </Grid>
-            <Grid item xs={1.5}>
-            
+          </Grid>
+          <Grid item xs={1.5}>
             <TextField
-              disabled={stockCount.status!= 1}
+              disabled={stockCount.status != 1}
               spellCheck="false"
               InputLabelProps={{ shrink: true }}
               size="small"
               InputProps={{
-                endAdornment: <InputAdornment position="end">KG</InputAdornment>,
-                readOnly:true
+                endAdornment: (
+                  <InputAdornment position="end">KG</InputAdornment>
+                ),
+                readOnly: true,
               }}
               variant="outlined"
               // type="number"
-              
+
               label={"Curr Amt"}
-              value={ selectedContainer ? (selectedContainer?.remaining_amount).toFixed(4) : 0 }
+              value={
+                selectedContainer
+                  ? (selectedContainer?.remaining_amount).toFixed(4)
+                  : 0
+              }
             />
-            </Grid>
+          </Grid>
           <Grid item xs={1.5}>
-            
-          <TextField
-            onChange={(e) =>
-              setWeighedAmt(parseFloat(e.target.value))
-            }
-            disabled={stockCount.status!= 1}
-            spellCheck="false"
-            InputLabelProps={{ shrink: true }}
-            size="small"
-            InputProps={{
-              endAdornment: <InputAdornment position="end">KG</InputAdornment>,
-            }}
-            variant="outlined"
-            type="number"
-            label={"Weighed amount"}
-            value={weighedAmt}
-          />
+            <TextField
+              onChange={(e) => setWeighedAmt(parseFloat(e.target.value))}
+              disabled={stockCount.status != 1}
+              spellCheck="false"
+              InputLabelProps={{ shrink: true }}
+              size="small"
+              InputProps={{
+                endAdornment: (
+                  <InputAdornment position="end">KG</InputAdornment>
+                ),
+              }}
+              variant="outlined"
+              type="number"
+              label={"Weighed amount"}
+              value={weighedAmt}
+            />
           </Grid>
           <Grid item xs={1}>
-            
-          <Button
-            disabled={stockCount.status!= 1}
-            variant="contained"
-            onClick={() => {
-              handleAddRow();
-            }}
-          >
-            Add
-          </Button>
+            <Button
+              disabled={stockCount.status != 1}
+              variant="contained"
+              onClick={() => {
+                handleAddRow();
+              }}
+            >
+              Add
+            </Button>
           </Grid>
-          </Grid>
+        </Grid>
         {/* </div> */}
         <DataGrid
           autoHeight={true}

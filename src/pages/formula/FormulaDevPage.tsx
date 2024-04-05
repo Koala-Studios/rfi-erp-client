@@ -195,7 +195,7 @@ const FormulaDevPage = () => {
           handleEditRow={handleEditRow}
           rowParams={row_params}
           initialValue={row_params.row.material_name}
-          letterMin={2}
+          letterMin={0}
           getOptionLabel={(item: IInventory) => {
             return (
               <>

@@ -126,7 +126,7 @@ const BatchingListPage = () => {
         return {
           id: batch._id,
           batch_code: batch.batch_code,
-          date: batch.date_created.toString().replace(/\T.+/, ""),
+          date: batch.date_created,
           date_needed: batch.date_needed
             ? batch.date_needed.toString().replace(/\T.+/, "")
             : "",

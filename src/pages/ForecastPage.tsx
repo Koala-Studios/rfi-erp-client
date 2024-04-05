@@ -96,7 +96,7 @@ export const ForecastPage = () => {
           handleEditRow={handleEditProductRow}
           rowParams={row_params}
           initialValue={row_params.row.product_name}
-          letterMin={3}
+          letterMin={0}
           getOptionLabel={(item: IInventory) =>
             item ? `${item.product_code} | ${item.name}` : ""
           }

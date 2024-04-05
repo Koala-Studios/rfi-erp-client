@@ -337,7 +337,7 @@ export const ProjectDetailsTable: React.FC<Props> = ({
               ? row_params.row.assigned_user.username
               : ""
           }
-          letterMin={1}
+          letterMin={0}
           getOptionLabel={(item: IUser) => (
             <>
               <Avatar sx={{ mr: 2 }} />
@@ -391,7 +391,7 @@ export const ProjectDetailsTable: React.FC<Props> = ({
           initialValue={
             row_params.row.product_code + " | " + row_params.row.product_name
           }
-          letterMin={3}
+          letterMin={0}
           getOptionLabel={(item) =>
             item ? `${item.product_code} | ${item.name}` : ""
           }

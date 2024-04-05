@@ -63,13 +63,15 @@ const CustomerProductPage = (props: { customer: ICustomer }) => {
       filterable: false,
       renderCell: (row_params: GridRenderCellParams<string>) => (
         <TableAutocomplete
+          initialValue={row_params.row.product.product_code}
           dbOption="approved-product"
           width={160}
           handleEditRow={handleEditProductRow}
           rowParams={row_params}
-          initialValue={row_params.row.product.product_code}
           letterMin={0}
-          getOptionLabel={GetProdLabel}
+          getOptionLabel={(item: IProduct) =>
+            item.name ? `${item.product_code} | ${item.name}` : ""
+          }
         />
       ),
     },
@@ -168,8 +170,15 @@ const CustomerProductPage = (props: { customer: ICustomer }) => {
   }, [location.key]);
 
   React.useEffect(() => {
-    if (dataOptions == null || productsSaved === false) return;
+    if (
+      dataOptions == null ||
+      dataOptions!.rows == null ||
+      savedRows == null ||
+      productsSaved === false
+    )
+      return;
     if (JSON.stringify(savedRows) !== JSON.stringify(dataOptions!.rows)) {
+      console.log("Bruh test", savedRows, dataOptions!.rows);
       setProductsSaved(false);
     }
   }, [dataOptions!]);
@@ -247,6 +256,11 @@ const CustomerProductPage = (props: { customer: ICustomer }) => {
         columns={columns}
         GetRowId={(row) => row._id}
         auto_height
+        OnCellKeyDown={(params, event) => {
+          if (event.code == "Space") {
+            event.stopPropagation();
+          }
+        }}
         listOptions={dataOptions.listOptions}
         OnCellEditCommit={(e, value) => {
           handleEditCell(e.id, e.field, e.value);

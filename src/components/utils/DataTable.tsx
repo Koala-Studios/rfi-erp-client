@@ -22,6 +22,7 @@ interface Props {
   OnCellEditCommit?: (e: any, value: any) => any;
   GetRowId?: (row: any) => any;
   GetCellClassName?: (row: any) => string;
+  OnCellKeyDown?: (p: any, e: any) => any;
 }
 
 export const DataTable: React.FC<Props> = ({
@@ -32,6 +33,7 @@ export const DataTable: React.FC<Props> = ({
   listOptions,
   GetCellClassName,
   OnCellEditCommit,
+  OnCellKeyDown,
   GetRowId,
   handleDBClick,
 }) => {
@@ -110,6 +112,7 @@ export const DataTable: React.FC<Props> = ({
           Pagination: CustomPagination,
         }}
         onCellEditCommit={OnCellEditCommit}
+        onCellKeyDown={OnCellKeyDown}
       />
     </div>
   );

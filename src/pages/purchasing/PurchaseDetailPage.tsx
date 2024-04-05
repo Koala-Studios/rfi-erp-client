@@ -424,7 +424,7 @@ export const PurchaseDetailPage = () => {
           dbOption="raw-mat"
           handleEditRow={handleEditProductRow}
           rowParams={row_params}
-          letterMin={3}
+          letterMin={0}
           getOptionLabel={(item: IInventory) =>
             item.name ? `${item.product_code} | ${item.name}` : ""
           }

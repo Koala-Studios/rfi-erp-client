@@ -63,14 +63,13 @@ const InventoryListPage = () => {
             color="primary"
             size="small"
             onClick={() => {
-              console.log(params.row)
-              if(params.row.is_raw) {
-              navigate(`/inventory/${params.value}`)
+              console.log(params.row);
+              if (params.row.is_raw) {
+                navigate(`/inventory/${params.value}`);
               } else {
-              navigate(`/products/${params.value}`)
+                navigate(`/products/${params.value}`);
               }
-            }
-            }
+            }}
           >
             View Details
           </Button>
@@ -92,7 +91,7 @@ const InventoryListPage = () => {
           ordered: item.ordered ?? 0,
           quarantined: item.quarantined ?? 0,
           allocated: item.allocated ?? 0,
-          is_raw: item.is_raw
+          is_raw: item.is_raw,
         };
       });
       setDataOptions({ rows: newRows, listOptions: list! });
