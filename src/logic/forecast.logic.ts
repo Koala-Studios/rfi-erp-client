@@ -31,20 +31,20 @@ const api = axios.create({
 });
 
 export const calculateForecast = async (
-  productLines: IForecast[]
+  products: IForecast[],
+  force_recursion: boolean
 ): Promise<IForecastResults[]> => {
-  const data = {
-    products: productLines,
-  };
-
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+    params: {
+      force_recursion,
+    },
   };
 
   let forecastResult: IForecastResults[] = [];
 
   await api
-    .post("/calculate", data, config)
+    .post("/calculate", products, config)
     .then((res) => {
       // console.log(res);
       if (res.status === apiStatus.OK) {

@@ -95,8 +95,8 @@ const addDays = (date: Date, days: number) => {
 const emptyBatching: IBatching = {
   _id: "",
   status: 1,
-  source_id: undefined,
-  source_type: undefined,
+  source_id: "",
+  source_type: "",
   batch_code: "",
   ingredients: [],
   notes: "",
@@ -551,6 +551,16 @@ export const BatchingDetailPage = () => {
     },
   ];
 
+  const getSourceLink = (src_id: string, src_type: string) => {
+    switch (src_type) {
+      case "Batching":
+        return "/batching/" + src_id;
+      case "SalesOrder":
+        return "/sales-orders/" + src_id;
+    }
+    return "";
+  };
+
   const reformatIngredients = (_batching: IBatching) => {
     const newIng = _batching.ingredients.map((item) => {
       return {
@@ -621,7 +631,7 @@ export const BatchingDetailPage = () => {
   };
 
   const handleFinishBatching = () => {
-    finishBatching(auth.token, batching!._id).then((_batching) => {
+    finishBatching(batching!._id).then((_batching) => {
       if (_batching) {
         // window.location.reload();
         savedBatching = _batching;
@@ -1061,7 +1071,7 @@ export const BatchingDetailPage = () => {
                   variant="outlined"
                 />
               </Grid>
-              {batching.source_id != undefined && (
+              {batching.source_id && batching.source_type && (
                 <Grid item xs={2}>
                   <Button
                     aria-label="go back"
@@ -1069,10 +1079,10 @@ export const BatchingDetailPage = () => {
                     variant="outlined"
                     onClick={() =>
                       navigate(
-                        "/sales-orders/" +
-                          batching!.source_type +
-                          "/" +
-                          batching!.source_id
+                        getSourceLink(
+                          batching!.source_id,
+                          batching!.source_type
+                        )
                       )
                     }
                   >
@@ -1081,7 +1091,7 @@ export const BatchingDetailPage = () => {
                 </Grid>
               )}
 
-              <Grid item xs={12}>
+              <Grid item xs={6}>
                 <TextField
                   defaultValue={batching.notes}
                   inputRef={(el: any) =>
@@ -1138,7 +1148,7 @@ export const BatchingDetailPage = () => {
             <Button
               color="success"
               variant="contained"
-              disabled={id === "new"}
+              disabled={id === "new" || batching.status != 3}
               onClick={() => handleFinishBatching()}
             >
               Finish Batching
@@ -1146,7 +1156,17 @@ export const BatchingDetailPage = () => {
             <Button
               color="error"
               variant="outlined"
-              disabled={id === "new"}
+              disabled={
+                id === "new" || batching.status < 2 || batching.status > 3
+              }
+              onClick={() => handleMarkBatchingCancelled()}
+            >
+              Abandon Batching
+            </Button>
+            <Button
+              color="error"
+              variant="outlined"
+              disabled={id === "new" || batching.status > 1}
               onClick={() => handleMarkBatchingCancelled()}
             >
               Cancel Batching

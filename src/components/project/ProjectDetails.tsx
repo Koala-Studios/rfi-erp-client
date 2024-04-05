@@ -209,7 +209,6 @@ export const ProjectDetails = () => {
     setProjectSaved(true);
   };
   const cancelSaveProject = () => {
-    // console.log(ref1.current!.value);
     setProject(savedProject);
     setProjectSaved(true);
   };

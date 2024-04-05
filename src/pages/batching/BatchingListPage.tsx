@@ -1,6 +1,10 @@
 import React from "react";
 import { DataTable } from "../../components/utils/DataTable";
-import { GridColDef, GridRenderCellParams, GridValueGetterParams } from "@mui/x-data-grid";
+import {
+  GridColDef,
+  GridRenderCellParams,
+  GridValueGetterParams,
+} from "@mui/x-data-grid";
 import { listBatching } from "../../logic/batching.logic";
 import { AuthContext } from "../../components/navigation/AuthProvider";
 import { FilterElement, IListData } from "../../logic/utils";
@@ -12,7 +16,7 @@ import {
   useSearchParams,
 } from "react-router-dom";
 import DataFilter from "../../components/utils/DataFilter";
-import RunningWithErrorsIcon from '@mui/icons-material/RunningWithErrors';
+import RunningWithErrorsIcon from "@mui/icons-material/RunningWithErrors";
 
 //label,field,type
 const filterArray: FilterElement[] = [
@@ -21,15 +25,21 @@ const filterArray: FilterElement[] = [
     field: "product_code",
     type: "text",
   },
-  { label: "Product Name", field: "name", type: "text"},
+  { label: "Product Name", field: "name", type: "text" },
   { label: "Batch Code", field: "batch_code", type: "text" },
-  { label: "Status", field: "status", type: "dropdown", options: [{value: 1, text: "Ok"}, {value: 2, text: "\!Ok"}] },
+  {
+    label: "Status",
+    field: "status",
+    type: "dropdown",
+    options: [
+      { value: 1, text: "Ok" },
+      { value: 2, text: "!Ok" },
+    ],
+  },
   { label: "Date Created", field: "date_created", type: "date" },
   { label: "Date Due", field: "date_needed", type: "date" },
   { label: "Quantity", field: "quantity", type: "number", regexOption: null },
-
 ];
-
 
 const BatchingStatus = [
   ["DRAFT", "warning"],
@@ -40,7 +50,6 @@ const BatchingStatus = [
   ["CANCELLED", "error"],
 ];
 
-
 const BatchingListPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -49,20 +58,34 @@ const BatchingListPage = () => {
 
   const columns: GridColDef[] = [
     // { field: "id", headerName: "ID", width: 300 },
-    {field: "has_enough", headerName: 'Inv', width: 30, renderCell: (params: GridRenderCellParams<number>) => (
-      <div> {params.row.has_enough == false ? <RunningWithErrorsIcon style={{color:params.row.status === 1 ? 'orange' : 'red'}}></RunningWithErrorsIcon> :  ''}</div>
-    ),},
+    {
+      field: "has_enough",
+      headerName: "Inv",
+      width: 30,
+      renderCell: (params: GridRenderCellParams<number>) => (
+        <div>
+          {" "}
+          {params.row.has_enough == false ? (
+            <RunningWithErrorsIcon
+              style={{ color: params.row.status === 1 ? "orange" : "red" }}
+            ></RunningWithErrorsIcon>
+          ) : (
+            ""
+          )}
+        </div>
+      ),
+    },
     { field: "date", headerName: "Date Created", width: 120 },
-    { field: "date_needed",  headerName: "Date Due", type: "date" },
+    { field: "date_needed", headerName: "Date Due", type: "date" },
     { field: "product_code", headerName: "Product Code", width: 120 },
     { field: "name", headerName: "Product Name", width: 320 },
-    { field: "batch_code", headerName: "Batch Code", width: 120 },
+    { field: "batch_code", headerName: "Batch Code", width: 150 },
     { field: "quantity", headerName: "Quantity", type: "number", width: 90 },
     {
       field: "status",
       headerName: "Status",
       width: 200,
-      align: 'center',
+      align: "center",
       renderCell: (params: GridRenderCellParams<number>) => (
         <Chip
           label={BatchingStatus[params.value ? params.value - 1 : 5][0]}
@@ -96,8 +119,6 @@ const BatchingListPage = () => {
       ),
     },
   ];
-  
-
 
   React.useEffect(() => {
     listBatching(searchParams, filterArray).then((list) => {
@@ -106,12 +127,14 @@ const BatchingListPage = () => {
           id: batch._id,
           batch_code: batch.batch_code,
           date: batch.date_created.toString().replace(/\T.+/, ""),
-          date_needed: batch.date_needed ? batch.date_needed.toString().replace(/\T.+/, "") : '',
+          date_needed: batch.date_needed
+            ? batch.date_needed.toString().replace(/\T.+/, "")
+            : "",
           quantity: batch.quantity,
           product_code: batch.product_code,
           name: batch.name,
           status: batch.status,
-          has_enough: batch.has_enough
+          has_enough: batch.has_enough,
         };
       });
       setDataOptions({ rows: newRows, listOptions: list! });

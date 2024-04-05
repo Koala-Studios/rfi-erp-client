@@ -22,7 +22,9 @@ interface Props {
     | "location"
     | "product-type-raw"
     | "container"
-    | "container-specific";
+    | "container-specific"
+    | "supplier-product"
+    | "customer-product";
   handleEditRow: (id: string, newItem: any) => void;
   readOnly?: boolean;
   rowParams: any;
@@ -54,21 +56,25 @@ const TableAutocomplete: React.FC<Props> = ({
     event: React.SyntheticEvent<Element, Event>,
     value: string
   ) => {
-    lookup(value.toUpperCase(), dbOption, letterMin,searchOptionalVar).then((result) => {
-      setOptionList(result);
-    });
+    lookup(value.toUpperCase(), dbOption, letterMin, searchOptionalVar).then(
+      (result) => {
+        setOptionList(result);
+      }
+    );
   };
   const handleSelect = async (value: string) => {
-    lookup(value.toUpperCase(), dbOption, letterMin, searchOptionalVar).then((result) => {
-      setOptionList(result);
-    });
+    lookup(value.toUpperCase(), dbOption, letterMin, searchOptionalVar).then(
+      (result) => {
+        setOptionList(result);
+      }
+    );
   };
 
   if (editMode) {
     return (
       <Autocomplete
         value={initialValue}
-        clearOnBlur={false}
+        // clearOnBlur={false}
         isOptionEqualToValue={(option, value) =>
           option._id === value._id || option.lot_number === value
         }
@@ -100,7 +106,8 @@ const TableAutocomplete: React.FC<Props> = ({
         onChange={(event, value) => {
           console.log(value);
           handleEditRow(rowParams.row._id, value);
-          setEditMode(false);
+          console.log(value);
+          setEditMode(value == null);
         }}
         renderInput={(params) => {
           return (

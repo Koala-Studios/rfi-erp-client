@@ -367,7 +367,7 @@ export const CustomerDetailPage = () => {
         />
       </NavTab>
       {(tab_id && tab_id === "products" && (
-        <CustomerProductPage></CustomerProductPage>
+        <CustomerProductPage customer={customer!}></CustomerProductPage>
       )) ||
         (tab_id && tab_id === "order-history" && <div></div>)}
     </>

@@ -25,7 +25,12 @@ import {
   updatePurchase,
 } from "../../logic/purchase-order.logic";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { DataGrid, GridCellParams, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridCellParams,
+  GridColDef,
+  GridRenderCellParams,
+} from "@mui/x-data-grid";
 
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import TableAutocomplete from "../../components/utils/TableAutocomplete";
@@ -49,11 +54,10 @@ const PurchaseStatus = [
   ["DRAFT", "warning"],
 ];
 
-
 const emptyPurchase: IPurchaseOrder = {
   _id: "",
   supplier: { _id: "", code: "" },
-  date_purchased: new Date().toISOString().split('T')[0],
+  date_purchased: new Date().toISOString().split("T")[0],
   date_arrived: "",
   shipping_code: "",
   status: 6,
@@ -65,12 +69,16 @@ const emptyPurchase: IPurchaseOrder = {
 const inputRefMap = {
   order_code: 0,
   date_purchased: 1,
-  supplier:2
+  supplier: 2,
   //TODO: Supplier
 };
 
 const inputMap: InputInfo[] = [
-  { label: "order_code", ref: 0, validation: { required: true, genericVal: "Text" } },
+  {
+    label: "order_code",
+    ref: 0,
+    validation: { required: true, genericVal: "Text" },
+  },
   {
     label: "date_purchased",
     ref: 1,
@@ -88,9 +96,7 @@ export const PurchaseDetailPage = () => {
   const { id } = useParams();
   const auth = React.useContext(AuthContext);
   const [purchaseSaved, setPurchaseSaved] = React.useState<boolean>(true);
-  const [purchase, setPurchase] = React.useState<IPurchaseOrder | null>(
-    null
-  );
+  const [purchase, setPurchase] = React.useState<IPurchaseOrder | null>(null);
   const [rows, setRows] = React.useState<IOrderItem[]>([]);
   const [receiveMode, setReceiveMode] = React.useState<boolean>(false);
 
@@ -99,8 +105,6 @@ export const PurchaseDetailPage = () => {
     Array(inputMap.length).fill({ helperText: "", error: false })
   );
 
-
-  
   const onInputBlur = (
     event: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement, Element>,
     input: InputInfo
@@ -123,8 +127,6 @@ export const PurchaseDetailPage = () => {
     setPurchaseSaved(false);
   };
 
-
-  
   const savePurchase = async () => {
     let allValid = true;
     //do client side validation
@@ -166,9 +168,9 @@ export const PurchaseDetailPage = () => {
         } else {
           console.log("Purchase Not Saved");
         }
-      })
-
-    } else { //TODO: Ensure user can't save PO with empty rows
+      });
+    } else {
+      //TODO: Ensure user can't save PO with empty rows
       const updated = await updatePurchase(purchase!);
 
       if (updated === false) {
@@ -197,9 +199,6 @@ export const PurchaseDetailPage = () => {
     pList[rowIdx].product_name = value.name;
     setRows(pList);
   };
-
-
-
 
   useEffect(() => {
     if (id === "new") {
@@ -328,8 +327,8 @@ export const PurchaseDetailPage = () => {
       align: "center",
     },
     {
-      field: "tare_amount",
-      headerName: "Tare Qty",
+      field: "gross_amount",
+      headerName: "Gross Qty",
       type: "number",
       width: 120,
       editable: true,
@@ -420,14 +419,14 @@ export const PurchaseDetailPage = () => {
       filterable: false,
       renderCell: (row_params: GridRenderCellParams<string>) => (
         <TableAutocomplete
-        initialValue={row_params.row.product_name}
+          initialValue={row_params.row.product_name}
           readOnly={purchase!.status != 6}
           dbOption="raw-mat"
           handleEditRow={handleEditProductRow}
           rowParams={row_params}
           letterMin={3}
-          getOptionLabel={(item: IInventory) => item.name ?
-            `${item.product_code} | ${item.name}` : ''
+          getOptionLabel={(item: IInventory) =>
+            item.name ? `${item.product_code} | ${item.name}` : ""
           }
         />
       ),
@@ -588,7 +587,7 @@ export const PurchaseDetailPage = () => {
         purchased_amount: 0,
         received_amount: 0,
         unit_price: 0,
-        sample:false
+        sample: false,
       },
       ...rows.slice(0),
     ]);
@@ -642,7 +641,9 @@ export const PurchaseDetailPage = () => {
                   onBlur={(event) =>
                     onInputBlur(event, inputMap[inputRefMap.order_code])
                   }
-                  required={inputMap[inputRefMap.order_code].validation.required}
+                  required={
+                    inputMap[inputRefMap.order_code].validation.required
+                  }
                   spellCheck="false"
                   InputLabelProps={{ shrink: true }}
                   fullWidth
@@ -658,11 +659,15 @@ export const PurchaseDetailPage = () => {
                     (inputRefs.current[inputRefMap.date_purchased] = el)
                   }
                   error={inputVisuals[inputRefMap.date_purchased].error}
-                  helperText={inputVisuals[inputRefMap.date_purchased].helperText}
+                  helperText={
+                    inputVisuals[inputRefMap.date_purchased].helperText
+                  }
                   onBlur={(event) =>
                     onInputBlur(event, inputMap[inputRefMap.date_purchased])
                   }
-                  required={inputMap[inputRefMap.date_purchased].validation.required}
+                  required={
+                    inputMap[inputRefMap.date_purchased].validation.required
+                  }
                   fullWidth
                   InputLabelProps={{ shrink: true }}
                   size="small"
@@ -698,7 +703,7 @@ export const PurchaseDetailPage = () => {
                   sx={{
                     width: "100%",
                     height: "100%",
-                    maxHeight:40,
+                    maxHeight: 40,
                     borderRadius: 10,
                     fontWeight: 600,
                   }}
@@ -738,21 +743,22 @@ export const PurchaseDetailPage = () => {
                   error={inputVisuals[inputRefMap.supplier].error}
                   helperText={inputVisuals[inputRefMap.supplier].helperText}
                   onChange={(event, value) => {
-                    console.log(value, 'testing ')
-                    setPurchase({ ...purchase, supplier: {_id: value._id, code: value.code} });
+                    console.log(value, "testing ");
+                    setPurchase({
+                      ...purchase,
+                      supplier: { _id: value._id, code: value.code },
+                    });
                     // onInputBlur(event, inputMap[inputRefMap.material_type]);
                   }}
                   // onBlur={(event: any) =>
                   //   onInputBlur(event, inputMap[inputRefMap.supplier])
                   // }
-                  required={
-                    inputMap[inputRefMap.supplier].validation.required
-                  }
+                  required={inputMap[inputRefMap.supplier].validation.required}
                   label={"Supplier"}
                   letterMin={0}
                   readOnly={purchase.status != 6}
                   dbOption={"supplier"}
-                  getOptionLabel={(item: ISupplier) => item ? item.code : ''}
+                  getOptionLabel={(item: ISupplier) => (item ? item.code : "")}
                 />
               </Grid>
 
@@ -846,21 +852,20 @@ export const PurchaseDetailPage = () => {
           rows={rows!}
           getRowId={(row) => row._id}
           getCellClassName={(params: GridCellParams<number>) => {
-            if (params.field === 'unit_price') {
-              return params.row.unit_price > 0 ? '' : 'YellowRow';
-            } else if (params.field === 'expiry_date') {
-              return params.row.expiry_date != null ? '' : 'YellowRow';
-            } else if (params.field === 'lot_number') {
-              return params.row.lot_number != null ? '' : 'YellowRow';
-            } else if (params.field === 'container_size') {
-              return params.row.container_size > 0 ? '' : 'YellowRow';
-            } else if (params.field === 'process_amount') {
-              return params.row.process_amount > 0 ? '' : 'YellowRow';
+            if (params.field === "unit_price") {
+              return params.row.unit_price > 0 ? "" : "YellowRow";
+            } else if (params.field === "expiry_date") {
+              return params.row.expiry_date != null ? "" : "YellowRow";
+            } else if (params.field === "lot_number") {
+              return params.row.lot_number != null ? "" : "YellowRow";
+            } else if (params.field === "container_size") {
+              return params.row.container_size > 0 ? "" : "YellowRow";
+            } else if (params.field === "process_amount") {
+              return params.row.process_amount > 0 ? "" : "YellowRow";
             }
-            return '';
+            return "";
           }}
           processRowUpdate={(newRow) => {
-            console.log(newRow);
             let pList = rows.slice();
             const rowIdx = rows.findIndex(
               (r: IOrderItem) => r._id === newRow._id
@@ -885,7 +890,6 @@ export const PurchaseDetailPage = () => {
           columns={receiveMode ? receiveColumns : draftColumns}
           onCellEditCommit={(e, value) => {
             handleEditCell(e.id.toString(), e.field, e.value);
-            console.log("test", rows);
           }}
         ></DataGrid>
       </Card>

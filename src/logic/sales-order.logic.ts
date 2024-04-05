@@ -15,12 +15,12 @@ export interface IOrderItem {
 }
 
 export const itemStatus = {
-  PENDING: 0,
-  SCHEDULED: 1,
-  IN_PROGRESS: 2,
-  WAITING_QC: 3,
-  WAITING_SHIPPING: 4,
-  SHIPPED: 5,
+  PENDING: 1,
+  SCHEDULED: 2,
+  IN_PROGRESS: 3,
+  WAITING_QC: 4,
+  WAITING_SHIPPING: 5,
+  SHIPPED: 6,
 };
 
 export interface IOrderItemProcess extends IOrderItem {

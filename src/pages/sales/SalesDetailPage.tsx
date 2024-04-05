@@ -42,6 +42,7 @@ import StandaloneAutocomplete from "../../components/utils/StandaloneAutocomplet
 import { ICustomer } from "../../logic/customer.logic";
 import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
 import { ILocation } from "../../logic/location.logic";
+import { ICustomerProduct } from "../../logic/customer-product.logic";
 
 let savedSales: ISalesOrder | null = null;
 
@@ -57,10 +58,10 @@ const SalesStatus = [
 const ItemStatus = [
   ["PENDING", "error"],
   ["SCHEDULED", "warning"],
-  ["IN PROGRESS", "warning"],
-  ["WAITING QC", "info"],
+  ["IN PRODUCTION", "warning"],
+  ["QC", "info"],
   ["WAITING SHIPPING", "info"],
-  ["SHIPPED", "success"],
+  ["FULFILLED", "success"],
 ];
 
 const emptySales: ISalesOrder = {
@@ -259,7 +260,13 @@ export const SalesDetailPage = () => {
     {
       field: "product_code",
       headerName: "Product Code",
-      width: 150,
+      width: 120,
+      editable: false,
+    },
+    {
+      field: "customer_sku",
+      headerName: "Customer Sku",
+      width: 120,
       editable: false,
     },
     {
@@ -306,7 +313,7 @@ export const SalesDetailPage = () => {
     {
       field: "status",
       headerName: "Status",
-      width: 200,
+      width: 120,
       align: "center",
       renderCell: (params: GridRenderCellParams<number>) => (
         <Chip
@@ -323,14 +330,6 @@ export const SalesDetailPage = () => {
     {
       field: "container_size",
       headerName: "Cont Size(KG)",
-      type: "number",
-      width: 120,
-      editable: true,
-      align: "center",
-    },
-    {
-      field: "process_amount",
-      headerName: "Qty to Process",
       type: "number",
       width: 120,
       editable: true,
@@ -442,12 +441,13 @@ export const SalesDetailPage = () => {
         <TableAutocomplete
           initialValue={row_params.row.product_name}
           readOnly={sales!.status != 6}
-          dbOption="approved-product"
+          dbOption="customer-product"
+          searchOptionalVar={sales!.customer._id}
           handleEditRow={handleEditProductRow}
           rowParams={row_params}
-          letterMin={3}
-          getOptionLabel={(item: IInventory) =>
-            item.name ? `${item.product_code} | ${item.name}` : ""
+          letterMin={0}
+          getOptionLabel={(item: ICustomerProduct) =>
+            item.c_prod_name ? `${item.customer_sku} | ${item.c_prod_name}` : ""
           }
         />
       ),
@@ -675,7 +675,7 @@ export const SalesDetailPage = () => {
                   InputLabelProps={{ shrink: true }}
                   size="small"
                   variant="outlined"
-                  label={"Sale Date"}
+                  label={"Order Date"}
                   type={"date"}
                 ></TextField>
               </Grid>
@@ -814,7 +814,7 @@ export const SalesDetailPage = () => {
               disabled={id === "new"}
               onClick={() => handleMarkSalesReceived()}
             >
-              Set as Received
+              Set as Fulfilled
             </Button>
             <Button
               color="error"
@@ -827,64 +827,66 @@ export const SalesDetailPage = () => {
           </Card>
         </div>
       </Card>
-      <Card variant="outlined" sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
-        <div>
-          <Button
-            style={{
-              marginBottom: 10,
-              marginRight: 10,
-              display: `${sales.status === 6 ? "block" : "none"}`,
-            }}
-            variant="contained"
-            onClick={() => {
-              handleAddRow();
-            }}
-          >
-            Add Row
-          </Button>
-          {/* <Switch color="primary"
+      {sales.customer._id && (
+        <Card variant="outlined" sx={{ mt: 2, padding: 2, overflowY: "auto" }}>
+          <div>
+            <Button
+              style={{
+                marginBottom: 10,
+                marginRight: 10,
+                display: `${sales.status === 6 ? "block" : "none"}`,
+              }}
+              variant="contained"
+              onClick={() => {
+                handleAddRow();
+              }}
+            >
+              Add Row
+            </Button>
+            {/* <Switch color="primary"
           disabled={id=== "new"}
           onChange={() => setReceiveMode(!receiveMode)}/>
           Receive Mode */}
-        </div>
-        <DataGrid
-          autoHeight={true}
-          rowHeight={46}
-          rows={rows!}
-          getRowId={(row) => row._id}
-          getCellClassName={(params: GridCellParams<number>) => {
-            return "";
-          }}
-          processRowUpdate={(newRow) => {
-            console.log(newRow);
-            let pList = rows.slice();
-            const rowIdx = rows.findIndex(
-              (r: IOrderItem) => r._id === newRow._id
-            );
-            pList[rowIdx] = newRow;
-            setRows(pList);
-            return newRow;
-          }}
-          onCellKeyDown={(params, event) => {
-            if (event.code == "Space") {
-              event.stopPropagation();
-            }
-          }}
-          initialState={{
-            columns: {
-              columnVisibilityModel: {
-                // Hide columns status and traderName, the other columns will remain visible
-                received_amount: sales.status != 6,
+          </div>
+          <DataGrid
+            autoHeight={true}
+            rowHeight={46}
+            rows={rows!}
+            getRowId={(row) => row._id}
+            getCellClassName={(params: GridCellParams<number>) => {
+              return "";
+            }}
+            processRowUpdate={(newRow) => {
+              console.log(newRow);
+              let pList = rows.slice();
+              const rowIdx = rows.findIndex(
+                (r: IOrderItem) => r._id === newRow._id
+              );
+              pList[rowIdx] = newRow;
+              setRows(pList);
+              return newRow;
+            }}
+            onCellKeyDown={(params, event) => {
+              if (event.code == "Space") {
+                event.stopPropagation();
+              }
+            }}
+            initialState={{
+              columns: {
+                columnVisibilityModel: {
+                  // Hide columns status and traderName, the other columns will remain visible
+                  received_amount: sales.status != 6,
+                },
               },
-            },
-          }}
-          columns={receiveMode ? receiveColumns : draftColumns}
-          onCellEditCommit={(e, value) => {
-            handleEditCell(e.id.toString(), e.field, e.value);
-            console.log("test", rows);
-          }}
-        ></DataGrid>
-      </Card>
+            }}
+            columns={receiveMode ? receiveColumns : draftColumns}
+            onCellEditCommit={(e, value) => {
+              handleEditCell(e.id.toString(), e.field, e.value);
+              console.log("test", rows);
+            }}
+          ></DataGrid>
+        </Card>
+      )}
     </>
   );
 };

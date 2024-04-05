@@ -29,12 +29,14 @@ const api = axios.create({
 });
 
 export const lookupSupplierProduct = async (
-  search_value: string
+  search_value: string,
+  supplier_id: string
 ): Promise<ISupplierProduct[] | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       search_value,
+      supplier_id,
     },
   };
 

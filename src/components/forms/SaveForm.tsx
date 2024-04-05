@@ -7,9 +7,15 @@ interface Props {
   display: boolean;
   onSave: () => void;
   onCancel: () => void;
+  location?: "top" | "bottom";
 }
 
-const SaveForm: React.FC<Props> = ({ display, onSave, onCancel }) => {
+const SaveForm: React.FC<Props> = ({
+  display,
+  onSave,
+  onCancel,
+  location = "top",
+}) => {
   return (
     <Paper
       sx={{
@@ -17,6 +23,9 @@ const SaveForm: React.FC<Props> = ({ display, onSave, onCancel }) => {
         transition: "300ms",
         display: "flex",
         position: "fixed",
+        bottom: location == "top" ? "unset" : 20, //TODO: TEMPORARY, HAVE TO MAKE A MINI VERSION OF THIS FORM
+        // right: location == "top" ? "unset" : "18px",
+        float: "right",
         justifyContent: "space-between",
         padding: "10px 30px",
         mt: -9,
@@ -29,7 +38,7 @@ const SaveForm: React.FC<Props> = ({ display, onSave, onCancel }) => {
         zIndex: 100000,
       }}
     >
-      <Typography color="white" variant="h6">
+      <Typography style={{ fontSize: "1.3rem" }} color="white" variant="h6">
         Unsaved Changes
       </Typography>
 

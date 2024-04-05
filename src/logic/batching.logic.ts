@@ -21,8 +21,8 @@ export interface IBatching {
   product_id: string | null;
   product_code: string;
   name: string;
-  source_id: string | undefined;
-  source_type: string | undefined;
+  source_id: string;
+  source_type: string;
   quantity: number;
   date_created: string;
   date_needed: string;
@@ -223,13 +223,15 @@ export const updateBatching = async (
 };
 
 export const finishBatching = async (
-  token: string,
   batching_id: string
 ): Promise<IBatching | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
+    params: { batching_id: batching_id },
   };
+
   let rtn = null;
+
   await api
     .post("/finish-batching", batching_id, config)
     .then((res) => {

@@ -1,7 +1,7 @@
 import React from "react";
 import { DataTable } from "../../components/utils/DataTable";
-import { GridColDef } from "@mui/x-data-grid";
-import { Button, Card, Rating } from "@mui/material";
+import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import { Button, Card, Rating, Tooltip } from "@mui/material";
 import {
   useLocation,
   useNavigate,
@@ -10,13 +10,26 @@ import {
 } from "react-router-dom";
 import { FilterElement, IListData } from "../../logic/utils";
 import DataFilter from "../../components/utils/DataFilter";
-import { listCustomerProducts } from "../../logic/customer-product.logic";
+import {
+  listCustomerProducts,
+  updateCustomerProducts,
+} from "../../logic/customer-product.logic";
+import { ICustomer } from "../../logic/customer.logic";
+import { ObjectID, ObjectId } from "bson";
+import reportWebVitals from "../../reportWebVitals";
+import TableAutocomplete from "../../components/utils/TableAutocomplete";
+import { IProduct } from "../../logic/product.logic";
+import SaveForm from "../../components/forms/SaveForm";
 
-const CustomerProductPage = () => {
+let savedRows: any[] | null = null;
+
+const CustomerProductPage = (props: { customer: ICustomer }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { id } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
+
+  const [productsSaved, setProductsSaved] = React.useState<boolean>(true);
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
   const filterArray: FilterElement[] = [
     {
@@ -25,59 +38,192 @@ const CustomerProductPage = () => {
       type: "text",
     },
     {
-      label: "Product Name",
-      field: "name",
-      type: "text",
-    },
-    {
       label: "Customer Sku",
       field: "name",
       type: "text",
     },
     {
-      label: "Cost/KG",
-      field: "cost",
-      type: "number",
-    },
-    {
-      label: "Cas Number",
-      field: "cas_number",
+      label: "Customer Product Name",
+      field: "name",
       type: "text",
+    },
+
+    {
+      label: "Price/KG",
+      field: "price",
+      type: "number",
     },
   ];
   const columns: GridColDef[] = [
-    { field: "product_code", headerName: "Product Code", width: 120 },
-    { field: "name", headerName: "Product Name", width: 350 },
     {
-      field: "cost",
-      headerName: "Cost/KG",
-      width: 120,
+      field: "product.product_code",
+      headerName: "Internal Code",
+      width: 160,
+      sortable: false,
+      filterable: false,
+      renderCell: (row_params: GridRenderCellParams<string>) => (
+        <TableAutocomplete
+          dbOption="approved-product"
+          width={160}
+          handleEditRow={handleEditProductRow}
+          rowParams={row_params}
+          initialValue={row_params.row.product.product_code}
+          letterMin={0}
+          getOptionLabel={GetProdLabel}
+        />
+      ),
     },
-    { field: "description", headerName: "Description", width: 350 },
-    { field: "customer_sku", headerName: "Customer SKU", width: 120 },
-    { field: "cas_number", headerName: "Cas Number", width: 140 },
+    {
+      field: "customer_sku",
+      headerName: "Customer SKU",
+      width: 120,
+      editable: true,
+    },
+    {
+      field: "c_prod_name",
+      headerName: "Product Name",
+      width: 350,
+      editable: true,
+    },
+    {
+      field: "price",
+      headerName: "Price/KG",
+      width: 120,
+      editable: true,
+    },
+    {
+      field: "rec_dose",
+      headerName: "Rec Dose",
+      width: 80,
+      editable: true,
+    },
   ];
 
-  React.useEffect(() => {
-    listCustomerProducts(searchParams, filterArray).then((list) => {
-      const newRows = list!.docs.map((customer) => {
-        return {
-          ...customer,
-          id: customer._id,
-        };
-      });
-      setDataOptions({ rows: newRows, listOptions: list! });
+  const saveProducts = async () => {
+    let allValid = true;
+    const changedRows = dataOptions!.rows.filter((row: any) => {
+      return (
+        savedRows?.findIndex((r: any) => {
+          return row === r;
+        }) === -1
+      );
     });
+    console.log(changedRows, "changed");
+    allValid =
+      changedRows.length != 0 &&
+      changedRows.filter((r: any) => {
+        return (
+          r!.product._id == "" || r!.c_prod_name == "" || r!.customer_sku == ""
+        );
+      }).length == 0;
+    if (allValid === false) {
+      setProductsSaved(true);
+      window.dispatchEvent(
+        new CustomEvent("NotificationEvent", {
+          detail: {
+            text: "Changes Not Saved. Some inputs are invalid",
+            color: "error",
+          },
+        })
+      );
+      return;
+    }
+
+    //send new project to server
+    const test = await updateCustomerProducts(changedRows);
+    savedRows = dataOptions!.rows;
+    window.dispatchEvent(
+      new CustomEvent("NotificationEvent", {
+        detail: {
+          text: test.data.message,
+          color: test.data.res ? "success" : "error",
+        },
+      })
+    );
+    setProductsSaved(true);
+  };
+
+  const cancelSaveProducts = () => {
+    setDataOptions({ rows: savedRows, listOptions: dataOptions!.listOptions });
+    setProductsSaved(true);
+  };
+
+  const GetProdLabel = (item: any): any => {
+    if (item) {
+      if (item.product_code) {
+        return item.product_code + " | " + item!.name;
+      } else {
+        return "";
+      }
+    }
+    return "";
+  };
+
+  React.useEffect(() => {
+    listCustomerProducts(searchParams, filterArray, id).then((list) => {
+      setDataOptions({ rows: list!.docs, listOptions: list! });
+      savedRows = list!.docs;
+    });
+    setProductsSaved(true);
   }, [location.key]);
+
+  React.useEffect(() => {
+    if (dataOptions == null || productsSaved === false) return;
+    if (JSON.stringify(savedRows) !== JSON.stringify(dataOptions!.rows)) {
+      setProductsSaved(false);
+    }
+  }, [dataOptions!]);
+
+  const handleEditProductRow = (rowid: string, value: IProduct) => {
+    let pList = dataOptions!.rows.slice();
+    const rowIdx = dataOptions!.rows.findIndex((r: any) => r._id === rowid);
+    pList[rowIdx].product.product_code = value ? value.product_code : "";
+    pList[rowIdx].product._id = value ? value._id : "";
+    pList[rowIdx].product.name = value ? value.name : "";
+    setDataOptions({ rows: pList, listOptions: dataOptions!.listOptions });
+  };
+
   const addProductRow = () => {
-    // const
-    // // setDataOptions({
-    // //   rows: [...{}, ...dataOptions!.rows],
-    // //   listOptions: dataOptions!.listOptions,
-    // // });
+    setDataOptions({
+      rows: [
+        {
+          _id: new ObjectID().toHexString(),
+          product: {},
+          customer: {
+            _id: props.customer._id,
+            code: props.customer.code,
+            name: props.customer.name,
+          },
+          rec_dose: 0.02,
+          customer_sku: "",
+          c_prod_name: "",
+          price: 0,
+          discount_rates: [],
+        },
+        ...dataOptions!.rows,
+      ],
+      listOptions: dataOptions!.listOptions,
+    });
   };
 
   if (dataOptions == null) return null;
+
+  function handleEditCell(row_id: string, field: string, value: any) {
+    const rowIndex = dataOptions!.rows.findIndex((r: any) => r._id === row_id);
+    setDataOptions({
+      rows: [
+        ...dataOptions!.rows.slice(0, rowIndex),
+        {
+          ...dataOptions!.rows[rowIndex],
+          [field]: value,
+        },
+        ...dataOptions!.rows.slice(
+          rowIndex == dataOptions!.rows.length ? rowIndex : rowIndex + 1
+        ),
+      ],
+      listOptions: dataOptions!.listOptions,
+    });
+  }
 
   return (
     <>
@@ -89,15 +235,24 @@ const CustomerProductPage = () => {
         <Button variant="contained" color="primary" onClick={addProductRow}>
           + New Customer Product
         </Button>
+        <SaveForm
+          display={!productsSaved}
+          onSave={saveProducts}
+          onCancel={cancelSaveProducts}
+          location="bottom"
+        ></SaveForm>
       </Card>
       <DataTable
         rows={dataOptions.rows}
         columns={columns}
+        GetRowId={(row) => row._id}
         auto_height
         listOptions={dataOptions.listOptions}
+        OnCellEditCommit={(e, value) => {
+          handleEditCell(e.id, e.field, e.value);
+        }}
       ></DataTable>
     </>
   );
 };
-
 export default CustomerProductPage;

@@ -12,19 +12,19 @@ interface ICustomerItem {
   code: string;
 }
 
-interface ICustomerProduct {
+export interface ICustomerProduct {
   product: IProductItem;
   customer: ICustomerItem;
+  rec_dose: number;
   customer_sku: string;
-  customer_prod_name: string;
-  cost: number;
+  c_prod_name: string;
+  price: number;
   discount_rates: IDiscountRate[];
   description: string;
-  aliases: string;
 }
 interface IDiscountRate {
   min_amount: number;
-  disc_percent: number;
+  percent: number;
 }
 
 const api = axios.create({
@@ -32,12 +32,14 @@ const api = axios.create({
 });
 
 export const lookupCustomerProduct = async (
-  search_value: string
+  search_value: string,
+  customer_id: string
 ): Promise<ICustomerProduct[] | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       search_value,
+      customer_id,
     },
   };
 
@@ -58,7 +60,8 @@ export const lookupCustomerProduct = async (
 
 export const listCustomerProducts = async (
   q: URLSearchParams | undefined,
-  filters: FilterElement[]
+  filters: FilterElement[],
+  customer_id?: string
 ): Promise<IListOptions | null> => {
   let query = getQuery(q, filters);
 
@@ -66,6 +69,7 @@ export const listCustomerProducts = async (
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       query,
+      customer_id,
     },
   };
 
@@ -135,20 +139,20 @@ export const createcustomerProduct = async (
   return rtn;
 };
 
-export const updateSupplier = async (
-  formData: ICustomerProduct
-): Promise<boolean> => {
+export const updateCustomerProducts = async (
+  formData: ICustomerProduct[]
+): Promise<any | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
   };
 
-  let rtn = false;
+  let rtn = null;
 
   await api
     .post("/update", formData, config)
     .then((res) => {
       if (res.status === apiStatus.OK) {
-        rtn = true;
+        rtn = res;
       }
     })
     .catch((err) => {

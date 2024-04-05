@@ -1,9 +1,11 @@
+import { lookupCustomerProduct } from "./customer-product.logic";
 import { lookupCustomer } from "./customer.logic";
 import { lookupInventoryStock } from "./inventory-stock.logic";
 import { lookupInventory } from "./inventory.logic";
 import { lookupLocation } from "./location.logic";
 import { lookupProductType } from "./product-type.logic";
 import { lookupProduct } from "./product.logic";
+import { lookupSupplierProduct } from "./supplier-product.logic";
 import { lookupSupplier } from "./supplier.logic";
 import { lookupRoles, lookupUser } from "./user.logic";
 
@@ -28,7 +30,9 @@ export const lookup = async (
     | "location"
     | "container"
     | "container-specific"
-    | "roles",
+    | "roles"
+    | "supplier-product"
+    | "customer-product",
   letterMin: number,
   variable?: any
 ) => {
@@ -74,6 +78,10 @@ export const lookup = async (
     return await lookupInventoryStock(query, variable);
   } else if (dbOption === "roles") {
     return await lookupRoles(query);
+  } else if (dbOption === "supplier-product") {
+    return await lookupSupplierProduct(query, variable);
+  } else if (dbOption === "customer-product") {
+    return await lookupCustomerProduct(query, variable);
   }
 
   return [];

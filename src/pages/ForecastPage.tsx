@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Card,
+  Checkbox,
   CircularProgress,
   Divider,
   Fade,
@@ -10,7 +11,15 @@ import {
   Typography,
 } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import { DataGrid, GridCellParams, GridColDef, GridFooter, GridFooterContainer, GridRenderCellParams, GridToolbar } from "@mui/x-data-grid";
+import {
+  DataGrid,
+  GridCellParams,
+  GridColDef,
+  GridFooter,
+  GridFooterContainer,
+  GridRenderCellParams,
+  GridToolbar,
+} from "@mui/x-data-grid";
 import React from "react";
 import { AuthContext } from "../components/navigation/AuthProvider";
 import { DataTable } from "../components/utils/DataTable";
@@ -27,7 +36,7 @@ import { ObjectID } from "bson";
 import { useNavigate } from "react-router-dom";
 import { darken, lighten } from "@mui/material/styles";
 import { IProduct, lookupProducts } from "../logic/product.logic";
-import LinearProgress from '@mui/material/LinearProgress';
+import LinearProgress from "@mui/material/LinearProgress";
 
 const getClassName = (row: IForecastResults) => {
   if (row.required_amount <= row.available_amount) {
@@ -38,10 +47,7 @@ const getClassName = (row: IForecastResults) => {
       row.reorder_amount
       ? "BlueRow"
       : "";
-  } else if (
-    row.required_amount <=
-    row.available_amount + row.ordered_amount
-  ) {
+  } else if (row.required_amount <= row.available_amount + row.ordered_amount) {
     return "YellowRow";
   } else {
     return "RedRow";
@@ -54,6 +60,7 @@ export const ForecastPage = () => {
   const auth = React.useContext(AuthContext);
   const [rowCount, setRowCount] = React.useState(0);
   let testRef = React.useRef<HTMLDivElement>();
+  const [forceRecursion, setForceRecursion] = React.useState<boolean>(false);
   const [file, setFile] = React.useState();
   const forecastColumns: GridColDef[] = [
     {
@@ -91,8 +98,7 @@ export const ForecastPage = () => {
           initialValue={row_params.row.product_name}
           letterMin={3}
           getOptionLabel={(item: IInventory) =>
-            item ? 
-            `${item.product_code} | ${item.name}` : ''
+            item ? `${item.product_code} | ${item.name}` : ""
           }
         />
       ),
@@ -118,7 +124,10 @@ export const ForecastPage = () => {
       headerName: "Required Qty",
       type: "number",
       width: 150,
-      valueGetter: (params) => params.row.required_amount ? params.row.required_amount.toFixed(15) : 'error'
+      valueGetter: (params) =>
+        params.row.required_amount
+          ? params.row.required_amount.toFixed(15)
+          : "error",
     },
     {
       field: "available_amount",
@@ -203,9 +212,7 @@ export const ForecastPage = () => {
         ...rows[rowIndex],
         [field]: value,
       },
-      ...rows.slice(
-        rowIndex == rows.length ? rowIndex : rowIndex + 1
-      ),
+      ...rows.slice(rowIndex == rows.length ? rowIndex : rowIndex + 1),
     ]);
   };
 
@@ -223,92 +230,105 @@ export const ForecastPage = () => {
     setRowCount(rowCount + 1);
   };
 
-
   const fileReader = new FileReader();
 
-  const handleOnChange = (e:any) => {
-      setFile(e.target.files[0]);
-      // console.log(e.target.files[0])
+  const handleOnChange = (e: any) => {
+    setFile(e.target.files[0]);
+    // console.log(e.target.files[0])
   };
 
-  const csvFileToArray = async (textFile:string) => {
+  const csvFileToArray = async (textFile: string) => {
     // console.log(JSON.stringify(textFile), "testFile")
-    textFile = textFile.replace( /[\r\n]+/gm, "\n" );
+    textFile = textFile.replace(/[\r\n]+/gm, "\n");
     const csvHeader = textFile.slice(0, textFile.indexOf("\n")).split(",");
     // console.log(csvHeader, "BRUH")
     const csvRows = textFile.slice(textFile.indexOf("\n") + 1).split("\n");
     let product_codes: any[] = [];
-    let unfound_products:any[] = [];
-    let final_array:any[] =[];
-    const value_array = csvRows.map(i => {
-      
+    let unfound_products: any[] = [];
+    let final_array: any[] = [];
+    const value_array = csvRows.map((i) => {
       const values = i.split(",");
-      const obj = csvHeader.reduce((object:any, header, index) => {
+      const obj = csvHeader.reduce((object: any, header, index) => {
         object[header] = values[index];
-          return object;
+        return object;
       }, {});
       product_codes = [...product_codes, obj.CODE];
       return obj;
     });
     //looking up imported values
-    lookupProducts(product_codes).then((products:IProduct[] | null) => {
+    lookupProducts(product_codes).then((products: IProduct[] | null) => {
       //setting rows to imported values
       value_array.map((element1) => {
-
-        if(products?.find((element => element1.CODE === element.product_code)) === undefined){
-          unfound_products = [...unfound_products, element1.CODE + '\n']
+        if (
+          products?.find(
+            (element) => element1.CODE === element.product_code
+          ) === undefined
+        ) {
+          unfound_products = [...unfound_products, element1.CODE + "\n"];
         }
       });
       window.dispatchEvent(
         new CustomEvent("NotificationEvent", {
-          detail: { color: "warning", text: "Could not find: " + unfound_products },
+          detail: {
+            color: "warning",
+            text: "Could not find: " + unfound_products,
+          },
         })
       );
-      for(const imported_product of value_array) {
-        const product:IProduct | undefined = products!.find(element => imported_product.AMOUNT !== undefined && element.product_code === imported_product.CODE);
-        if(product) {
+      for (const imported_product of value_array) {
+        const product: IProduct | undefined = products!.find(
+          (element) =>
+            imported_product.AMOUNT !== undefined &&
+            element.product_code === imported_product.CODE
+        );
+        if (product) {
           final_array.push({
             _id: new ObjectID().toHexString(),
             product_id: product!._id,
             product_code: product!.product_code,
             product_name: product!.name,
             amount: imported_product.AMOUNT,
-          }
-          );
+          });
         }
-
       }
       // const imported_rows = value_array!.map((imported_product:{CODE:string, AMOUNT:number}) => {
       setRows(final_array);
-    })};
+    });
+  };
 
-  const handleOnSubmit = (e:any) => {
-      e.preventDefault();
+  const handleOnSubmit = (e: any) => {
+    e.preventDefault();
 
-      if (file) {
-        fileReader.onload = function (event:any) {
-          const text = event?.target.result;
-          csvFileToArray(text);
-        };
-  
-        fileReader.readAsText(file);
-      }
+    if (file) {
+      fileReader.onload = function (event: any) {
+        const text = event?.target.result;
+        csvFileToArray(text);
+      };
+
+      fileReader.readAsText(file);
+    }
   };
 
   const handleCalculate = () => {
     if (rows.length === 0) {
       window.dispatchEvent(
         new CustomEvent("NotificationEvent", {
-          detail: { color: "error", text: "Rows Are Empty!"},
+          detail: { color: "error", text: "Rows Are Empty!" },
         })
       );
       return;
     }
-    const zero_amt = rows.find((x)=> x.amount <= 0 || x.product_id === "")
-    if(zero_amt != undefined) {
+    const zero_amt = rows.find((x) => x.amount <= 0 || x.product_id === "");
+    if (zero_amt != undefined) {
       window.dispatchEvent(
         new CustomEvent("NotificationEvent", {
-          detail: { color: "error", text: zero_amt.product_id === "" ? "Empty Row!"  : zero_amt.product_code + " Has an Invalid Qty!"},
+          detail: {
+            color: "error",
+            text:
+              zero_amt.product_id === ""
+                ? "Empty Row!"
+                : zero_amt.product_code + " Has an Invalid Qty!",
+          },
         })
       );
       return;
@@ -325,41 +345,50 @@ export const ForecastPage = () => {
         amount: line.amount,
       };
     });
+    console.log(forceRecursion, "TETS");
+    calculateForecast(forecastList, forceRecursion).then(
+      (result: IForecastResults[]) => {
+        // console.log(result);
+        const newRows = result.map((item, idx) => {
+          return {
+            id: idx,
+            product_id: item.product_id,
+            product_code: item.product_code,
+            product_name: item.product_name,
+            required_amount: item.required_amount,
+            available_amount: item.available_amount,
+            ordered_amount: item.ordered_amount,
+            on_hand_amount: item.on_hand_amount,
+            in_transit_amount: item.in_transit_amount,
+            reorder_amount: item.reorder_amount,
+          };
+        });
 
-    calculateForecast(forecastList).then((result: IForecastResults[]) => {
-      // console.log(result);
-      const newRows = result.map((item, idx) => {
-        return {
-          id: idx,
-          product_id: item.product_id,
-          product_code: item.product_code,
-          product_name: item.product_name,
-          required_amount: item.required_amount,
-          available_amount: item.available_amount,
-          ordered_amount: item.ordered_amount,
-          on_hand_amount: item.on_hand_amount,
-          in_transit_amount: item.in_transit_amount,
-          reorder_amount: item.reorder_amount,
-        };
-      });
+        setMaterialRows(newRows);
+        window.dispatchEvent(
+          new CustomEvent("NotificationEvent", {
+            detail: { color: "success", text: "Success!" },
+          })
+        );
+        setLoading(false);
 
-      setMaterialRows(newRows);
-      window.dispatchEvent(
-        new CustomEvent("NotificationEvent", {
-          detail: { color: "success", text: "Success!"},
-        })
-      );
-      setLoading(false);
-      
-      testRef.current?.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});//with just one it doesn't work sometimes lol..
-      testRef.current?.scrollIntoView({behavior: "smooth", block: "start", inline: "nearest"});
-    });
+        testRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+          inline: "nearest",
+        }); //with just one it doesn't work sometimes lol..
+        testRef.current?.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+          inline: "nearest",
+        });
+      }
+    );
   };
 
   const CustomPagination = () => {
     return (
       <GridFooterContainer>
-
         <Button
           size="medium"
           variant="outlined"
@@ -368,9 +397,11 @@ export const ForecastPage = () => {
         >
           + Add Row
         </Button>
-      <GridFooter sx={{
-        border: 'none', // To delete double border.
-        }} />
+        <GridFooter
+          sx={{
+            border: "none", // To delete double border.
+          }}
+        />
       </GridFooterContainer>
     );
   };
@@ -378,38 +409,49 @@ export const ForecastPage = () => {
   return (
     <>
       <Card variant="outlined" sx={{ p: 3 }}>
-
         <Box sx={{ mb: 2 }}>
-        <div>
-        <Button size="medium" variant="contained" sx={{marginBottom:2, marginRight:1}}
-                    onClick={(e) => {
-                        handleOnSubmit(e);
-                    }}
-                >
-                    IMPORT CSV
-                </Button>
-                <input
-                    type={"file"}
-                    id={"csvFileInput"}
-                    accept={".csv"}
-                    onChange={handleOnChange}
-                />
+          <div>
+            <Button
+              size="medium"
+              variant="contained"
+              sx={{ marginBottom: 2, marginRight: 1 }}
+              onClick={(e) => {
+                handleOnSubmit(e);
+              }}
+            >
+              IMPORT CSV
+            </Button>
+            <input
+              type={"file"}
+              id={"csvFileInput"}
+              accept={".csv"}
+              onChange={handleOnChange}
+            />
           </div>
-          <div style={{display:'flex', alignItems:'center', gap:15}}>
-          <Button size="medium" variant="contained" onClick={handleCalculate}>
-            Calculate
-          </Button>
-          <Fade
-          in={loading}
-          style={{
-            transitionDelay: loading ? '250ms' : '0ms',
-          }}
-          unmountOnExit
-        >
-          <CircularProgress  />
-        </Fade>
+          <div style={{ display: "flex", alignItems: "center", gap: 15 }}>
+            <Button size="medium" variant="contained" onClick={handleCalculate}>
+              Calculate
+            </Button>
+            <Checkbox
+              value={forceRecursion}
+              onClick={() => {
+                setForceRecursion(!forceRecursion);
+              }}
+            />
+            Force Recursion?
+            <Fade
+              in={loading}
+              style={{
+                transitionDelay: loading ? "250ms" : "0ms",
+                width: 25,
+                height: 25,
+              }}
+              unmountOnExit
+            >
+              <CircularProgress />
+            </Fade>
           </div>
-      </Box>
+        </Box>
         <DataGrid
           style={{
             border: "1px solid #c9c9c9",
@@ -418,12 +460,12 @@ export const ForecastPage = () => {
           columns={forecastColumns}
           autoHeight={true}
           pagination
-          density={'compact'}
+          density={"compact"}
           getCellClassName={(params: GridCellParams<number>) => {
-            if (params.field === 'amount') {
-              return params.row.amount > 0 ? '' : 'RedRow';
+            if (params.field === "amount") {
+              return params.row.amount > 0 ? "" : "RedRow";
             }
-            return '';  
+            return "";
           }}
           // rowHeight={45}
           onCellKeyDown={(params, event) => {
@@ -434,9 +476,7 @@ export const ForecastPage = () => {
           getRowId={(row) => row._id}
           processRowUpdate={(newRow) => {
             let pList = rows.slice();
-            const rowIdx = rows.findIndex(
-              (r) => r.product_id === newRow._id
-            );
+            const rowIdx = rows.findIndex((r) => r.product_id === newRow._id);
             pList[rowIdx] = newRow;
             setRows(pList);
             return newRow;
@@ -451,21 +491,20 @@ export const ForecastPage = () => {
           // hideFooterPagination
           components={{
             Footer: CustomPagination,
-            Toolbar:GridToolbar,
+            Toolbar: GridToolbar,
           }}
           // hideFooter
           // rowCount={listOptions!.totalDocs}
         />
       </Card>
       {materialRows ? (
-        
         <Card
-          ref={(element: any) => testRef!.current = (element)}
+          ref={(element: any) => (testRef!.current = element)}
           style={{
-            marginTop:2,
-            padding:5,
-            scrollMarginTop:350,
-            overflow:'clip'
+            marginTop: 2,
+            padding: 5,
+            scrollMarginTop: 350,
+            overflow: "clip",
           }}
         >
           <Typography variant="h6" sx={{ textAlign: "center", mb: 0.5 }}>
@@ -477,8 +516,8 @@ export const ForecastPage = () => {
             getRowId={(row) => row.product_id}
             columns={materialColumns}
             autoHeight={true}
-            density={'compact'}
-            components={{Toolbar:GridToolbar}}
+            density={"compact"}
+            components={{ Toolbar: GridToolbar }}
           />
         </Card>
       ) : null}

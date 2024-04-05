@@ -19,6 +19,8 @@ interface Props {
   auto_height?: boolean;
   listOptions: IListOptions;
   handleDBClick?: GridEventListener<"rowClick">;
+  OnCellEditCommit?: (e: any, value: any) => any;
+  GetRowId?: (row: any) => any;
   GetCellClassName?: (row: any) => string;
 }
 
@@ -29,6 +31,8 @@ export const DataTable: React.FC<Props> = ({
   auto_height = false,
   listOptions,
   GetCellClassName,
+  OnCellEditCommit,
+  GetRowId,
   handleDBClick,
 }) => {
   const CustomToolbar: React.FC = () => {
@@ -45,7 +49,7 @@ export const DataTable: React.FC<Props> = ({
   };
 
   const CustomPagination = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     let currPage = 1;
 
@@ -57,7 +61,7 @@ export const DataTable: React.FC<Props> = ({
       <div style={{ display: "flex", alignItems: "center" }}>
         <Pagination
           color="primary"
-          count={listOptions!.totalPages }
+          count={listOptions!.totalPages}
           page={currPage}
           shape="rounded"
           variant="outlined"
@@ -74,9 +78,11 @@ export const DataTable: React.FC<Props> = ({
         />
         <Typography variant="subtitle2" sx={{ mr: 2 }}>{`${
           listOptions.pagingCounter
-        }-${ listOptions.totalDocs > (listOptions.pagingCounter + listOptions.limit) ? (listOptions.pagingCounter + listOptions.limit) : listOptions.totalDocs} of ${
-          listOptions.totalDocs
-        }`}</Typography>
+        }-${
+          listOptions.totalDocs > listOptions.pagingCounter + listOptions.limit
+            ? listOptions.pagingCounter + listOptions.limit
+            : listOptions.totalDocs
+        } of ${listOptions.totalDocs}`}</Typography>
       </div>
     );
   };
@@ -90,6 +96,7 @@ export const DataTable: React.FC<Props> = ({
           border: "1px solid #c9c9c9",
         }}
         getCellClassName={GetCellClassName}
+        getRowId={GetRowId}
         rows={rows}
         columns={columns}
         autoHeight={auto_height}
@@ -102,6 +109,7 @@ export const DataTable: React.FC<Props> = ({
           Toolbar: CustomToolbar,
           Pagination: CustomPagination,
         }}
+        onCellEditCommit={OnCellEditCommit}
       />
     </div>
   );
