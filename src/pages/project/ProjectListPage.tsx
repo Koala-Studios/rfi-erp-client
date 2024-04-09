@@ -103,6 +103,7 @@ const ProjectListPage = () => {
           project_code: project.project_code,
           status: project.status,
           assigned_user: project.assigned_user ?? "None",
+          start_date: project.start_date.split("T")[0],
           notes: project.notes,
           request_size: project.project_items.length,
         };

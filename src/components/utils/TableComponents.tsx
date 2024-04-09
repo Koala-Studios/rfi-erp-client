@@ -44,18 +44,16 @@ export const SingleDropdownCell: React.FC<SingleDropdownCellProps> = ({
     setAnchorEl(null);
   };
 
-  console.log("STATUS VAL", value);
-
   return (
     <>
       <Chip
         onClick={handleClick}
-        label={options[1][1]}
+        label={options[value - 1][1]}
         sx={{
           fontWeight: 600,
         }}
         //@ts-ignore
-        color={options[1][2]}
+        color={options[value - 1][2]}
         variant="outlined"
       />
       <Menu
@@ -139,8 +137,18 @@ export const MultiDropdownCell: React.FC<SingleDropdownCellProps> = ({
     <>
       <div
         onClick={handleClick}
-        style={{ display: "flex", width: "100%", flexWrap: "wrap", gap: 5 }}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          width: "100%",
+          minWidth: "100%",
+          minHeight: "100%",
+          padding: "2px 0",
+          flexWrap: "wrap",
+          gap: 5,
+        }}
       >
+        &nbsp;
         {value.map((val: number) => {
           return (
             <Chip

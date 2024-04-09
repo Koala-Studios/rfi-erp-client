@@ -75,7 +75,22 @@ const BatchingListPage = () => {
         </div>
       ),
     },
-    { field: "date", headerName: "Date Created", width: 120 },
+    {
+      field: "date",
+      headerName: "Date Created",
+      width: 120,
+      valueGetter(params: any) {
+        return params.row.date.split("T")[0];
+      },
+    },
+    {
+      field: "date_time",
+      headerName: "Time Created",
+      width: 120,
+      valueGetter(params: any) {
+        return params.row.date.split("T")[1].split(".")[0];
+      },
+    },
     { field: "date_needed", headerName: "Date Due", type: "date" },
     { field: "product_code", headerName: "Product Code", width: 120 },
     { field: "name", headerName: "Product Name", width: 320 },
@@ -102,7 +117,7 @@ const BatchingListPage = () => {
       field: "id",
       headerName: "Actions",
       align: "left",
-      width: 250,
+      width: 120,
       renderCell: (params: GridRenderCellParams<string>) => (
         <strong>
           <Button
@@ -127,9 +142,7 @@ const BatchingListPage = () => {
           id: batch._id,
           batch_code: batch.batch_code,
           date: batch.date_created,
-          date_needed: batch.date_needed
-            ? batch.date_needed.toString().replace(/\T.+/, "")
-            : "",
+          date_needed: batch.date_needed ? batch.date_needed.split("T")[0] : "",
           quantity: batch.quantity,
           product_code: batch.product_code,
           name: batch.name,

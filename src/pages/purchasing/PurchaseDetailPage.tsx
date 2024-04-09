@@ -743,7 +743,6 @@ export const PurchaseDetailPage = () => {
                   error={inputVisuals[inputRefMap.supplier].error}
                   helperText={inputVisuals[inputRefMap.supplier].helperText}
                   onChange={(event, value) => {
-                    console.log(value, "testing ");
                     setPurchase({
                       ...purchase,
                       supplier: { _id: value._id, code: value.code },

@@ -20,18 +20,17 @@ export interface IProject {
 
 export interface IProjectItem {
   _id: string;
-  flavor_name: string;
-  // code: string;
+  c_prod_name: string;
   product_id: string;
   product_name: string;
   status: number;
   product_status: number;
   product_code: string;
-  assigned_user: IUser;
-  notes?:string;
-  external_code?:string;
-  regulatory_status?:[Number];
-  dietary_status?:[Number];
+  assigned_user: { _id: string; username: string };
+  notes: string;
+  customer_sku: string;
+  regulatory_status: number[];
+  dietary_status: number[];
 }
 
 const api = axios.create({

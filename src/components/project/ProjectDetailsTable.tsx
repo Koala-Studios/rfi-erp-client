@@ -216,7 +216,7 @@ export const ProjectDetailsTable: React.FC<Props> = ({
   const handleEditAsigneeRow = (rowid: string, value: IUser) => {
     let pList = projectItems.slice();
     const rowIdx = projectItems.findIndex((r) => r._id === rowid);
-    pList[rowIdx].assigned_user = value;
+    pList[rowIdx].assigned_user = { _id: value._id, username: value.username };
 
     setProjectItems(pList);
   };
@@ -232,17 +232,21 @@ export const ProjectDetailsTable: React.FC<Props> = ({
   const handleEditRegStatus = (rowid: string, value: number | string) => {
     let pList = projectItems.slice();
     const rowIdx = projectItems.findIndex((r) => r._id === rowid);
-
     //@ts-ignore
     pList[rowIdx].regulatory_status = value;
-
+    console.log(value, "BRUH.");
     setProjectItems(pList);
   };
   const handleEditDietStatus = (rowid: string, value: number | string) => {
-    let pList = projectItems.slice();
+    let pList = projectItems!.slice();
     const rowIdx = projectItems.findIndex((r) => r._id === rowid);
-    //@ts-ignore
-    pList[rowIdx].dietary_status.push(value);
+    const idx = pList[rowIdx].dietary_status?.findIndex((e) => e == value);
+    if (idx == -1) {
+      //@ts-ignore
+      pList[rowIdx].dietary_status.push(value);
+    } else {
+      pList[rowIdx].dietary_status.splice(idx, 1);
+    }
     // pList[rowIdx].dietary_status = pList[rowIdx].dietary_status.push(value);
 
     setProjectItems(pList);
@@ -258,7 +262,7 @@ export const ProjectDetailsTable: React.FC<Props> = ({
         product_name: "",
         product_code: "",
         regulatory_status: [1],
-        assigned_user: null,
+        assigned_user: { _id: "", username: "" },
         dietary_status: [1],
         notes: "",
         application: "",
@@ -294,6 +298,26 @@ export const ProjectDetailsTable: React.FC<Props> = ({
       },
     },
     {
+      field: "product_name",
+      headerName: "Internal Product",
+      width: 120,
+      sortable: false,
+      filterable: false,
+      renderCell: (row_params: GridRenderCellParams<string>) => (
+        <TableAutocomplete
+          dbOption="product"
+          handleEditRow={handleEditProductRow}
+          // width={120}
+          rowParams={row_params}
+          initialValue={row_params.row.product_code}
+          letterMin={0}
+          getOptionLabel={(item) =>
+            item.name ? `${item.product_code} | ${item.name}` : ""
+          }
+        />
+      ),
+    },
+    {
       field: "flavor_name",
       headerName: "Request Flavor Name",
       width: 170,
@@ -315,16 +339,11 @@ export const ProjectDetailsTable: React.FC<Props> = ({
         />
       ),
     },
-    {
-      field: "notes",
-      headerName: "Notes",
-      width: 350,
-      editable: true,
-    },
+
     {
       field: "assigned_user",
       headerName: "Assignee",
-      width: 130,
+      width: 160,
       sortable: false,
       filterable: false,
       renderCell: (row_params: GridRenderCellParams<string>) => (
@@ -332,18 +351,10 @@ export const ProjectDetailsTable: React.FC<Props> = ({
           dbOption="user"
           handleEditRow={handleEditAsigneeRow}
           rowParams={row_params}
-          initialValue={
-            row_params.row.assigned_user
-              ? row_params.row.assigned_user.username
-              : ""
-          }
+          initialValue={row_params.row.assigned_user.username ?? ""}
+          height={30}
           letterMin={0}
-          getOptionLabel={(item: IUser) => (
-            <>
-              <Avatar sx={{ mr: 2 }} />
-              {item.username}
-            </>
-          )}
+          getOptionLabel={(item: IUser) => item.username ?? ""}
         />
       ),
     },
@@ -366,7 +377,7 @@ export const ProjectDetailsTable: React.FC<Props> = ({
       field: "dietary_status",
       headerName: "Diet Status",
       editable: false,
-      width: 150,
+      width: 200,
       renderCell: (params: GridRenderCellParams<number>) => (
         <MultiDropdownCell
           handleEditRow={handleEditDietStatus}
@@ -378,25 +389,10 @@ export const ProjectDetailsTable: React.FC<Props> = ({
       ),
     },
     {
-      field: "product_name",
-      headerName: "Internal Product",
-      width: 200,
-      sortable: false,
-      filterable: false,
-      renderCell: (row_params: GridRenderCellParams<string>) => (
-        <TableAutocomplete
-          dbOption="product"
-          handleEditRow={handleEditProductRow}
-          rowParams={row_params}
-          initialValue={
-            row_params.row.product_code + " | " + row_params.row.product_name
-          }
-          letterMin={0}
-          getOptionLabel={(item) =>
-            item ? `${item.product_code} | ${item.name}` : ""
-          }
-        />
-      ),
+      field: "notes",
+      headerName: "Notes",
+      width: 350,
+      editable: true,
     },
   ];
 

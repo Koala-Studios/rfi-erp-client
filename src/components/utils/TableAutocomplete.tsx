@@ -32,6 +32,7 @@ interface Props {
   letterMin: number;
   getOptionLabel: (option: any) => any;
   width?: number;
+  height?: number;
   searchOptionalVar?: any;
   dropDownWidth?: number;
 }
