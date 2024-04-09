@@ -1,22 +1,12 @@
-import React from "react";
-import { DataTable } from "../../components/utils/DataTable";
-import {
-  GridColDef,
-  GridRenderCellParams,
-  GridValueGetterParams,
-} from "@mui/x-data-grid";
-import { listBatching } from "../../logic/batching.logic";
-import { AuthContext } from "../../components/navigation/AuthProvider";
-import { FilterElement, IListData } from "../../logic/utils";
-import { Button, Card, Chip, Divider } from "@mui/material";
-import {
-  useLocation,
-  useNavigate,
-  useParams,
-  useSearchParams,
-} from "react-router-dom";
-import DataFilter from "../../components/utils/DataFilter";
 import RunningWithErrorsIcon from "@mui/icons-material/RunningWithErrors";
+import { Button, Card, Chip } from "@mui/material";
+import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import React from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import DataFilter from "../../components/utils/DataFilter";
+import { DataTable } from "../../components/utils/DataTable";
+import { listBatching } from "../../logic/batching.logic";
+import { FilterElement, IListData } from "../../logic/utils";
 
 //label,field,type
 const filterArray: FilterElement[] = [
@@ -65,7 +55,7 @@ const BatchingListPage = () => {
       renderCell: (params: GridRenderCellParams<number>) => (
         <div>
           {" "}
-          {params.row.has_enough == false ? (
+          {params.row.has_enough === false ? (
             <RunningWithErrorsIcon
               style={{ color: params.row.status === 1 ? "orange" : "red" }}
             ></RunningWithErrorsIcon>
@@ -157,7 +147,7 @@ const BatchingListPage = () => {
     navigate(`/batching/new`, { replace: false });
   };
 
-  if (dataOptions == null) return null;
+  if (dataOptions === null) return null;
 
   return (
     <>

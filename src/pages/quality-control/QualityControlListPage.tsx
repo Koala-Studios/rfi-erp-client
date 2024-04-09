@@ -1,17 +1,13 @@
-import React from "react";
-import { DataTable } from "../../components/utils/DataTable";
-import {
-  GridColDef,
-  GridRenderCellParams,
-  GridValueGetterParams,
-} from "@mui/x-data-grid";
-import { listQualityControl } from "../../logic/quality-control.logic";
-import { AuthContext } from "../../components/navigation/AuthProvider";
-import { Button, Card, Chip } from "@mui/material";
-import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { FilterElement, IListData } from "../../logic/utils";
-import DataFilter from "../../components/utils/DataFilter";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { Button, Card, Chip } from "@mui/material";
+import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import React from "react";
+import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
+import { AuthContext } from "../../components/navigation/AuthProvider";
+import DataFilter from "../../components/utils/DataFilter";
+import { DataTable } from "../../components/utils/DataTable";
+import { listQualityControl } from "../../logic/quality-control.logic";
+import { FilterElement, IListData } from "../../logic/utils";
 const QualityControlListPage = () => {
   const orderStatus = [
     ["PENDING", "warning"],
@@ -134,7 +130,7 @@ const QualityControlListPage = () => {
       setDataOptions({ rows: newRows, listOptions: list! });
     });
   }, [location.key]);
-  if (dataOptions == null) return null;
+  if (dataOptions === null) return null;
 
   return (
     <>

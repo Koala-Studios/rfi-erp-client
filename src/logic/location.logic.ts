@@ -1,4 +1,4 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios from "axios";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
 
 export interface ILocation {

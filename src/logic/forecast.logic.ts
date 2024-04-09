@@ -1,5 +1,5 @@
 import axios from "axios";
-import { apiStatus, IListOptions } from "./utils";
+import { apiStatus } from "./utils";
 
 export interface IProductLine {
   _id: string;

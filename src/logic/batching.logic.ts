@@ -1,11 +1,5 @@
 import axios from "axios";
-import {
-  apiStatus,
-  FilterElement,
-  getQuery,
-  IListOptions,
-  paramsToObject,
-} from "./utils";
+import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
 
 export const batchingStatus = {
   DRAFT: 1,

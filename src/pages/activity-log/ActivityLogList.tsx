@@ -1,15 +1,10 @@
+import { Box, Card, Typography } from "@mui/material";
+import { GridColDef } from "@mui/x-data-grid";
 import React from "react";
-import { DataTable } from "../../components/utils/DataTable";
-import {
-  GridColDef,
-  GridRenderCellParams,
-  GridValueGetterParams,
-} from "@mui/x-data-grid";
-import { AuthContext } from "../../components/navigation/AuthProvider";
-import { Box, Button, Card, Typography } from "@mui/material";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { FilterElement, IListData } from "../../logic/utils";
+import { AuthContext } from "../../components/navigation/AuthProvider";
 import { listActivityLog } from "../../logic/activity-log.logic";
+import { FilterElement, IListData } from "../../logic/utils";
 
 const UserListPage = () => {
   const navigate = useNavigate();
@@ -44,7 +39,7 @@ const UserListPage = () => {
     });
   }, [location.key]);
 
-  if (dataOptions == null) return null;
+  if (dataOptions === null) return null;
 
   return (
     <Box

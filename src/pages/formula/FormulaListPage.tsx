@@ -1,16 +1,12 @@
-import React from "react";
-import { DataTable } from "../../components/utils/DataTable";
-import {
-  GridColDef,
-  GridRenderCellParams,
-  GridValueGetterParams,
-} from "@mui/x-data-grid";
-import { listProducts } from "../../logic/product.logic";
-import { AuthContext } from "../../components/navigation/AuthProvider";
 import { Button, Card, Chip } from "@mui/material";
+import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import React from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { FilterElement, IListData } from "../../logic/utils";
+import { AuthContext } from "../../components/navigation/AuthProvider";
 import DataFilter from "../../components/utils/DataFilter";
+import { DataTable } from "../../components/utils/DataTable";
+import { listProducts } from "../../logic/product.logic";
+import { FilterElement, IListData } from "../../logic/utils";
 
 const ProductStatus = [
   ["Pending", "error"],
@@ -26,15 +22,14 @@ const filterArray: FilterElement[] = [
     field: "product_code",
     type: "text",
   },
-  { label: "Product Name", field: "name", type: "text"},
-  { label: "Product Alias", field: "aliases", type: "text"},
-  { label: "Regulatory", field: "regulatory", type: "text"}, // Look at regulatory obj
-  { label: "Dietary", field: "dietary", type: "text"},
-  { label: "Product Type", field: "product_type", type: "text"},
-  { label: "Date Created", field: "date_created", type: "date"},
-  { label: "Solid", field: "is_solid", type: "text"},
+  { label: "Product Name", field: "name", type: "text" },
+  { label: "Product Alias", field: "aliases", type: "text" },
+  { label: "Regulatory", field: "regulatory", type: "text" }, // Look at regulatory obj
+  { label: "Dietary", field: "dietary", type: "text" },
+  { label: "Product Type", field: "product_type", type: "text" },
+  { label: "Date Created", field: "date_created", type: "date" },
+  { label: "Solid", field: "is_solid", type: "text" },
   { label: "Quantity", field: "quantity", type: "number", regexOption: null },
-
 ];
 const FormulaListPage = () => {
   const navigate = useNavigate();
@@ -49,7 +44,7 @@ const FormulaListPage = () => {
       field: "status",
       headerName: "Status",
       width: 200,
-      align: 'center',
+      align: "center",
       renderCell: (params: GridRenderCellParams<number>) => (
         <Chip
           label={ProductStatus[params.value ? params.value - 1 : 4][0]}
@@ -73,14 +68,16 @@ const FormulaListPage = () => {
       headerName: "Created Date",
       width: 120,
       align: "right",
-      valueGetter: (params) => params.row.created_date ? params.row.created_date : ''
+      valueGetter: (params) =>
+        params.row.created_date ? params.row.created_date : "",
     },
     {
       field: "latest_update",
       headerName: "Latest Update",
       width: 120,
       align: "right",
-      valueGetter: (params) => params.row.latest_update ? params.row.latest_update : ''
+      valueGetter: (params) =>
+        params.row.latest_update ? params.row.latest_update : "",
     },
     { field: "cost", headerName: "Cost", width: 100, align: "right" },
     {
@@ -89,24 +86,24 @@ const FormulaListPage = () => {
       align: "left",
       width: 120,
       renderCell: (params: GridRenderCellParams<string>) => (
-          <Button
-            variant="contained"
-            color="primary"
-            size="small"
-            style={{ marginLeft: 16 }}
-            onClick={() =>
-              navigate(
-                `/formula/develop/${params.value}/${params.row.versions}`,
-                {
-                  //TODO: TEMPORARY FOR DEVELOPMENT
-                  // navigate(`/formula/${params.value}/${params.row.versions}`, {
-                  replace: false,
-                }
-              )
-            }
-          >
-            Formula
-          </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          size="small"
+          style={{ marginLeft: 16 }}
+          onClick={() =>
+            navigate(
+              `/formula/develop/${params.value}/${params.row.versions}`,
+              {
+                //TODO: TEMPORARY FOR DEVELOPMENT
+                // navigate(`/formula/${params.value}/${params.row.versions}`, {
+                replace: false,
+              }
+            )
+          }
+        >
+          Formula
+        </Button>
       ),
     },
   ];
@@ -134,7 +131,7 @@ const FormulaListPage = () => {
     navigate(`/products/new`, { replace: false });
   };
 
-  if (dataOptions == null) return null;
+  if (dataOptions === null) return null;
 
   return (
     <>

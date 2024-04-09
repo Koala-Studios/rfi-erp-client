@@ -1,15 +1,15 @@
-import React from "react";
-import NavTab from "../../components/utils/NavTab";
-import LinkTab from "../../components/utils/LinkTab";
 import { Button, Card, Chip } from "@mui/material";
-import { DataGrid, GridColDef, GridRenderCellParams, GridRowClassNameParams } from "@mui/x-data-grid";
+import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import React from "react";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
 import { DataTable } from "../../components/utils/DataTable";
-import { listInventoryMovements } from "../../logic/inventory-movements.logic";
-import { FilterElement, IListData } from "../../logic/utils";
-import { useLocation, useNavigate, useSearchParams, useParams } from "react-router-dom";
-import { AuthContext } from "../../components/navigation/AuthProvider";
-import { IInventoryStock, listInventoryContainers } from "../../logic/inventory-stock.logic";
 import { listSupplierOrders } from "../../logic/purchase-order.logic";
+import { FilterElement, IListData } from "../../logic/utils";
 
 //label,field,type
 const filterArray: FilterElement[] = [
@@ -21,7 +21,7 @@ const filterArray: FilterElement[] = [
     regexOption: null,
   },
 ];
-  
+
 const PurchaseStatus = [
   ["AWAITING SHIPPING", "warning"],
   ["AWAITING ARRIVAL", "warning"],
@@ -29,7 +29,7 @@ const PurchaseStatus = [
   ["RECEIVED", "success"],
   ["ABANDONED", "error"],
   ["DRAFT", "warning"],
-  ["ERROR", 'error']
+  ["ERROR", "error"],
 ];
 
 export const SupplierOrdersPage = () => {
@@ -43,14 +43,20 @@ export const SupplierOrdersPage = () => {
   const columns: GridColDef[] = [
     { field: "order_code", headerName: "Order Code", width: 150 },
     { field: "date_purchased", headerName: "Date Purchased", width: 170 },
-    { field: "order_items", headerName: "Item Count", width: 100, valueGetter(params) {
-      return params.row.order_items.length
-    }, align:'center' },
+    {
+      field: "order_items",
+      headerName: "Item Count",
+      width: 100,
+      valueGetter(params) {
+        return params.row.order_items.length;
+      },
+      align: "center",
+    },
     {
       field: "status",
       headerName: "Status",
       width: 200,
-      align: 'center',
+      align: "center",
       renderCell: (params: GridRenderCellParams<number>) => (
         <Chip
           label={PurchaseStatus[params.value ? params.value - 1 : 6][0]}
@@ -69,7 +75,7 @@ export const SupplierOrdersPage = () => {
       align: "left",
       width: 250,
       renderCell: (params: GridRenderCellParams<string>) => (
-      <strong>
+        <strong>
           <Button
             variant="contained"
             color="primary"
@@ -87,33 +93,33 @@ export const SupplierOrdersPage = () => {
     //   return params.row.supplier.length
     // }, },
     // { field: "order_code", headerName: "Order Code", width: 150 },
-    
   ];
 
   React.useEffect(() => {
     listSupplierOrders(searchParams, filterArray, id).then((list) => {
-      console.log("sad")
-      const newRows =  list!.docs.map((item) => {
-        console.log(item, ' TESTING')
-        return {...item, id: item._id}
-      }
-      )
+      console.log("sad");
+      const newRows = list!.docs.map((item) => {
+        console.log(item, " TESTING");
+        return { ...item, id: item._id };
+      });
       setDataOptions({ rows: newRows, listOptions: list! });
     });
   }, [currPage, location.key]);
 
-  if (dataOptions == null) return null;
+  if (dataOptions === null) return null;
 
-  return <>
-    <Card variant="outlined" style={{ padding:16, marginBottom: 10 }}>
-    <DataTable
-        rows={dataOptions.rows}
-        columns={columns}
-        auto_height={true}
-        listOptions={dataOptions.listOptions}
-      ></DataTable>
-    </Card>
-  </>;
+  return (
+    <>
+      <Card variant="outlined" style={{ padding: 16, marginBottom: 10 }}>
+        <DataTable
+          rows={dataOptions.rows}
+          columns={columns}
+          auto_height={true}
+          listOptions={dataOptions.listOptions}
+        ></DataTable>
+      </Card>
+    </>
+  );
 };
 
 export default SupplierOrdersPage;

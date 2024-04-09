@@ -1,6 +1,6 @@
 import axios from "axios";
 import { IProduct } from "./product.logic";
-import { apiStatus, IListOptions } from "./utils";
+import { apiStatus } from "./utils";
 
 export interface IFormulaItem {
   material_name: string;

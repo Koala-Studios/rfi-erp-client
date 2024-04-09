@@ -1,7 +1,6 @@
 import axios from "axios";
 import { ObjectId } from "bson";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
-import { IInventory } from "./inventory.logic";
 
 interface IStockExtension {
   extension_date: Date;

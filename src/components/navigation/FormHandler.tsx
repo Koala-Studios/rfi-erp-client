@@ -23,7 +23,7 @@ const FormHandler = () => {
     });
   }, []);
 
-  if (currForm == null) return <></>;
+  if (currForm === null) return <></>;
 
   const submitFunction = () => {
     //dynamically get final values from form fields

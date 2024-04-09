@@ -1,16 +1,12 @@
-import React from "react";
-import { DataTable } from "../../components/utils/DataTable";
-import {
-  GridColDef,
-  GridRenderCellParams,
-  GridValueGetterParams,
-} from "@mui/x-data-grid";
-import { listProducts } from "../../logic/product.logic";
-import { AuthContext } from "../../components/navigation/AuthProvider";
 import { Button, Card } from "@mui/material";
+import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import React from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { FilterElement, IListData } from "../../logic/utils";
+import { AuthContext } from "../../components/navigation/AuthProvider";
 import DataFilter from "../../components/utils/DataFilter";
+import { DataTable } from "../../components/utils/DataTable";
+import { listProducts } from "../../logic/product.logic";
+import { FilterElement, IListData } from "../../logic/utils";
 
 const ProductListPage = () => {
   const navigate = useNavigate();
@@ -23,15 +19,14 @@ const ProductListPage = () => {
       field: "product_code",
       type: "text",
     },
-    { label: "Product Name", field: "name", type: "text"},
-    { label: "Product Alias", field: "aliases", type: "text"},
-    { label: "Regulatory", field: "regulatory", type: "text"}, // Look at regulatory obj
-    { label: "Dietary", field: "dietary", type: "text"},
-    { label: "Product Type", field: "product_type", type: "text"},
-    { label: "Date Created", field: "date_created", type: "date"},
-    { label: "Solid", field: "is_solid", type: "text"},
+    { label: "Product Name", field: "name", type: "text" },
+    { label: "Product Alias", field: "aliases", type: "text" },
+    { label: "Regulatory", field: "regulatory", type: "text" }, // Look at regulatory obj
+    { label: "Dietary", field: "dietary", type: "text" },
+    { label: "Product Type", field: "product_type", type: "text" },
+    { label: "Date Created", field: "date_created", type: "date" },
+    { label: "Solid", field: "is_solid", type: "text" },
     { label: "Quantity", field: "quantity", type: "number", regexOption: null },
-  
   ];
   const columns: GridColDef[] = [
     // { field: "id", headerName: "ID", width: 300 },
@@ -41,9 +36,9 @@ const ProductListPage = () => {
       field: "approved_version",
       headerName: "Appr Version",
       width: 100,
-      align: 'center'
+      align: "center",
     },
-    { field: "cost", headerName: "Cost/KG", width: 100, align: "right"},
+    { field: "cost", headerName: "Cost/KG", width: 100, align: "right" },
     { field: "on_hand", headerName: "On Hand", width: 100, align: "right" },
     { field: "ordered", headerName: "Ordered", width: 100, align: "right" },
     {
@@ -78,7 +73,7 @@ const ProductListPage = () => {
   const auth = React.useContext(AuthContext);
 
   React.useEffect(() => {
-    listProducts(searchParams ,filterArray, true, true).then((list) => {
+    listProducts(searchParams, filterArray, true, true).then((list) => {
       const newRows = list!.docs.map((product) => {
         return {
           id: product._id,
@@ -99,7 +94,7 @@ const ProductListPage = () => {
     navigate(`/products/new`, { replace: false });
   };
 
-  if (dataOptions == null) return null;
+  if (dataOptions === null) return null;
 
   return (
     <>

@@ -1,13 +1,17 @@
-import { Card, Button, Grid, TextField, Chip, Typography } from "@mui/material";
-import { useEffect, useState, useContext } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { AuthContext } from "../../components/navigation/AuthProvider";
-import { getProduct } from "../../logic/product.logic";
-import { createUser, getUser, IUser, IUserRole, updateUser } from "../../logic/user.logic";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { Button, Card, Grid, TextField, Typography } from "@mui/material";
+import { useContext, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import SaveForm from "../../components/forms/SaveForm";
-import StandaloneAutocomplete from "../../components/utils/StandaloneAutocomplete";
+import { AuthContext } from "../../components/navigation/AuthProvider";
 import MultiAutocomplete from "../../components/utils/MultiAutocomplete";
+import {
+  IUser,
+  IUserRole,
+  createUser,
+  getUser,
+  updateUser,
+} from "../../logic/user.logic";
 
 const emptyUser: IUser = {
   _id: "",
@@ -15,7 +19,7 @@ const emptyUser: IUser = {
   email: "",
   user_code: "",
   created_date: "",
-  roles:[]
+  roles: [],
 };
 
 let savedUser: IUser | null = null;
@@ -42,7 +46,7 @@ export const UserDetailPage = () => {
   }, []);
 
   useEffect(() => {
-    if (user == null || userSaved === false) return;
+    if (user === null || userSaved === false) return;
 
     if (JSON.stringify(savedUser) !== JSON.stringify(user)) {
       console.log(JSON.stringify(savedUser), JSON.stringify(user), "test");
@@ -78,7 +82,7 @@ export const UserDetailPage = () => {
     setUserSaved(true);
   };
 
-  if (user == null) return null;
+  if (user === null) return null;
 
   return (
     <>
@@ -137,25 +141,23 @@ export const UserDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
-            
-          <Grid item xs={6}>
-          <MultiAutocomplete //TODO: Make this work properly, for testing purposes rn
-            initialValue={user.roles}
-            readOnly={false}
-            onChange={(e:any, value:any) => {
-              console.log(value, 'test', e)
-              setUser({...user!, roles: value  })
-            }}
-            label={"Roles"}
-            letterMin={0}
-            dbOption={"roles"}
-            getOptionLabel={(item: IUserRole) => {
-              return (
-                item.name
-              );
-            }}
-          />
-          </Grid>
+
+            <Grid item xs={6}>
+              <MultiAutocomplete //TODO: Make this work properly, for testing purposes rn
+                initialValue={user.roles}
+                readOnly={false}
+                onChange={(e: any, value: any) => {
+                  console.log(value, "test", e);
+                  setUser({ ...user!, roles: value });
+                }}
+                label={"Roles"}
+                letterMin={0}
+                dbOption={"roles"}
+                getOptionLabel={(item: IUserRole) => {
+                  return item.name;
+                }}
+              />
+            </Grid>
 
             <Grid item xs={3}>
               <TextField

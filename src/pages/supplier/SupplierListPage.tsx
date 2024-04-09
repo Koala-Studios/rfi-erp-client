@@ -1,16 +1,12 @@
-import React from "react";
-import { DataTable } from "../../components/utils/DataTable";
-import {
-  GridColDef,
-  GridRenderCellParams,
-  GridValueGetterParams,
-} from "@mui/x-data-grid";
-import { listSuppliers } from "../../logic/supplier.logic";
-import { AuthContext } from "../../components/navigation/AuthProvider";
 import { Button, Card, Rating } from "@mui/material";
+import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import React from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { FilterElement, IListData } from "../../logic/utils";
+import { AuthContext } from "../../components/navigation/AuthProvider";
 import DataFilter from "../../components/utils/DataFilter";
+import { DataTable } from "../../components/utils/DataTable";
+import { listSuppliers } from "../../logic/supplier.logic";
+import { FilterElement, IListData } from "../../logic/utils";
 
 const SupplierListPage = () => {
   const navigate = useNavigate();
@@ -24,7 +20,6 @@ const SupplierListPage = () => {
     { label: "Contact Name", field: "contact_name", type: "text" },
     { label: "Email", field: "email", type: "text" },
     { label: "Phone", field: "phone", type: "text" },
-  
   ];
   const columns: GridColDef[] = [
     { field: "code", headerName: "Code", width: 80 },
@@ -37,15 +32,20 @@ const SupplierListPage = () => {
     { field: "address_one", headerName: "Address Line One", width: 200 },
     { field: "address_two", headerName: "Address Line Two", width: 200 },
     { field: "phone", headerName: "Phone Number", width: 170 },
-    { field: "trust_factor", headerName: "Trust Rating", width: 120, align:'center',
-    renderCell: (params: GridRenderCellParams<number>) => (
-      <Rating
-      name="half-rating"
-      value={params.row.trust_factor}
-      readOnly={true}
-      precision={0.5}
-    />
-    ), },
+    {
+      field: "trust_factor",
+      headerName: "Trust Rating",
+      width: 120,
+      align: "center",
+      renderCell: (params: GridRenderCellParams<number>) => (
+        <Rating
+          name="half-rating"
+          value={params.row.trust_factor}
+          readOnly={true}
+          precision={0.5}
+        />
+      ),
+    },
     {
       field: "id",
       headerName: "Actions",
@@ -76,7 +76,6 @@ const SupplierListPage = () => {
         return {
           ...supplier,
           id: supplier._id,
-          
         };
       });
       setDataOptions({ rows: newRows, listOptions: list! });
@@ -86,7 +85,7 @@ const SupplierListPage = () => {
     navigate(`/suppliers/new`, { replace: false });
   };
 
-  if (dataOptions == null) return null;
+  if (dataOptions === null) return null;
 
   return (
     <>

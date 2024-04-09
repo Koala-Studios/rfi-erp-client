@@ -1,19 +1,17 @@
-import React from "react";
-import { DataTable } from "../../components/utils/DataTable";
+import { Button, Card, Chip } from "@mui/material";
 import {
   GridColDef,
   GridEventListener,
   GridRenderCellParams,
-  GridValueGetterParams,
 } from "@mui/x-data-grid";
-import { createProject, listProjects } from "../../logic/project.logic";
-import { AuthContext } from "../../components/navigation/AuthProvider";
-import { Button, Card, Chip } from "@mui/material";
+import React from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { formTypes } from "../../logic/form.logic";
-import { FilterElement, IListData } from "../../logic/utils";
+import { AuthContext } from "../../components/navigation/AuthProvider";
 import DataFilter from "../../components/utils/DataFilter";
-import { ExpandableDataTable } from "../../components/utils/ExpandableDataTable";
+import { DataTable } from "../../components/utils/DataTable";
+import { formTypes } from "../../logic/form.logic";
+import { createProject, listProjects } from "../../logic/project.logic";
+import { FilterElement, IListData } from "../../logic/utils";
 
 const ProjectStatus = [
   ["Draft", "error"],
@@ -112,7 +110,7 @@ const ProjectListPage = () => {
     });
   }, [location.key]);
 
-  if (dataOptions == null) return null;
+  if (dataOptions === null) return null;
 
   //TODO:Memoization
   const createProjectForm = () => {

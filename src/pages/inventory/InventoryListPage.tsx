@@ -1,17 +1,12 @@
-import React from "react";
-import { DataTable } from "../../components/utils/DataTable";
-import {
-  GridColDef,
-  GridRenderCellParams,
-  GridValueGetterParams,
-} from "@mui/x-data-grid";
-import { listInventory } from "../../logic/inventory.logic";
-import { AuthContext } from "../../components/navigation/AuthProvider";
 import { Button, Card } from "@mui/material";
+import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import React from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { setTokenSourceMapRange } from "typescript";
-import { FilterElement, IListData } from "../../logic/utils";
+import { AuthContext } from "../../components/navigation/AuthProvider";
 import DataFilter from "../../components/utils/DataFilter";
+import { DataTable } from "../../components/utils/DataTable";
+import { listInventory } from "../../logic/inventory.logic";
+import { FilterElement, IListData } from "../../logic/utils";
 
 //label,field,type
 const filterArray: FilterElement[] = [
@@ -101,7 +96,7 @@ const InventoryListPage = () => {
     navigate(`/inventory/new`, { replace: false });
   };
 
-  if (dataOptions == null) return null;
+  if (dataOptions === null) return null;
 
   return (
     <>

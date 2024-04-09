@@ -1,16 +1,12 @@
+import { Box, Button, Card } from "@mui/material";
+import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import React from "react";
-import { DataTable } from "../../components/utils/DataTable";
-import {
-  GridColDef,
-  GridRenderCellParams,
-  GridValueGetterParams,
-} from "@mui/x-data-grid";
-import { listLocations } from "../../logic/location.logic";
-import { AuthContext } from "../../components/navigation/AuthProvider";
-import { Box, Button, Card, Typography } from "@mui/material";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { FilterElement, IListData } from "../../logic/utils";
+import { AuthContext } from "../../components/navigation/AuthProvider";
 import DataFilter from "../../components/utils/DataFilter";
+import { DataTable } from "../../components/utils/DataTable";
+import { listLocations } from "../../logic/location.logic";
+import { FilterElement, IListData } from "../../logic/utils";
 
 const LocationListPage = () => {
   const navigate = useNavigate();
@@ -24,14 +20,18 @@ const LocationListPage = () => {
       type: "text",
     },
     { label: "Name", field: "name", type: "text" },
-  
   ];
   const columns: GridColDef[] = [
     { field: "code", headerName: "Code", width: 150 },
     { field: "name", headerName: "Name", width: 250 },
     { field: "description", headerName: "Description", width: 350 },
-    { field: "total_containers", headerName: "# Containers", width: 120},
-    { field: "created_date", headerName: "Created Date", width: 150, valueGetter : (params) => params.row.created_date.split('T')[0]  },
+    { field: "total_containers", headerName: "# Containers", width: 120 },
+    {
+      field: "created_date",
+      headerName: "Created Date",
+      width: 150,
+      valueGetter: (params) => params.row.created_date.split("T")[0],
+    },
     {
       field: "id",
       headerName: "Actions",
@@ -74,12 +74,12 @@ const LocationListPage = () => {
     navigate(`/locations/new`, { replace: false });
   };
 
-  if (dataOptions == null) return null;
+  if (dataOptions === null) return null;
 
   return (
     <Box>
       <Card variant="outlined" sx={{ mb: 2, p: 2 }}>
-      <DataFilter filters={filterArray}></DataFilter>
+        <DataFilter filters={filterArray}></DataFilter>
         <Button variant="contained" color="primary" onClick={createNewLocation}>
           + New Location
         </Button>

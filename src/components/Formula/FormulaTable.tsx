@@ -16,7 +16,7 @@ const FormulaTable = () => {
   const auth = React.useContext(AuthContext);
   const [rows, setRows] = React.useState<any>(null);
 
-  if (rows == null) return null;
+  if (rows === null) return null;
 
   return null;
   //return <DataTable auto_height={true} rows={rows!} columns={columns}></DataTable>;

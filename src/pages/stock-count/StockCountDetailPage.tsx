@@ -1,6 +1,5 @@
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
-  Autocomplete,
-  Box,
   Button,
   Card,
   Chip,
@@ -11,34 +10,33 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../components/navigation/AuthProvider";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 
+import Battery0BarTwoToneIcon from "@mui/icons-material/Battery0BarTwoTone";
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import { IInventory } from "../../logic/inventory.logic";
 import { ObjectID } from "bson";
 import SaveForm from "../../components/forms/SaveForm";
 import StandaloneAutocomplete from "../../components/utils/StandaloneAutocomplete";
-import {
-  createStockCount,
-  getStockCount,
-  IStockCount,
-  ICountItem,
-  updateStockCount,
-  submitStockCount,
-  approveStockCount,
-  disapproveStockCount,
-  abandonStockCount,
-  fillAllStockCount,
-  fillAllLocation,
-} from "../../logic/stock-count.logic";
 import { IInventoryStock } from "../../logic/inventory-stock.logic";
-import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
-import Battery0BarTwoToneIcon from "@mui/icons-material/Battery0BarTwoTone";
+import { IInventory } from "../../logic/inventory.logic";
 import { ILocation } from "../../logic/location.logic";
+import {
+  ICountItem,
+  IStockCount,
+  abandonStockCount,
+  approveStockCount,
+  createStockCount,
+  disapproveStockCount,
+  fillAllLocation,
+  fillAllStockCount,
+  getStockCount,
+  submitStockCount,
+  updateStockCount,
+} from "../../logic/stock-count.logic";
+import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
 let savedStockCount: IStockCount | null = null;
 
 const StockCountStatus = [
@@ -167,7 +165,7 @@ export const StockCountDetailPage = () => {
   }, []);
 
   useEffect(() => {
-    if (stockCount == null) return;
+    if (stockCount === null) return;
     setReceiveMode(stockCount.status <= 3);
 
     if (stockCountSaved === false) return;
@@ -179,7 +177,7 @@ export const StockCountDetailPage = () => {
 
   useEffect(() => {
     //temp maybe
-    if (rows.length != 0 && rows != null) {
+    if (rows.length !== 0 && rows !== null) {
       if (
         JSON.stringify(savedStockCount?.count_items) !== JSON.stringify(rows)
       ) {
@@ -351,7 +349,7 @@ export const StockCountDetailPage = () => {
         ...rows[rowIndex],
         [field]: value,
       },
-      ...rows.slice(rowIndex == rows.length ? rowIndex : rowIndex + 1),
+      ...rows.slice(rowIndex === rows.length ? rowIndex : rowIndex + 1),
     ]);
     console.log(rows, "pizzeria mama mia");
   };
@@ -369,14 +367,14 @@ export const StockCountDetailPage = () => {
   //       item_cost: 0,
   //       cost: 0,
   //     },
-  //     ...rows.slice(index == rows.length - 1 ? index + 2 : index + 1),
+  //     ...rows.slice(index === rows.length - 1 ? index + 2 : index + 1),
   //   ]);
   // };
 
   const handleAddRow = () => {
     if (selectedContainer && !Number.isNaN(weighedAmt)) {
       if (
-        rows.findIndex((e) => e.container_id === selectedContainer._id) != -1
+        rows.findIndex((e) => e.container_id === selectedContainer._id) !== -1
       ) {
         console.log(
           rows.findIndex((e) => e.container_id === selectedContainer._id),
@@ -546,7 +544,7 @@ export const StockCountDetailPage = () => {
     setStockCountSaved(true);
   };
 
-  if (stockCount == null) return null;
+  if (stockCount === null) return null;
 
   return (
     <>
@@ -718,7 +716,7 @@ export const StockCountDetailPage = () => {
             </div>
             <Divider></Divider>
             <Button
-              disabled={id === "new" || stockCount!.status != 1}
+              disabled={id === "new" || stockCount!.status !== 1}
               variant="contained"
               onClick={() => handleSubmitStockCount()}
             >
@@ -728,7 +726,7 @@ export const StockCountDetailPage = () => {
             <Button
               color="success"
               variant="contained"
-              disabled={id === "new" || stockCount!.status != 2}
+              disabled={id === "new" || stockCount!.status !== 2}
               onClick={() => handleApproveStockCount()}
             >
               Approve
@@ -736,7 +734,7 @@ export const StockCountDetailPage = () => {
             <Button
               color="warning"
               variant="contained"
-              disabled={id === "new" || stockCount!.status != 2}
+              disabled={id === "new" || stockCount!.status !== 2}
               onClick={() => handleDisapproveStockCount()}
             >
               Disapprove
@@ -746,8 +744,8 @@ export const StockCountDetailPage = () => {
               variant="outlined"
               disabled={
                 id === "new" ||
-                stockCount!.status == 4 ||
-                stockCount!.status == 3
+                stockCount!.status === 4 ||
+                stockCount!.status === 3
               }
               onClick={() => handleAbandonStockCount()}
             >
@@ -762,7 +760,7 @@ export const StockCountDetailPage = () => {
           <Grid item xs={3}>
             <StandaloneAutocomplete
               initialValue={selectedLocation}
-              readOnly={stockCount.status != 1}
+              readOnly={stockCount.status !== 1}
               onChange={(e, value) => {
                 setSelectedLocation(value);
               }}
@@ -798,7 +796,7 @@ export const StockCountDetailPage = () => {
           <Grid item xs={4.5}>
             <StandaloneAutocomplete
               initialValue={selectedContainer}
-              readOnly={stockCount.status != 1}
+              readOnly={stockCount.status !== 1}
               onChange={(e, value) => {
                 setSelectedContainer(value);
                 console.log(value);
@@ -827,7 +825,7 @@ export const StockCountDetailPage = () => {
           </Grid>
           <Grid item xs={1}>
             <TextField
-              disabled={stockCount.status != 1}
+              disabled={stockCount.status !== 1}
               spellCheck="false"
               InputLabelProps={{ shrink: true }}
               size="small"
@@ -845,7 +843,7 @@ export const StockCountDetailPage = () => {
           </Grid>
           <Grid item xs={1}>
             <TextField
-              disabled={stockCount.status != 1}
+              disabled={stockCount.status !== 1}
               spellCheck="false"
               InputLabelProps={{ shrink: true }}
               size="small"
@@ -862,7 +860,7 @@ export const StockCountDetailPage = () => {
           </Grid>
           <Grid item xs={1}>
             <TextField
-              disabled={stockCount.status != 1}
+              disabled={stockCount.status !== 1}
               spellCheck="false"
               InputLabelProps={{ shrink: true }}
               size="small"
@@ -884,7 +882,7 @@ export const StockCountDetailPage = () => {
           </Grid>
           <Grid item xs={1.5}>
             <TextField
-              disabled={stockCount.status != 1}
+              disabled={stockCount.status !== 1}
               spellCheck="false"
               InputLabelProps={{ shrink: true }}
               size="small"
@@ -908,7 +906,7 @@ export const StockCountDetailPage = () => {
           <Grid item xs={1.5}>
             <TextField
               onChange={(e) => setWeighedAmt(parseFloat(e.target.value))}
-              disabled={stockCount.status != 1}
+              disabled={stockCount.status !== 1}
               spellCheck="false"
               InputLabelProps={{ shrink: true }}
               size="small"
@@ -925,7 +923,7 @@ export const StockCountDetailPage = () => {
           </Grid>
           <Grid item xs={1}>
             <Button
-              disabled={stockCount.status != 1}
+              disabled={stockCount.status !== 1}
               variant="contained"
               onClick={() => {
                 handleAddRow();
@@ -952,7 +950,7 @@ export const StockCountDetailPage = () => {
             return newRow;
           }}
           onCellKeyDown={(params, event) => {
-            if (event.code == "Space") {
+            if (event.code === "Space") {
               event.stopPropagation();
             }
             // if (receiveMode !== null) {

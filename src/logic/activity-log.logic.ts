@@ -1,6 +1,5 @@
-import axios, { AxiosRequestConfig } from "axios";
+import axios from "axios";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
-import PERMISSIONS from "./config.permissions";
 
 const api = axios.create({
   baseURL: "http://localhost:5000/activity",

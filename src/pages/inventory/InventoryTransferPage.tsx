@@ -1,3 +1,6 @@
+import { MoreHoriz } from "@mui/icons-material";
+import BiotechIcon from "@mui/icons-material/Biotech";
+import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import {
   Button,
   Card,
@@ -6,20 +9,16 @@ import {
   MenuItem,
   Tooltip,
 } from "@mui/material";
-import StandaloneAutocomplete from "../../components/utils/StandaloneAutocomplete";
+import Checkbox from "@mui/material/Checkbox";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import React, { useEffect } from "react";
-import { ILocation } from "../../logic/location.logic";
+import StandaloneAutocomplete from "../../components/utils/StandaloneAutocomplete";
 import {
   IInventoryStock,
   listLocationContainers,
   moveBulkContainers,
 } from "../../logic/inventory-stock.logic";
-import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
-import Checkbox from "@mui/material/Checkbox";
-import BiotechIcon from "@mui/icons-material/Biotech";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-import { MoreHoriz } from "@mui/icons-material";
-import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
+import { ILocation } from "../../logic/location.logic";
 
 interface ActionProps {
   tableParams: GridRenderCellParams<string>;
@@ -157,7 +156,7 @@ export const InventoryTransferPage = () => {
       setSelectedContainers([...selectedContainers, row_id]);
     }
     const tempContainers = locationContainers?.map((container) => {
-      return container._id == row_id
+      return container._id === row_id
         ? { ...container, checked: !checked }
         : container;
     });
@@ -304,7 +303,7 @@ export const InventoryTransferPage = () => {
           <div style={{ margin: "1.2em" }}>
             <Button
               variant="contained"
-              // disabled={id === "new" || stockCount!.status != 1}
+              // disabled={id === "new" || stockCount!.status !==1}
               onClick={() => {
                 if (selectedContainer && targetLocation) {
                   handleMoveBulkContainers(
@@ -317,7 +316,7 @@ export const InventoryTransferPage = () => {
                       detail: {
                         color: "error",
                         text:
-                          selectedContainers.length == 0
+                          selectedContainers.length === 0
                             ? "No Container Selected"
                             : "Target Location Empty",
                       },
@@ -369,12 +368,12 @@ export const InventoryTransferPage = () => {
           <div style={{ margin: "1.2em" }}>
             <Button
               variant="contained"
-              // disabled={id === "new" || stockCount!.status != 1}
+              // disabled={id === "new" || stockCount!.status !==1}
               onClick={() => {
                 if (
                   selectedContainers.length > 0 &&
                   targetBulkLocation &&
-                  targetBulkLocation._id != selectedLocation!._id
+                  targetBulkLocation._id !== selectedLocation!._id
                 ) {
                   handleMoveBulkContainers(
                     selectedContainers,
@@ -386,7 +385,7 @@ export const InventoryTransferPage = () => {
                       detail: {
                         color: "error",
                         text:
-                          selectedContainers.length == 0
+                          selectedContainers.length === 0
                             ? "No Containers Selected"
                             : "Target Location Same As Source Or Empty",
                       },
@@ -442,7 +441,7 @@ export const InventoryTransferPage = () => {
                 <StandaloneAutocomplete
                   initialValue={targetBulkLocation}
                   onChange={(e, value) => {
-                    if (value._id != selectedLocation!._id) {
+                    if (value._id !== selectedLocation!._id) {
                       setTargetBulkLocation(value);
                     } else {
                       setTargetBulkLocation(undefined);

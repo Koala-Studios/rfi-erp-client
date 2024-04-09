@@ -1,26 +1,19 @@
-import React from "react";
-import NavTab from "../../components/utils/NavTab";
-import LinkTab from "../../components/utils/LinkTab";
-import { Button, Card, Chip } from "@mui/material";
+import { Card, Chip } from "@mui/material";
 import {
-  DataGrid,
   GridCellParams,
   GridColDef,
   GridRenderCellParams,
 } from "@mui/x-data-grid";
-import { DataTable } from "../../components/utils/DataTable";
-import {
-  IMovement,
-  listInventoryMovements,
-} from "../../logic/inventory-movements.logic";
-import { FilterElement, IListData } from "../../logic/utils";
+import React from "react";
 import {
   useLocation,
   useNavigate,
-  useSearchParams,
   useParams,
+  useSearchParams,
 } from "react-router-dom";
-import { AuthContext } from "../../components/navigation/AuthProvider";
+import { DataTable } from "../../components/utils/DataTable";
+import { listInventoryMovements } from "../../logic/inventory-movements.logic";
+import { FilterElement, IListData } from "../../logic/utils";
 
 //label,field,type
 const filterArray: FilterElement[] = [
@@ -139,7 +132,7 @@ export const InventoryMovementPage = () => {
       width: 120,
       align: "right",
       valueGetter: (params) =>
-        params.row.amount != 0 ? params.row.amount.toFixed(5) : null,
+        params.row.amount !== 0 ? params.row.amount.toFixed(5) : null,
     },
     {
       field: "movement_date",
@@ -197,7 +190,7 @@ export const InventoryMovementPage = () => {
     });
   }, [currPage, location.key]);
 
-  if (dataOptions == null) return null;
+  if (dataOptions === null) return null;
 
   return (
     <>

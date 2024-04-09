@@ -240,8 +240,8 @@ export const ProjectDetailsTable: React.FC<Props> = ({
   const handleEditDietStatus = (rowid: string, value: number | string) => {
     let pList = projectItems!.slice();
     const rowIdx = projectItems.findIndex((r) => r._id === rowid);
-    const idx = pList[rowIdx].dietary_status?.findIndex((e) => e == value);
-    if (idx == -1) {
+    const idx = pList[rowIdx].dietary_status?.findIndex((e) => e === value);
+    if (idx === -1) {
       //@ts-ignore
       pList[rowIdx].dietary_status.push(value);
     } else {
@@ -396,7 +396,7 @@ export const ProjectDetailsTable: React.FC<Props> = ({
     },
   ];
 
-  // if (rows == null) return null;
+  // if (rows === null) return null;
   return (
     <>
       <Box component="div" sx={{ display: "inline" }}>
@@ -423,7 +423,7 @@ export const ProjectDetailsTable: React.FC<Props> = ({
         getRowId={(row) => row._id}
         experimentalFeatures={{ newEditingApi: true }}
         onCellKeyDown={(params, event) => {
-          if (event.code == "Space") {
+          if (event.code === "Space") {
             event.stopPropagation();
           }
         }}

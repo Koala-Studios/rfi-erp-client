@@ -1,10 +1,9 @@
+import { Card } from "@mui/material";
+import { GridColDef } from "@mui/x-data-grid";
 import React from "react";
-import { DataTable } from "../../components/utils/DataTable";
-import { GridColDef, GridValueGetterParams } from "@mui/x-data-grid";
+import { useParams } from "react-router-dom";
 import { AuthContext } from "../../components/navigation/AuthProvider";
 import { getFormula } from "../../logic/formula.logic";
-import { useNavigate, useParams } from "react-router-dom";
-import { Card } from "@mui/material";
 
 const columns: GridColDef[] = [
   // { field: "id", headerName: "ID", width: 300 },
@@ -42,7 +41,7 @@ const FormulaPage = () => {
     });
   }, []);
 
-  if (rows == null) return null;
+  if (rows === null) return null;
 
   return (
     <Card variant="outlined" sx={{ padding: 3, overflowY: "auto" }}>

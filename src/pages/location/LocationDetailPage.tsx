@@ -1,12 +1,16 @@
-import { Card, Button, Grid, TextField, Chip, Typography } from "@mui/material";
-import { useEffect, useState, useContext } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { AuthContext } from "../../components/navigation/AuthProvider";
-import { createLocation, getLocation, ILocation, updateLocation } from "../../logic/location.logic";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import { Button, Card, Grid, TextField, Typography } from "@mui/material";
+import React, { useContext, useEffect, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import SaveForm from "../../components/forms/SaveForm";
+import { AuthContext } from "../../components/navigation/AuthProvider";
+import {
+  ILocation,
+  createLocation,
+  getLocation,
+  updateLocation,
+} from "../../logic/location.logic";
 import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
-import React from "react";
 
 const emptyLocation: ILocation = {
   _id: "new",
@@ -14,32 +18,32 @@ const emptyLocation: ILocation = {
   code: "",
   description: "",
   total_containers: 0,
-  created_date: new Date().toISOString().split('T')[0]
+  created_date: new Date().toISOString().split("T")[0],
 };
-
-
 
 let savedLocation: ILocation | null = null;
 
-
 const inputRefMap = {
-    name: 0,
-    created_date:1,
-    code: 2,
-    description:3
-    
-  };
-  
-  const inputMap: InputInfo[] = [
-    { label: "name", ref: 0, validation: { required: true, genericVal: "Text" } },
-    {
-      label: "created_date",
-      ref: 1,
-      validation: { required: true, genericVal: "Date" },
-    },
-    { label: "code", ref: 2, validation: { required: true, genericVal: "Text" } },
-    { label: "description", ref: 3, validation: { required: false, genericVal: "Text" } },
-  ];
+  name: 0,
+  created_date: 1,
+  code: 2,
+  description: 3,
+};
+
+const inputMap: InputInfo[] = [
+  { label: "name", ref: 0, validation: { required: true, genericVal: "Text" } },
+  {
+    label: "created_date",
+    ref: 1,
+    validation: { required: true, genericVal: "Date" },
+  },
+  { label: "code", ref: 2, validation: { required: true, genericVal: "Text" } },
+  {
+    label: "description",
+    ref: 3,
+    validation: { required: false, genericVal: "Text" },
+  },
+];
 
 export const LocationDetailPage = () => {
   const navigate = useNavigate();
@@ -81,7 +85,7 @@ export const LocationDetailPage = () => {
       setLocation(emptyLocation);
     } else {
       getLocation(id!).then((l) => {
-        console.log(l)
+        console.log(l);
         savedLocation = l;
         setLocation(l!);
         // setLocationSaved(true);
@@ -90,16 +94,19 @@ export const LocationDetailPage = () => {
   }, []);
 
   useEffect(() => {
-    if (location == null || locationSaved === false) return;
+    if (location === null || locationSaved === false) return;
 
     if (JSON.stringify(savedLocation) !== JSON.stringify(location)) {
-      console.log(JSON.stringify(savedLocation), JSON.stringify(location), "test");
+      console.log(
+        JSON.stringify(savedLocation),
+        JSON.stringify(location),
+        "test"
+      );
       setLocationSaved(false);
     }
   }, [location]);
 
   const saveLocation = async () => {
-    
     let allValid = true;
     //do client side validation
     for (let i = 0; i < inputRefs.current.length; i++) {
@@ -156,7 +163,7 @@ export const LocationDetailPage = () => {
     setLocationSaved(true);
   };
 
-  if (location == null) return null;
+  if (location === null) return null;
 
   return (
     <>
@@ -182,20 +189,18 @@ export const LocationDetailPage = () => {
         </Button>
         <div style={{ display: "flex", gap: 16, marginBottom: 10 }}>
           <Grid container spacing={3}>
-          <Grid item xs={3}>
+            <Grid item xs={3}>
               <TextField
                 defaultValue={location!.code}
                 inputRef={(el: any) =>
-                    (inputRefs.current[inputRefMap.code] = el)
+                  (inputRefs.current[inputRefMap.code] = el)
                 }
                 error={inputVisuals[inputRefMap.code].error}
                 helperText={inputVisuals[inputRefMap.code].helperText}
                 onBlur={(event) =>
-                    onInputBlur(event, inputMap[inputRefMap.code])
+                  onInputBlur(event, inputMap[inputRefMap.code])
                 }
-                required={
-                    inputMap[inputRefMap.code].validation.required
-                }
+                required={inputMap[inputRefMap.code].validation.required}
                 spellCheck="false"
                 InputLabelProps={{ shrink: true }}
                 fullWidth
@@ -208,16 +213,14 @@ export const LocationDetailPage = () => {
               <TextField
                 defaultValue={location!.name}
                 inputRef={(el: any) =>
-                    (inputRefs.current[inputRefMap.name] = el)
+                  (inputRefs.current[inputRefMap.name] = el)
                 }
                 error={inputVisuals[inputRefMap.name].error}
                 helperText={inputVisuals[inputRefMap.name].helperText}
                 onBlur={(event) =>
-                    onInputBlur(event, inputMap[inputRefMap.name])
+                  onInputBlur(event, inputMap[inputRefMap.name])
                 }
-                required={
-                    inputMap[inputRefMap.name].validation.required
-                }
+                required={inputMap[inputRefMap.name].validation.required}
                 spellCheck="false"
                 InputLabelProps={{ shrink: true }}
                 fullWidth
@@ -229,17 +232,21 @@ export const LocationDetailPage = () => {
             <Grid item xs={3}></Grid>
             <Grid item xs={3}>
               <TextField
-                defaultValue={location!.created_date ? location!.created_date.split('T')[0] : null}
+                defaultValue={
+                  location!.created_date
+                    ? location!.created_date.split("T")[0]
+                    : null
+                }
                 inputRef={(el: any) =>
-                    (inputRefs.current[inputRefMap.created_date] = el)
+                  (inputRefs.current[inputRefMap.created_date] = el)
                 }
                 error={inputVisuals[inputRefMap.created_date].error}
                 helperText={inputVisuals[inputRefMap.created_date].helperText}
                 onBlur={(event) =>
-                    onInputBlur(event, inputMap[inputRefMap.created_date])
+                  onInputBlur(event, inputMap[inputRefMap.created_date])
                 }
                 required={
-                    inputMap[inputRefMap.created_date].validation.required
+                  inputMap[inputRefMap.created_date].validation.required
                 }
                 fullWidth
                 InputLabelProps={{ shrink: true }}
@@ -253,16 +260,14 @@ export const LocationDetailPage = () => {
               <TextField
                 defaultValue={location!.description}
                 inputRef={(el: any) =>
-                    (inputRefs.current[inputRefMap.description] = el)
+                  (inputRefs.current[inputRefMap.description] = el)
                 }
                 error={inputVisuals[inputRefMap.description].error}
                 helperText={inputVisuals[inputRefMap.description].helperText}
                 onBlur={(event) =>
-                    onInputBlur(event, inputMap[inputRefMap.description])
+                  onInputBlur(event, inputMap[inputRefMap.description])
                 }
-                required={
-                    inputMap[inputRefMap.description].validation.required
-                }
+                required={inputMap[inputRefMap.description].validation.required}
                 spellCheck="false"
                 InputLabelProps={{ shrink: true }}
                 fullWidth
@@ -274,12 +279,11 @@ export const LocationDetailPage = () => {
                 type="string"
               ></TextField>
             </Grid>
-            
-            <Grid item xs={4}></Grid>
-            
-            <Grid item xs={2}>
-                <TextField
 
+            <Grid item xs={4}></Grid>
+
+            <Grid item xs={2}>
+              <TextField
                 spellCheck="false"
                 InputLabelProps={{ shrink: true }}
                 fullWidth
@@ -287,8 +291,8 @@ export const LocationDetailPage = () => {
                 variant="outlined"
                 label={"Total Containers"}
                 type="string"
-                value={location!.total_containers}>
-                </TextField>
+                value={location!.total_containers}
+              ></TextField>
             </Grid>
           </Grid>
 

@@ -1,3 +1,4 @@
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
   Button,
   Card,
@@ -9,23 +10,22 @@ import {
 } from "@mui/material";
 import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { AuthContext } from "../../components/navigation/AuthProvider";
-import {
-  createProduct,
-  getProduct,
-  IProduct,
-  updateProduct,
-} from "../../logic/product.logic";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import SaveForm from "../../components/forms/SaveForm";
-import StandaloneAutocomplete from "../../components/utils/StandaloneAutocomplete";
-import { IProductType } from "../../logic/product-type.logic";
-import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
-import InventoryMovementPage from "../inventory/InventoryMovementPage";
-import ProductFormulaPage from "./ProductFormulaPage";
-import InventoryContainerPage from "../inventory/InventoryContainerPage";
+import { AuthContext } from "../../components/navigation/AuthProvider";
 import LinkTab from "../../components/utils/LinkTab";
 import NavTab from "../../components/utils/NavTab";
+import StandaloneAutocomplete from "../../components/utils/StandaloneAutocomplete";
+import { IProductType } from "../../logic/product-type.logic";
+import {
+  IProduct,
+  createProduct,
+  getProduct,
+  updateProduct,
+} from "../../logic/product.logic";
+import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
+import InventoryContainerPage from "../inventory/InventoryContainerPage";
+import InventoryMovementPage from "../inventory/InventoryMovementPage";
+import ProductFormulaPage from "./ProductFormulaPage";
 
 const ProductStatus = [
   ["PENDING", "error"],
@@ -38,13 +38,13 @@ const ProductStatus = [
 const emptyProduct: IProduct = {
   _id: "",
   name: "",
-  aliases:"",
+  aliases: "",
   description: "",
   rating: null,
   product_code: "",
   is_raw: false,
   is_solid: true,
-  date_created: new Date().toISOString().split('T')[0],
+  date_created: new Date().toISOString().split("T")[0],
   for_sale: true,
   cost: 0,
   stock: {
@@ -55,7 +55,8 @@ const emptyProduct: IProduct = {
     on_hold: 0,
     quarantined: 0,
   },
-  regulatory: { //TODO: ADD OTHER FIELDS HERE!!
+  regulatory: {
+    //TODO: ADD OTHER FIELDS HERE!!
     fda_status: 0,
     cpl_hazard: "",
     fema_number: 0,
@@ -78,13 +79,10 @@ const emptyProduct: IProduct = {
 
 let savedProduct: IProduct | null = null;
 
-
-
 const inputRefMap = {
   name: 0,
-  date_created:1,
+  date_created: 1,
   // product_code: 2,
-
 };
 
 const inputMap: InputInfo[] = [
@@ -94,14 +92,18 @@ const inputMap: InputInfo[] = [
     ref: 1,
     validation: { required: true, genericVal: "Date" },
   },
-  { label: "product_type", ref: 2, validation: { required: true, genericVal: "Text" } },
+  {
+    label: "product_type",
+    ref: 2,
+    validation: { required: true, genericVal: "Text" },
+  },
 ];
 
-
 export const ProductDetailPage = () => {
-  const { id,tab_id } = useParams();
+  const { id, tab_id } = useParams();
   const navigate = useNavigate();
-  const p_type_var = tab_id === 'material' ? "product-type-mat" : "product-type";
+  const p_type_var =
+    tab_id === "material" ? "product-type-mat" : "product-type";
   const auth = React.useContext(AuthContext);
   const [product, setProduct] = React.useState<IProduct | null>(null);
   const isNewId = id === "new";
@@ -134,7 +136,6 @@ export const ProductDetailPage = () => {
     setProductSaved(false);
   };
 
-
   useEffect(() => {
     if (isNewId) {
       //new product, create new on save
@@ -150,7 +151,7 @@ export const ProductDetailPage = () => {
   }, []);
 
   useEffect(() => {
-    if (product == null || productSaved === false) return;
+    if (product === null || productSaved === false) return;
 
     if (JSON.stringify(savedProduct) !== JSON.stringify(product)) {
       setProductSaved(false);
@@ -158,7 +159,6 @@ export const ProductDetailPage = () => {
   }, [product]);
 
   const saveProduct = async () => {
-    
     let allValid = true;
     //do client side validation
     for (let i = 0; i < inputRefs.current.length; i++) {
@@ -193,7 +193,7 @@ export const ProductDetailPage = () => {
     if (id === "new") {
       createProduct(product!).then((_product) => {
         if (_product) {
-          console.log(_product)
+          console.log(_product);
           navigate(`/products/${_product._id}`, { replace: true });
           savedProduct = _product;
           setProduct(_product); //THIS IS NOT WORKING ...
@@ -201,7 +201,7 @@ export const ProductDetailPage = () => {
         } else {
           console.log("Product Not Saved");
         }
-      })
+      });
     } else {
       const updated = await updateProduct(product!);
 
@@ -221,7 +221,7 @@ export const ProductDetailPage = () => {
     setProductSaved(true);
   };
 
-  if (product == null) return null;
+  if (product === null) return null;
 
   return (
     <>
@@ -240,7 +240,14 @@ export const ProductDetailPage = () => {
         >
           <ArrowBackIcon fontSize="small" />
         </Button>
-        <div style={{ display: "flex", gap: 16, marginBottom: 10, maxWidth:'80%' }}>
+        <div
+          style={{
+            display: "flex",
+            gap: 16,
+            marginBottom: 10,
+            maxWidth: "80%",
+          }}
+        >
           <Grid container spacing={3}>
             <Grid item xs={2}>
               <TextField
@@ -255,7 +262,6 @@ export const ProductDetailPage = () => {
                 }}
                 label={"Product Code"}
               ></TextField>
-              
             </Grid>
             <Grid item xs={5}>
               <TextField
@@ -268,10 +274,7 @@ export const ProductDetailPage = () => {
                 onBlur={(event) =>
                   onInputBlur(event, inputMap[inputRefMap.name])
                 }
-                required={
-                  inputMap[inputRefMap.name].validation.required
-                }
-                
+                required={inputMap[inputRefMap.name].validation.required}
                 spellCheck="false"
                 InputLabelProps={{ shrink: true }}
                 fullWidth
@@ -295,7 +298,7 @@ export const ProductDetailPage = () => {
                 }}
               ></TextField>
             </Grid>
-            <Grid item xs={2} sx={{ "& > legend": { mt: -0.5 }, }} >
+            <Grid item xs={2} sx={{ "& > legend": { mt: -0.5 } }}>
               <Typography component="legend">Rating</Typography>
               <Rating
                 onChange={(e, value) => {
@@ -315,7 +318,7 @@ export const ProductDetailPage = () => {
                 sx={{
                   width: "80%",
                   height: "80%",
-                  maxHeight:40,
+                  maxHeight: 40,
                   borderRadius: 10,
                   fontWeight: 600,
                 }}
@@ -327,8 +330,8 @@ export const ProductDetailPage = () => {
               />
             </Grid>
 
-            <Grid item xs={4} >
-            <TextField
+            <Grid item xs={4}>
+              <TextField
                 onChange={(e) =>
                   setProduct({ ...product, aliases: e.target.value })
                 }
@@ -371,12 +374,16 @@ export const ProductDetailPage = () => {
                 size="small"
                 variant="outlined"
                 label={"Cost/KG"}
-                type="number">
-              </TextField>
+                type="number"
+              ></TextField>
             </Grid>
             <Grid item xs={2}>
               <TextField
-                defaultValue={product!.date_created ? product.date_created.split('T')[0] : null}
+                defaultValue={
+                  product!.date_created
+                    ? product.date_created.split("T")[0]
+                    : null
+                }
                 inputRef={(el: any) =>
                   (inputRefs.current[inputRefMap.date_created] = el)
                 }
@@ -432,20 +439,40 @@ export const ProductDetailPage = () => {
         </div>
       </Card>
       <NavTab>
-        <LinkTab label="Formula" href= "formula" tab_id={tab_id} disable={id === 'new'}/>
-        <LinkTab label="Customers" href="customers" tab_id={tab_id} disable={id === 'new'} />
-        <LinkTab label="Movements" href= "movements" tab_id={tab_id} disable={id === 'new'}/>
-        <LinkTab label="Containers"  href="containers" tab_id={tab_id} disable={id === 'new'} />
-        <LinkTab label="Usage Stats"  href="stats" tab_id={tab_id} disable={true} />
+        <LinkTab
+          label="Formula"
+          href="formula"
+          tab_id={tab_id}
+          disable={id === "new"}
+        />
+        <LinkTab
+          label="Customers"
+          href="customers"
+          tab_id={tab_id}
+          disable={id === "new"}
+        />
+        <LinkTab
+          label="Movements"
+          href="movements"
+          tab_id={tab_id}
+          disable={id === "new"}
+        />
+        <LinkTab
+          label="Containers"
+          href="containers"
+          tab_id={tab_id}
+          disable={id === "new"}
+        />
+        <LinkTab
+          label="Usage Stats"
+          href="stats"
+          tab_id={tab_id}
+          disable={true}
+        />
       </NavTab>
-      {
-          (tab_id && tab_id === "movements" && 
-            <InventoryMovementPage/>) ||
-          (tab_id && tab_id === "formula" &&
-          <ProductFormulaPage/>
-          ) ||
-      (tab_id && tab_id === "containers" && <InventoryContainerPage />)
-      }
+      {(tab_id && tab_id === "movements" && <InventoryMovementPage />) ||
+        (tab_id && tab_id === "formula" && <ProductFormulaPage />) ||
+        (tab_id && tab_id === "containers" && <InventoryContainerPage />)}
     </>
-  ); 
+  );
 };

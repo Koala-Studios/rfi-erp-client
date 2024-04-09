@@ -1,18 +1,21 @@
-import React from "react";
-import { DataTable } from "../../components/utils/DataTable";
-import {
-  DataGrid,
-  GridColDef,
-  GridRenderCellParams,
-} from "@mui/x-data-grid";
-import { Button, Card, Rating } from "@mui/material";
-import { useLocation, useNavigate, useParams, useSearchParams } from "react-router-dom";
-import { FilterElement, IListData } from "../../logic/utils";
-import DataFilter from "../../components/utils/DataFilter";
-import { ISupplierProduct, listSupplierProducts } from "../../logic/supplier-product.logic";
+import { Button, Card } from "@mui/material";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 import { ObjectID } from "bson";
+import React from "react";
+import {
+  useLocation,
+  useNavigate,
+  useParams,
+  useSearchParams,
+} from "react-router-dom";
+import DataFilter from "../../components/utils/DataFilter";
 import TableAutocomplete from "../../components/utils/TableAutocomplete";
 import { IInventory } from "../../logic/inventory.logic";
+import {
+  ISupplierProduct,
+  listSupplierProducts,
+} from "../../logic/supplier-product.logic";
+import { FilterElement, IListData } from "../../logic/utils";
 
 const SupplierProductPage = () => {
   const navigate = useNavigate();
@@ -23,27 +26,30 @@ const SupplierProductPage = () => {
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
   const filterArray: FilterElement[] = [
     {
-        label: "Product Code",
-        field: "product_code",
-        type: "text",
-      },{
-        label: "Product Name",
-        field: "name",
-        type: "text",
-      },{
-        label: "Supplier Sku",
-        field: "name",
-        type: "text",
-      },{
-        label: "Cost/KG",
-        field: "cost",
-        type: "number",
-      },{
-        label: "Cas Number",
-        field: "cas_number",
-        type: "text",
-      },
-  
+      label: "Product Code",
+      field: "product_code",
+      type: "text",
+    },
+    {
+      label: "Product Name",
+      field: "name",
+      type: "text",
+    },
+    {
+      label: "Supplier Sku",
+      field: "name",
+      type: "text",
+    },
+    {
+      label: "Cost/KG",
+      field: "cost",
+      type: "number",
+    },
+    {
+      label: "Cas Number",
+      field: "cas_number",
+      type: "text",
+    },
   ];
   const columns: GridColDef[] = [
     { field: "product_code", headerName: "Product Code", width: 120 },
@@ -61,8 +67,7 @@ const SupplierProductPage = () => {
           initialValue={row_params.row.name}
           letterMin={0}
           getOptionLabel={(item: IInventory) =>
-            item ? 
-            `${item.product_code} | ${item.name}` : ''
+            item ? `${item.product_code} | ${item.name}` : ""
           }
         />
       ),
@@ -71,39 +76,55 @@ const SupplierProductPage = () => {
       field: "cost",
       headerName: "Cost/KG",
       width: 120,
-      editable:true
+      editable: true,
     },
-    { field: "description", headerName: "Description", width: 350, editable:true },
-    { field: "supplier_sku", headerName: "Supplier SKU", width: 140, editable:true },
-    { field: "cas_number", headerName: "Cas Number", width: 140, editable:true },
+    {
+      field: "description",
+      headerName: "Description",
+      width: 350,
+      editable: true,
+    },
+    {
+      field: "supplier_sku",
+      headerName: "Supplier SKU",
+      width: 140,
+      editable: true,
+    },
+    {
+      field: "cas_number",
+      headerName: "Cas Number",
+      width: 140,
+      editable: true,
+    },
   ];
-
 
   React.useEffect(() => {
     listSupplierProducts(searchParams, filterArray, id).then((list) => {
-      const newRows = list!.docs.map((product:ISupplierProduct) => {
+      const newRows = list!.docs.map((product: ISupplierProduct) => {
         return {
           ...product,
           _id: product._id,
-
         };
       });
-      setRows(newRows)
+      setRows(newRows);
     });
   }, [location.key]);
   const createNewSupplierProduct = () => {
-    setRows([{
-      _id: new ObjectID().toHexString(),
-      product_id: '',
-      supplier: {_id: '', code:'', name: ''},
-      supplier_sku: '',
-      product_code: '',
-      name: '',
-      cost: 0,
-      discount_rates: [],
-      description: '',
-      cas_number: '',
-    }, ...rows.slice(0)])
+    setRows([
+      {
+        _id: new ObjectID().toHexString(),
+        product_id: "",
+        supplier: { _id: "", code: "", name: "" },
+        supplier_sku: "",
+        product_code: "",
+        name: "",
+        cost: 0,
+        discount_rates: [],
+        description: "",
+        cas_number: "",
+      },
+      ...rows.slice(0),
+    ]);
   };
 
   const handleEditProductRow = (rowid: string, value: IInventory) => {
@@ -116,7 +137,7 @@ const SupplierProductPage = () => {
     setRows(pList);
   };
 
-  if (rows == null) return null;
+  if (rows === null) return null;
 
   return (
     <>
@@ -125,7 +146,11 @@ const SupplierProductPage = () => {
         sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
       >
         <DataFilter filters={filterArray}></DataFilter>
-        <Button variant="contained" color="primary" onClick={createNewSupplierProduct}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={createNewSupplierProduct}
+        >
           + New Supplier Product
         </Button>
       </Card>
@@ -136,7 +161,7 @@ const SupplierProductPage = () => {
         rowHeight={45}
         editMode="cell"
         getRowId={(row) => row._id}
-        />
+      />
     </>
   );
 };

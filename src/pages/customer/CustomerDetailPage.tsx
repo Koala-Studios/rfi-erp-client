@@ -108,7 +108,7 @@ export const CustomerDetailPage = () => {
   };
 
   useEffect(() => {
-    if (customer == null || customerSaved === false) return;
+    if (customer === null || customerSaved === false) return;
 
     if (JSON.stringify(savedCustomer) !== JSON.stringify(customer)) {
       setCustomerSaved(false);
@@ -173,7 +173,7 @@ export const CustomerDetailPage = () => {
     setCustomerSaved(true);
   };
 
-  if (customer == null) return null;
+  if (customer === null) return null;
 
   return (
     <>

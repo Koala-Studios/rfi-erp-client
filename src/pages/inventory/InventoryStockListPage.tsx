@@ -123,7 +123,7 @@ const InventoryStockListPage = () => {
     navigate(`/inventory-stock/new`, { replace: false });
   };
 
-  if (dataOptions == null) return null;
+  if (dataOptions === null) return null;
 
   return (
     <>

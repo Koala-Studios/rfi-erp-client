@@ -1,37 +1,34 @@
-import React from "react";
-import { DataTable } from "../../components/utils/DataTable";
-import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
-import { AuthContext } from "../../components/navigation/AuthProvider";
-import {
-  approveFormula,
-  disapproveFormula,
-  getFormula,
-  submitFormula,
-} from "../../logic/formula.logic";
-import { useNavigate, useParams } from "react-router-dom";
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import SpaIcon from "@mui/icons-material/Spa";
+import WarningIcon from "@mui/icons-material/Warning";
 import {
   Button,
   Card,
   Checkbox,
   Chip,
   Divider,
-  FormControlLabel,
   Grid,
-  Paper,
   TextField,
   Tooltip,
   Typography,
 } from "@mui/material";
-import { IInventory } from "../../logic/inventory.logic";
-import { getProduct } from "../../logic/product.logic";
-import { IFormula, IFormulaItem } from "../../logic/formula.logic";
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import { ObjectID } from "bson";
+import React from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { AuthContext } from "../../components/navigation/AuthProvider";
 import TableAutocomplete from "../../components/utils/TableAutocomplete";
-import { IProduct } from "../../logic/product.logic";
-import WarningIcon from "@mui/icons-material/Warning";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { ObjectID, ObjectId } from "bson";
-import SpaIcon from "@mui/icons-material/Spa";
 import PERMISSIONS from "../../logic/config.permissions";
+import {
+  IFormula,
+  IFormulaItem,
+  approveFormula,
+  disapproveFormula,
+  getFormula,
+  submitFormula,
+} from "../../logic/formula.logic";
+import { IInventory } from "../../logic/inventory.logic";
+import { IProduct, getProduct } from "../../logic/product.logic";
 import { hasPermission } from "../../logic/user.logic";
 
 const emptyFormula: IFormula = {
@@ -111,7 +108,7 @@ const FormulaDevPage = () => {
   }, [cost]);
 
   React.useEffect(() => {
-    if (carrier != null) {
+    if (carrier !== null) {
       handleCalcCarrier();
     }
   }, [carrier]);
@@ -165,7 +162,7 @@ const FormulaDevPage = () => {
             +
           </Button>
           <Checkbox
-            disabled={carrier != null && carrier != params.row._id}
+            disabled={carrier !== null && carrier !== params.row._id}
             checked={carrier === params.row._id}
             onClick={() => {
               setCarrier(carrier === null ? params.row._id : null);
@@ -191,7 +188,7 @@ const FormulaDevPage = () => {
       renderCell: (row_params: GridRenderCellParams<string>) => (
         <TableAutocomplete
           dbOption="material"
-          readOnly={row_params.row.last_amount != null}
+          readOnly={row_params.row.last_amount !== null}
           handleEditRow={handleEditRow}
           rowParams={row_params}
           initialValue={row_params.row.material_name}
@@ -291,7 +288,7 @@ const FormulaDevPage = () => {
           item_cost: 0,
           cost: 0,
         },
-        ...rows.slice(index == rows.length - 1 ? index + 2 : index + 1),
+        ...rows.slice(index === rows.length - 1 ? index + 2 : index + 1),
       ]);
     } else {
       setRows([
@@ -309,7 +306,7 @@ const FormulaDevPage = () => {
   const handleMultiplier = (mult_amount: number) => {
     setRows(
       rows.map((material: IFormulaDevRow, index: number) => {
-        if (material._id != carrier) {
+        if (material._id !== carrier) {
           material.amount = material.amount
             ? material.amount * mult_amount
             : material.last_amount * mult_amount;
@@ -341,7 +338,7 @@ const FormulaDevPage = () => {
         ...rows[rowIndex],
         [field]: value,
       },
-      ...rows.slice(rowIndex == rows.length ? rowIndex : rowIndex + 1),
+      ...rows.slice(rowIndex === rows.length ? rowIndex : rowIndex + 1),
     ]);
   };
 
@@ -374,10 +371,10 @@ const FormulaDevPage = () => {
   };
 
   const handleCalcCarrier = () => {
-    if (rows && carrier != null) {
+    if (rows && carrier !== null) {
       let totalMat = 0;
       for (var i = 0; i < rows.length; i++) {
-        if (rows[i]._id != carrier) {
+        if (rows[i]._id !== carrier) {
           totalMat += rows[i].amount ? rows[i].amount : rows[i].last_amount;
         }
       }
@@ -440,7 +437,7 @@ const FormulaDevPage = () => {
     }
   };
 
-  if (rows == null) return null;
+  if (rows === null) return null;
 
   return (
     <>
@@ -601,7 +598,7 @@ const FormulaDevPage = () => {
               }
               disabled={
                 id === "new" ||
-                (product! && product!.status != 1 && product!.status != 2)
+                (product! && product!.status !== 1 && product!.status !== 2)
               }
               variant="contained"
               onClick={() => handleSubmit(false)}
@@ -614,7 +611,7 @@ const FormulaDevPage = () => {
               variant="contained"
               disabled={
                 id === "new" ||
-                (product! && product!.status != 2) ||
+                (product! && product!.status !== 2) ||
                 !hasPermission(auth.user!, PERMISSIONS.development_actions)
               }
               onClick={() => handleSubmit(true)}
@@ -626,7 +623,7 @@ const FormulaDevPage = () => {
               variant="contained"
               disabled={
                 id === "new" ||
-                (product! && product!.status != 3) ||
+                (product! && product!.status !== 3) ||
                 !hasPermission(auth.user!, PERMISSIONS.development_admin)
               }
               onClick={() => handleAdminApprove()}
@@ -638,7 +635,7 @@ const FormulaDevPage = () => {
               variant="contained"
               disabled={
                 id === "new" ||
-                (product! && product!.status != 3) ||
+                (product! && product!.status !== 3) ||
                 !hasPermission(auth.user!, PERMISSIONS.development_actions)
               }
               onClick={() => handleDisapprove()}
@@ -744,7 +741,9 @@ const FormulaDevPage = () => {
               <h3>Total: {totalAmt}</h3>
             </Grid>
             <Grid item xs={0.5}>
-              <div hidden={!(formula?.yield === 1 && totalAmt != formula.base)}>
+              <div
+                hidden={!(formula?.yield === 1 && totalAmt !== formula.base)}
+              >
                 <Tooltip
                   placement="top"
                   title={
@@ -766,7 +765,7 @@ const FormulaDevPage = () => {
           hideFooter
           getRowId={(row) => row._id}
           onCellKeyDown={(params, event) => {
-            if (event.code == "Space") {
+            if (event.code === "Space") {
               event.stopPropagation();
             }
           }}

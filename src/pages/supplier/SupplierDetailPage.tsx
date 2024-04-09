@@ -1,21 +1,27 @@
-import { Card, Button, Grid, TextField, Chip, Typography, Rating } from "@mui/material";
-import { useEffect, useState, useContext, useRef } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { AuthContext } from "../../components/navigation/AuthProvider";
-import { getProduct } from "../../logic/product.logic";
-import {
-  createSupplier,
-  getSupplier,
-  ISupplier,
-  updateSupplier,
-} from "../../logic/supplier.logic";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
+import {
+  Button,
+  Card,
+  Grid,
+  Rating,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { useContext, useEffect, useRef, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import SaveForm from "../../components/forms/SaveForm";
-import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
-import SupplierProductPage from "./SupplierProductPage";
+import { AuthContext } from "../../components/navigation/AuthProvider";
 import LinkTab from "../../components/utils/LinkTab";
 import NavTab from "../../components/utils/NavTab";
+import {
+  ISupplier,
+  createSupplier,
+  getSupplier,
+  updateSupplier,
+} from "../../logic/supplier.logic";
+import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
 import SupplierOrdersPage from "./SupplierOrdersPage";
+import SupplierProductPage from "./SupplierProductPage";
 
 const emptySupplier: ISupplier = {
   _id: "new",
@@ -25,13 +31,11 @@ const emptySupplier: ISupplier = {
   email: "",
   address_one: "",
   address_two: "",
-  trust_factor:null,
-  notes:"",
+  trust_factor: null,
+  notes: "",
   phone: "",
-  created_date: new Date().toISOString().split('T')[0]
+  created_date: new Date().toISOString().split("T")[0],
 };
-
-
 
 let savedSupplier: ISupplier | null = null;
 
@@ -57,7 +61,7 @@ const inputMap: InputInfo[] = [
 
 export const SupplierDetailPage = () => {
   const navigate = useNavigate();
-  const { id,tab_id } = useParams();
+  const { id, tab_id } = useParams();
   const auth = useContext(AuthContext);
   const [supplier, setSupplier] = useState<ISupplier | null>(null);
   const [supplierSaved, setSupplierSaved] = useState<boolean>(true);
@@ -82,7 +86,7 @@ export const SupplierDetailPage = () => {
   }, []);
 
   useEffect(() => {
-    if (supplier == null || supplierSaved === false) return;
+    if (supplier === null || supplierSaved === false) return;
 
     if (JSON.stringify(savedSupplier) !== JSON.stringify(supplier)) {
       setSupplierSaved(false);
@@ -168,7 +172,7 @@ export const SupplierDetailPage = () => {
     setSupplierSaved(true);
   };
 
-  if (supplier == null) return null;
+  if (supplier === null) return null;
 
   return (
     <>
@@ -236,7 +240,7 @@ export const SupplierDetailPage = () => {
                 InputProps={{}}
               ></TextField>
             </Grid>
-            <Grid item xs={2} sx={{ "& > legend": { mt: -0.5 }, }} >
+            <Grid item xs={2} sx={{ "& > legend": { mt: -0.5 } }}>
               <Typography component="legend">Trust Rating</Typography>
               <Rating
                 onChange={(e, value) => {
@@ -250,7 +254,7 @@ export const SupplierDetailPage = () => {
             </Grid>
             <Grid item xs={2}>
               <TextField
-                defaultValue={supplier.created_date }
+                defaultValue={supplier.created_date}
                 inputRef={(el: any) =>
                   (inputRefs.current[inputRefMap.created_date] = el)
                 }
@@ -259,14 +263,20 @@ export const SupplierDetailPage = () => {
                 onBlur={(event) =>
                   onInputBlur(event, inputMap[inputRefMap.created_date])
                 }
-                required={inputMap[inputRefMap.created_date].validation.required}
+                required={
+                  inputMap[inputRefMap.created_date].validation.required
+                }
                 fullWidth
                 InputLabelProps={{ shrink: true }}
                 size="small"
                 variant="outlined"
                 label={"Created Date"}
                 type={"date"}
-                value={supplier.created_date ? supplier.created_date.split('T')[0] : null}
+                value={
+                  supplier.created_date
+                    ? supplier.created_date.split("T")[0]
+                    : null
+                }
               ></TextField>
             </Grid>
             <Grid item xs={4.5}>
@@ -358,16 +368,25 @@ export const SupplierDetailPage = () => {
         </div>
       </Card>
       <NavTab>
-
-        <LinkTab label="Products" href= "products" tab_id={tab_id} disable={id === 'new'}/>
-        <LinkTab label="Order History" href= "order-history" tab_id={tab_id} disable={id === 'new'}/>
+        <LinkTab
+          label="Products"
+          href="products"
+          tab_id={tab_id}
+          disable={id === "new"}
+        />
+        <LinkTab
+          label="Order History"
+          href="order-history"
+          tab_id={tab_id}
+          disable={id === "new"}
+        />
       </NavTab>
-      {
-          (tab_id && tab_id === "products" && 
-          <SupplierProductPage></SupplierProductPage>) ||
-          (tab_id && tab_id === "order-history" && 
-          <SupplierOrdersPage></SupplierOrdersPage>)
-      }
+      {(tab_id && tab_id === "products" && (
+        <SupplierProductPage></SupplierProductPage>
+      )) ||
+        (tab_id && tab_id === "order-history" && (
+          <SupplierOrdersPage></SupplierOrdersPage>
+        ))}
     </>
   );
 };

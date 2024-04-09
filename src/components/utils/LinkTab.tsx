@@ -1,8 +1,8 @@
-import * as React from 'react';
-import Box from '@mui/material/Box';
-import Tabs from '@mui/material/Tabs';
-import Tab from '@mui/material/Tab';
-import { useNavigate } from 'react-router-dom';
+import * as React from "react";
+import Box from "@mui/material/Box";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import { useNavigate } from "react-router-dom";
 
 interface LinkTabProps {
   label: string;
@@ -11,8 +11,7 @@ interface LinkTabProps {
   disable: boolean | undefined;
 }
 
-function LinkTab(props: LinkTabProps, ) {
-  
+function LinkTab(props: LinkTabProps) {
   const navigate = useNavigate();
   return (
     <Tab
@@ -20,12 +19,13 @@ function LinkTab(props: LinkTabProps, ) {
       disabled={props.disable}
       onClick={(event: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
         event.preventDefault();
-        navigate((props.tab_id != undefined ? './../' : '././') + props.href, {replace:true});
+        navigate((props.tab_id !== undefined ? "./../" : "././") + props.href, {
+          replace: true,
+        });
       }}
       {...props}
     />
   );
 }
-
 
 export default LinkTab;

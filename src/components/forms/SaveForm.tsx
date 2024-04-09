@@ -23,8 +23,8 @@ const SaveForm: React.FC<Props> = ({
         transition: "300ms",
         display: "flex",
         position: "fixed",
-        bottom: location == "top" ? "unset" : 20, //TODO: TEMPORARY, HAVE TO MAKE A MINI VERSION OF THIS FORM
-        // right: location == "top" ? "unset" : "18px",
+        bottom: location === "top" ? "unset" : 20, //TODO: TEMPORARY, HAVE TO MAKE A MINI VERSION OF THIS FORM
+        // right: location === "top" ? "unset" : "18px",
         float: "right",
         justifyContent: "space-between",
         padding: "10px 30px",

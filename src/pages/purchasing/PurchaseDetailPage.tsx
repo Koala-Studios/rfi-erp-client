@@ -1,6 +1,5 @@
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
-  Autocomplete,
-  Box,
   Button,
   Card,
   Chip,
@@ -10,38 +9,36 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { AuthContext } from "../../components/navigation/AuthProvider";
-import {
-  confirmPurchase,
-  createPurchase,
-  getPurchase,
-  handlePurchaseItem,
-  IOrderItemProcess,
-  IPurchaseOrder,
-  markPurchaseCancelled,
-  markPurchaseReceived,
-  updatePurchase,
-} from "../../logic/purchase-order.logic";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
   DataGrid,
   GridCellParams,
   GridColDef,
   GridRenderCellParams,
 } from "@mui/x-data-grid";
+import React, { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { AuthContext } from "../../components/navigation/AuthProvider";
+import {
+  IOrderItemProcess,
+  IPurchaseOrder,
+  confirmPurchase,
+  createPurchase,
+  getPurchase,
+  handlePurchaseItem,
+  markPurchaseCancelled,
+  markPurchaseReceived,
+  updatePurchase,
+} from "../../logic/purchase-order.logic";
 
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import TableAutocomplete from "../../components/utils/TableAutocomplete";
-import { IOrderItem } from "../../logic/purchase-order.logic";
-import { IInventory } from "../../logic/inventory.logic";
 import { ObjectID } from "bson";
 import SaveForm from "../../components/forms/SaveForm";
 import StandaloneAutocomplete from "../../components/utils/StandaloneAutocomplete";
+import TableAutocomplete from "../../components/utils/TableAutocomplete";
+import { IInventory } from "../../logic/inventory.logic";
+import { IOrderItem } from "../../logic/purchase-order.logic";
 import { ISupplier } from "../../logic/supplier.logic";
 import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
-import { ILocation } from "../../logic/location.logic";
 
 let savedPurchase: IPurchaseOrder | null = null;
 
@@ -223,7 +220,7 @@ export const PurchaseDetailPage = () => {
   }, []);
 
   useEffect(() => {
-    if (purchase == null) return;
+    if (purchase === null) return;
     setReceiveMode(purchase.status <= 3);
 
     if (purchaseSaved === false) return;
@@ -235,7 +232,7 @@ export const PurchaseDetailPage = () => {
 
   useEffect(() => {
     //temp maybe
-    if (rows.length != 0 && rows != null && !receiveMode) {
+    if (rows.length !== 0 && rows !== null && !receiveMode) {
       if (JSON.stringify(savedPurchase?.order_items) !== JSON.stringify(rows)) {
         setPurchaseSaved(false);
       }
@@ -420,7 +417,7 @@ export const PurchaseDetailPage = () => {
       renderCell: (row_params: GridRenderCellParams<string>) => (
         <TableAutocomplete
           initialValue={row_params.row.product_name}
-          readOnly={purchase!.status != 6}
+          readOnly={purchase!.status !== 6}
           dbOption="raw-mat"
           handleEditRow={handleEditProductRow}
           rowParams={row_params}
@@ -556,7 +553,7 @@ export const PurchaseDetailPage = () => {
         ...rows[rowIndex],
         [field]: value,
       },
-      ...rows.slice(rowIndex == rows.length ? rowIndex : rowIndex + 1),
+      ...rows.slice(rowIndex === rows.length ? rowIndex : rowIndex + 1),
     ]);
   };
 
@@ -573,7 +570,7 @@ export const PurchaseDetailPage = () => {
   //       item_cost: 0,
   //       cost: 0,
   //     },
-  //     ...rows.slice(index == rows.length - 1 ? index + 2 : index + 1),
+  //     ...rows.slice(index === rows.length - 1 ? index + 2 : index + 1),
   //   ]);
   // };
 
@@ -594,7 +591,7 @@ export const PurchaseDetailPage = () => {
     console.log(rows);
   };
 
-  if (purchase == null) return null;
+  if (purchase === null) return null;
 
   return (
     <>
@@ -755,7 +752,7 @@ export const PurchaseDetailPage = () => {
                   required={inputMap[inputRefMap.supplier].validation.required}
                   label={"Supplier"}
                   letterMin={0}
-                  readOnly={purchase.status != 6}
+                  readOnly={purchase.status !== 6}
                   dbOption={"supplier"}
                   getOptionLabel={(item: ISupplier) => (item ? item.code : "")}
                 />
@@ -854,9 +851,9 @@ export const PurchaseDetailPage = () => {
             if (params.field === "unit_price") {
               return params.row.unit_price > 0 ? "" : "YellowRow";
             } else if (params.field === "expiry_date") {
-              return params.row.expiry_date != null ? "" : "YellowRow";
+              return params.row.expiry_date !== null ? "" : "YellowRow";
             } else if (params.field === "lot_number") {
-              return params.row.lot_number != null ? "" : "YellowRow";
+              return params.row.lot_number !== null ? "" : "YellowRow";
             } else if (params.field === "container_size") {
               return params.row.container_size > 0 ? "" : "YellowRow";
             } else if (params.field === "process_amount") {
@@ -874,7 +871,7 @@ export const PurchaseDetailPage = () => {
             return newRow;
           }}
           onCellKeyDown={(params, event) => {
-            if (event.code == "Space") {
+            if (event.code === "Space") {
               event.stopPropagation();
             }
           }}
@@ -882,7 +879,7 @@ export const PurchaseDetailPage = () => {
             columns: {
               columnVisibilityModel: {
                 // Hide columns status and traderName, the other columns will remain visible
-                received_amount: purchase.status != 6,
+                received_amount: purchase.status !== 6,
               },
             },
           }}

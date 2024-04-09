@@ -1,24 +1,22 @@
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
-  Card,
   Button,
+  Card,
+  Checkbox,
   Grid,
   TextField,
-  Chip,
   Typography,
-  Checkbox,
 } from "@mui/material";
-import { useEffect, useState, useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import SaveForm from "../../components/forms/SaveForm";
 import { AuthContext } from "../../components/navigation/AuthProvider";
-import { getProduct } from "../../logic/product.logic";
 import {
+  IProductType,
   createProductType,
   getProductType,
-  IProductType,
   updateProductType,
 } from "../../logic/product-type.logic";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import SaveForm from "../../components/forms/SaveForm";
 
 const emptyProductType: IProductType = {
   _id: "",
@@ -54,7 +52,7 @@ export const ProductTypeDetailPage = () => {
   }, []);
 
   useEffect(() => {
-    if (productType == null || productTypeSaved === false) return;
+    if (productType === null || productTypeSaved === false) return;
 
     if (JSON.stringify(savedProductType) !== JSON.stringify(productType)) {
       console.log(
@@ -94,7 +92,7 @@ export const ProductTypeDetailPage = () => {
     setProductTypeSaved(true);
   };
 
-  if (productType == null) return null;
+  if (productType === null) return null;
 
   return (
     <>
@@ -158,7 +156,10 @@ export const ProductTypeDetailPage = () => {
                 <Checkbox
                   checked={productType.is_raw}
                   onClick={(e) => {
-                    setProductType({ ...productType, is_raw: !productType.is_raw });
+                    setProductType({
+                      ...productType,
+                      is_raw: !productType.is_raw,
+                    });
                   }}
                   inputProps={{ "aria-label": "controlled" }}
                 />
@@ -171,15 +172,15 @@ export const ProductTypeDetailPage = () => {
                 <Checkbox
                   checked={productType.for_sale}
                   onClick={(e) => {
-                    setProductType({ ...productType, for_sale: !productType.for_sale });
+                    setProductType({
+                      ...productType,
+                      for_sale: !productType.for_sale,
+                    });
                   }}
                   inputProps={{ "aria-label": "controlled" }}
                 />
               </label>
             </Grid>
-          
-
-
 
             <Grid item xs={2.5}>
               <label>
@@ -187,14 +188,16 @@ export const ProductTypeDetailPage = () => {
                 <Checkbox
                   checked={productType.avoid_recur}
                   onClick={(e) => {
-                    setProductType({ ...productType, avoid_recur: !productType.avoid_recur });
+                    setProductType({
+                      ...productType,
+                      avoid_recur: !productType.avoid_recur,
+                    });
                   }}
                   inputProps={{ "aria-label": "controlled" }}
                 />
               </label>
             </Grid>
           </Grid>
-
 
           <Card
             variant="outlined"

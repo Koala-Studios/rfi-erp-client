@@ -1,6 +1,6 @@
-import axios, { AxiosRequestConfig } from "axios";
-import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
+import axios from "axios";
 import PERMISSIONS from "./config.permissions";
+import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
 
 export interface INotification {
   _id: string;

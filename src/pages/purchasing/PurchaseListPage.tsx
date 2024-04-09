@@ -1,16 +1,12 @@
-import React from "react";
-import { DataTable } from "../../components/utils/DataTable";
-import {
-  GridColDef,
-  GridRenderCellParams,
-  GridValueGetterParams,
-} from "@mui/x-data-grid";
-import { listPOs } from "../../logic/purchase-order.logic";
-import { AuthContext } from "../../components/navigation/AuthProvider";
 import { Button, Card, Chip } from "@mui/material";
+import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import React from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { FilterElement, IListData } from "../../logic/utils";
+import { AuthContext } from "../../components/navigation/AuthProvider";
 import DataFilter from "../../components/utils/DataFilter";
+import { DataTable } from "../../components/utils/DataTable";
+import { listPOs } from "../../logic/purchase-order.logic";
+import { FilterElement, IListData } from "../../logic/utils";
 
 const PurchaseListPage = () => {
   const navigate = useNavigate();
@@ -18,25 +14,39 @@ const PurchaseListPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [dataOptions, setDataOptions] = React.useState<IListData | null>(null);
 
-  
-const PurchaseStatus = [
-  ["AWAITING SHIPPING", "warning"],
-  ["AWAITING ARRIVAL", "warning"],
-  ["PARTIALLY RECEIVED", "success"],
-  ["RECEIVED", "success"],
-  ["ABANDONED", "error"],
-  ["DRAFT", "warning"],
-  ["ERROR", 'error']
-];
-
+  const PurchaseStatus = [
+    ["AWAITING SHIPPING", "warning"],
+    ["AWAITING ARRIVAL", "warning"],
+    ["PARTIALLY RECEIVED", "success"],
+    ["RECEIVED", "success"],
+    ["ABANDONED", "error"],
+    ["DRAFT", "warning"],
+    ["ERROR", "error"],
+  ];
 
   const filterArray: FilterElement[] = [
     { label: "Order Code", field: "order_code", type: "text" },
     { label: "Date Purchased", field: "date_purchased", type: "date" },
     { label: "Date Arrived", field: "date_arrived", type: "date" },
     { label: "Shipping Code", field: "shipping_code", type: "text" },
-    { label: "Supplier", field: "supplier", type: "dropdown", options: [{value: "sup", text: "Sup_1"}, {value: "Rolling", text: "Sup_2"}] },
-    { label: "Status", field: "status", type: "dropdown", options: [{value: 1, text: "Ok"}, {value: 2, text: "\!Ok"}] },
+    {
+      label: "Supplier",
+      field: "supplier",
+      type: "dropdown",
+      options: [
+        { value: "sup", text: "Sup_1" },
+        { value: "Rolling", text: "Sup_2" },
+      ],
+    },
+    {
+      label: "Status",
+      field: "status",
+      type: "dropdown",
+      options: [
+        { value: 1, text: "Ok" },
+        { value: 2, text: "!Ok" },
+      ],
+    },
   ];
   const columns: GridColDef[] = [
     { field: "order_code", headerName: "Order Code", width: 150 },
@@ -47,7 +57,7 @@ const PurchaseStatus = [
       field: "status",
       headerName: "Status",
       width: 200,
-      align: 'center',
+      align: "center",
       renderCell: (params: GridRenderCellParams<number>) => (
         <Chip
           label={PurchaseStatus[params.value ? params.value - 1 : 6][0]}
@@ -67,7 +77,7 @@ const PurchaseStatus = [
       align: "left",
       width: 250,
       renderCell: (params: GridRenderCellParams<string>) => (
-      <strong>
+        <strong>
           <Button
             variant="contained"
             color="primary"
@@ -90,13 +100,13 @@ const PurchaseStatus = [
         return {
           id: purchase._id,
           order_code: purchase.order_code,
-          supplier: purchase.supplier ? purchase.supplier.code : 'error',
+          supplier: purchase.supplier ? purchase.supplier.code : "error",
           date_purchased: purchase.date_purchased
             ? purchase.date_purchased.toString().replace(/\T.+/, "")
             : "Not Set",
           status: purchase.status,
           item_count: purchase.order_items.length,
-          notes: purchase.notes
+          notes: purchase.notes,
         };
       });
       setDataOptions({ rows: newRows, listOptions: list! });
@@ -106,7 +116,7 @@ const PurchaseStatus = [
     navigate(`/purchase-orders/new`, { replace: false });
   };
 
-  if (dataOptions == null) return null;
+  if (dataOptions === null) return null;
 
   return (
     <>
@@ -114,7 +124,7 @@ const PurchaseStatus = [
         variant="outlined"
         sx={{ mb: 2, p: 2, border: "1px solid #c9c9c9" }}
       >
-      <DataFilter filters={filterArray}></DataFilter>
+        <DataFilter filters={filterArray}></DataFilter>
         <Button
           variant="contained"
           color="primary"

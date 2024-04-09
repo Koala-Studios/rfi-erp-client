@@ -78,7 +78,7 @@ export const ExpandableRow = (props: {
   //     row.confirm_lot_number === ""
   //   ) {
   //     return "YellowRow";
-  //   } else if (row.lot_number != row.confirm_lot_number) {
+  //   } else if (row.lot_number !==row.confirm_lot_number) {
   //     return "RedRow";
   //   } else {
   //     return "";
@@ -156,7 +156,7 @@ export const ExpandableRow = (props: {
                     props.row[col.field] ? props.row[col.field] : ""
                   }
                   handleEditRow={(value: string) => {
-                    if (value != "") {
+                    if (value !== "") {
                       props.handleEditCell(props.row["_id"], col.field, value);
                     }
                   }}
@@ -237,7 +237,7 @@ export const ExpandableRow = (props: {
                                         : ""
                                     }
                                     handleEditRow={(value: string) => {
-                                      if (value != "") {
+                                      if (value !== "") {
                                         props.handleEditCell(
                                           row_item["_id"],
                                           col.field,

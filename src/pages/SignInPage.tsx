@@ -1,13 +1,13 @@
+import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import { Button, Card, Typography } from "@mui/material";
 import { Field, Form, Formik } from "formik";
 import React, { useContext } from "react";
-import { FormField } from "../components/utils/FormField";
-import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import "../styles/SignIn.css";
-import { ISignIn } from "../logic/auth.logic";
-import { AuthContext } from "../components/navigation/AuthProvider";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import { AuthContext } from "../components/navigation/AuthProvider";
+import { FormField } from "../components/utils/FormField";
+import { ISignIn } from "../logic/auth.logic";
 import RFI_Logo from "../resources/rfi_logo_R.svg";
+import "../styles/SignIn.css";
 
 export const SignInPage: React.FC = () => {
   const auth = useContext(AuthContext);

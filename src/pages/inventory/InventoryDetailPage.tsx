@@ -1,31 +1,29 @@
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
   Button,
   Card,
-  Chip,
   Grid,
-  IconButton,
   Rating,
   TextField,
   Typography,
 } from "@mui/material";
 import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import SaveForm from "../../components/forms/SaveForm";
 import { AuthContext } from "../../components/navigation/AuthProvider";
+import LinkTab from "../../components/utils/LinkTab";
+import NavTab from "../../components/utils/NavTab";
+import StandaloneAutocomplete from "../../components/utils/StandaloneAutocomplete";
 import {
+  IInventory,
   createInventory,
   getInventory,
-  IInventory,
   updateInventory,
 } from "../../logic/inventory.logic";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import SaveForm from "../../components/forms/SaveForm";
-import StandaloneAutocomplete from "../../components/utils/StandaloneAutocomplete";
 import { IProductType } from "../../logic/product-type.logic";
 import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
-import NavTab from "../../components/utils/NavTab";
-import LinkTab from "../../components/utils/LinkTab";
-import InventoryMovementPage from "./InventoryMovementPage";
 import InventoryContainerPage from "./InventoryContainerPage";
+import InventoryMovementPage from "./InventoryMovementPage";
 
 const emptyInventory: IInventory = {
   _id: "",
@@ -151,7 +149,7 @@ export const InventoryDetailPage = () => {
   }, []);
 
   useEffect(() => {
-    if (inventory == null || productSaved === false) return;
+    if (inventory === null || productSaved === false) return;
 
     if (JSON.stringify(savedInventory) !== JSON.stringify(inventory)) {
       setInventorySaved(false);
@@ -221,7 +219,7 @@ export const InventoryDetailPage = () => {
     setInventorySaved(true);
   };
 
-  if (inventory == null) return null;
+  if (inventory === null) return null;
 
   return (
     <>

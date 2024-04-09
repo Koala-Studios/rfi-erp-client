@@ -1,14 +1,5 @@
-import { Key } from "@mui/icons-material";
-import {
-  Chip,
-  Menu,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { GridColDef, useGridApiContext } from "@mui/x-data-grid";
+import { Chip, Menu, MenuItem, TextField, Typography } from "@mui/material";
+import { useGridApiContext } from "@mui/x-data-grid";
 import React, { useState } from "react";
 
 interface SingleDropdownCellProps {
@@ -237,7 +228,7 @@ export const TableTexfield: React.FC<TableTexfieldProps> = ({
 }) => {
   const [editMode, setEditMode] = React.useState(false);
   const [defaultValue, setDefaultValue] = React.useState(initialValue);
-  if (readOnly == false && editMode) {
+  if (readOnly === false && editMode) {
     return (
       <TextField
         variant="outlined"
@@ -258,7 +249,7 @@ export const TableTexfield: React.FC<TableTexfieldProps> = ({
         onBlur={(event) => {
           // console.log(event, "test if empty", event.target.value); //!Line below fixes weird bug for 0 values in textfield not updating.. nvm.. wtv.. works with '-' for now for strings
           handleEditRow(
-            event.target.value == ""
+            event.target.value === ""
               ? type === "number"
                 ? "0"
                 : "-"

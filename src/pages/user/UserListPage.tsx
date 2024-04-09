@@ -20,7 +20,15 @@ const UserListPage = () => {
   const filterArray: FilterElement[] = [
     { label: "Email", field: "email", type: "text" },
     { label: "Username", field: "username", type: "text" },
-    { label: "Roles", field: "roles", type: "dropdown", options: [{value: "idk", text: "Role_1"}, {value: "Rolling", text: "Role_2"}] },
+    {
+      label: "Roles",
+      field: "roles",
+      type: "dropdown",
+      options: [
+        { value: "idk", text: "Role_1" },
+        { value: "Rolling", text: "Role_2" },
+      ],
+    },
   ];
   const columns: GridColDef[] = [
     // { field: "id", headerName: "ID", width: 300 },
@@ -66,12 +74,12 @@ const UserListPage = () => {
     navigate(`/users/new`, { replace: false });
   };
 
-  if (dataOptions == null) return null;
+  if (dataOptions === null) return null;
 
   return (
     <Box>
       <Card variant="outlined" sx={{ mb: 2, p: 2 }}>
-      <DataFilter filters={filterArray}></DataFilter>
+        <DataFilter filters={filterArray}></DataFilter>
         <Button variant="contained" color="primary" onClick={createNewUser}>
           + New User
         </Button>

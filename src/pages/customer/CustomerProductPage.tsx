@@ -1,25 +1,24 @@
-import React from "react";
-import { DataTable } from "../../components/utils/DataTable";
+import { Button, Card } from "@mui/material";
 import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
-import { Button, Card, Rating, Tooltip } from "@mui/material";
+import { ObjectID } from "bson";
+import React from "react";
 import {
   useLocation,
   useNavigate,
   useParams,
   useSearchParams,
 } from "react-router-dom";
-import { FilterElement, IListData } from "../../logic/utils";
+import SaveForm from "../../components/forms/SaveForm";
 import DataFilter from "../../components/utils/DataFilter";
+import { DataTable } from "../../components/utils/DataTable";
+import TableAutocomplete from "../../components/utils/TableAutocomplete";
 import {
   listCustomerProducts,
   updateCustomerProducts,
 } from "../../logic/customer-product.logic";
 import { ICustomer } from "../../logic/customer.logic";
-import { ObjectID, ObjectId } from "bson";
-import reportWebVitals from "../../reportWebVitals";
-import TableAutocomplete from "../../components/utils/TableAutocomplete";
 import { IProduct } from "../../logic/product.logic";
-import SaveForm from "../../components/forms/SaveForm";
+import { FilterElement, IListData } from "../../logic/utils";
 
 let savedRows: any[] | null = null;
 
@@ -112,12 +111,14 @@ const CustomerProductPage = (props: { customer: ICustomer }) => {
     });
     console.log(changedRows, "changed");
     allValid =
-      changedRows.length != 0 &&
+      changedRows.length !== 0 &&
       changedRows.filter((r: any) => {
         return (
-          r!.product._id == "" || r!.c_prod_name == "" || r!.customer_sku == ""
+          r!.product._id === "" ||
+          r!.c_prod_name === "" ||
+          r!.customer_sku === ""
         );
-      }).length == 0;
+      }).length === 0;
     if (allValid === false) {
       setProductsSaved(true);
       window.dispatchEvent(
@@ -171,9 +172,9 @@ const CustomerProductPage = (props: { customer: ICustomer }) => {
 
   React.useEffect(() => {
     if (
-      dataOptions == null ||
-      dataOptions!.rows == null ||
-      savedRows == null ||
+      dataOptions === null ||
+      dataOptions!.rows === null ||
+      savedRows === null ||
       productsSaved === false
     )
       return;
@@ -215,7 +216,7 @@ const CustomerProductPage = (props: { customer: ICustomer }) => {
     });
   };
 
-  if (dataOptions == null) return null;
+  if (dataOptions === null) return null;
 
   function handleEditCell(row_id: string, field: string, value: any) {
     const rowIndex = dataOptions!.rows.findIndex((r: any) => r._id === row_id);
@@ -227,7 +228,7 @@ const CustomerProductPage = (props: { customer: ICustomer }) => {
           [field]: value,
         },
         ...dataOptions!.rows.slice(
-          rowIndex == dataOptions!.rows.length ? rowIndex : rowIndex + 1
+          rowIndex === dataOptions!.rows.length ? rowIndex : rowIndex + 1
         ),
       ],
       listOptions: dataOptions!.listOptions,
@@ -257,7 +258,7 @@ const CustomerProductPage = (props: { customer: ICustomer }) => {
         GetRowId={(row) => row._id}
         auto_height
         OnCellKeyDown={(params, event) => {
-          if (event.code == "Space") {
+          if (event.code === "Space") {
             event.stopPropagation();
           }
         }}

@@ -1,16 +1,14 @@
+import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import {
   Box,
   Button,
   Card,
   Checkbox,
   CircularProgress,
-  Divider,
   Fade,
   IconButton,
-  TextField,
   Typography,
 } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/DeleteOutlined";
 import {
   DataGrid,
   GridCellParams,
@@ -20,23 +18,19 @@ import {
   GridRenderCellParams,
   GridToolbar,
 } from "@mui/x-data-grid";
+import { ObjectID } from "bson";
 import React from "react";
+import { useNavigate } from "react-router-dom";
 import { AuthContext } from "../components/navigation/AuthProvider";
-import { DataTable } from "../components/utils/DataTable";
+import TableAutocomplete from "../components/utils/TableAutocomplete";
 import {
-  calculateForecast,
   IForecast,
   IForecastResults,
   IProductLine,
+  calculateForecast,
 } from "../logic/forecast.logic";
-import Delete from "@mui/icons-material/Delete";
-import TableAutocomplete from "../components/utils/TableAutocomplete";
 import { IInventory } from "../logic/inventory.logic";
-import { ObjectID } from "bson";
-import { useNavigate } from "react-router-dom";
-import { darken, lighten } from "@mui/material/styles";
 import { IProduct, lookupProducts } from "../logic/product.logic";
-import LinearProgress from "@mui/material/LinearProgress";
 
 const getClassName = (row: IForecastResults) => {
   if (row.required_amount <= row.available_amount) {
@@ -212,7 +206,7 @@ export const ForecastPage = () => {
         ...rows[rowIndex],
         [field]: value,
       },
-      ...rows.slice(rowIndex == rows.length ? rowIndex : rowIndex + 1),
+      ...rows.slice(rowIndex === rows.length ? rowIndex : rowIndex + 1),
     ]);
   };
 
@@ -319,7 +313,7 @@ export const ForecastPage = () => {
       return;
     }
     const zero_amt = rows.find((x) => x.amount <= 0 || x.product_id === "");
-    if (zero_amt != undefined) {
+    if (zero_amt !== undefined) {
       window.dispatchEvent(
         new CustomEvent("NotificationEvent", {
           detail: {
@@ -469,7 +463,7 @@ export const ForecastPage = () => {
           }}
           // rowHeight={45}
           onCellKeyDown={(params, event) => {
-            if (event.code == "Space") {
+            if (event.code === "Space") {
               event.stopPropagation();
             }
           }}

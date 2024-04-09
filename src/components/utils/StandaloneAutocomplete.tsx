@@ -59,7 +59,7 @@ const StandaloneAutocomplete: React.FC<Props> = ({
     if (letterMin === 0) {
       lookup("", dbOption, letterMin).then((result) => {
         setOptionList(result);
-        console.log(result)
+        console.log(result);
       });
     }
   }, []);

@@ -1,42 +1,18 @@
-import * as React from "react";
 import {
-  GridRenderCellParams,
-  useGridApiContext,
-  GridColDef,
-  GridToolbarContainer,
-  GridToolbarExport,
-  GridToolbarFilterButton,
-  GridValueGetterParams,
-  GridEventListener,
-} from "@mui/x-data-grid";
-import {
-  Box,
-  Button,
-  Card,
-  Collapse,
-  IconButton,
   Input,
-  Pagination,
   Paper,
   Table,
   TableBody,
   TableCell,
   TableContainer,
-  TableFooter,
   TableHead,
   TableRow,
-  Typography,
 } from "@mui/material";
-import { IListOptions } from "../../logic/utils";
+import { GridColDef, GridEventListener } from "@mui/x-data-grid";
+import * as React from "react";
 import { useSearchParams } from "react-router-dom";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
-import { DataGrid } from "@mui/x-data-grid";
-import TableAutocomplete from "../../components/utils/TableAutocomplete";
-import { IBatchingContainer } from "../../logic/batching.logic";
-import { IInventoryStock } from "../../logic/inventory-stock.logic";
-import { TableTexfield } from "../../components/utils/TableComponents";
 import { ExpandableRow } from "../../components/batching/BatchingTable";
+import { IListOptions } from "../../logic/utils";
 
 interface Props {
   rows: any[];

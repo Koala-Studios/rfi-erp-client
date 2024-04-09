@@ -102,7 +102,7 @@ const TableAutocomplete: React.FC<Props> = ({
         onBlur={() => setEditMode(false)}
         onChange={(event, value) => {
           handleEditRow(rowParams.row._id, value);
-          setEditMode(value == null);
+          setEditMode(value === null);
         }}
         renderInput={(params) => {
           return (

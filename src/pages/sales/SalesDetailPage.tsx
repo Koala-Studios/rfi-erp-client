@@ -1,6 +1,5 @@
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
-  Autocomplete,
-  Box,
   Button,
   Card,
   Chip,
@@ -10,39 +9,36 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { AuthContext } from "../../components/navigation/AuthProvider";
-import {
-  confirmSales,
-  createSales,
-  getSalesOrder,
-  handleSalesItem,
-  IOrderItemProcess,
-  ISalesOrder,
-  markSalesCancelled,
-  markSalesReceived,
-  updateSales,
-} from "../../logic/sales-order.logic";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
   DataGrid,
   GridCellParams,
   GridColDef,
   GridRenderCellParams,
 } from "@mui/x-data-grid";
+import React, { useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { AuthContext } from "../../components/navigation/AuthProvider";
+import {
+  IOrderItemProcess,
+  ISalesOrder,
+  confirmSales,
+  createSales,
+  getSalesOrder,
+  handleSalesItem,
+  markSalesCancelled,
+  markSalesReceived,
+  updateSales,
+} from "../../logic/sales-order.logic";
 
 import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import TableAutocomplete from "../../components/utils/TableAutocomplete";
-import { IOrderItem } from "../../logic/sales-order.logic";
-import { IInventory } from "../../logic/inventory.logic";
 import { ObjectID } from "bson";
 import SaveForm from "../../components/forms/SaveForm";
 import StandaloneAutocomplete from "../../components/utils/StandaloneAutocomplete";
-import { ICustomer } from "../../logic/customer.logic";
-import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
-import { ILocation } from "../../logic/location.logic";
+import TableAutocomplete from "../../components/utils/TableAutocomplete";
 import { ICustomerProduct } from "../../logic/customer-product.logic";
+import { ICustomer } from "../../logic/customer.logic";
+import { IOrderItem } from "../../logic/sales-order.logic";
+import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
 
 let savedSales: ISalesOrder | null = null;
 
@@ -236,7 +232,7 @@ export const SalesDetailPage = () => {
   }, []);
 
   useEffect(() => {
-    if (sales == null) return;
+    if (sales === null) return;
     setHandleMode(sales.status <= 3);
 
     if (salesSaved === false) return;
@@ -248,7 +244,7 @@ export const SalesDetailPage = () => {
 
   useEffect(() => {
     //temp maybe
-    if (rows.length != 0 && rows != null && !handleMode) {
+    if (rows.length !== 0 && rows !== null && !handleMode) {
       if (JSON.stringify(savedSales?.order_items) !== JSON.stringify(rows)) {
         setSalesSaved(false);
       }
@@ -345,7 +341,7 @@ export const SalesDetailPage = () => {
               Schedule Batching
             </Button>
           )}
-          {params.row.batch_id != "" && (
+          {params.row.batch_id !== "" && (
             <Button
               variant="contained"
               color="primary"
@@ -419,7 +415,7 @@ export const SalesDetailPage = () => {
       renderCell: (row_params: GridRenderCellParams<string>) => (
         <TableAutocomplete
           initialValue={row_params.row.c_prod_name}
-          readOnly={sales!.status != 6}
+          readOnly={sales!.status !== 6}
           dbOption="customer-product"
           searchOptionalVar={sales!.customer._id}
           handleEditRow={handleEditProductRow}
@@ -532,7 +528,7 @@ export const SalesDetailPage = () => {
         ...rows[rowIndex],
         [field]: value,
       },
-      ...rows.slice(rowIndex == rows.length ? rowIndex : rowIndex + 1),
+      ...rows.slice(rowIndex === rows.length ? rowIndex : rowIndex + 1),
     ]);
   };
 
@@ -557,7 +553,7 @@ export const SalesDetailPage = () => {
     console.log(rows);
   };
 
-  if (sales == null) return null;
+  if (sales === null) return null;
 
   return (
     <>
@@ -713,7 +709,7 @@ export const SalesDetailPage = () => {
                   required={inputMap[inputRefMap.customer].validation.required}
                   label={"Customer"}
                   letterMin={0}
-                  readOnly={sales.status != 6}
+                  readOnly={sales.status !== 6}
                   dbOption={"customer"}
                   getOptionLabel={(item: ICustomer) =>
                     item.code ? `${item.code}` + " | " + `${item.name}` : ""
@@ -825,7 +821,7 @@ export const SalesDetailPage = () => {
               return newRow;
             }}
             onCellKeyDown={(params, event) => {
-              if (event.code == "Space") {
+              if (event.code === "Space") {
                 event.stopPropagation();
               }
             }}
@@ -833,7 +829,7 @@ export const SalesDetailPage = () => {
               columns: {
                 columnVisibilityModel: {
                   // Hide columns status and traderName, the other columns will remain visible
-                  received_amount: sales.status != 6,
+                  received_amount: sales.status !== 6,
                 },
               },
             }}

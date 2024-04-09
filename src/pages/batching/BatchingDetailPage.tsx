@@ -1,57 +1,40 @@
+import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import {
-  Autocomplete,
-  Box,
   Button,
   Card,
   Chip,
   Divider,
   Grid,
-  IconButton,
-  Paper,
-  Table,
-  TableBody,
   TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   TextField,
   Typography,
 } from "@mui/material";
 import React, { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { AuthContext } from "../../components/navigation/AuthProvider";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
 
-import DeleteIcon from "@mui/icons-material/DeleteOutlined";
-import TableAutocomplete from "../../components/utils/TableAutocomplete";
-import { IInventory } from "../../logic/inventory.logic";
 import { ObjectID } from "bson";
+import { TableGridColDef } from "../../components/batching/BatchingTable";
 import SaveForm from "../../components/forms/SaveForm";
 import StandaloneAutocomplete from "../../components/utils/StandaloneAutocomplete";
-import { ISupplier } from "../../logic/supplier.logic";
+import TableAutocomplete from "../../components/utils/TableAutocomplete";
 import {
+  IBatching,
+  IBatchingContainer,
+  IBatchingIngredient,
+  batchingStatus,
   confirmBatching,
   createBatching,
+  finishBatching,
+  generateBatchingBOM,
   getBatching,
-  IBatching,
   markBatchingCancelled,
   updateBatching,
-  finishBatching,
-  IBatchingIngredient,
-  generateBatchingBOM,
-  batchingStatus,
-  IBatchingContainer,
 } from "../../logic/batching.logic";
+import { IInventoryStock } from "../../logic/inventory-stock.logic";
 import { IProduct } from "../../logic/product.logic";
-import { padding } from "@mui/system";
 import { InputInfo, InputVisual, isValid } from "../../logic/validation.logic";
 import { BatchingDataTable } from "./BatchingDataTable";
-import Battery4BarIcon from "@mui/icons-material/Battery4Bar";
-import BatteryFullIcon from "@mui/icons-material/BatteryFull";
-import { IInventoryStock } from "../../logic/inventory-stock.logic";
-import { TableGridColDef } from "../../components/batching/BatchingTable";
-import { isSet } from "util/types";
 
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
@@ -269,7 +252,7 @@ export const BatchingDetailPage = () => {
   }, []);
 
   useEffect(() => {
-    if (batching == null) return;
+    if (batching === null) return;
     setReceiveMode(batching.status <= 3);
 
     if (batchingSaved === false) return;
@@ -281,7 +264,7 @@ export const BatchingDetailPage = () => {
 
   useEffect(() => {
     //temp maybe
-    if (rows.length != 0 && rows != null && !receiveMode) {
+    if (rows.length !== 0 && rows !== null && !receiveMode) {
       if (JSON.stringify(savedBatching?.ingredients) !== JSON.stringify(rows)) {
         setBatchingSaved(false);
       }
@@ -374,7 +357,7 @@ export const BatchingDetailPage = () => {
             rowParams={{ row: row }}
             letterMin={0}
             getOptionLabel={(item: any) => {
-              return item.lot_number != undefined ? item.lot_number : "";
+              return item.lot_number !== undefined ? item.lot_number : "";
               // (
               //   <>
               //     {" "}
@@ -489,7 +472,7 @@ export const BatchingDetailPage = () => {
             rowParams={{ row: row }}
             letterMin={0}
             getOptionLabel={(item: any) => {
-              return item.lot_number != undefined ? item.lot_number : "";
+              return item.lot_number !== undefined ? item.lot_number : "";
             }}
           />
         </TableCell>
@@ -884,7 +867,7 @@ export const BatchingDetailPage = () => {
     setBatchingSaved(true);
   };
 
-  if (batching == null) return null;
+  if (batching === null) return null;
 
   return (
     <>
@@ -977,7 +960,7 @@ export const BatchingDetailPage = () => {
                       });
                     }
                   }}
-                  readOnly={batching.status != batchingStatus.DRAFT}
+                  readOnly={batching.status !== batchingStatus.DRAFT}
                   label={"Product"}
                   letterMin={0}
                   dbOption={"approved-product-all"}
@@ -1001,7 +984,7 @@ export const BatchingDetailPage = () => {
                   }
                   required={inputMap[inputRefMap.quantity].validation.required}
                   InputProps={{
-                    readOnly: batching.status != batchingStatus.DRAFT,
+                    readOnly: batching.status !== batchingStatus.DRAFT,
                   }}
                   fullWidth
                   InputLabelProps={{ shrink: true }}
@@ -1132,14 +1115,14 @@ export const BatchingDetailPage = () => {
             </div>
             <Divider></Divider>
             <Button
-              disabled={id === "new" || batching.status != 1}
+              disabled={id === "new" || batching.status !== 1}
               variant="contained"
               onClick={() => handleConfirmBatching()}
             >
               Schedule
             </Button>
             <Button
-              disabled={id === "new" || batching.status != 2}
+              disabled={id === "new" || batching.status !== 2}
               variant="contained"
               onClick={() => handleBOMBatching()}
             >
@@ -1148,7 +1131,7 @@ export const BatchingDetailPage = () => {
             <Button
               color="success"
               variant="contained"
-              disabled={id === "new" || batching.status != 3}
+              disabled={id === "new" || batching.status !== 3}
               onClick={() => handleFinishBatching()}
             >
               Finish Batching

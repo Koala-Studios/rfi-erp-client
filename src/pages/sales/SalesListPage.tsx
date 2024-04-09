@@ -1,16 +1,12 @@
-import React from "react";
-import { DataTable } from "../../components/utils/DataTable";
-import {
-  GridColDef,
-  GridRenderCellParams,
-  GridValueGetterParams,
-} from "@mui/x-data-grid";
-import { listSalesOrders } from "../../logic/sales-order.logic";
-import { AuthContext } from "../../components/navigation/AuthProvider";
 import { Button, Card, Chip } from "@mui/material";
+import { GridColDef, GridRenderCellParams } from "@mui/x-data-grid";
+import React from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router-dom";
-import { FilterElement, IListData } from "../../logic/utils";
+import { AuthContext } from "../../components/navigation/AuthProvider";
 import DataFilter from "../../components/utils/DataFilter";
+import { DataTable } from "../../components/utils/DataTable";
+import { listSalesOrders } from "../../logic/sales-order.logic";
+import { FilterElement, IListData } from "../../logic/utils";
 
 const SalesListPage = () => {
   const SalesListStatus = [
@@ -104,7 +100,7 @@ const SalesListPage = () => {
     navigate(`/sales-orders/new`, { replace: false });
   };
 
-  if (dataOptions == null) return null;
+  if (dataOptions === null) return null;
 
   return (
     <>

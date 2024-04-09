@@ -126,7 +126,7 @@ export const ProjectDetails = () => {
   useEffect(() => {
     console.log(project);
 
-    if (project == null || projectSaved === false) return;
+    if (project === null || projectSaved === false) return;
 
     if (JSON.stringify(savedProject) !== JSON.stringify(project)) {
       setProjectSaved(false);
@@ -213,7 +213,7 @@ export const ProjectDetails = () => {
     setProjectSaved(true);
   };
 
-  if (project == null || project === undefined) return null;
+  if (project === null || project === undefined) return null;
 
   console.log("PROJECT", project);
 
@@ -410,7 +410,7 @@ export const ProjectDetails = () => {
             <Divider></Divider>
             <Button
               variant="contained"
-              // disabled={id === "new" || stockCount!.status != 1}
+              // disabled={id === "new" || stockCount!.status !==1}
               // onClick={() => handleSubmitStockCount()}
             >
               Confirm
@@ -419,7 +419,7 @@ export const ProjectDetails = () => {
             <Button
               color="success"
               variant="contained"
-              // disabled={id === "new" || stockCount!.status != 2}
+              // disabled={id === "new" || stockCount!.status !==2}
               // onClick={() => handleApproveStockCount()}
             >
               Finish
@@ -427,7 +427,7 @@ export const ProjectDetails = () => {
             <Button
               color="error"
               variant="outlined"
-              // disabled={id === "new" || stockCount!.status == 4 ||  stockCount!.status == 3}
+              // disabled={id === "new" || stockCount!.status === 4 ||  stockCount!.status === 3}
               // onClick={() => handleAbandonStockCount()}
             >
               Abandon
