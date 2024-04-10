@@ -2,6 +2,7 @@ import { IUser } from "./user.logic";
 import axios from "axios";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
 import { ICustomer } from "./customer.logic";
+import config from "../config/config";
 
 export interface IProject {
   _id: string;
@@ -34,7 +35,7 @@ export interface IProjectItem {
 }
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/projects",
+  baseURL: config.API.BASE_URL + config.API.PORT + "/projects",
 });
 
 export const listProjects = async (

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
+import config from "../config/config";
 
 export interface ICustomer {
   _id: string;
@@ -12,11 +13,11 @@ export interface ICustomer {
   phone?: string;
   email?: string;
   lead_time?: string;
-  notes:string;
+  notes: string;
 }
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/customers",
+  baseURL: config.API.BASE_URL + config.API.PORT + "/customers",
 });
 export const listCustomers = async (
   q: URLSearchParams | undefined,

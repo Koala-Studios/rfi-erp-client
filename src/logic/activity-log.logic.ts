@@ -1,8 +1,9 @@
 import axios from "axios";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
+import config from "../config/config";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/activity",
+  baseURL: config.API.BASE_URL + config.API.PORT + "/activity",
 });
 
 export const listActivityLog = async (

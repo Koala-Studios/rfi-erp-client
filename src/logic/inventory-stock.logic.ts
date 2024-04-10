@@ -1,6 +1,7 @@
 import axios from "axios";
 import { ObjectId } from "bson";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
+import config from "../config/config";
 
 interface IStockExtension {
   extension_date: Date;
@@ -54,7 +55,7 @@ export interface IInventoryStock {
 }
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/inventory-stock",
+  baseURL: config.API.BASE_URL + config.API.PORT + "/inventory-stock",
 });
 export const listInventoryStock = async (
   q: URLSearchParams | undefined,

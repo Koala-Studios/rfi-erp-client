@@ -1,5 +1,6 @@
 import axios from "axios";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
+import config from "../config/config";
 
 export interface IOrderItem {
   _id: string;
@@ -50,7 +51,7 @@ export interface ISalesOrder {
 }
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/sales-orders",
+  baseURL: config.API.BASE_URL + config.API.PORT + "/sales-orders",
 });
 
 export const listSalesOrders = async (

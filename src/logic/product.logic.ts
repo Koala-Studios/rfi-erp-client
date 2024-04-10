@@ -1,6 +1,7 @@
 import axios from "axios";
 import { ObjectId } from "bson";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
+import config from "../config/config";
 
 interface IRegulatory {
   fda_status?: number;
@@ -53,7 +54,7 @@ export interface IProduct {
 }
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/products",
+  baseURL: config.API.BASE_URL + config.API.PORT + "/products",
 });
 
 export const listProducts = async (

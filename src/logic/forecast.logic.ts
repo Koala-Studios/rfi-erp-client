@@ -1,5 +1,6 @@
 import axios from "axios";
 import { apiStatus } from "./utils";
+import config from "../config/config";
 
 export interface IProductLine {
   _id: string;
@@ -27,7 +28,7 @@ export interface IForecastResults {
   reorder_amount: number;
 }
 const api = axios.create({
-  baseURL: "http://localhost:5000/forecast",
+  baseURL: config.API.BASE_URL + config.API.PORT + "/forecast",
 });
 
 export const calculateForecast = async (

@@ -1,6 +1,7 @@
 import axios from "axios";
 import { IProduct } from "./product.logic";
 import { apiStatus } from "./utils";
+import config from "../config/config";
 
 export interface IFormulaItem {
   material_name: string;
@@ -25,7 +26,7 @@ export interface IFormula {
 }
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/formula",
+  baseURL: config.API.BASE_URL + config.API.PORT + "/formula",
 });
 
 export const getFormula = async (

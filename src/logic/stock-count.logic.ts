@@ -8,6 +8,7 @@ import {
 } from "./utils";
 import { IInventoryStock } from "./inventory-stock.logic";
 import { ILocation } from "./location.logic";
+import config from "../config/config";
 
 export interface ICountItem {
   _id: string;
@@ -34,7 +35,7 @@ export interface IStockCount {
 }
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/stock-counts",
+  baseURL: config.API.BASE_URL + config.API.PORT + "/stock-counts",
 });
 
 export const listStockCounts = async (

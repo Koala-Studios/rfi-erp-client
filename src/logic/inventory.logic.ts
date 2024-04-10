@@ -1,5 +1,6 @@
 import axios from "axios";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
+import config from "../config/config";
 
 interface IProductTypes {
   product_type_id: string;
@@ -58,7 +59,7 @@ export interface IInventory {
 }
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/inventory",
+  baseURL: config.API.BASE_URL + config.API.PORT + "/inventory",
 });
 export const listInventory = async (
   q: URLSearchParams | undefined,

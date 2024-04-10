@@ -1,5 +1,6 @@
 import axios from "axios";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
+import config from "../config/config";
 
 export const movementTypes = {
   ON_HOLD: "on_hold",
@@ -27,7 +28,7 @@ export interface IMovement {
 }
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/inventory-movement",
+  baseURL: config.API.BASE_URL + config.API.PORT + "/inventory-movement",
 });
 export const listInventoryMovements = async (
   q: URLSearchParams | undefined,

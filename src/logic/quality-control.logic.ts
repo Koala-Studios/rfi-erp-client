@@ -1,5 +1,6 @@
 import axios from "axios";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
+import config from "../config/config";
 
 export interface IQualityControl {
   _id: string;
@@ -24,7 +25,7 @@ export const orderStatus = {
 };
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/qc",
+  baseURL: config.API.BASE_URL + config.API.PORT + "/qc",
 });
 
 export const getQualityControl = async (

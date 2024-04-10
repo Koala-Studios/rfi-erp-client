@@ -1,5 +1,6 @@
 import axios from "axios";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
+import config from "../config/config";
 
 interface IProductItem {
   _id: string;
@@ -28,7 +29,7 @@ interface IDiscountRate {
 }
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/customer-products",
+  baseURL: config.API.BASE_URL + config.API.PORT + "/customer-products",
 });
 
 export const lookupCustomerProduct = async (

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
+import config from "../config/config";
 
 interface ISupplierItem {
   _id: string;
@@ -25,7 +26,7 @@ export interface ISupplierProduct {
 }
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/supplier-products",
+  baseURL: config.API.BASE_URL + config.API.PORT + "/supplier-products",
 });
 
 export const lookupSupplierProduct = async (

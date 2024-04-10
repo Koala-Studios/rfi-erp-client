@@ -1,5 +1,6 @@
 import axios from "axios";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
+import config from "../config/config";
 
 export interface ILocation {
   _id: string;
@@ -11,7 +12,7 @@ export interface ILocation {
 }
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/location",
+  baseURL: config.API.BASE_URL + config.API.PORT + "/location",
 });
 
 export const getLocation = async (id: string): Promise<ILocation | null> => {

@@ -1,8 +1,9 @@
 import io, { Socket } from "socket.io-client";
 import send from "./config.socket";
 import { INotification } from "./user.logic";
+import config from "../config/config";
 
-const base_url = "http://localhost:5001";
+const base_url = config.API.BASE_URL + ":5001";
 
 //initialize socket
 let socket: Socket;

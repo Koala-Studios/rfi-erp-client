@@ -1,8 +1,9 @@
 import axios from "axios";
 import { apiStatus } from "./utils";
+import config from "../config/config";
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/auth",
+  baseURL: config.API.BASE_URL + config.API.PORT + "/auth",
 });
 
 export interface ISignIn {

@@ -1,5 +1,6 @@
 import axios from "axios";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
+import config from "../config/config";
 
 export interface IProductType {
   _id: string;
@@ -8,11 +9,11 @@ export interface IProductType {
   is_raw: boolean;
   for_sale: boolean;
   avoid_recur: boolean;
-  total:number;
+  total: number;
 }
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/product-types",
+  baseURL: config.API.BASE_URL + config.API.PORT + "/product-types",
 });
 export const listProductTypes = async (
   q: URLSearchParams | undefined,
@@ -72,14 +73,14 @@ export const getProductType = async (
 export const lookupProductType = async (
   search_value: string,
   f_sale: boolean | undefined,
-  i_raw: boolean | undefined,
+  i_raw: boolean | undefined
 ): Promise<IProductType[] | null> => {
   const config = {
     headers: { Authorization: `Bearer ${localStorage.getItem("auth_token")}` },
     params: {
       search_value,
       f_sale,
-      i_raw
+      i_raw,
     },
   };
 

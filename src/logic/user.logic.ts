@@ -1,6 +1,7 @@
 import axios from "axios";
 import PERMISSIONS from "./config.permissions";
 import { apiStatus, FilterElement, getQuery, IListOptions } from "./utils";
+import config from "../config/config";
 
 export interface INotification {
   _id: string;
@@ -28,7 +29,7 @@ export interface IUser {
 }
 
 const api = axios.create({
-  baseURL: "http://localhost:5000/user",
+  baseURL: config.API.BASE_URL + config.API.PORT + "/user",
 });
 
 export const getUser = async (id: string): Promise<IUser | null> => {
