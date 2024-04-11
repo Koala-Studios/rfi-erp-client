@@ -1,6 +1,6 @@
 export default {
   API: {
-    BASE_URL: process.env.API_URL ?? "http://localhost",
+    BASE_URL: "https://main--rfi-api.netlify.app/",
     PORT: ":5000",
   },
 };
