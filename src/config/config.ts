@@ -1,6 +1,6 @@
 export default {
   API: {
-    BASE_URL: "https://rfi-api.netlify.app",
+    BASE_URL: "3.137.168.91",
     PORT: ":5000",
   },
 };
