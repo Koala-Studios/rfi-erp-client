@@ -1,6 +1,6 @@
 export default {
   API: {
-    BASE_URL: "https://3.137.168.91",
+    BASE_URL: "http://127.0.0.1",
     PORT: ":5000",
   },
 };
