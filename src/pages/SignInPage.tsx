@@ -1,6 +1,6 @@
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
-import { Button, Card, Typography } from "@mui/material";
-import { Field, Form, Formik } from "formik";
+import { Button, Card, TextField, Typography } from "@mui/material";
+import { Field, Form, Formik, useFormik } from "formik";
 import React, { useContext } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { AuthContext } from "../components/navigation/AuthProvider";
@@ -13,7 +13,6 @@ export const SignInPage: React.FC = () => {
   const auth = useContext(AuthContext);
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-
   return (
     <Card
       className="signin-page"
@@ -35,8 +34,8 @@ export const SignInPage: React.FC = () => {
         <Formik
           enableReinitialize
           initialValues={{
-            username: "test",
-            password: "test1",
+            username: "",
+            password: "",
           }}
           onSubmit={(values: ISignIn) => {
             console.log(values);
@@ -52,18 +51,22 @@ export const SignInPage: React.FC = () => {
           {({ values, handleChange, handleBlur }) => (
             <Form>
               <div className="form-field">
-                <Field
+                <TextField
+                  sx={{ width: "100%" }}
                   name="username"
                   label="Username or Email*"
-                  component={FormField}
+                  // component={FormField}
+                  onChange={handleChange}
                 />
               </div>
               <div className="form-field">
-                <Field
+                <TextField
+                  sx={{ width: "100%" }}
                   name="password"
                   label="Password*"
                   type="password"
-                  component={FormField}
+                  // component={FormField}
+                  onChange={handleChange}
                 />
               </div>
               <Button

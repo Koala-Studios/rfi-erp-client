@@ -55,10 +55,12 @@ const FormHandler = () => {
           <FormField
             required={formField.required}
             label={formField.label}
+            name={""}
             placeholder={formField.default}
             type={formField.type}
             key={`${idx}${formField.label}`}
             ref={(element: any) => formEls.current.push(element)}
+            handleChange={null}
           />
         );
       })}
@@ -67,3 +69,5 @@ const FormHandler = () => {
 };
 
 export default FormHandler;
+
+//TODO: I don't think we're using this
